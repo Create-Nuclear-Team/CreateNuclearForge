@@ -7,7 +7,7 @@ plugins {
     id 'org.parchmentmc.librarian.forgegradle' version "${librarian_version}"
 }
 
-version = mod_version
+version = mod_version + '-forge'
 group = mod_group_id
 
 
