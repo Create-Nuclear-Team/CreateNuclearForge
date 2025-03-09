@@ -2,10 +2,13 @@ package net.nuclearteam.createnuclear;
 
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate;
+import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate.getChestplateTag;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet;
+import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet.getHelmetTag;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings;
 
 import static net.nuclearteam.createnuclear.CNTags.CNItemTags;
+import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings.getLeggingsTag;
 
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.resources.ResourceLocation;
@@ -89,14 +92,11 @@ public class CNItems {
 
     public static final Helmet.DyeItemHelmetList<Helmet> ANTI_RADIATION_HELMETS = new Helmet.DyeItemHelmetList<>(color -> {
         String colorName = color.getSerializedName();
-        TagKey<Item> tag = !colorName.equals("white")
-                ? CNItemTags.ANTI_RADIATION_HELMET_DYE.tag
-                : CNItemTags.ANTI_RADIATION_ARMOR.tag;
         return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_helmet", p -> new Helmet(p, color))
                 .tag(
                         CNTags.forgeItemTag("helmets"),
                         CNTags.forgeItemTag("armors"),
-                        tag,
+                        getHelmetTag(colorName),
                         CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
                         CNItemTags.ANTI_RADIATION_HELMET_FULL_DYE.tag
                 )
@@ -109,14 +109,11 @@ public class CNItems {
     public static final Chestplate.DyeItemChestplateList<Chestplate> ANTI_RADIATION_CHESTPLATES = new Chestplate.DyeItemChestplateList<>(color -> {
         String colorName = color.getSerializedName();
 
-        TagKey<Item> tag = !colorName.equals("white")
-                ? CNItemTags.ANTI_RADIATION_CHESTPLATE_DYE.tag
-                : CNItemTags.ANTI_RADIATION_ARMOR.tag;
         return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_chestplate",  p -> new Chestplate(p, color))
                 .tag(
                         CNTags.forgeItemTag("chestplates"),
                         CNTags.forgeItemTag("armors"),
-                        tag,
+                        getChestplateTag(colorName),
                         CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
                         CNItemTags.ANTI_RADIATION_CHESTPLATE_FULL_DYE.tag
                 )
@@ -127,16 +124,12 @@ public class CNItems {
     });
 
     public static final Leggings.DyeItemLeggingsList<Leggings> ANTI_RADIATION_LEGGINGS = new Leggings.DyeItemLeggingsList<>(color -> {
-
         String colorName = color.getSerializedName();
-        TagKey<Item> tag = !colorName.equals("white")
-                ? CNItemTags.ANTI_RADIATION_LEGGINGS_DYE.tag
-                : CNItemTags.ANTI_RADIATION_ARMOR.tag;
         return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_leggings",  p -> new Leggings(p, color))
                 .tag(
                         CNTags.forgeItemTag("leggings"),
                         CNTags.forgeItemTag("armors"),
-                        tag,
+                        getLeggingsTag(colorName),
                         CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
                         CNItemTags.ANTI_RADIATION_LEGGINGS_FULL_DYE.tag
                 )

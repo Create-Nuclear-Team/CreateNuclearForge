@@ -2,10 +2,12 @@ package net.nuclearteam.createnuclear.content.equipment.armor;
 
 import com.simibubi.create.foundation.data.recipe.CreateRecipeProvider.GeneratedRecipe;
 import com.tterrag.registrate.util.entry.ItemEntry;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -81,6 +83,12 @@ public class AntiRadiationArmorItem {
             }
         }
 
+        public static TagKey<Item> getHelmetTag(String key) {
+            return key.equals("white")
+                    ? CNItemTags.ANTI_RADIATION_ARMOR.tag
+                    : CNItemTags.ANTI_RADIATION_HELMET_DYE.tag;
+        }
+
 
     }
 
@@ -145,6 +153,11 @@ public class AntiRadiationArmorItem {
             }
         }
 
+        public static TagKey<Item> getChestplateTag(String key) {
+            return key.equals("white")
+                    ? CNItemTags.ANTI_RADIATION_ARMOR.tag
+                    : CNItemTags.ANTI_RADIATION_CHESTPLATE_DYE.tag;
+        }
     }
 
     public static class Leggings extends ArmorItem {
@@ -208,6 +221,11 @@ public class AntiRadiationArmorItem {
             }
         }
 
+        public static TagKey<Item> getLeggingsTag(String key) {
+            return key.equals("white")
+                    ? CNItemTags.ANTI_RADIATION_ARMOR.tag
+                    : CNItemTags.ANTI_RADIATION_LEGGINGS_DYE.tag;
+        }
     }
 
     public static class Boot extends ArmorItem {
