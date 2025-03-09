@@ -1,9 +1,8 @@
 package net.nuclearteam.createnuclear;
 
-import com.simibubi.create.content.kinetics.base.HalfShaftInstance;
-import com.simibubi.create.content.kinetics.base.IRotate;
+import com.simibubi.create.AllPartialModels;
+import com.simibubi.create.content.kinetics.base.OrientedRotatingVisual;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
@@ -35,7 +34,7 @@ public class CNBlockEntityTypes {
 
     public static final BlockEntityEntry<ReactorOutputEntity> REACTOR_OUTPUT =
             CreateNuclear.REGISTRATE.blockEntity("reactor_output", ReactorOutputEntity::new)
-                    .instance(() -> HalfShaftInstance::new, false)
+                    .visual(() -> OrientedRotatingVisual.of(AllPartialModels.SHAFT_HALF), false)
                     .validBlocks(CNBlocks.REACTOR_OUTPUT)
                     .renderer(() -> ReactorOutputRenderer::new)
                     .register();

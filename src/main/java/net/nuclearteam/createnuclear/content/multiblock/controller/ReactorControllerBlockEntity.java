@@ -1,10 +1,10 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller;
 
-import com.simibubi.create.content.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
-import com.simibubi.create.foundation.utility.Lang;
 import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -28,6 +28,7 @@ import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.List;
 
@@ -104,11 +105,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return Boolean.TRUE.equals(state.getValue(ASSEMBLED));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         if(!configuredPattern.getOrCreateTag().isEmpty()) {
-            tooltip.add(componentSpacing.plainCopy().append(Lang.translateDirect("gui.gauge.info_header")));
+            CreateLang.translate("gui.gauge.info_header")
+                .style(ChatFormatting.GRAY)
+                .forGoggles(tooltip);
             IHeat.HeatLevel.getName("reactor_controller").style(ChatFormatting.GRAY).forGoggles(tooltip);
 
             IHeat.HeatLevel.getFormattedHeatText(configuredPattern.getOrCreateTag().getInt("heat")).forGoggles(tooltip);

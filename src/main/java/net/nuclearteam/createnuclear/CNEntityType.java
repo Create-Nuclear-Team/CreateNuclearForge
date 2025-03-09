@@ -19,39 +19,39 @@ import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.Irradi
 public class CNEntityType {
 
    public static final EntityEntry<IrradiatedCat> IRRADIATED_CAT = CreateNuclear.REGISTRATE
-    .entity("irradiated_cat", IrradiatedCat::new, MobCategory.CREATURE)
-    .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
-    .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
-    .properties(p -> p.sized(0.6f, 0.7f))
-    .lang("Irradiated Cat")
-    .renderer(() -> IrradiatedCatRenderer::new)
-    .attributes(IrradiatedCat::createAttributes)
-    .register();
+        .entity("irradiated_cat", IrradiatedCat::new, MobCategory.CREATURE)
+        .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
+        .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
+        .properties(p -> p.sized(0.6f, 0.7f))
+        .lang("Irradiated Cat")
+        .renderer(() -> IrradiatedCatRenderer::new)
+        .attributes(IrradiatedCat::createAttributes)
+        .register();
 
     public static final EntityEntry<IrradiatedChicken> IRRADIATED_CHICKEN = CreateNuclear.REGISTRATE
-    .entity("irradiated_chicken", IrradiatedChicken::new, MobCategory.CREATURE)
-    .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
-    .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
-    .properties(p -> p.sized(0.6f, 0.7f))
-    .lang("Irradiated Chicken")
-    .renderer(() -> IrradiatedChickenRenderer::new)
-    .attributes(IrradiatedChicken::createAttributes)
-    .register();
+        .entity("irradiated_chicken", IrradiatedChicken::new, MobCategory.CREATURE)
+        .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
+        .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
+        .properties(p -> p.sized(0.6f, 0.7f))
+        .lang("Irradiated Chicken")
+        .renderer(() -> IrradiatedChickenRenderer::new)
+        .attributes(IrradiatedChicken::createAttributes)
+        .register();
 
    public static final EntityEntry<IrradiatedWolf> IRRADIATED_WOLF = CreateNuclear.REGISTRATE
-    .entity("irradiated_wolf", IrradiatedWolf::new, MobCategory.CREATURE)
-    .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
-    .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
-    .properties(p -> p.sized(0.6f, 0.85f))
-    .lang("Irradiated Wolf")
-    .renderer(() -> IrradiatedWolfRenderer::new)
-    .attributes(IrradiatedWolf::createAttributes)
-    .register();
+        .entity("irradiated_wolf", IrradiatedWolf::new, MobCategory.CREATURE)
+        .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
+        .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
+        .properties(p -> p.sized(0.6f, 0.85f))
+        .lang("Irradiated Wolf")
+        .renderer(() -> IrradiatedWolfRenderer::new)
+        .attributes(IrradiatedWolf::createAttributes)
+        .register();
 
    public static void registerModelLayer(EntityRenderersEvent.RegisterLayerDefinitions event) {
-    event.registerLayerDefinition(CNModelLayers.IRRADIATED_CAT, IrradiatedCatModel::createBodyLayer);
-    event.registerLayerDefinition(CNModelLayers.IRRADIATED_CHICKEN, IrradiatedChickenModel::createBodyLayer);
-    event.registerLayerDefinition(CNModelLayers.IRRADIATED_WOLF, IrradiatedWolfModel::createBodyLayer);
+        event.registerLayerDefinition(CNModelLayers.IRRADIATED_CAT, IrradiatedCatModel::createBodyLayer);
+        event.registerLayerDefinition(CNModelLayers.IRRADIATED_CHICKEN, IrradiatedChickenModel::createBodyLayer);
+        event.registerLayerDefinition(CNModelLayers.IRRADIATED_WOLF, IrradiatedWolfModel::createBodyLayer);
    }
 
     public static void register() {}

@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear;
 
-import com.simibubi.create.content.equipment.blueprint.BlueprintMenu;
 import com.tterrag.registrate.builders.MenuBuilder.ScreenFactory;
 import com.tterrag.registrate.builders.MenuBuilder.ForgeMenuFactory;
 import com.tterrag.registrate.util.entry.MenuEntry;

@@ -1,11 +1,12 @@
 package net.nuclearteam.createnuclear;
 
 import com.simibubi.create.AllTags;
+import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.content.decoration.encasing.EncasedCTBehaviour;
-import com.simibubi.create.content.kinetics.BlockStressDefaults;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.data.SharedProperties;
+import com.simibubi.create.infrastructure.config.CStress;
 import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.client.renderer.RenderType;
@@ -148,7 +149,7 @@ public class CNBlocks {
                     .tag(AllTags.AllBlockTags.SAFE_NBT.tag, CNBlockTags.NEEDS_DIAMOND_TOOL.tag)
                     .transform(pickaxeOnly())
                     .blockstate(new ReactorOutputGenerator()::generate)
-                    .transform(BlockStressDefaults.setCapacity(10240))
+                    .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 10240.0))
                     .item()
                     .transform(customItemModel("reactor", "output", "item"))
                     .register();

@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear;
 
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;

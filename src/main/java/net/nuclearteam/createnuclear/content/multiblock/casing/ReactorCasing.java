@@ -2,7 +2,6 @@ package net.nuclearteam.createnuclear.content.multiblock.casing;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.foundation.utility.Lang;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
@@ -20,10 +19,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -114,7 +113,7 @@ public class ReactorCasing extends Block implements IWrenchable, IBE<ReactorCasi
 
         @Override
         public String getSerializedName() {
-            return Lang.asId(name());
+            return CreateNuclearLang.asId(name());
         }
     }
 }

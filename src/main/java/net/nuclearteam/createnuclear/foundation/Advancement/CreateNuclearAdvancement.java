@@ -1,14 +1,13 @@
 package net.nuclearteam.createnuclear.foundation.Advancement;
 
-import com.simibubi.create.Create;
 import com.simibubi.create.foundation.advancement.AllTriggers;
 import com.simibubi.create.foundation.advancement.SimpleCreateTrigger;
-import com.simibubi.create.foundation.utility.Components;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.FrameType;
 import net.minecraft.advancements.critereon.*;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
@@ -52,8 +51,8 @@ public class CreateNuclearAdvancement {
             builder.addCriterion("0", builtinTrigger.instance());
         }
 
-        builder.display(t.icon, Components.translatable(titleKey()),
-                Components.translatable(descriptionKey()).withStyle(s -> s.withColor(0xDBA213)),
+        builder.display(t.icon, Component.translatable(titleKey()),
+                Component.translatable(descriptionKey()).withStyle(s -> s.withColor(0xDBA213)),
                 id.equals("root") ? BACKGROUND : null, t.type.frame, t.type.toast, t.type.announce, t.type.hide);
 
         if (t.type == TaskType.SECRET)

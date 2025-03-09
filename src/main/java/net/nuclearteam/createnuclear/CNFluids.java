@@ -1,9 +1,9 @@
 package net.nuclearteam.createnuclear;
 
 import com.simibubi.create.AllFluids;
-import com.simibubi.create.foundation.utility.Color;
 import com.tterrag.registrate.builders.FluidBuilder.FluidTypeFactory;
 import com.tterrag.registrate.util.entry.FluidEntry;
+import net.createmod.catnip.theme.Color;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;

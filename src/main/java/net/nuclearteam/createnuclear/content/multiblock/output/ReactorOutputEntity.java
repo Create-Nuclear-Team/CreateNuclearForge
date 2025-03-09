@@ -1,29 +1,30 @@
 package net.nuclearteam.createnuclear.content.multiblock.output;
 
-import com.jozufozu.flywheel.util.transform.TransformStack;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.simibubi.create.content.kinetics.motor.KineticScrollValueBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
-import com.simibubi.create.foundation.utility.AngleHelper;
-import com.simibubi.create.foundation.utility.Lang;
-import com.simibubi.create.foundation.utility.VecHelper;
+import com.simibubi.create.foundation.utility.CreateLang;
+import dev.engine_room.flywheel.lib.transform.TransformStack;
+import net.createmod.catnip.math.AngleHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CreateNuclear;
+
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.List;
 import java.util.Objects;
@@ -47,7 +48,7 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
-        generatedSpeed = new KineticScrollValueBehaviour(Lang.translateDirect("kinetics.reactor_output.rotation_speed"), this, new ReactorOutputValue());
+        generatedSpeed = new KineticScrollValueBehaviour(CreateNuclearLang.translateDirect("kinetics.reactor_output.rotation_speed"), this, new ReactorOutputValue());
         generatedSpeed.between(-1500000, 1500000);
         generatedSpeed.setValue(speed);
         generatedSpeed.withCallback(i -> this.updateGeneratedRotation());
@@ -77,9 +78,9 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
         float stressBase = calculateAddedStressCapacity();
 
-        Lang.translate("gui.goggles.generator_stats")
+        CreateLang.translate("gui.goggles.generator_stats")
                 .forGoggles(tooltip);
-        Lang.translate("tooltip.capacityProvided")
+        CreateLang.translate("tooltip.capacityProvided")
                 .style(ChatFormatting.GRAY)
                 .forGoggles(tooltip);
 
@@ -88,11 +89,11 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
         float stressTotal = stressBase * speed;
 
-        Lang.number(stressTotal)
+        CreateLang.number(stressTotal)
                 .translate("generic.unit.stress")
                 .style(ChatFormatting.AQUA)
                 .space()
-                .add(Lang.translate("gui.goggles.at_current_speed")
+                .add(CreateLang.translate("gui.goggles.at_current_speed")
                         .style(ChatFormatting.DARK_GRAY))
                 .forGoggles(tooltip, 1);
         return true;
@@ -145,25 +146,25 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
         @Override
         protected Vec3 getSouthLocation() {
-            return VecHelper.voxelSpace(8, 8, 12.5);
+            return net.createmod.catnip.math.VecHelper.voxelSpace(8, 8, 12.5);
         }
 
         @Override
-        public Vec3 getLocalOffset(BlockState state) {
+        public Vec3 getLocalOffset(LevelAccessor level, BlockPos pos, BlockState state) {
             Direction facing = state.getValue(ReactorOutput.FACING);
-            return super.getLocalOffset(state).add(Vec3.atLowerCornerOf(facing.getNormal())
+            return super.getLocalOffset(level, pos, state).add(Vec3.atLowerCornerOf(facing.getNormal())
                     .scale(-1 / 16f));
         }
 
         @Override
-        public void rotate(BlockState state, PoseStack ms) {
-            super.rotate(state, ms);
+        public void rotate(LevelAccessor level, BlockPos pos, BlockState state, PoseStack ms) {
+            super.rotate(level, pos, state, ms);
             Direction facing = state.getValue(ReactorOutput.FACING);
             if (facing.getAxis() == Direction.Axis.Y)
                 return;
             if (getSide() != Direction.UP)
                 return;
-            TransformStack.cast(ms)
+            TransformStack.of(ms)
                     .rotateZ(-AngleHelper.horizontalAngle(facing) + 180);
         }
 

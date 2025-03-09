@@ -1,4 +1,4 @@
-// 1.20.1	2025-02-28T21:40:45.7402549	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-03-07T23:26:05.6554053	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 5cf183e5277aea7ac5eb2bfa88737db909c6244d assets/createnuclear/blockstates/deepslate_lead_ore.json
 a6f90dfcfc0659663335d4c80129ce41d0c8e47a assets/createnuclear/blockstates/deepslate_uranium_ore.json
 e11c7fa5830b0877af69bb18e650d2b1e6f90027 assets/createnuclear/blockstates/enriched_soul_soil.json
@@ -19,8 +19,8 @@ f7504d5f748fe938bf07d2eb5d0ba46bbfa0499d assets/createnuclear/blockstates/reinfo
 57c846a957e9250bc45f2f1091bf3f78b2a77344 assets/createnuclear/blockstates/steel_block.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-a6b0597eafffa2021004691bdab6a680800ec5b8 assets/createnuclear/lang/en_ud.json
-269ee23c5596e93630578d687879ad18dab56747 assets/createnuclear/lang/en_us.json
+02ce3c08498fe5cf316ee18e380285b1f7a1380f assets/createnuclear/lang/en_ud.json
+7b1ce48eeb35c9e58238bfb67bc15c2baf56d0a2 assets/createnuclear/lang/en_us.json
 9a589577d80aa23ac97312bda605b5512eff5167 assets/createnuclear/models/block/deepslate_lead_ore.json
 6793dd91b730f4c9abea29215de16cd0751d8cbd assets/createnuclear/models/block/deepslate_uranium_ore.json
 e1b8fdc0555a1fdabda54f66cca868e444d1110b assets/createnuclear/models/block/enriched_soul_soil.json

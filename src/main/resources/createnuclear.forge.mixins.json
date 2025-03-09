@@ -11,6 +11,5 @@
   "injectors": {
     "defaultRequire": 1
   },
-  "minVersion": "0.8",
-  "debug": true
+  "minVersion": "0.8"
 }

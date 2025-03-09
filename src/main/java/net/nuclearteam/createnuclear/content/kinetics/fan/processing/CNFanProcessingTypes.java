@@ -1,13 +1,13 @@
 package net.nuclearteam.createnuclear.content.kinetics.fan.processing;
 
-import com.jozufozu.flywheel.util.Color;
+import com.simibubi.create.api.registry.CreateBuiltInRegistries;
 import com.simibubi.create.content.kinetics.fan.processing.FanProcessingType;
-import com.simibubi.create.content.kinetics.fan.processing.FanProcessingTypeRegistry;
 import com.simibubi.create.foundation.recipe.RecipeApplier;
-import com.simibubi.create.foundation.utility.VecHelper;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import net.createmod.catnip.math.VecHelper;
+import net.createmod.catnip.theme.Color;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -39,8 +39,7 @@ public class CNFanProcessingTypes {
     }
 
     private static <T extends FanProcessingType> T register(String id, T type) {
-        FanProcessingTypeRegistry.register(CreateNuclear.asResource(id), type);
-        return type;
+        return Registry.register(CreateBuiltInRegistries.FAN_PROCESSING_TYPE, CreateNuclear.asResource(id), type);
     }
 
     @Nullable

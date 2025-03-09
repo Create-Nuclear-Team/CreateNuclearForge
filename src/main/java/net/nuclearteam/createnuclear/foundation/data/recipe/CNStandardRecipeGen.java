@@ -7,8 +7,8 @@ import com.google.gson.JsonObject;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.data.recipe.CreateRecipeProvider;
-import com.simibubi.create.foundation.utility.RegisteredObjects;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
+import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
@@ -385,7 +385,7 @@ public class CNStandardRecipeGen extends CreateRecipeProvider {
         }
 
         private ResourceLocation getRegistryName() {
-            return compatDatagenOutput == null ? RegisteredObjects.getKeyOrThrow(result.get()
+            return compatDatagenOutput == null ? CatnipServices.REGISTRIES.getKeyOrThrow(result.get()
                     .asItem()) : compatDatagenOutput;
         }
 
@@ -470,7 +470,7 @@ public class CNStandardRecipeGen extends CreateRecipeProvider {
                         consumer.accept(
                                 isOtherMod ? new ModdedCookingRecipeResult(result, compatDatagenOutput, null )
                                         : result);
-                    }, createSimpleLocation(RegisteredObjects.getKeyOrThrow(serializer)
+                    }, createSimpleLocation(CatnipServices.REGISTRIES.getKeyOrThrow(serializer)
                             .getPath()));
                 });
             }

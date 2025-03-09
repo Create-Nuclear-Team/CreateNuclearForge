@@ -5,7 +5,7 @@ import com.simibubi.create.AllItems;
 import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.foundation.data.recipe.MechanicalCraftingRecipeBuilder;
 import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
-import com.simibubi.create.foundation.utility.RegisteredObjects;
+import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
@@ -131,7 +131,7 @@ public class CNMechanicalCraftingRecipeGen extends CNProcessingRecipeGen {
             return register(consumer -> {
                 MechanicalCraftingRecipeBuilder b =
                         builder.apply(MechanicalCraftingRecipeBuilder.shapedRecipe(result.get(), amount));
-                ResourceLocation location = CreateNuclear.asResource("mechanical_crafting/" + RegisteredObjects.getKeyOrThrow(result.get()
+                ResourceLocation location = CreateNuclear.asResource("mechanical_crafting/" + CatnipServices.REGISTRIES.getKeyOrThrow(result.get()
                                 .asItem())
                         .getPath() + suffix);
                 b.build(consumer, location);

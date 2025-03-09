@@ -1,7 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.frame;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.foundation.utility.Lang;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -20,8 +19,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,7 +48,7 @@ public class ReactorFrame extends Block implements IWrenchable {
 
         @Override
         public @NotNull String getSerializedName() {
-            return Lang.asId(name());
+            return CreateNuclearLang.asId(name());
         }
     }
 

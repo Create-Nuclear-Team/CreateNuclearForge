@@ -2,23 +2,18 @@ package net.nuclearteam.createnuclear.foundation.data.recipe;
 
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllRecipeTypes;
-import com.simibubi.create.Create;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipe;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeSerializer;
-import com.simibubi.create.foundation.data.recipe.CompatMetals;
-import com.simibubi.create.foundation.utility.RegisteredObjects;
+import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.crafting.conditions.NotCondition;
-import net.minecraftforge.common.crafting.conditions.TagEmptyCondition;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
 import java.util.function.Supplier;
@@ -64,7 +59,7 @@ public class CNCrushingRecipeGen extends CNProcessingRecipeGen {
             ItemLike itemLike = singleIngredient.get();
             transform
                     .apply(new ProcessingRecipeBuilder<>(serializer.getFactory(),
-                            new ResourceLocation(namespace, RegisteredObjects.getKeyOrThrow(itemLike.asItem())
+                            new ResourceLocation(namespace, CatnipServices.REGISTRIES.getKeyOrThrow(itemLike.asItem())
                                     .getPath())).withItemIngredients(Ingredient.of(itemLike)))
                     .build(c);
         };
@@ -79,7 +74,7 @@ public class CNCrushingRecipeGen extends CNProcessingRecipeGen {
             ItemLike itemLike = singleIngredient.get();
             transform
                     .apply(new ProcessingRecipeBuilder<>(serializer.getFactory(),
-                            new ResourceLocation(namespace, "fix/" + RegisteredObjects.getKeyOrThrow(itemLike.asItem())
+                            new ResourceLocation(namespace, "fix/" + CatnipServices.REGISTRIES.getKeyOrThrow(itemLike.asItem())
                                     .getPath())).withItemIngredients(Ingredient.of(itemLike)))
                     .build(c);
         };

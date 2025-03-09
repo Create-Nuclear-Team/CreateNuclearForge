@@ -20,7 +20,7 @@ public class ReactorBluePrintItemScreen extends AbstractSimiContainerScreen<Reac
 
     @Override
     protected void init() {
-        setWindowSize(BG.width, BG.height + PLAYER_INVENTORY.height);
+        setWindowSize(BG.width, BG.height + PLAYER_INVENTORY.getHeight());
         setWindowOffset(0, 0);
         super.init();
         clearWidgets();

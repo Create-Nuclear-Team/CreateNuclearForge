@@ -6,7 +6,7 @@ import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeSerializer;
 import com.simibubi.create.foundation.data.recipe.CreateRecipeProvider;
 import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
-import com.simibubi.create.foundation.utility.RegisteredObjects;
+import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
@@ -15,7 +15,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.foundation.Advancement.CNAdvancement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,16 +40,17 @@ public abstract class CNProcessingRecipeGen extends CreateRecipeProvider {
 
 
         gen.addProvider(true, new DataProvider() {
+
+            @Override
+            public String getName() {
+                return "CreateNuclear's Processing Recipes";
+            }
+
             @Override
             public CompletableFuture<?> run(CachedOutput dc) {
                 return CompletableFuture.allOf(GENERATORS.stream()
                         .map(gen -> gen.run(dc))
                         .toArray(CompletableFuture[]::new));
-            }
-
-            @Override
-            public String getName() {
-                return "CreateNuclearForge Processing Recipe";
             }
         });
     }
@@ -72,7 +72,7 @@ public abstract class CNProcessingRecipeGen extends CreateRecipeProvider {
             ItemLike itemLike = singleIngredient.get();
             transform
                     .apply(new ProcessingRecipeBuilder<>(serializer.getFactory(),
-                            new ResourceLocation(namespace, RegisteredObjects.getKeyOrThrow(itemLike.asItem())
+                            new ResourceLocation(namespace, CatnipServices.REGISTRIES.getKeyOrThrow(itemLike.asItem())
                                     .getPath())).withItemIngredients(Ingredient.of(itemLike)))
                     .build(c);
         };
@@ -134,15 +134,9 @@ public abstract class CNProcessingRecipeGen extends CreateRecipeProvider {
 
     protected Supplier<ResourceLocation> idWithSuffix(Supplier<ItemLike> item, String suffix) {
         return () -> {
-            ResourceLocation registryName = RegisteredObjects.getKeyOrThrow(item.get()
+            ResourceLocation registryName = CatnipServices.REGISTRIES.getKeyOrThrow(item.get()
                     .asItem());
             return CreateNuclear.asResource(registryName.getPath() + suffix);
         };
     }
-
-//    @Override
-//    public String getName() {
-//        return "CreateNuclear's Processing Recipes: " + getRecipeType().getId()
-//                .getPath();
-//    }
 }

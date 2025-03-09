@@ -1,8 +1,7 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
-import com.simibubi.create.compat.Mods;
 import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
-import com.simibubi.create.foundation.utility.RegisteredObjects;
+import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -26,7 +25,7 @@ public class EnrichedRecipeGen extends CNProcessingRecipeGen {
     }
 
     public GeneratedRecipe convert(Supplier<Ingredient> input, Supplier<ItemLike> result) {
-        return create(CreateNuclear.asResource(RegisteredObjects.getKeyOrThrow(result.get()
+        return create(CreateNuclear.asResource(CatnipServices.REGISTRIES.getKeyOrThrow(result.get()
                 .asItem())
                 .getPath()),
                 p -> p.withItemIngredients(input.get())
