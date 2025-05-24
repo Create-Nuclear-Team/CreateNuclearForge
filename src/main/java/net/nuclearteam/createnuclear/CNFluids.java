@@ -32,29 +32,27 @@ import java.util.function.Supplier;
 
 public class CNFluids {
     public static final FluidEntry<ForgeFlowingFluid.Flowing> URANIUM =
-            CreateNuclear.REGISTRATE.standardFluid("uranium",
-                            SolidRenderedPlaceableFluidtype.create(0x38FF08, () -> 1f / 32f))
-                    .lang("Liquid Uranium")
-                    .tag(CNFluidTags.URANIUM.tag)
-                    .properties(p -> p.viscosity(2500)
-                            .density(1600)
-                            .canSwim(false)
-                            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA)
-                            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_LAVA)
-                            .canDrown(false)
-
-                    )
-                    .fluidProperties(f -> f.levelDecreasePerBlock(2)
-                            .tickRate(15)
-                            .slopeFindDistance(6)
-                            .explosionResistance(100f)
-                    )
-                    .source(ForgeFlowingFluid.Source::new)
-                    .bucket()
-                    .tag(CNTags.forgeItemTag("buckets/uranium"))
-                    .lang("Uranium Bucket")
-                    .build()
-                    .register();
+        CreateNuclear.REGISTRATE.standardFluid("uranium", SolidRenderedPlaceableFluidtype.create(0x38FF08, () -> 1f / 32f))
+            .lang("Liquid Uranium")
+            .tag(CNFluidTags.URANIUM.tag)
+            .properties(p -> p.viscosity(2500)
+                .density(1600)
+                .canSwim(false)
+                .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA)
+                .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_LAVA)
+                .canDrown(false)
+            )
+            .fluidProperties(f -> f.levelDecreasePerBlock(2)
+                .tickRate(15)
+                .slopeFindDistance(6)
+                .explosionResistance(100f)
+            )
+            .source(ForgeFlowingFluid.Source::new)
+            .bucket()
+            .tag(CNTags.forgeItemTag("buckets/uranium"))
+            .lang("Uranium Bucket")
+            .build()
+            .register();
 
     public static void register() {}
 

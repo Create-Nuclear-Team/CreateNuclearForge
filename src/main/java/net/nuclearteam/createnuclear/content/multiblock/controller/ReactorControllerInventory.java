@@ -1,9 +1,11 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller;
 
 import com.simibubi.create.foundation.item.SmartInventory;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNItems;
 
+@MethodsReturnNonnullByDefault
 public class ReactorControllerInventory extends SmartInventory {
     private final ReactorControllerBlockEntity be;
 

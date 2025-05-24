@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear.foundation.advancement;
 
 import com.google.common.collect.Sets;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.data.CachedOutput;
@@ -16,6 +17,7 @@ import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.foundation.advancement.CreateNuclearAdvancement.Builder;
 
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,9 @@ import java.util.function.UnaryOperator;
 import static net.nuclearteam.createnuclear.foundation.advancement.CreateNuclearAdvancement.TaskType.SILENT;
 import static net.nuclearteam.createnuclear.foundation.advancement.CreateNuclearAdvancement.TaskType.SECRET;
 
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+@SuppressWarnings("unused")
 public class CNAdvancement implements DataProvider {
 
     public static final List<CreateNuclearAdvancement> ENTRIES = new ArrayList<>();
@@ -95,7 +100,7 @@ public class CNAdvancement implements DataProvider {
             .after(COAL_DUST)
             .whenIconCollected()),
 
-    GRAPITE_ROD = create("graphite_rod", b -> b.icon(CNItems.GRAPHITE_ROD)
+    GRAPHITE_ROD = create("graphite_rod", b -> b.icon(CNItems.GRAPHITE_ROD)
             .title("Don't Forget Those Ones")
             .description("Combine graphene and steel ingots in a mechanical crafter to make graphite rods")
             .after(GRAPHENE)

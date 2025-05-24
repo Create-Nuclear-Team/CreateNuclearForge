@@ -37,7 +37,7 @@ public class EventTextOverlay implements HudOverlay {
 
     @Override
     public boolean isActive() {
-        return timer > 0;
+        return timer > 0 && false;
     }
 
     @Override

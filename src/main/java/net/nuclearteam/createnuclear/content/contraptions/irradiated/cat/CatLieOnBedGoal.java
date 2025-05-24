@@ -6,8 +6,10 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
 import net.minecraft.world.level.LevelReader;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.EnumSet;
 
+@ParametersAreNonnullByDefault
 public class CatLieOnBedGoal extends MoveToBlockGoal {
     private final IrradiatedCat cat;
 

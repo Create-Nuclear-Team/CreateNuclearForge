@@ -12,8 +12,6 @@ public class ReactorCasingEntity extends SmartBlockEntity {
 
     protected BlockPos controller;
 
-    //protected ReactorControllerInventory inventory;
-
     public ReactorCasingEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         setController(pos);

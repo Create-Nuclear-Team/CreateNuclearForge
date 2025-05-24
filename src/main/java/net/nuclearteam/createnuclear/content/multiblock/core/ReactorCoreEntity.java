@@ -12,6 +12,7 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorContro
 
 import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 
+@SuppressWarnings({"unused"})
 public class ReactorCoreEntity extends ReactorCasingEntity {
     private int countdownTicks = 0;
 

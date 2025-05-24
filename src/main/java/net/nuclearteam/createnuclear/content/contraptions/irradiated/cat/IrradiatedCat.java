@@ -1,19 +1,16 @@
 package net.nuclearteam.createnuclear.content.contraptions.irradiated.cat;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.CatVariantTags;
 import net.minecraft.tags.StructureTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
@@ -43,11 +40,15 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+@SuppressWarnings({"unused", "deprecation"})
 public class IrradiatedCat extends TamableAnimal {
     public static final double TEMPT_SPEED_MOD = 0.6;
     public static final double WALK_SPEED_MOD = 0.8;
@@ -94,7 +95,7 @@ public class IrradiatedCat extends TamableAnimal {
     }
 
     public boolean isLying() {
-        return (Boolean)this.entityData.get(IS_LYING);
+        return this.entityData.get(IS_LYING);
     }
 
     public void setRelaxStateOne(boolean relaxStateOne) {
@@ -102,11 +103,11 @@ public class IrradiatedCat extends TamableAnimal {
     }
 
     public boolean isRelaxStateOne() {
-        return (Boolean)this.entityData.get(RELAX_STATE_ONE);
+        return this.entityData.get(RELAX_STATE_ONE);
     }
 
     public DyeColor getCollarColor() {
-        return DyeColor.byId((Integer)this.entityData.get(DATA_COLLAR_COLOR));
+        return DyeColor.byId(this.entityData.get(DATA_COLLAR_COLOR));
     }
 
     public void setCollarColor(DyeColor color) {
@@ -259,7 +260,7 @@ public class IrradiatedCat extends TamableAnimal {
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {
-        Cat cat = (Cat) EntityType.CAT.create(level);
+        Cat cat = EntityType.CAT.create(level);
         if (cat != null && otherParent instanceof Cat cat2) {
 
             if (this.isTame()) {
@@ -287,7 +288,6 @@ public class IrradiatedCat extends TamableAnimal {
         }
     }
 
-    @Nullable
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
         spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
         boolean bl = level.getMoonBrightness() > 0.9F;
@@ -313,7 +313,7 @@ public class IrradiatedCat extends TamableAnimal {
             if (this.isTame()) {
                 if (this.isOwnedBy(player)) {
                     if (!(item instanceof DyeItem)) {
-                        if (((Item) item).isEdible() && this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
+                        if (item.isEdible() && this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
                             this.usePlayerItem(player, hand, itemStack);
                             this.heal((float)item.getFoodProperties().getNutrition());
                             return InteractionResult.CONSUME;
@@ -429,11 +429,7 @@ public class IrradiatedCat extends TamableAnimal {
                     BlockPos blockPos = this.ownerPlayer.blockPosition();
                     BlockState blockState = this.cat.level().getBlockState(blockPos);
                     if (blockState.is(BlockTags.BEDS)) {
-                        this.goalPos = (BlockPos)blockState.getOptionalValue(BedBlock.FACING).map((direction) -> {
-                            return blockPos.relative(direction.getOpposite());
-                        }).orElseGet(() -> {
-                            return new BlockPos(blockPos);
-                        });
+                        this.goalPos = blockState.getOptionalValue(BedBlock.FACING).map((direction) -> blockPos.relative(direction.getOpposite())).orElseGet(() -> new BlockPos(blockPos));
                         return !this.spaceIsOccupied();
                     }
                 }
@@ -445,7 +441,7 @@ public class IrradiatedCat extends TamableAnimal {
         private boolean spaceIsOccupied() {
             assert this.goalPos != null;
             List<IrradiatedCat> list = this.cat.level().getEntitiesOfClass(IrradiatedCat.class, (new AABB(this.goalPos)).inflate(2.0));
-            Iterator var2 = list.iterator();
+            Iterator<IrradiatedCat> var2 = list.iterator();
 
             IrradiatedCat cat;
             do {
@@ -454,7 +450,7 @@ public class IrradiatedCat extends TamableAnimal {
                         return false;
                     }
 
-                    cat = (IrradiatedCat)var2.next();
+                    cat = var2.next();
                 } while(cat == this.cat);
             } while(!cat.isLying() && !cat.isRelaxStateOne());
 
@@ -468,7 +464,7 @@ public class IrradiatedCat extends TamableAnimal {
         public void start() {
             if (this.goalPos != null) {
                 this.cat.setInSittingPose(false);
-                this.cat.getNavigation().moveTo((double)this.goalPos.getX(), (double)this.goalPos.getY(), (double)this.goalPos.getZ(), 1.100000023841858);
+                this.cat.getNavigation().moveTo(this.goalPos.getX(), this.goalPos.getY(), this.goalPos.getZ(), 1.100000023841858);
             }
 
         }
@@ -489,16 +485,14 @@ public class IrradiatedCat extends TamableAnimal {
             RandomSource randomSource = this.cat.getRandom();
             BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
             mutableBlockPos.set(this.cat.isLeashed() ? this.cat.getLeashHolder().blockPosition() : this.cat.blockPosition());
-            this.cat.randomTeleport((double)(mutableBlockPos.getX() + randomSource.nextInt(11) - 5), (double)(mutableBlockPos.getY() + randomSource.nextInt(5) - 2), (double)(mutableBlockPos.getZ() + randomSource.nextInt(11) - 5), false);
+            this.cat.randomTeleport(mutableBlockPos.getX() + randomSource.nextInt(11) - 5, mutableBlockPos.getY() + randomSource.nextInt(5) - 2, (double)(mutableBlockPos.getZ() + randomSource.nextInt(11) - 5), false);
             mutableBlockPos.set(this.cat.blockPosition());
             LootTable lootTable = this.cat.level().getServer().getLootData().getLootTable(BuiltInLootTables.CAT_MORNING_GIFT);
             LootParams lootParams = (new LootParams.Builder((ServerLevel)this.cat.level())).withParameter(LootContextParams.ORIGIN, this.cat.position()).withParameter(LootContextParams.THIS_ENTITY, this.cat).create(LootContextParamSets.GIFT);
             List<ItemStack> list = lootTable.getRandomItems(lootParams);
-            Iterator var6 = list.iterator();
 
-            while(var6.hasNext()) {
-                ItemStack itemStack = (ItemStack)var6.next();
-                this.cat.level().addFreshEntity(new ItemEntity(this.cat.level(), (double)mutableBlockPos.getX() - (double)Mth.sin(this.cat.yBodyRot * 0.017453292F), (double)mutableBlockPos.getY(), (double)mutableBlockPos.getZ() + (double)Mth.cos(this.cat.yBodyRot * 0.017453292F), itemStack));
+            for (ItemStack itemStack : list) {
+                this.cat.level().addFreshEntity(new ItemEntity(this.cat.level(), (double) mutableBlockPos.getX() - (double) Mth.sin(this.cat.yBodyRot * 0.017453292F), (double) mutableBlockPos.getY(), (double) mutableBlockPos.getZ() + (double) Mth.cos(this.cat.yBodyRot * 0.017453292F), itemStack));
             }
 
         }
@@ -506,7 +500,7 @@ public class IrradiatedCat extends TamableAnimal {
         public void tick() {
             if (this.ownerPlayer != null && this.goalPos != null) {
                 this.cat.setInSittingPose(false);
-                this.cat.getNavigation().moveTo((double)this.goalPos.getX(), (double)this.goalPos.getY(), (double)this.goalPos.getZ(), 1.100000023841858);
+                this.cat.getNavigation().moveTo(this.goalPos.getX(), this.goalPos.getY(), this.goalPos.getZ(), 1.100000023841858);
                 if (this.cat.distanceToSqr(this.ownerPlayer) < 2.5) {
                     ++this.onBedTicks;
                     if (this.onBedTicks > this.adjustedTickDelay(16)) {

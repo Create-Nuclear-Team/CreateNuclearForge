@@ -24,7 +24,7 @@ public class BegGoal extends Goal {
         this.wolf = wolf;
         this.level = wolf.level();
         this.lookDistance = lookDistance;
-        this.begTargeting = TargetingConditions.forNonCombat().range((double)lookDistance);
+        this.begTargeting = TargetingConditions.forNonCombat().range(lookDistance);
         this.setFlags(EnumSet.of(Flag.LOOK));
     }
 
@@ -60,10 +60,8 @@ public class BegGoal extends Goal {
 
     private boolean playerHoldingInteresting(Player player) {
         InteractionHand[] var2 = InteractionHand.values();
-        int var3 = var2.length;
 
-        for(int var4 = 0; var4 < var3; ++var4) {
-            InteractionHand interactionHand = var2[var4];
+        for (InteractionHand interactionHand : var2) {
             ItemStack itemStack = player.getItemInHand(interactionHand);
             if (this.wolf.isTame() && itemStack.is(Items.BONE)) {
                 return true;
