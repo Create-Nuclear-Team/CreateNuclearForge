@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "type": "single",
+      "resource": "createnuclear:fluid/uranium_flow"
+    },
+    {
+      "type": "single",
+      "resource": "createnuclear:fluid/uranium_still"
+    }
+  ]
+}
