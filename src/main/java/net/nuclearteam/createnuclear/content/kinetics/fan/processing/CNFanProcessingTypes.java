@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+@SuppressWarnings("unused")
 public class CNFanProcessingTypes {
     public static final EnrichedType ENRICHED = register("enriched", new EnrichedType());
 
@@ -64,10 +65,7 @@ public class CNFanProcessingTypes {
         public boolean isValidAt(Level level, BlockPos pos) {
             BlockState state = level.getBlockState(pos);
             if (CNTags.CNBlockTags.FAN_PROCESSING_CATALYSTS_ENRICHED.matches(state)) {
-                if (state.is(CNBlocks.ENRICHING_CAMPFIRE.get()) && state.hasProperty(EnrichingCampfireBlock.LIT) && !state.getValue(EnrichingCampfireBlock.LIT)) {
-                    return false;
-                }
-                return true;
+                return !state.is(CNBlocks.ENRICHING_CAMPFIRE.get()) || !state.hasProperty(EnrichingCampfireBlock.LIT) || state.getValue(EnrichingCampfireBlock.LIT);
             }
             return false;
         }
@@ -89,10 +87,7 @@ public class CNFanProcessingTypes {
         public List<ItemStack> process(ItemStack stack, Level level) {
             ENRICHED_WRAPPER.setItem(0, stack);
             Optional<EnrichedRecipe> recipe = CNRecipeTypes.ENRICHED.find(ENRICHED_WRAPPER, level);
-            if (recipe.isPresent()) {
-                return RecipeApplier.applyRecipeOn(level, stack, recipe.get());
-            }
-            return null;
+            return recipe.map(enrichedRecipe -> RecipeApplier.applyRecipeOn(level, stack, enrichedRecipe)).orElse(null);
         }
 
         @Override

@@ -29,6 +29,7 @@ import static net.nuclearteam.createnuclear.content.decoration.palettes.PaletteB
 import static net.nuclearteam.createnuclear.content.decoration.palettes.PaletteBlockPartial.FOR_POLISHED;
 import static net.nuclearteam.createnuclear.content.decoration.palettes.PaletteBlockPattern.PatternNameType.*;
 
+@SuppressWarnings("unused")
 public class PaletteBlockPattern {
     public static final PaletteBlockPattern
         CUT = create("cut", PREFIX, ALL_PARTIALS),
@@ -231,9 +232,9 @@ public class PaletteBlockPattern {
         LAYERED(AllCTTypes.HORIZONTAL_KRYPPERS, s -> toLocation(s, "layered")),
         ;
 
-        public CTType type;
-        private Function<String, ResourceLocation> srcFactory;
-        private Function<String, ResourceLocation> targetFactory;
+        public final CTType type;
+        private final Function<String, ResourceLocation> srcFactory;
+        private final Function<String, ResourceLocation> targetFactory;
 
         CTs(CTType type, Function<String, ResourceLocation> factory) {
             this(type, factory, factory);

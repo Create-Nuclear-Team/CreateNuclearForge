@@ -23,25 +23,24 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+@SuppressWarnings({"unused", "unchecked"})
 public enum CNRecipeTypes implements IRecipeTypeInfo {
-    ENRICHED(EnrichedRecipe::new)
+        ENRICHED(EnrichedRecipe::new)
     ;
 
     public static final Predicate<? super Recipe<?>> CAN_BE_AUTOMATED = r -> !r.getId()
-            .getPath()
-            .endsWith("_manual_only");
+        .getPath()
+        .endsWith("_manual_only");
 
     private final ResourceLocation id;
     private final RegistryObject<RecipeSerializer<?>> serializerObject;
-    @Nullable
-    private final RegistryObject<RecipeType<?>> typeObject;
     private final Supplier<RecipeType<?>> type;
 
     CNRecipeTypes(Supplier<RecipeSerializer<?>> serializerSupplier) {
         String name = Lang.asId(name());
         id = CreateNuclear.asResource(name);
         serializerObject = Registers.SERIALIZER_REGISTER.register(name, serializerSupplier);
-        typeObject = Registers.TYPE_REGISTER.register(name, () -> RecipeType.simple(id));
+        @Nullable RegistryObject<RecipeType<?>> typeObject = Registers.TYPE_REGISTER.register(name, () -> RecipeType.simple(id));
         type = typeObject;
     }
 
@@ -60,13 +59,11 @@ public enum CNRecipeTypes implements IRecipeTypeInfo {
         return id;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends RecipeSerializer<?>> T getSerializer() {
         return (T) serializerObject.get();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends RecipeType<?>> T getType() {
         return (T) type.get();

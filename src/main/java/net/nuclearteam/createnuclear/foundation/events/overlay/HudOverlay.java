@@ -24,7 +24,6 @@ public interface HudOverlay {
     void render(ForgeGui gui, GuiGraphics graphics, float partialTicks, int width, int height);
 
     default void register(RegisterGuiOverlaysEvent event) {
-        CreateNuclear.LOGGER.info("Registering overlay: {} | {} | {}", getOverlayId(), getAfterOverlay(), isActive());
         event.registerAbove(
                 getAfterOverlay(),
                 getOverlayId(),

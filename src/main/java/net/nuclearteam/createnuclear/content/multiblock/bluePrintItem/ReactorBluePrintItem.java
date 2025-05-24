@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.bluePrintItem;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,6 +20,10 @@ import net.minecraftforge.network.NetworkHooks;
 import net.nuclearteam.createnuclear.CNItems;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ReactorBluePrintItem extends Item implements MenuProvider {
 
     public ReactorBluePrintItem(Properties properties) {
@@ -49,16 +54,12 @@ public class ReactorBluePrintItem extends Item implements MenuProvider {
 
         if (!player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
             if (!world.isClientSide && player instanceof ServerPlayer)
-                NetworkHooks.openScreen((ServerPlayer) player, this, buf -> {
-                    buf.writeItem(heldItem);
-                });
+                NetworkHooks.openScreen((ServerPlayer) player, this, buf -> buf.writeItem(heldItem));
             return InteractionResultHolder.success(heldItem);
         }
         else if (player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
             if (!world.isClientSide && player instanceof ServerPlayer) {
-                NetworkHooks.openScreen((ServerPlayer) player, this, buf -> {
-                    buf.writeItem(heldItem);
-                });
+                NetworkHooks.openScreen((ServerPlayer) player, this, buf -> buf.writeItem(heldItem));
             }
             return InteractionResultHolder.success(heldItem);
         }

@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
+@SuppressWarnings("unused")
 public class AntiRadiationArmorItem {
 
     public static final ArmorItem.Type HELMET = ArmorItem.Type.HELMET;
@@ -39,21 +40,21 @@ public class AntiRadiationArmorItem {
         public static class DyeItemHelmetList<T extends Helmet> implements Iterable<ItemEntry<T>> {
             private static final int COLOR_AMOUNT = DyeColor.values().length;
 
-            private final ItemEntry<?>[] entrys = new ItemEntry<?>[COLOR_AMOUNT];
+            private final ItemEntry<?>[] entry = new ItemEntry<?>[COLOR_AMOUNT];
 
             public DyeItemHelmetList(Function<DyeColor, ItemEntry<? extends T>> filler) {
                 for (DyeColor color : DyeColor.values()) {
-                    entrys[color.ordinal()] = filler.apply(color);
+                    entry[color.ordinal()] = filler.apply(color);
                 }
             }
 
             @SuppressWarnings("unchecked")
             public ItemEntry<T> get(DyeColor color) {
-                return (ItemEntry<T>) entrys[color.ordinal()];
+                return (ItemEntry<T>) entry[color.ordinal()];
             }
 
             public boolean contains(Item block) {
-                for (ItemEntry<?> entry : entrys) {
+                for (ItemEntry<?> entry : entry) {
                     if (entry.is(block)) return true;
                 }
                 return false;
@@ -61,7 +62,7 @@ public class AntiRadiationArmorItem {
 
             @SuppressWarnings("unchecked")
             public ItemEntry<T>[] toArray() {
-                return (ItemEntry<T>[]) Arrays.copyOf(entrys, entrys.length);
+                return (ItemEntry<T>[]) Arrays.copyOf(entry, entry.length);
             }
 
             @Override
@@ -70,14 +71,14 @@ public class AntiRadiationArmorItem {
                     private int index = 0;
                     @Override
                     public boolean hasNext() {
-                        return index < entrys.length;
+                        return index < entry.length;
                     }
 
                     @SuppressWarnings("unchecked")
                     @Override
                     public ItemEntry<T> next() {
                         if (!hasNext()) throw new NoSuchElementException();
-                        return (ItemEntry<T>) entrys[index++];
+                        return (ItemEntry<T>) entry[index++];
                     }
                 };
             }
@@ -109,21 +110,21 @@ public class AntiRadiationArmorItem {
         public static class DyeItemChestplateList<T extends Chestplate> implements Iterable<ItemEntry<T>> {
             private static final int COLOR_AMOUNT = DyeColor.values().length;
 
-            private final ItemEntry<?>[] entrys = new ItemEntry<?>[COLOR_AMOUNT];
+            private final ItemEntry<?>[] entry = new ItemEntry<?>[COLOR_AMOUNT];
 
             public DyeItemChestplateList(Function<DyeColor, ItemEntry<? extends T>> filler) {
                 for (DyeColor color : DyeColor.values()) {
-                    entrys[color.ordinal()] = filler.apply(color);
+                    entry[color.ordinal()] = filler.apply(color);
                 }
             }
 
             @SuppressWarnings("unchecked")
             public ItemEntry<T> get(DyeColor color) {
-                return (ItemEntry<T>) entrys[color.ordinal()];
+                return (ItemEntry<T>) entry[color.ordinal()];
             }
 
             public boolean contains(Item block) {
-                for (ItemEntry<?> entry : entrys) {
+                for (ItemEntry<?> entry : entry) {
                     if (entry.is(block)) return true;
                 }
                 return false;
@@ -131,7 +132,7 @@ public class AntiRadiationArmorItem {
 
             @SuppressWarnings("unchecked")
             public ItemEntry<T>[] toArray() {
-                return (ItemEntry<T>[]) Arrays.copyOf(entrys, entrys.length);
+                return (ItemEntry<T>[]) Arrays.copyOf(entry, entry.length);
             }
 
             @Override
@@ -140,14 +141,14 @@ public class AntiRadiationArmorItem {
                     private int index = 0;
                     @Override
                     public boolean hasNext() {
-                        return index < entrys.length;
+                        return index < entry.length;
                     }
 
                     @SuppressWarnings("unchecked")
                     @Override
                     public ItemEntry<T> next() {
                         if (!hasNext()) throw new NoSuchElementException();
-                        return (ItemEntry<T>) entrys[index++];
+                        return (ItemEntry<T>) entry[index++];
                     }
                 };
             }
@@ -177,21 +178,21 @@ public class AntiRadiationArmorItem {
         public static class DyeItemLeggingsList<T extends Leggings> implements Iterable<ItemEntry<T>> {
             private static final int COLOR_AMOUNT = DyeColor.values().length;
 
-            private final ItemEntry<?>[] entrys = new ItemEntry<?>[COLOR_AMOUNT];
+            private final ItemEntry<?>[] entry = new ItemEntry<?>[COLOR_AMOUNT];
 
             public DyeItemLeggingsList(Function<DyeColor, ItemEntry<? extends T>> filler) {
                 for (DyeColor color : DyeColor.values()) {
-                    entrys[color.ordinal()] = filler.apply(color);
+                    entry[color.ordinal()] = filler.apply(color);
                 }
             }
 
             @SuppressWarnings("unchecked")
             public ItemEntry<T> get(DyeColor color) {
-                return (ItemEntry<T>) entrys[color.ordinal()];
+                return (ItemEntry<T>) entry[color.ordinal()];
             }
 
             public boolean contains(Item block) {
-                for (ItemEntry<?> entry : entrys) {
+                for (ItemEntry<?> entry : entry) {
                     if (entry.is(block)) return true;
                 }
                 return false;
@@ -199,7 +200,7 @@ public class AntiRadiationArmorItem {
 
             @SuppressWarnings("unchecked")
             public ItemEntry<T>[] toArray() {
-                return (ItemEntry<T>[]) Arrays.copyOf(entrys, entrys.length);
+                return (ItemEntry<T>[]) Arrays.copyOf(entry, entry.length);
             }
 
             @Override
@@ -208,14 +209,14 @@ public class AntiRadiationArmorItem {
                     private int index = 0;
                     @Override
                     public boolean hasNext() {
-                        return index < entrys.length;
+                        return index < entry.length;
                     }
 
                     @SuppressWarnings("unchecked")
                     @Override
                     public ItemEntry<T> next() {
                         if (!hasNext()) throw new NoSuchElementException();
-                        return (ItemEntry<T>) entrys[index++];
+                        return (ItemEntry<T>) entry[index++];
                     }
                 };
             }
@@ -240,12 +241,12 @@ public class AntiRadiationArmorItem {
         }
     }
 
-    public static class DyeRecipArmorList implements Iterable<GeneratedRecipe> {
+    public static class DyeRecipeArmorList implements Iterable<GeneratedRecipe> {
         private static final int COLOR_AMOUNT = DyeColor.values().length;
 
         protected final GeneratedRecipe[] recipes = new GeneratedRecipe[getColorCount()];
 
-        public DyeRecipArmorList(Function<@NotNull DyeColor, GeneratedRecipe> filler) {
+        public DyeRecipeArmorList(Function<@NotNull DyeColor, GeneratedRecipe> filler) {
             for (DyeColor color : DyeColor.values()) {
                 recipes[color.ordinal()] = filler.apply(color);
             }

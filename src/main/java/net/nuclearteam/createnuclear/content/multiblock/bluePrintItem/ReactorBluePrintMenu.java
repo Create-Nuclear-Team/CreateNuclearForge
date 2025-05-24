@@ -78,7 +78,7 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
     @Override
     protected void addSlots() {
-        addPlayerSlots(getPlayerInventotryXOffset(), getplayerInventoryYOffset());
+        addPlayerSlots(getPlayerInventoryXOffset(), getPlayerInventoryYOffset());
         addPatternSlots();
     }
 
@@ -127,11 +127,11 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
     }
 
-    protected int getPlayerInventotryXOffset() {
+    protected int getPlayerInventoryXOffset() {
         return 31;
     }
 
-    protected int getplayerInventoryYOffset() {
+    protected int getPlayerInventoryYOffset() {
         return 231;
     }
 

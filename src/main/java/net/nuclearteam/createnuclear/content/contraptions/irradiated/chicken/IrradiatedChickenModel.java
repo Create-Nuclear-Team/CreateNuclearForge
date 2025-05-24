@@ -3,6 +3,7 @@ package net.nuclearteam.createnuclear.content.contraptions.irradiated.chicken;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -13,6 +14,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.NotNull;
 
+@MethodsReturnNonnullByDefault
 public class IrradiatedChickenModel<T extends IrradiatedChicken> extends AgeableListModel<T> {
 
     private final ModelPart head;

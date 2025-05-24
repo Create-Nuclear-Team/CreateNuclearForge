@@ -1,8 +1,6 @@
 package net.nuclearteam.createnuclear;
 
-import com.simibubi.create.AllTags;
 import net.createmod.catnip.lang.Lang;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -26,6 +24,7 @@ import java.util.Collections;
 
 import static net.nuclearteam.createnuclear.CNTags.NameSpace.*;
 
+@SuppressWarnings({"unused", "deprecation"})
 public class CNTags {
     public static <T> TagKey<T> optionalTag(IForgeRegistry<T> registry, ResourceLocation id) {
         return registry.tags().createOptionalTagKey(id, Collections.emptySet());
@@ -56,16 +55,16 @@ public class CNTags {
 
         public final String id;
         public final boolean optionalDefault;
-        public final boolean alwayDatagenDefault;
+        public final boolean alwaysDatagenDefault;
 
         NameSpace(String id) {
             this(id, true, false);
         }
 
-        NameSpace(String id, boolean optionalDefault, boolean alwayDatagenDefault) {
+        NameSpace(String id, boolean optionalDefault, boolean alwaysDatagenDefault) {
             this.id = id;
             this.optionalDefault = optionalDefault;
-            this.alwayDatagenDefault = alwayDatagenDefault;
+            this.alwaysDatagenDefault = alwaysDatagenDefault;
         }
     }
 
@@ -73,10 +72,6 @@ public class CNTags {
         FAN_PROCESSING_CATALYSTS_ENRICHED(MOD, "fan_processing_catalysts/enriched"),
         ENRICHING_FIRE_BASE_BLOCKS,
         ALL_CAMPFIRES(MINECRAFT, "all/campfires"),
-        NEEDS_DIAMOND_TOOL(MINECRAFT),
-        NEEDS_IRON_TOOL(MINECRAFT),
-        NEEDS_STONE_TOOL(MINECRAFT),
-        SHOVEL(MINECRAFT, "mineable/shovel"),
         URANIUM_ORES,
         LEAD_ORES
         ;
@@ -89,28 +84,27 @@ public class CNTags {
         }
 
         CNBlockTags(NameSpace namespace) {
-            this(namespace, namespace.optionalDefault, namespace.alwayDatagenDefault);
+            this(namespace, namespace.optionalDefault, namespace.alwaysDatagenDefault);
         }
 
         CNBlockTags(NameSpace nameSpace, String path) {
-            this(nameSpace, path, nameSpace.optionalDefault, nameSpace.alwayDatagenDefault);
+            this(nameSpace, path, nameSpace.optionalDefault, nameSpace.alwaysDatagenDefault);
         }
 
-        CNBlockTags(NameSpace nameSpace, boolean optional, boolean alwayDatagenDefault) {
-            this(nameSpace, null, optional, alwayDatagenDefault);
+        CNBlockTags(NameSpace nameSpace, boolean optional, boolean alwaysDatagenDefault) {
+            this(nameSpace, null, optional, alwaysDatagenDefault);
         }
 
-        CNBlockTags(NameSpace nameSpace, String path, boolean optional, boolean alwayDatagenDefault) {
+        CNBlockTags(NameSpace nameSpace, String path, boolean optional, boolean alwaysDatagenDefault) {
             ResourceLocation id = new ResourceLocation(nameSpace.id, path == null ? Lang.asId(name()) : path);
             if (optional) {
                 tag = optionalTag(ForgeRegistries.BLOCKS, id);
             } else {
                 tag = BlockTags.create(id);
             }
-            this.alwaysDatagen = alwayDatagenDefault;
+            this.alwaysDatagen = alwaysDatagenDefault;
         }
 
-        @SuppressWarnings("deprecation")
         public boolean matches(Block block) {
             return block.builtInRegistryHolder().is(tag);
         }
@@ -151,28 +145,27 @@ public class CNTags {
         }
 
         CNItemTags(NameSpace namespace) {
-            this(namespace, namespace.optionalDefault, namespace.alwayDatagenDefault);
+            this(namespace, namespace.optionalDefault, namespace.alwaysDatagenDefault);
         }
 
         CNItemTags(NameSpace nameSpace, String path) {
-            this(nameSpace, path, nameSpace.optionalDefault, nameSpace.alwayDatagenDefault);
+            this(nameSpace, path, nameSpace.optionalDefault, nameSpace.alwaysDatagenDefault);
         }
 
-        CNItemTags(NameSpace nameSpace, boolean optional, boolean alwayDatagenDefault) {
-            this(nameSpace, null, optional, alwayDatagenDefault);
+        CNItemTags(NameSpace nameSpace, boolean optional, boolean alwaysDatagenDefault) {
+            this(nameSpace, null, optional, alwaysDatagenDefault);
         }
 
-        CNItemTags(NameSpace nameSpace, String path, boolean optional, boolean alwayDatagenDefault) {
+        CNItemTags(NameSpace nameSpace, String path, boolean optional, boolean alwaysDatagenDefault) {
             ResourceLocation id = new ResourceLocation(nameSpace.id, path == null ? Lang.asId(name()) : path);
             if (optional) {
                 tag = optionalTag(ForgeRegistries.ITEMS, id);
             } else {
                 tag = ItemTags.create(id);
             }
-            this.alwaysDatagen = alwayDatagenDefault;
+            this.alwaysDatagen = alwaysDatagenDefault;
         }
 
-        @SuppressWarnings("deprecation")
         public boolean matches(Item item) {
             return item.builtInRegistryHolder().is(tag);
         }
@@ -196,28 +189,27 @@ public class CNTags {
         }
 
         CNFluidTags(NameSpace namespace) {
-            this(namespace, namespace.optionalDefault, namespace.alwayDatagenDefault);
+            this(namespace, namespace.optionalDefault, namespace.alwaysDatagenDefault);
         }
 
         CNFluidTags(NameSpace nameSpace, String path) {
-            this(nameSpace, path, nameSpace.optionalDefault, nameSpace.alwayDatagenDefault);
+            this(nameSpace, path, nameSpace.optionalDefault, nameSpace.alwaysDatagenDefault);
         }
 
-        CNFluidTags(NameSpace nameSpace, boolean optional, boolean alwayDatagenDefault) {
-            this(nameSpace, null, optional, alwayDatagenDefault);
+        CNFluidTags(NameSpace nameSpace, boolean optional, boolean alwaysDatagenDefault) {
+            this(nameSpace, null, optional, alwaysDatagenDefault);
         }
 
-        CNFluidTags(NameSpace nameSpace, String path, boolean optional, boolean alwayDatagenDefault) {
+        CNFluidTags(NameSpace nameSpace, String path, boolean optional, boolean alwaysDatagenDefault) {
             ResourceLocation id = new ResourceLocation(nameSpace.id, path == null ? Lang.asId(name()) : path);
             if (optional) {
                 tag = optionalTag(ForgeRegistries.FLUIDS, id);
             } else {
                 tag = FluidTags.create(id);
             }
-            this.alwaysDatagen = alwayDatagenDefault;
+            this.alwaysDatagen = alwaysDatagenDefault;
         }
 
-        @SuppressWarnings("deprecation")
         public boolean matches(Fluid fluid) {
             return fluid.is(tag);
         }
@@ -241,25 +233,25 @@ public class CNTags {
         }
 
         CNEntityTags(NameSpace nameSpace) {
-            this(nameSpace, nameSpace.optionalDefault, nameSpace.alwayDatagenDefault);
+            this(nameSpace, nameSpace.optionalDefault, nameSpace.alwaysDatagenDefault);
         }
 
         CNEntityTags(NameSpace nameSpace, String path) {
-            this(nameSpace, path, nameSpace.optionalDefault, nameSpace.alwayDatagenDefault);
+            this(nameSpace, path, nameSpace.optionalDefault, nameSpace.alwaysDatagenDefault);
         }
 
-        CNEntityTags(NameSpace nameSpace, boolean optional, boolean alwayDatagenDefault) {
-            this(nameSpace, null, optional, alwayDatagenDefault);
+        CNEntityTags(NameSpace nameSpace, boolean optional, boolean alwaysDatagenDefault) {
+            this(nameSpace, null, optional, alwaysDatagenDefault);
         }
 
-        CNEntityTags(NameSpace nameSpace, String path, boolean optional, boolean alwayDatagenDefault) {
+        CNEntityTags(NameSpace nameSpace, String path, boolean optional, boolean alwaysDatagenDefault) {
             ResourceLocation id = new ResourceLocation(nameSpace.id, path == null ? Lang.asId(name()) : path);
             if (optional) {
                 tag = optionalTag(ForgeRegistries.ENTITY_TYPES, id);
             } else {
                 tag = TagKey.create(Registries.ENTITY_TYPE, id);
             }
-            this.alwaysDatagen = alwayDatagenDefault;
+            this.alwaysDatagen = alwaysDatagenDefault;
         }
 
         public boolean matches(EntityType<?> type) {
@@ -274,9 +266,7 @@ public class CNTags {
     }
 
     public enum CNRecipeSerializerTags {
-
         AUTOMATION_IGNORE,
-
         ;
 
         public final TagKey<RecipeSerializer<?>> tag;
@@ -287,11 +277,11 @@ public class CNTags {
         }
 
         CNRecipeSerializerTags(NameSpace namespace) {
-            this(namespace, namespace.optionalDefault, namespace.alwayDatagenDefault);
+            this(namespace, namespace.optionalDefault, namespace.alwaysDatagenDefault);
         }
 
         CNRecipeSerializerTags(NameSpace namespace, String path) {
-            this(namespace, path, namespace.optionalDefault, namespace.alwayDatagenDefault);
+            this(namespace, path, namespace.optionalDefault, namespace.alwaysDatagenDefault);
         }
 
         CNRecipeSerializerTags(NameSpace namespace, boolean optional, boolean alwaysDatagen) {

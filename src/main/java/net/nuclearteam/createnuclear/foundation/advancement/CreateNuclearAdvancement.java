@@ -22,19 +22,20 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
+@SuppressWarnings("unused")
 public class CreateNuclearAdvancement {
 
     static final ResourceLocation BACKGROUND = CreateNuclear.asResource("textures/block/steel_block.png");
     static final String LANG = "advancement." + CreateNuclear.MOD_ID + ".";
     static final String SECRET_SUFFIX = "\n\u00A77(Hidden Advancement)";
 
-    private Advancement.Builder builder;
+    private final Advancement.Builder builder;
     private SimpleCreateTrigger builtinTrigger;
     private CreateNuclearAdvancement parent;
 
     Advancement datagenResult;
 
-    private String id;
+    private final String id;
     private String title;
     private String description;
 
@@ -103,7 +104,7 @@ public class CreateNuclearAdvancement {
         consumer.accept(descriptionKey(), description);
     }
 
-    static enum TaskType {
+    enum TaskType {
 
         SILENT(FrameType.TASK, false, false, false),
         NORMAL(FrameType.TASK, true, false, false),
@@ -113,12 +114,12 @@ public class CreateNuclearAdvancement {
 
         ;
 
-        private FrameType frame;
-        private boolean toast;
-        private boolean announce;
-        private boolean hide;
+        private final FrameType frame;
+        private final boolean toast;
+        private final boolean announce;
+        private final boolean hide;
 
-        private TaskType(FrameType frame, boolean toast, boolean announce, boolean hide) {
+        TaskType(FrameType frame, boolean toast, boolean announce, boolean hide) {
             this.frame = frame;
             this.toast = toast;
             this.announce = announce;

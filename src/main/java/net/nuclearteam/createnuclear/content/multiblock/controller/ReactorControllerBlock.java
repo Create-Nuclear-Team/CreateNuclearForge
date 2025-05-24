@@ -4,6 +4,7 @@ import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.item.ItemHelper;
 import net.minecraft.ChatFormatting;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -28,8 +29,12 @@ import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEnti
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+@SuppressWarnings("deprecation")
 public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock implements IWrenchable, IBE<ReactorControllerBlockEntity> {
     public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
 
@@ -65,7 +70,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
 
         ItemStack heldItem = player.getItemInHand(handIn);
 
-        if (Boolean.FALSE.equals(state.getValue(ASSEMBLED))) {
+        if (!state.getValue(ASSEMBLED)) {
             player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
         }
         else {
@@ -119,7 +124,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
-        if (Boolean.TRUE.equals(state.getValue(ASSEMBLED)))
+        if (state.getValue(ASSEMBLED))
             return;
         List<? extends Player> players = level.players();
         ReactorControllerBlock controller = (ReactorControllerBlock) state.getBlock();
@@ -175,18 +180,16 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             ReactorOutput block = (ReactorOutput) level.getBlockState(pos).getBlock();
             ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
 
-            if (Boolean.TRUE.equals(state.getValue(ASSEMBLED)) && rotation != 0) { // Starting the energy
+            if (state.getValue(ASSEMBLED) && rotation != 0) { // Starting the energy
                 entity.speed = rotation;
                 entity.setSpeed(Math.abs(entity.speed));
-                entity.updateSpeed = true;
-                entity.updateGeneratedRotation();
             } else { // stopping the energy
 
                 entity.setSpeed(0);
                 entity.speed = 0;
-                entity.updateSpeed = true;
-                entity.updateGeneratedRotation();
             }
+            entity.updateSpeed = true;
+            entity.updateGeneratedRotation();
 
             entity.setSpeed(rotation);
         }

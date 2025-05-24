@@ -2,19 +2,19 @@ package net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.model.ColorableAgeableListModel;
-import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.nuclearteam.createnuclear.CreateNuclear;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+@SuppressWarnings("unused")
 public class IrradiatedWolfModel<T extends IrradiatedWolf> extends ColorableAgeableListModel<T> {
-	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(CreateNuclear.asResource("irradiated_wolf"), "main");
 	private final ModelPart head;
 	private final ModelPart pustule1;
 	private final ModelPart pustule2;

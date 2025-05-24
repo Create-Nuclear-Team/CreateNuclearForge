@@ -1,7 +1,7 @@
 package net.nuclearteam.createnuclear.foundation.block;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -9,7 +9,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.CNPackets;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.controller.EventTriggerPacket;
@@ -17,6 +16,8 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.EventTriggerP
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+@SuppressWarnings("deprecation")
 public class EventTriggerBlock extends Block {
     public EventTriggerBlock(Properties properties) {
         super(properties);

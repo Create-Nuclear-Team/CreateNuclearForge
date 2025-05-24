@@ -16,6 +16,7 @@ import java.util.function.Function;
 
 import static net.nuclearteam.createnuclear.content.decoration.palettes.PaletteBlockPattern.STANDARD_RANGE;
 
+@SuppressWarnings("unused")
 public enum CNPaletteStoneTypes {
     AUTUNITE(STANDARD_RANGE, r -> r.paletteStoneBlock("autunite", () -> Blocks.ANDESITE, true, true)
             .properties(p ->
@@ -24,11 +25,11 @@ public enum CNPaletteStoneTypes {
             .register()),
     ;
 
-    private Function<CreateRegistrate, NonNullSupplier<Block>> factory;
+    private final Function<CreateRegistrate, NonNullSupplier<Block>> factory;
     private PalettesVariantEntry variant;
 
     public NonNullSupplier<Block> baseBlock;
-    public PaletteBlockPattern[] variantTypes;
+    public final PaletteBlockPattern[] variantTypes;
     public TagKey<Item> materialTag;
 
 

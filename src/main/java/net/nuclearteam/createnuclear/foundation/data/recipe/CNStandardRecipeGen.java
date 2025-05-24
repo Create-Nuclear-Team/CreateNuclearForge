@@ -140,8 +140,8 @@ public class CNStandardRecipeGen extends CreateRecipeProvider {
 
     private String CRAFTING_ITEMS = enterFolder("crafting/items/armors");
 
-    AntiRadiationArmorItem.DyeRecipArmorList
-        ANTI_RADIATION_HELMET = new AntiRadiationArmorItem.DyeRecipArmorList(color -> create(CNItems.ANTI_RADIATION_HELMETS.get(color))
+    AntiRadiationArmorItem.DyeRecipeArmorList
+        ANTI_RADIATION_HELMET = new AntiRadiationArmorItem.DyeRecipeArmorList(color -> create(CNItems.ANTI_RADIATION_HELMETS.get(color))
             .unlockedByTag(() -> CNItemTags.CLOTH.tag)
             .withCategory(RecipeCategory.COMBAT)
             .viaShaped(i -> i
@@ -155,7 +155,7 @@ public class CNStandardRecipeGen extends CreateRecipeProvider {
         ),
 
 
-        ANTI_RADIATION_CHESTPLATES = new AntiRadiationArmorItem.DyeRecipArmorList(color -> create(CNItems.ANTI_RADIATION_CHESTPLATES.get(color))
+        ANTI_RADIATION_CHESTPLATES = new AntiRadiationArmorItem.DyeRecipeArmorList(color -> create(CNItems.ANTI_RADIATION_CHESTPLATES.get(color))
             .unlockedByTag(() -> CNItemTags.CLOTH.tag)
             .withCategory(RecipeCategory.COMBAT)
             .viaShaped(i -> i
@@ -169,7 +169,7 @@ public class CNStandardRecipeGen extends CreateRecipeProvider {
             )
         ),
 
-        ANTI_RADIATION_LEGGINS = new AntiRadiationArmorItem.DyeRecipArmorList(color -> create(CNItems.ANTI_RADIATION_LEGGINGS.get(color))
+        ANTI_RADIATION_LEGGINS = new AntiRadiationArmorItem.DyeRecipeArmorList(color -> create(CNItems.ANTI_RADIATION_LEGGINGS.get(color))
             .unlockedByTag(() -> CNItemTags.CLOTH.tag)
             .withCategory(RecipeCategory.COMBAT)
             .viaShaped(i -> i
