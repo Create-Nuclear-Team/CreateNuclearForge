@@ -32,9 +32,10 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+@SuppressWarnings("unused")
 public class CNShapelessRecipeGen extends CNProcessingRecipeGen {
 
-    private String SHAPELESS = enterFolder("shapeless");
+    private final String SHAPELESS = enterFolder("shapeless");
     GeneratedRecipe
         RAW_URANIUM = create(CNItems.RAW_URANIUM).returns(9)
             .withSuffix("_from_decompacting")
@@ -69,7 +70,7 @@ public class CNShapelessRecipeGen extends CNProcessingRecipeGen {
         REACTOR_BLUEPRINT_ITEM_CLEAR = clearData(CNItems.REACTOR_BLUEPRINT)
         ;
 
-    private String SHAPELESS_CLOTH = enterFolder("shapeless/cloth");
+    private final String SHAPELESS_CLOTH = enterFolder("shapeless/cloth");
 
     ClothItem.DyeRecipeList CLOTH_CHANGING = new ClothItem.DyeRecipeList(color -> {
         List<Item> ingredients = new ArrayList<>(Arrays.asList(Items.WHITE_DYE, Items.ORANGE_DYE, Items.MAGENTA_DYE, Items.LIGHT_BLUE_DYE, Items.YELLOW_DYE, Items.LIME_DYE, Items.PINK_DYE, Items.GRAY_DYE, Items.LIGHT_GRAY_DYE, Items.CYAN_DYE, Items.PURPLE_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.GREEN_DYE, Items.RED_DYE, Items.BLACK_DYE));

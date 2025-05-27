@@ -13,7 +13,7 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 
 import java.util.function.Supplier;
 
-public class EnrichedRecipeGen extends CNProcessingRecipeGen {
+public class CNEnrichedRecipeGen extends CNProcessingRecipeGen {
 
     GeneratedRecipe
         ENRICHING_CAMPFIRES = convert(Items.CAMPFIRE, CNBlocks.ENRICHING_CAMPFIRE),
@@ -32,7 +32,7 @@ public class EnrichedRecipeGen extends CNProcessingRecipeGen {
                         .output(result.get()));
     }
 
-    public EnrichedRecipeGen(PackOutput output) {
+    public CNEnrichedRecipeGen(PackOutput output) {
         super(output);
     }
 
