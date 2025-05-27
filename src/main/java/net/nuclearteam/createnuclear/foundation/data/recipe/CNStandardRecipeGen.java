@@ -36,9 +36,10 @@ import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
+@SuppressWarnings("unused")
 public class CNStandardRecipeGen extends CreateRecipeProvider {
 
-    private String CRAFTING = enterFolder("crafting");
+    private final String CRAFTING = enterFolder("crafting");
     GeneratedRecipe
         WHITE_CLOTH_FROM_STRING = create(ClothItem.Cloths.WHITE_CLOTH::getItem)
             .unlockedBy(() -> Items.STRING)
@@ -123,7 +124,7 @@ public class CNStandardRecipeGen extends CreateRecipeProvider {
         ;
 
 
-    private String CRAFTING_REACTOR = enterFolder("crafting/reactor");
+    private final String CRAFTING_REACTOR = enterFolder("crafting/reactor");
 
     GeneratedRecipe
         REINFORCED_GLASS = create(CNBlocks.REINFORCED_GLASS)
@@ -138,7 +139,7 @@ public class CNStandardRecipeGen extends CreateRecipeProvider {
             )
     ;
 
-    private String CRAFTING_ITEMS = enterFolder("crafting/items/armors");
+    private final String CRAFTING_ITEMS = enterFolder("crafting/items/armors");
 
     AntiRadiationArmorItem.DyeRecipeArmorList
         ANTI_RADIATION_HELMET = new AntiRadiationArmorItem.DyeRecipeArmorList(color -> create(CNItems.ANTI_RADIATION_HELMETS.get(color))
@@ -169,7 +170,7 @@ public class CNStandardRecipeGen extends CreateRecipeProvider {
             )
         ),
 
-        ANTI_RADIATION_LEGGINS = new AntiRadiationArmorItem.DyeRecipeArmorList(color -> create(CNItems.ANTI_RADIATION_LEGGINGS.get(color))
+        ANTI_RADIATION_LEGGINGS = new AntiRadiationArmorItem.DyeRecipeArmorList(color -> create(CNItems.ANTI_RADIATION_LEGGINGS.get(color))
             .unlockedByTag(() -> CNItemTags.CLOTH.tag)
             .withCategory(RecipeCategory.COMBAT)
             .viaShaped(i -> i
@@ -198,9 +199,9 @@ public class CNStandardRecipeGen extends CreateRecipeProvider {
     GeneratedRecipe
         URANIUM_ORE_TO_URANIUM_POWDER = blastFurnaceRecipeTags(() -> CNItems.RAW_URANIUM::get, () -> CNItemTags.URANIUM_ORES.tag, "_for_uranium_ore", 4),
         RAW_LEAD_ORES = blastFurnaceRecipeTags(() -> CNItems.LEAD_INGOT::get, () -> CNItemTags.LEAD_ORES.tag, "_for_lead_ore", 1),
-        RAW_LEAD = blastFurnaceRecipeTags(CNItems.LEAD_INGOT::get, () -> CNTags.forgeItemTag("raw_materials/lead"), "_for_raw_lead", 1)
+        RAW_LEAD = blastFurnaceRecipeTags(CNItems.LEAD_INGOT::get, () -> CNTags.forgeItemTag("raw_materials/lead"), "_for_raw_lead", 1),
+        CRUSHED_RAW_LEAD_TO_LEAD_BLAST_FURNACE = blastFurnaceRecipe(CNItems.LEAD_INGOT::get, AllItems.CRUSHED_LEAD::get, "_for_lead", 1)
     ;
-
 
 
 
