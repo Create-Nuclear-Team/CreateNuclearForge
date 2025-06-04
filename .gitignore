@@ -1,0 +1,47 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+# run
+
+# Files from Forge MDK
+forge*changelog.txt
+
+# run/
+run/config/
+run/crash-reports/
+run/data/
+run/defaultconfigs/
+run/logs/*
+run/resourcepacks/
+run/resources/
+run/saves/
+run/schematics/uploaded
+run/screenshots/
+run/fabricloader.log
+run/options.txt
+run/usercache.json
+run/usernamecache.json
+run/emi.json
+run/.mixin.out
+run/gametest
+run/logs
+run/schematics
+run/server
