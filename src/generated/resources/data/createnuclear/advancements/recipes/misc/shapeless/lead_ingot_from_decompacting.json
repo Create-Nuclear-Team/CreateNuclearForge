@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "createnuclear:lead_ingot"
-            ]
+            "tag": "forge:storage_blocks/lead"
           }
         ]
       },

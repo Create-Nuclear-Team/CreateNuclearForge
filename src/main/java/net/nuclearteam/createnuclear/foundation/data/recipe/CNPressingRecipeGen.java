@@ -14,11 +14,11 @@ import java.util.function.UnaryOperator;
 public class CNPressingRecipeGen extends CNProcessingRecipeGen {
 
     GeneratedRecipe
-            GRAPHENE = create("graphene", b -> b
+        GRAPHENE = create("graphene", b -> b
             .require(Ingredient.of(CNTags.forgeItemTag("coal_dusts")))
             .output(CNItems.GRAPHENE)
     )
-            ;
+    ;
 
 
 

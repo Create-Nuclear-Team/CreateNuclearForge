@@ -25,8 +25,8 @@ public class CNMixingRecipeGen extends CNProcessingRecipeGen {
         ),
 
         URANIUM_FLUID = create("uranium_fluid", b -> b
-                .require(CNItems.URANIUM_POWDER)
-                .output(CNFluids.URANIUM.get(), 25)
+            .require(CNItems.URANIUM_POWDER)
+            .output(CNFluids.URANIUM.get(), 25)
         )
     ;
 

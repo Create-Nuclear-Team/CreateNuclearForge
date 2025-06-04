@@ -23,18 +23,19 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.CNPackets;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
-import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.List;
 
 import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
+@SuppressWarnings({"unused"})
 public class ReactorControllerBlockEntity extends SmartBlockEntity implements IInteractionChecker, IHaveGoggleInformation {
     public boolean destroyed = false;
     public boolean created = false;
@@ -73,7 +74,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private ItemStack fuelItem;
     private ItemStack coolerItem;
 
-    private int[][] formattedPattern = new int[][]{
+    private final int[][] formattedPattern = new int[][]{
             {99,99,99,0,1,2,99,99,99},
             {99,99,3,4,5,6,7,99,99},
             {99,8,9,10,11,12,13,14,99},
@@ -84,7 +85,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             {99,99,49,50,51,52,53,99,99},
             {99,99,99,54,55,56,99,99,99}
     };
-    private int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
+    private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
 
 
@@ -102,7 +103,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     public boolean getAssembled() { // permet de savoir si le réacteur est formé ou pas.
         BlockState state = getBlockState();
-        return Boolean.TRUE.equals(state.getValue(ASSEMBLED));
+        return state.getValue(ASSEMBLED);
     }
 
     @Override
@@ -182,7 +183,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     public enum State {
-        ON, OFF;
+        ON, OFF
     }
 
     private void explodeReactorCore(Level level, BlockPos pos) {
@@ -230,6 +231,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                         if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
                             this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4);
                         } else {
+                            // Send a packet to all clients around this block within 16 blocks
+                            EventTriggerPacket packet = new EventTriggerPacket(600); // display for 100 ticks
+                            CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
+                            CNPackets.sendToNear(level, getBlockPos(), 32, packet);
                             this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
                         }
                         return;
@@ -343,7 +348,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                         // Loop through the list to find the neighbor slot
                         for (int l = 0; l < list.size(); l++) {
                             if (list.getCompound(l).getInt("Slot") == neighborSlot) {
-                                // If currentRod equals "u", apply the corresponding heat
+                                // If the currentRod equals "u", apply the corresponding heat
                                 if (currentRod.equals("u")) {
                                     String id = list.getCompound(l).getString("id");
                                     if (id.equals("createnuclear:uranium_rod")) {
@@ -425,27 +430,23 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     public void rotate(BlockState state, BlockPos pos, Level level, int rotation) {
         if (level.getBlockState(pos).is(CNBlocks.REACTOR_OUTPUT.get()) && rotation > 0) {
-            if (level.getBlockState(pos).getBlock() instanceof ReactorOutput) {
-                ReactorOutput block = (ReactorOutput) level.getBlockState(pos).getBlock();
+            if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
                 ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
                 if (state.getValue(ASSEMBLED)) { // Starting the energy
                     entity.speed = rotation;
                     entity.heat = rotation;
-                    entity.updateSpeed = true;
-                    entity.updateGeneratedRotation();
                 } else { // stopping the energy
                     entity.speed = 0;
                     entity.heat = 0;
-                    entity.updateSpeed = true;
-                    entity.updateGeneratedRotation();
                 }
+                entity.updateSpeed = true;
+                entity.updateGeneratedRotation();
                 entity.setSpeed(rotation);
 
             }
         }
         else {
-            if (level.getBlockState(pos).getBlock() instanceof ReactorOutput) {
-                ReactorOutput block = (ReactorOutput) level.getBlockState(pos).getBlock();
+            if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
                 ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
                 entity.setSpeed(0);
                 entity.heat = 0;
@@ -471,15 +472,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 if (!level.isClientSide) {
                     if (player.addItem(configuredPattern)){
                         configuredPattern = ItemStack.EMPTY;
-                        notifyUpdate();
-                        return InteractionResult.CONSUME;
                     }
                     else {
                         player.setItemInHand(hand, configuredPattern);
                         inventory.setStackInSlot(0, ItemStack.EMPTY);
-                        notifyUpdate();
-                        return InteractionResult.CONSUME;
                     }
+                    notifyUpdate();
+                    return InteractionResult.CONSUME;
                     //return InteractionResult.FAIL;
                 }
                 else return InteractionResult.SUCCESS;

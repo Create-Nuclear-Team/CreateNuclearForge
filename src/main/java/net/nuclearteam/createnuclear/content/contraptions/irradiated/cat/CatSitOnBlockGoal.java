@@ -2,7 +2,6 @@ package net.nuclearteam.createnuclear.content.contraptions.irradiated.cat;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BedBlock;
@@ -47,8 +46,8 @@ public class CatSitOnBlockGoal extends MoveToBlockGoal {
             if (blockState.is(Blocks.CHEST)) {
                 return ChestBlockEntity.getOpenCount(level, pos) < 1;
             } else {
-                return blockState.is(Blocks.FURNACE) && (Boolean) blockState.getValue(FurnaceBlock.LIT) || blockState.is(BlockTags.BEDS, (blockStatex) ->
-                        (Boolean) blockStatex.getOptionalValue(BedBlock.PART)
+                return blockState.is(Blocks.FURNACE) && blockState.getValue(FurnaceBlock.LIT) || blockState.is(BlockTags.BEDS, (blockStates) ->
+                        blockStates.getOptionalValue(BedBlock.PART)
                                 .map((bedPart) -> bedPart != BedPart.HEAD)
                                 .orElse(true));
             }

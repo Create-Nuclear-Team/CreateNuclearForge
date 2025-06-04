@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "createnuclear:raw_lead"
-            ]
+            "tag": "forge:storage_blocks/raw_lead"
           }
         ]
       },

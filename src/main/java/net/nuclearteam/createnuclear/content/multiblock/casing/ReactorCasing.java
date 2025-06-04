@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear.content.multiblock.casing;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
@@ -25,10 +26,14 @@ import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+@SuppressWarnings({"deprecation", "unused"})
 public class ReactorCasing extends Block implements IWrenchable, IBE<ReactorCasingEntity> {
-    private TypeBlock typeBlock;
+    private final TypeBlock typeBlock;
 
     public ReactorCasing(Properties properties, TypeBlock tBlock) {
         super(properties);

@@ -5,6 +5,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+
+import static net.minecraftforge.network.NetworkDirection.PLAY_TO_CLIENT;
 import static net.minecraftforge.network.NetworkDirection.PLAY_TO_SERVER;
 
 import net.minecraftforge.network.NetworkDirection;
@@ -13,20 +15,24 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.network.NetworkEvent.Context;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItemPacket;
+import net.nuclearteam.createnuclear.content.multiblock.controller.EventTriggerPacket;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public enum CNPackets {
-    CONFIGURE_REACTOR_PATTERN(ReactorBluePrintItemPacket.class, ReactorBluePrintItemPacket::new, PLAY_TO_SERVER)
+    CONFIGURE_REACTOR_PATTERN(ReactorBluePrintItemPacket.class, ReactorBluePrintItemPacket::new, PLAY_TO_SERVER),
+
+    // To client
+    TRIGGER_EVENT_TEXT_OVERLAY(EventTriggerPacket.class, EventTriggerPacket::new, PLAY_TO_CLIENT),
     ;
     public static final ResourceLocation CHANNEL_NAME = CreateNuclear.asResource("main");
     public static final int NETWORK_VERSION = 0;
     public static final String NETWORK_VERSION_STR = String.valueOf(NETWORK_VERSION);
     private static SimpleChannel channel;
 
-    private PacketType<?> packetType;
+    private final PacketType<?> packetType;
 
     <T extends SimplePacketBase> CNPackets(Class<T> type, Function<FriendlyByteBuf, T> factory, NetworkDirection direction) {
         packetType = new PacketType<>(type, factory, direction);
@@ -58,11 +64,11 @@ public enum CNPackets {
     private static class PacketType<T extends SimplePacketBase> {
         private static int index = 0;
 
-        private BiConsumer<T, FriendlyByteBuf> encoder;
-        private Function<FriendlyByteBuf, T> decoder;
-        private BiConsumer<T, Supplier<Context>> handler;
-        private Class<T> type;
-        private NetworkDirection direction;
+        private final BiConsumer<T, FriendlyByteBuf> encoder;
+        private final Function<FriendlyByteBuf, T> decoder;
+        private final BiConsumer<T, Supplier<Context>> handler;
+        private final Class<T> type;
+        private final NetworkDirection direction;
 
         private PacketType(Class<T> type, Function<FriendlyByteBuf, T> factory, NetworkDirection direction) {
             encoder = T::write;

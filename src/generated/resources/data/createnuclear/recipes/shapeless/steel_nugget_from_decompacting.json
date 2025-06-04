@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "createnuclear:steel_ingot"
+      "tag": "forge:ingots/steel"
     }
   ],
   "result": {

@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "createnuclear:raw_uranium"
-            ]
+            "tag": "forge:storage_blocks/raw_uranium"
           }
         ]
       },

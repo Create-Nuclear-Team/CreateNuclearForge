@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "createnuclear:raw_lead"
-            ]
+            "tag": "forge:raw_materials/lead"
           }
         ]
       },

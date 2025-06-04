@@ -2,25 +2,24 @@ package net.nuclearteam.createnuclear.foundation.data.recipe;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllRecipeTypes;
-import com.simibubi.create.foundation.data.recipe.ProcessingRecipeGen;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
 public class CNItemApplicationRecipeGen extends CNProcessingRecipeGen {
 
     GeneratedRecipe REACTOR_CASING = itemApplication("reactor_casing_from_steel_and_brass_casing",
-            CNItems.STEEL_INGOT.get(),
+            Ingredient.of(CNTags.forgeItemTag("ingots/steel")),
             AllBlocks.BRASS_CASING.get(),
             CNBlocks.REACTOR_CASING.get()
     );
 
-    GeneratedRecipe REACTOR_OUPUT = itemApplication("reactor_output_from_shaft_and_reactor_casing",
+    GeneratedRecipe REACTOR_OUTPUT = itemApplication("reactor_output_from_shaft_and_reactor_casing",
             AllBlocks.SHAFT.asItem(),
             CNBlocks.REACTOR_CASING.get(),
             CNBlocks.REACTOR_OUTPUT.get()
@@ -47,9 +46,6 @@ public class CNItemApplicationRecipeGen extends CNProcessingRecipeGen {
                         .output(output)
         );
     }
-
-
-
 
 
     public CNItemApplicationRecipeGen(PackOutput generator) {

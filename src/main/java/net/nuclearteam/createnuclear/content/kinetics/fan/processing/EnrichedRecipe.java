@@ -2,8 +2,6 @@ package net.nuclearteam.createnuclear.content.kinetics.fan.processing;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import com.simibubi.create.AllRecipeTypes;
-import com.simibubi.create.content.kinetics.fan.processing.HauntingRecipe.HauntingWrapper;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipe;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder.ProcessingRecipeParams;
 

@@ -1,12 +1,13 @@
 {
   "itemGroup.createnuclear.main": "Create Nuclear",
+  "itemgroup.uranium": "Uranium Group",
 
-  "createnuclear.enriched.fan.recipe": "Bulk Enriched",
-  "emi.category.createnuclear.fan_enriched": "Bulk Enriched",
-  "create.recipe.fan_enriched.fan": "Fan behing Enriched",
+  "createnuclear.enriched.fan.recipe": "Bulk Enriching",
+  "emi.category.createnuclear.fan_enriched": "Bulk Enriching",
+  "create.recipe.fan_enriched.fan": "Fan behind Enriched Fire",
 
-  "createnuclear.gui.createnuclear.reactor_controller.title": "Reactor Controller",
-  "createnuclear.gui.createnuclear.reactor_input.title": "Reactor Input Storage",
+  "gui.createnuclear.reactor_controller.title": "Reactor Controller",
+  "gui.createnuclear.reactor_input.title": "Reactor Input Storage",
 
   "createnuclear.tooltip.heatLevel": "Heat Level",
   "createnuclear.tooltip.heatLevel.none": "None",
@@ -20,4 +21,5 @@
   "createnuclear.tooltip.item.graphene.rod": "Graphite Rod: ",
   "createnuclear.tooltip.item.unknown.rod": "Unknown: ",
   "createnuclear.gui.reactor_controller.info_header.title": "Heat value"
+
 }

@@ -3,10 +3,10 @@
   "category": "misc",
   "key": {
     "G": {
-      "item": "minecraft:glass"
+      "tag": "forge:glass"
     },
     "S": {
-      "item": "createnuclear:lead_ingot"
+      "tag": "forge:ingots/lead"
     }
   },
   "pattern": [

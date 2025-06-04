@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.content.enriching.campfire;
 
 import com.simibubi.create.foundation.block.IBE;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -39,19 +40,22 @@ import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNEffects;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+@SuppressWarnings({"deprecation", "unused"})
 public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWaterloggedBlock, IBE<EnrichingCampfireBlockEntity> {
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 7.0, 16.0);
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     private final boolean spawnParticles;
-    private final int fireDamage;
 
-    public EnrichingCampfireBlock(Properties propertie, boolean spawnParticles, int fireDamage) {
-        super(propertie);
+    public EnrichingCampfireBlock(Properties property, boolean spawnParticles, int fireDamage) {
+        super(property);
         this.spawnParticles = spawnParticles;
-        this.fireDamage = fireDamage;
-        this.registerDefaultState((BlockState) ((BlockState)((BlockState)((BlockState)this.stateDefinition.any()).setValue(LIT, true)).setValue(WATERLOGGED, false)).setValue(FACING, Direction.NORTH));
+        this.registerDefaultState(this.stateDefinition.any().setValue(LIT, true).setValue(WATERLOGGED, false).setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -61,9 +65,8 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
 
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
-        if (state.getValue(LIT).booleanValue() && entity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)entity)) {
+        if (state.getValue(LIT) && entity instanceof LivingEntity && !EnchantmentHelper.hasFrostWalker((LivingEntity)entity)) {
             ((LivingEntity) entity).addEffect(new MobEffectInstance(CNEffects.RADIATION.get(), 100, 0));
-            //entity.hurt(level.damageSources().inFire(), this.fireDamage); // a remplacé
         }
         super.entityInside(state, level, pos, entity);
     }
@@ -73,13 +76,13 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos blockPos;
         Level levelAccessor = context.getLevel();
-        boolean bl = levelAccessor.getFluidState(blockPos = context.getClickedPos()).getType() == Fluids.WATER;
-        return (BlockState)((BlockState)((BlockState)this.defaultBlockState().setValue(WATERLOGGED, bl)).setValue(LIT, !bl)).setValue(FACING, context.getHorizontalDirection());
+        boolean bl = levelAccessor.getFluidState(context.getClickedPos()).getType() == Fluids.WATER;
+        return this.defaultBlockState().setValue(WATERLOGGED, bl).setValue(LIT, !bl).setValue(FACING, context.getHorizontalDirection());
     }
 
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        if (state.getValue(WATERLOGGED).booleanValue()) {
+        if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
         return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
@@ -97,7 +100,7 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (!state.getValue(LIT).booleanValue()) {
+        if (!state.getValue(LIT)) {
             return;
         }
         if (random.nextInt(10) == 0) {
@@ -125,7 +128,7 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
 
     @Override
     public boolean placeLiquid(LevelAccessor level, BlockPos pos, BlockState state, FluidState fluidState) {
-        if (!state.getValue(BlockStateProperties.WATERLOGGED).booleanValue() && fluidState.getType() == Fluids.WATER) {
+        if (!state.getValue(BlockStateProperties.WATERLOGGED) && fluidState.getType() == Fluids.WATER) {
             boolean bl = state.getValue(LIT);
             if (bl) {
                 if (!level.isClientSide()) {
@@ -133,7 +136,7 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
                 }
                 EnrichingCampfireBlock.dowse(null, level, pos, state);
             }
-            level.setBlock(pos, (BlockState)((BlockState)state.setValue(WATERLOGGED, true)).setValue(LIT, false), 3);
+            level.setBlock(pos, state.setValue(WATERLOGGED, true).setValue(LIT, false), 3);
             level.scheduleTick(pos, fluidState.getType(), fluidState.getType().getTickDelay(level));
             return true;
         }
@@ -143,8 +146,8 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
     @Override
     public void onProjectileHit(Level level, BlockState state, BlockHitResult hit, Projectile projectile) {
         BlockPos blockPos = hit.getBlockPos();
-        if (!level.isClientSide && projectile.isOnFire() && projectile.mayInteract(level, blockPos) && !state.getValue(LIT).booleanValue() && !state.getValue(WATERLOGGED).booleanValue()) {
-            level.setBlock(blockPos, (BlockState)state.setValue(BlockStateProperties.LIT, true), 11);
+        if (!level.isClientSide && projectile.isOnFire() && projectile.mayInteract(level, blockPos) && !state.getValue(LIT) && !state.getValue(WATERLOGGED)) {
+            level.setBlock(blockPos, state.setValue(BlockStateProperties.LIT, true), 11);
         }
     }
 
@@ -155,7 +158,7 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        if (state.getValue(WATERLOGGED).booleanValue()) {
+        if (state.getValue(WATERLOGGED)) {
             return Fluids.WATER.getSource(false);
         }
         return super.getFluidState(state);
@@ -163,7 +166,7 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
 
     @Override
     public BlockState rotate(BlockState state, Rotation rotation) {
-        return (BlockState)state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
 
     @Override
@@ -194,7 +197,7 @@ public class EnrichingCampfireBlock extends BaseEntityBlock implements SimpleWat
     @Override
     public <S extends BlockEntity> BlockEntityTicker<S> getTicker(Level level, BlockState state, BlockEntityType<S> blockEntityType) {
         if (level.isClientSide) {
-            if (state.getValue(LIT).booleanValue()) {
+            if (state.getValue(LIT)) {
                 return EnrichingCampfireBlock.createTickerHelper(blockEntityType, CNBlockEntityTypes.ENRICHING_CAMPFIRE_BLOCK.get(), EnrichingCampfireBlockEntity::particleTick);
             }
         }

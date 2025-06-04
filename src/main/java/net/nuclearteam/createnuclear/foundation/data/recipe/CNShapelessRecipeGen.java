@@ -21,7 +21,6 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.ModLoadedCondition;
 import net.minecraftforge.common.crafting.conditions.NotCondition;
-import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
@@ -33,45 +32,45 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+@SuppressWarnings("unused")
 public class CNShapelessRecipeGen extends CNProcessingRecipeGen {
 
-    private String SHAPELESS = enterFolder("shapeless");
+    private final String SHAPELESS = enterFolder("shapeless");
     GeneratedRecipe
-
-            RAW_URANIUM = create(CNItems.RAW_URANIUM).returns(9)
+        RAW_URANIUM = create(CNItems.RAW_URANIUM).returns(9)
             .withSuffix("_from_decompacting")
-            .unlockedBy(CNItems.RAW_URANIUM::get)
-            .viaShapeless(b -> b.requires(CNBlocks.RAW_URANIUM_BLOCK.get())),
+            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/raw_uranium"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/raw_uranium"))),
 
-    RAW_LEAD = create(CNItems.RAW_LEAD).returns(9)
+        RAW_LEAD = create(CNItems.RAW_LEAD).returns(9)
             .withSuffix("_from_decompacting")
-            .unlockedBy(CNItems.RAW_LEAD::get)
-            .viaShapeless(b -> b.requires(CNBlocks.RAW_LEAD_BLOCK.get())),
+            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/raw_lead"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/raw_lead"))),
 
-    LEAD_INGOT = create(CNItems.LEAD_INGOT).returns(9)
+        LEAD_INGOT = create(CNItems.LEAD_INGOT).returns(9)
             .withSuffix("_from_decompacting")
-            .unlockedBy(CNItems.LEAD_INGOT::get)
-            .viaShapeless(b -> b.requires(CNBlocks.LEAD_BLOCK.get())),
+            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/lead"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/lead"))),
 
-    LEAD_NUGGET = create(CNItems.LEAD_NUGGET).returns(9)
+        LEAD_NUGGET = create(CNItems.LEAD_NUGGET).returns(9)
             .withSuffix("_from_decompacting")
-            .unlockedBy(CNItems.LEAD_NUGGET::get)
-            .viaShapeless(b -> b.requires(CNItems.LEAD_INGOT.get())),
+            .unlockedByTag(() -> CNTags.forgeItemTag("ingots/lead"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("ingots/lead"))),
 
-    STEEL_INGOT = create(CNItems.STEEL_INGOT).returns(9)
+        STEEL_INGOT = create(CNItems.STEEL_INGOT).returns(9)
             .withSuffix("_from_decompacting")
-            .unlockedBy(CNItems.STEEL_INGOT::get)
-            .viaShapeless(b -> b.requires(CNBlocks.STEEL_BLOCK.get())),
+            .unlockedByTag(() -> CNTags.forgeItemTag("storage_blocks/steel"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("storage_blocks/steel"))),
 
-    STEEL_NUGGET = create(CNItems.STEEL_NUGGET).returns(9)
+        STEEL_NUGGET = create(CNItems.STEEL_NUGGET).returns(9)
             .withSuffix("_from_decompacting")
-            .unlockedBy(CNItems.STEEL_NUGGET::get)
-            .viaShapeless(b -> b.requires(CNItems.STEEL_INGOT.get())),
+            .unlockedByTag(() -> CNTags.forgeItemTag("ingots/steel"))
+            .viaShapeless(b -> b.requires(CNTags.forgeItemTag("ingots/steel"))),
 
-    REACTOR_BLUEPRINT_ITEM_CLEAR = clearData(CNItems.REACTOR_BLUEPRINT)
-            ;
+        REACTOR_BLUEPRINT_ITEM_CLEAR = clearData(CNItems.REACTOR_BLUEPRINT)
+        ;
 
-    private String SHAPELESS_CLOTH = enterFolder("shapeless/cloth");
+    private final String SHAPELESS_CLOTH = enterFolder("shapeless/cloth");
 
     ClothItem.DyeRecipeList CLOTH_CHANGING = new ClothItem.DyeRecipeList(color -> {
         List<Item> ingredients = new ArrayList<>(Arrays.asList(Items.WHITE_DYE, Items.ORANGE_DYE, Items.MAGENTA_DYE, Items.LIGHT_BLUE_DYE, Items.YELLOW_DYE, Items.LIME_DYE, Items.PINK_DYE, Items.GRAY_DYE, Items.LIGHT_GRAY_DYE, Items.CYAN_DYE, Items.PURPLE_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.GREEN_DYE, Items.RED_DYE, Items.BLACK_DYE));

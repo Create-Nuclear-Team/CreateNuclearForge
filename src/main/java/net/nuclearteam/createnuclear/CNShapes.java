@@ -10,6 +10,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.function.BiFunction;
 
+@SuppressWarnings("unused")
 public class CNShapes {
 
     // Independent Shapers

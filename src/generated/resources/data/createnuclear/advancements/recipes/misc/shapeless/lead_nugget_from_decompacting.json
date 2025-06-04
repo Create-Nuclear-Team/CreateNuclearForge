@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "createnuclear:lead_nugget"
-            ]
+            "tag": "forge:ingots/lead"
           }
         ]
       },

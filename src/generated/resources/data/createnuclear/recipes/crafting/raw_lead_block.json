@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "R": {
-      "item": "createnuclear:raw_lead"
+      "tag": "forge:raw_materials/lead"
     }
   },
   "pattern": [

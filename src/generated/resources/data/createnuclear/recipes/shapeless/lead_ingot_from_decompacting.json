@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "createnuclear:lead_block"
+      "tag": "forge:storage_blocks/lead"
     }
   ],
   "result": {
