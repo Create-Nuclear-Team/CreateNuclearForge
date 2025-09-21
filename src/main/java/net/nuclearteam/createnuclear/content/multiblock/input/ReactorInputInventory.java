@@ -4,6 +4,7 @@ package net.nuclearteam.createnuclear.content.multiblock.input;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.CNTags;
 import org.jetbrains.annotations.NotNull;
 
 public class ReactorInputInventory extends ItemStackHandler {
@@ -23,8 +24,8 @@ public class ReactorInputInventory extends ItemStackHandler {
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
         return switch (slot) {
-            case 0 -> CNItems.URANIUM_ROD.get() == stack.getItem();
-            case 1 -> CNItems.GRAPHITE_ROD.get() == stack.getItem();
+            case 0 -> CNTags.CNItemTags.FUEL.matches(stack);
+            case 1 -> CNTags.CNItemTags.COOLER.matches(stack);
             default -> !super.isItemValid(slot, stack);
         };
     }
