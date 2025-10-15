@@ -18,6 +18,8 @@
     "createnuclear:steel_block",
     "createnuclear:thorium_ore",
     "createnuclear:deepslate_thorium_ore",
+    "createnuclear:thorium_block",
+    "createnuclear:raw_thorium_block",
     "createnuclear:autunite",
     "createnuclear:cut_autunite",
     "createnuclear:cut_autunite_stairs",
