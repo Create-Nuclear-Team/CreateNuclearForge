@@ -444,12 +444,10 @@ public class CNBlocks {
                     .tag(BlockTags.NEEDS_IRON_TOOL,
                             CNTags.forgeBlockTag("ores"),
                             CNTags.forgeBlockTag("ores_in_ground/stone"),
-                            CNTags.forgeBlockTag("ores/thorium"),
-                            CNBlockTags.LEAD_ORES.tag
+                            CNTags.forgeBlockTag("ores/thorium")
                     )
                     .item()
-                    .tag(CNItemTags.LEAD_ORES.tag,
-                            CNTags.forgeItemTag("ores/thorium"))
+                    .tag(CNTags.forgeItemTag("ores/thorium"))
                     .build()
                     .register();
 
