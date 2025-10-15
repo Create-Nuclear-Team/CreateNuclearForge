@@ -49,6 +49,7 @@ import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
 import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
 
+
 public class CNBlocks {
 
     public static final BlockEntry<ReactorCasing> REACTOR_CASING =
@@ -428,6 +429,29 @@ public class CNBlocks {
             .tag(CNTags.forgeItemTag("storage_blocks/steel"))
             .build()
             .register();
+
+
+    public static final BlockEntry<Block> THORIUM_ORE =
+            CreateNuclear.REGISTRATE.block("thorium_ore", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .simpleItem()
+                    .transform(pickaxeOnly())
+                    .loot((lt, b) -> lt.add(b,
+                            RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
+                                            .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                                    ))))
+                    .tag(BlockTags.NEEDS_IRON_TOOL,
+                            CNTags.forgeBlockTag("ores"),
+                            CNTags.forgeBlockTag("ores_in_ground/stone"),
+                            CNTags.forgeBlockTag("ores/thorium"),
+                            CNBlockTags.LEAD_ORES.tag
+                    )
+                    .item()
+                    .tag(CNItemTags.LEAD_ORES.tag,
+                            CNTags.forgeItemTag("ores/thorium"))
+                    .build()
+                    .register();
 
     /*public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK = CreateNuclear.REGISTRATE.block("test_event_trigger_block", EventTriggerBlock::new)
             .defaultBlockstate()

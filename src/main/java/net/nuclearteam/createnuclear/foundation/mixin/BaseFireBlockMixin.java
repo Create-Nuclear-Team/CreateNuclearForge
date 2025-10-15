@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BaseFireBlock.class)
 public abstract class BaseFireBlockMixin {
-    @Inject(at = @At("HEAD"), method = "m_49245_", cancellable = true)
+    @Inject(at = @At("HEAD"), method = "getState", cancellable = true)
     private static void CN$getState(BlockGetter reader, BlockPos pos, CallbackInfoReturnable<BlockState> cir) {
         BlockPos blockPos = pos.below();
         BlockState blockState = reader.getBlockState(blockPos);
