@@ -404,7 +404,7 @@ public class CNBlocks {
             .transform(pickaxeOnly())
             .loot((lt, b) -> lt.add(b,
                 RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
+                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
                         .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
             ))))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL,
@@ -438,12 +438,32 @@ public class CNBlocks {
                     .transform(pickaxeOnly())
                     .loot((lt, b) -> lt.add(b,
                             RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
                                             .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
                                     ))))
                     .tag(BlockTags.NEEDS_IRON_TOOL,
                             CNTags.forgeBlockTag("ores"),
                             CNTags.forgeBlockTag("ores_in_ground/stone"),
+                            CNTags.forgeBlockTag("ores/thorium")
+                    )
+                    .item()
+                    .tag(CNTags.forgeItemTag("ores/thorium"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<Block> DEEPSLATE_THORIUM_ORE =
+            CreateNuclear.REGISTRATE.block("deepslate_thorium_ore", Block::new)
+                    .initialProperties(() -> Blocks.DIAMOND_ORE)
+                    .simpleItem()
+                    .transform(pickaxeOnly())
+                    .loot((lt, b) -> lt.add(b,
+                            RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
+                                            .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                                    ))))
+                    .tag(BlockTags.NEEDS_DIAMOND_TOOL,
+                            CNTags.forgeBlockTag("ores"),
+                            CNTags.forgeBlockTag("ores_in_ground/deepslate"),
                             CNTags.forgeBlockTag("ores/thorium")
                     )
                     .item()

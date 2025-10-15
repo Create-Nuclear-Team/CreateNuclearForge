@@ -24,7 +24,7 @@
                   }
                 }
               ],
-              "name": "createnuclear:uranium_ore"
+              "name": "createnuclear:thorium_ore"
             },
             {
               "type": "minecraft:item",
@@ -38,7 +38,7 @@
                   "function": "minecraft:explosion_decay"
                 }
               ],
-              "name": "createnuclear:raw_thorium"
+              "name": "createnuclear:raw_lead"
             }
           ]
         }
@@ -46,5 +46,5 @@
       "rolls": 1.0
     }
   ],
-  "random_sequence": "createnuclear:blocks/uranium_ore"
+  "random_sequence": "createnuclear:blocks/thorium_ore"
 }
