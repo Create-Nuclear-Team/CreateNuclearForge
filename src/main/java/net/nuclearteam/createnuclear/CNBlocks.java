@@ -471,6 +471,26 @@ public class CNBlocks {
                     .build()
                     .register();
 
+    public static final BlockEntry<Block> THORIUM_BLOCK =
+            CreateNuclear.REGISTRATE.block("thorium_block", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .transform(pickaxeOnly())
+                    .tag(CNTags.forgeBlockTag("storage_blocks/thorium"))
+                    .item()
+                    .tag(CNTags.forgeItemTag("storage_blocks/thorium"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<Block> RAW_THORIUM_BLOCK =
+            CreateNuclear.REGISTRATE.block("raw_thorium_block", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .transform(pickaxeOnly())
+                    .tag(CNTags.forgeBlockTag("storage_blocks/raw_thorium"))
+                    .item()
+                    .tag(CNTags.forgeItemTag("storage_blocks/raw_thorium"))
+                    .build()
+                    .register();
+
     /*public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK = CreateNuclear.REGISTRATE.block("test_event_trigger_block", EventTriggerBlock::new)
             .defaultBlockstate()
             .defaultLang()
