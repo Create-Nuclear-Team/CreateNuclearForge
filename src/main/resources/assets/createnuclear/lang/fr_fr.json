@@ -267,5 +267,7 @@
   "tag.item.createnuclear.fuel": "Carburant",
   "tag.item.minecraft.all.campfires": "Tous les feux de camps",
   "tag.item.minecraft.campfires": "Feu de camps",
-  "tag.item.trinkets.head.face": "Face avant"
+  "tag.item.trinkets.head.face": "Face avant",
+  "item.createnuclear.raw_thorium": "Thorium brut"
+
 }
