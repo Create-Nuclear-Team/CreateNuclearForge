@@ -54,6 +54,29 @@ public class CNFluids {
             .build()
             .register();
 
+    public static final FluidEntry<ForgeFlowingFluid.Flowing> THORIUM =
+            CreateNuclear.REGISTRATE.standardFluid("thorium", SolidRenderedPlaceableFluidtype.create(0x38f9ff, () -> 1f / 32f))
+                    .lang("Liquid Thorium")
+                    .tag(CNFluidTags.THORIUM.tag)
+                    .properties(p -> p.viscosity(200)
+                            .density(100)
+                            .canSwim(false)
+                            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA)
+                            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_LAVA)
+                            .canDrown(false)
+                    )
+                    .fluidProperties(f -> f.levelDecreasePerBlock(2)
+                            .tickRate(15)
+                            .slopeFindDistance(6)
+                            .explosionResistance(100f)
+                    )
+                    .source(ForgeFlowingFluid.Source::new)
+                    .bucket()
+                    .tag(CNTags.forgeItemTag("buckets/thorium"))
+                    .lang("Thorium Bucket")
+                    .build()
+                    .register();
+
     public static void register() {}
 
     public static void handleFluidEffect(LivingEvent.LivingTickEvent event) {
@@ -100,8 +123,8 @@ public class CNFluids {
             };
         }
 
-        private SolidRenderedPlaceableFluidtype(Properties properties, ResourceLocation stillTecture, ResourceLocation flowingTexture) {
-            super(properties, stillTecture, flowingTexture);
+        private SolidRenderedPlaceableFluidtype(Properties properties, ResourceLocation stillTexture, ResourceLocation flowingTexture) {
+            super(properties, stillTexture, flowingTexture);
         }
 
         @Override
