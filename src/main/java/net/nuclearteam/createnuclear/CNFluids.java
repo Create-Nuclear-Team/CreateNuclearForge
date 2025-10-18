@@ -134,7 +134,7 @@ public class CNFluids {
 
         @Override
         protected int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-            return 0x38FF08;
+            return 0x00ffffff;
         }
 
         @Override
