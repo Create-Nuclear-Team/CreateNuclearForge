@@ -71,6 +71,7 @@ public class IrradiatedCat extends TamableAnimal {
         super(entityType, level);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     protected void registerGoals() {
         this.temptGoal = new CatTemptGoal(this, 0.6, TEMPT_INGREDIENT, true);
         this.goalSelector.addGoal(1, new FloatGoal(this));
@@ -288,6 +289,7 @@ public class IrradiatedCat extends TamableAnimal {
         }
     }
 
+    @SuppressWarnings("null")
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
         spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
         boolean bl = level.getMoonBrightness() > 0.9F;
@@ -299,6 +301,7 @@ public class IrradiatedCat extends TamableAnimal {
         return spawnData;
     }
 
+    @SuppressWarnings("null")
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         Item item = itemStack.getItem();

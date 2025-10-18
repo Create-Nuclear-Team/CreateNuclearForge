@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:raw_materials/uranium"
+            "items": [
+              "createnuclear:thorium_ingot"
+            ]
           }
         ]
       },
@@ -13,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "createnuclear:crafting/raw_uranium_block"
+        "recipe": "createnuclear:crafting/thorium/thorium_block_from_compacting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "createnuclear:crafting/raw_uranium_block"
+      "createnuclear:crafting/thorium/thorium_block_from_compacting"
     ]
   },
   "sends_telemetry_event": false

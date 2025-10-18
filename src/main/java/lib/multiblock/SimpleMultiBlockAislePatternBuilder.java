@@ -4,15 +4,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.multiblock.impl.IMultiBlockPatternBuilder;
 import lib.multiblock.impl.IMultiBlockPattern;
-import lib.multiblock.impl.IMultiBlockPatternBuilder;
 import lib.multiblock.impl.IPatternBuilder;
 import lib.multiblock.misc.MultiBlockOffsetPos;
 import lib.multiblock.misc.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
-import net.nuclearteam.createnuclear.CreateNuclear;
-
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 

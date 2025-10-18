@@ -178,7 +178,8 @@ public class CNTags {
     }
 
     public enum CNFluidTags {
-        URANIUM
+        URANIUM,
+        THORIUM
         ;
 
         public final TagKey<Fluid> tag;

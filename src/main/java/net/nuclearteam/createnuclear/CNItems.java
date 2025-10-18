@@ -46,7 +46,34 @@ public class CNItems {
             .tag(CNTags.forgeItemTag("raw_ores"), CNTags.forgeItemTag("raw_materials"), CNTags.forgeItemTag("raw_materials/lead"))
             .register(),
 
-        RAW_URANIUM = CreateNuclear.REGISTRATE
+        RAW_THORIUM = CreateNuclear.REGISTRATE
+            .item("raw_thorium", Item::new)
+            .tag(
+                    CNTags.forgeItemTag("raw_ores"),
+                    CNTags.forgeItemTag("raw_materials"),
+                    CNTags.forgeItemTag("raw_materials/thorium")
+            )
+            .register(),
+
+    THORIUM_DUST = CreateNuclear.REGISTRATE
+            .item("thorium_dust", Item::new)
+            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/thorium_dust")))
+            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("dusts/thorium"))
+            .register(),
+
+    THORIUM_INGOT = CreateNuclear.REGISTRATE
+            .item("thorium_ingot", Item::new)
+            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/thorium_ingot")))
+            .tag(CNTags.forgeItemTag("ingots"), CNTags.forgeItemTag("ingots/thorium"))
+            .register(),
+
+    THORIUM_NUGGET = CreateNuclear.REGISTRATE
+            .item("thorium_nugget", Item::new)
+            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/thorium_nugget")))
+            .tag(CNTags.forgeItemTag("nuggets"), CNTags.forgeItemTag("nuggets/thorium"))
+            .register(),
+
+    RAW_URANIUM = CreateNuclear.REGISTRATE
             .item("raw_uranium", Item::new)
             .tag(CNTags.forgeItemTag("raw_ores"), CNTags.forgeItemTag("raw_materials"), CNTags.forgeItemTag("raw_materials/uranium"))
             .register(),

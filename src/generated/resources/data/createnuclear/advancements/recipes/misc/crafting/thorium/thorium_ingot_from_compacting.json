@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:raw_materials/lead"
+            "items": [
+              "createnuclear:thorium_nugget"
+            ]
           }
         ]
       },
@@ -13,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "createnuclear:crafting/raw_lead_block"
+        "recipe": "createnuclear:crafting/thorium/thorium_ingot_from_compacting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "createnuclear:crafting/raw_lead_block"
+      "createnuclear:crafting/thorium/thorium_ingot_from_compacting"
     ]
   },
   "sends_telemetry_event": false

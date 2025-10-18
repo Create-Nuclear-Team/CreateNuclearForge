@@ -1,6 +1,7 @@
 {
   "values": [
     "createnuclear:raw_lead",
+    "createnuclear:raw_thorium",
     "createnuclear:raw_uranium"
   ]
 }

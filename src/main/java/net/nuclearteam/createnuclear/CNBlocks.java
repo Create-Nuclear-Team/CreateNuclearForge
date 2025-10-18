@@ -25,7 +25,6 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.Tags;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasing;
@@ -49,6 +48,7 @@ import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
 import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
 
+@SuppressWarnings("removal")
 public class CNBlocks {
 
     public static final BlockEntry<ReactorCasing> REACTOR_CASING =
@@ -83,6 +83,7 @@ public class CNBlocks {
             .simpleItem()
             .register();
 
+    
     public static final BlockEntry<ReactorFrame> REACTOR_FRAME =
         CreateNuclear.REGISTRATE.block("reactor_frame", ReactorFrame::new)
             .initialProperties(SharedProperties::stone)
@@ -403,7 +404,7 @@ public class CNBlocks {
             .transform(pickaxeOnly())
             .loot((lt, b) -> lt.add(b,
                 RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
+                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
                         .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
             ))))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL,
@@ -428,6 +429,67 @@ public class CNBlocks {
             .tag(CNTags.forgeItemTag("storage_blocks/steel"))
             .build()
             .register();
+
+
+    public static final BlockEntry<Block> THORIUM_ORE =
+            CreateNuclear.REGISTRATE.block("thorium_ore", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .simpleItem()
+                    .transform(pickaxeOnly())
+                    .loot((lt, b) -> lt.add(b,
+                            RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
+                                            .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                                    ))))
+                    .tag(BlockTags.NEEDS_IRON_TOOL,
+                            CNTags.forgeBlockTag("ores"),
+                            CNTags.forgeBlockTag("ores_in_ground/stone"),
+                            CNTags.forgeBlockTag("ores/thorium")
+                    )
+                    .item()
+                    .tag(CNTags.forgeItemTag("ores/thorium"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<Block> DEEPSLATE_THORIUM_ORE =
+            CreateNuclear.REGISTRATE.block("deepslate_thorium_ore", Block::new)
+                    .initialProperties(() -> Blocks.DIAMOND_ORE)
+                    .simpleItem()
+                    .transform(pickaxeOnly())
+                    .loot((lt, b) -> lt.add(b,
+                            RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
+                                            .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                                    ))))
+                    .tag(BlockTags.NEEDS_DIAMOND_TOOL,
+                            CNTags.forgeBlockTag("ores"),
+                            CNTags.forgeBlockTag("ores_in_ground/deepslate"),
+                            CNTags.forgeBlockTag("ores/thorium")
+                    )
+                    .item()
+                    .tag(CNTags.forgeItemTag("ores/thorium"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<Block> THORIUM_BLOCK =
+            CreateNuclear.REGISTRATE.block("thorium_block", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .transform(pickaxeOnly())
+                    .tag(CNTags.forgeBlockTag("storage_blocks/thorium"))
+                    .item()
+                    .tag(CNTags.forgeItemTag("storage_blocks/thorium"))
+                    .build()
+                    .register();
+
+    public static final BlockEntry<Block> RAW_THORIUM_BLOCK =
+            CreateNuclear.REGISTRATE.block("raw_thorium_block", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .transform(pickaxeOnly())
+                    .tag(CNTags.forgeBlockTag("storage_blocks/raw_thorium"))
+                    .item()
+                    .tag(CNTags.forgeItemTag("storage_blocks/raw_thorium"))
+                    .build()
+                    .register();
 
     /*public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK = CreateNuclear.REGISTRATE.block("test_event_trigger_block", EventTriggerBlock::new)
             .defaultBlockstate()

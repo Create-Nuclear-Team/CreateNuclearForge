@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.multiblock.impl.IMultiBlockPatternBuilder;
-import lib.multiblock.impl.IMultiBlockPatternBuilder;
 import lib.multiblock.impl.IPatternBuilder;
 import lib.multiblock.misc.MultiBlockOffsetPos;
 import net.minecraft.core.BlockPos;
@@ -19,6 +18,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public final class SimpleMultiBlockPatternBuilder implements IMultiBlockPatternBuilder {
     private static final Joiner COMA_SEPARATOR = Joiner.on(',');
     public static SimpleMultiBlockPatternBuilder start() {
