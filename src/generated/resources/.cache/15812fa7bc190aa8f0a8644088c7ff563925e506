@@ -1,4 +1,4 @@
-// 1.20.1	2025-05-27T20:12:08.2853318	CreateNuclear's Processing Recipes
+// 1.20.1	2025-10-18T20:38:48.8956666	CreateNuclear's Processing Recipes
 d02fe65c0c4f06b58fa7565d7254902de5018e8b data/createnuclear/advancements/recipes/building_blocks/shapeless/cloth/black_cloth.json
 9690e12858db1c546576ce70847e723c005f814e data/createnuclear/advancements/recipes/building_blocks/shapeless/cloth/blue_cloth.json
 3bebcd85a99be0ddec8db66c5734232ac4bbd2ad data/createnuclear/advancements/recipes/building_blocks/shapeless/cloth/brown_cloth.json
@@ -40,8 +40,8 @@ f2d3a2dbcb9135e31261cc8408f11cd07038a826 data/createnuclear/recipes/item_applica
 8228bb2d850dfd474e2ce142ac9a0ff6ab707f07 data/createnuclear/recipes/mechanical_crafting/reactor_core.json
 48db9006423a3762a24c7cae7a3534f124aa0e4c data/createnuclear/recipes/mechanical_crafting/reactor_frame.json
 0a1d26105f14cb2a01b18b9f050c900412f917fb data/createnuclear/recipes/mechanical_crafting/uranium_rod.json
-21619f6b573091dd880541f61af3c1b1b8d495e4 data/createnuclear/recipes/mixing/steel.json
-a9895b29715ad4cce9d97c158677bfcf21eaff14 data/createnuclear/recipes/mixing/uranium_fluid.json
+7fc7695cd03577131096e9695170193044f8bc1a data/createnuclear/recipes/mixing/steel.json
+23e57de458330d04dfebff8070b44b3b1b2718eb data/createnuclear/recipes/mixing/uranium_fluid.json
 ee4d2bf63449ba88826be263cf98e4bba2927ced data/createnuclear/recipes/pressing/graphene.json
 1713ce33da8ce2fd0145e9921cab615d31fa5e66 data/createnuclear/recipes/shapeless/cloth/black_cloth.json
 0d0c71a2b494a34439cb2d7873b31083b07877b0 data/createnuclear/recipes/shapeless/cloth/blue_cloth.json

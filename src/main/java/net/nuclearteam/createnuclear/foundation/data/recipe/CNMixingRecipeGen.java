@@ -19,13 +19,13 @@ public class CNMixingRecipeGen extends CNProcessingRecipeGen {
 
     GeneratedRecipe
         STEEL = create("steel", b -> b
-            .require(CNTags.forgeItemTag("coal_dusts"))
+            .require(CNTags.forgeItemTag("dusts/coal"))
             .require(Tags.Items.INGOTS_IRON)
             .output(CNItems.STEEL_INGOT)
         ),
 
         URANIUM_FLUID = create("uranium_fluid", b -> b
-            .require(CNItems.URANIUM_POWDER)
+            .require(CNTags.forgeItemTag("dusts/uranium"))
             .output(CNFluids.URANIUM.get(), 25)
         )
     ;
