@@ -25,7 +25,6 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.common.Tags;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasing;
@@ -49,7 +48,7 @@ import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
 import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
 
-
+@SuppressWarnings("removal")
 public class CNBlocks {
 
     public static final BlockEntry<ReactorCasing> REACTOR_CASING =
@@ -84,6 +83,7 @@ public class CNBlocks {
             .simpleItem()
             .register();
 
+    
     public static final BlockEntry<ReactorFrame> REACTOR_FRAME =
         CreateNuclear.REGISTRATE.block("reactor_frame", ReactorFrame::new)
             .initialProperties(SharedProperties::stone)

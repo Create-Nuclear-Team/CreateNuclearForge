@@ -38,6 +38,7 @@ public class CatSitOnBlockGoal extends MoveToBlockGoal {
         this.cat.setInSittingPose(this.isReachedTarget());
     }
 
+    @SuppressWarnings("null")
     protected boolean isValidTarget(LevelReader level, BlockPos pos) {
         if (!level.isEmptyBlock(pos.above())) {
             return false;
