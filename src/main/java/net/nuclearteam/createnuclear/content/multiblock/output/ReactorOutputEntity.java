@@ -65,8 +65,8 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     }
 
     public void determineSpeed() {
-        int speed = this.speed
-        setSpeedAndUpdate(speed)
+        int deterSpeed = this.speed
+        setSpeedAndUpdate(deterSpeed)
     }
 
     public void setSpeedAndUpdate(int speed) {
