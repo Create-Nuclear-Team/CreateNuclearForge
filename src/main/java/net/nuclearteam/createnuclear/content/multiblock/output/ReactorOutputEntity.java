@@ -2,17 +2,13 @@ package net.nuclearteam.createnuclear.content.multiblock.output;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
-import com.simibubi.create.content.kinetics.motor.KineticScrollValueBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
-import com.simibubi.create.foundation.utility.CreateLang;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import net.createmod.catnip.math.AngleHelper;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -25,7 +21,6 @@ import net.nuclearteam.createnuclear.CNBlocks;
 
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
-import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.List;
 import java.util.Objects;
@@ -66,8 +61,8 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     }
 
     public void determineSpeed() {
-        int deterSpeed = this.speed
-        setSpeedAndUpdate(deterSpeed)
+        int deterSpeed = this.speed;
+        setSpeedAndUpdate(deterSpeed);
     }
 
     public void setSpeedAndUpdate(int speed) {
@@ -172,7 +167,7 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
         // if (!CNBlocks.REACTOR_OUTPUT.has(getBlockState()))
         //     return 0;
         // return speed; //convertToDirection(speed, getBlockState().getValue(ReactorOutput.FACING));
-        return Mth.clamp(generatedSpeed, 0, 1500000)
+        return Mth.clamp(generatedSpeed, 0, 1500000);
     }
 
     @Override
