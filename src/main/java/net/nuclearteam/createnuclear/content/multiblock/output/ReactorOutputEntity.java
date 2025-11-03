@@ -39,22 +39,58 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     ReactorControllerBlock controller = null;
     ReactorControllerBlockEntity controllerEntity = null;
 
-    protected ScrollValueBehaviour generatedSpeed;
+    // protected ScrollValueBehaviour generatedSpeed;
+    protected float generatedSpeed;
 
     public ReactorOutputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-    //KineticBlockEntity
+
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
-        generatedSpeed = new KineticScrollValueBehaviour(CreateNuclearLang.translateDirect("kinetics.reactor_output.rotation_speed"), this, new ReactorOutputValue());
-        generatedSpeed.between(-1500000, 1500000);
-        generatedSpeed.setValue(speed);
-        generatedSpeed.withCallback(i -> this.updateGeneratedRotation());
-        behaviours.add(generatedSpeed);
+        // generatedSpeed = new KineticScrollValueBehaviour(CreateNuclearLang.translateDirect("kinetics.reactor_output.rotation_speed"), this, new ReactorOutputValue());
+        // generatedSpeed.between(-1500000, 1500000);
+        // generatedSpeed.setValue(speed);
+        // generatedSpeed.withCallback(i -> this.updateGeneratedRotation());
+        // behaviours.add(generatedSpeed);
 
     }
+
+    @Override
+    public void lazyTick() {
+        super.lazyTick();
+
+        determineSpeed();
+    }
+
+    public void determineSpeed() {
+        int speed = speed
+        setSpeedAndUpdate(speed)
+    }
+
+    public void setSpeedAndUpdate(int speed) {
+        if (generatedSpeed == speed) return;
+
+        generatedSpeed = (float) speed;
+
+        updateGeneratedRotation();
+		setChanged();
+    }
+
+    @Override
+	protected void read(CompoundTag compound, boolean clientPacket) {
+		super.read(compound, clientPacket);
+		generatedSpeed = compound.getFloat("generatedSpeed");
+	}
+
+	
+	
+	@Override
+	public void write(CompoundTag compound, boolean clientPacket) {
+		super.write(compound, clientPacket);
+		compound.putFloat("generatedSpeed", generatedSpeed);
+	}
 
     @Override
     public void tick() {
@@ -73,31 +109,31 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
         } else setSpeed(0);
     }
 
-    @Override
-    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+    // @Override
+    // public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
 
-        float stressBase = calculateAddedStressCapacity();
+    //     float stressBase = calculateAddedStressCapacity();
 
-        CreateLang.translate("gui.goggles.generator_stats")
-                .forGoggles(tooltip);
-        CreateLang.translate("tooltip.capacityProvided")
-                .style(ChatFormatting.GRAY)
-                .forGoggles(tooltip);
+    //     CreateLang.translate("gui.goggles.generator_stats")
+    //             .forGoggles(tooltip);
+    //     CreateLang.translate("tooltip.capacityProvided")
+    //             .style(ChatFormatting.GRAY)
+    //             .forGoggles(tooltip);
 
-        float speed = getTheoreticalSpeed();
-        speed = Math.abs(speed);
+    //     float speed = getTheoreticalSpeed();
+    //     speed = Math.abs(speed);
 
-        float stressTotal = stressBase * speed;
+    //     float stressTotal = stressBase * speed;
 
-        CreateLang.number(stressTotal)
-                .translate("generic.unit.stress")
-                .style(ChatFormatting.AQUA)
-                .space()
-                .add(CreateLang.translate("gui.goggles.at_current_speed")
-                        .style(ChatFormatting.DARK_GRAY))
-                .forGoggles(tooltip, 1);
-        return true;
-    }
+    //     CreateLang.number(stressTotal)
+    //             .translate("generic.unit.stress")
+    //             .style(ChatFormatting.AQUA)
+    //             .space()
+    //             .add(CreateLang.translate("gui.goggles.at_current_speed")
+    //                     .style(ChatFormatting.DARK_GRAY))
+    //             .forGoggles(tooltip, 1);
+    //     return true;
+    // }
 
     @Override
     public void initialize() {
@@ -132,9 +168,10 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
     @Override
     public float getGeneratedSpeed() {
-        if (!CNBlocks.REACTOR_OUTPUT.has(getBlockState()))
-            return 0;
-        return speed; //convertToDirection(speed, getBlockState().getValue(ReactorOutput.FACING));
+        // if (!CNBlocks.REACTOR_OUTPUT.has(getBlockState()))
+        //     return 0;
+        // return speed; //convertToDirection(speed, getBlockState().getValue(ReactorOutput.FACING));
+        return Math.clamp(generatedSpeed, 0, 1500000)
     }
 
     @Override
