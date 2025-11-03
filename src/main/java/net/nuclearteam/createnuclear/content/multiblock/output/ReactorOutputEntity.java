@@ -65,7 +65,7 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     }
 
     public void determineSpeed() {
-        int speed = speed
+        int speed = this.speed
         setSpeedAndUpdate(speed)
     }
 
@@ -171,7 +171,7 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
         // if (!CNBlocks.REACTOR_OUTPUT.has(getBlockState()))
         //     return 0;
         // return speed; //convertToDirection(speed, getBlockState().getValue(ReactorOutput.FACING));
-        return Math.clamp(generatedSpeed, 0, 1500000)
+        return Mth.clamp(generatedSpeed, 0, 1500000)
     }
 
     @Override
