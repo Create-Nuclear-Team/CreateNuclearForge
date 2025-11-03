@@ -4,11 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
+import com.simibubi.create.foundation.utility.CreateLang;
 import dev.engine_room.flywheel.lib.transform.TransformStack;
 import net.createmod.catnip.math.AngleHelper;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -105,31 +108,31 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
         } else setSpeed(0);
     }
 
-    // @Override
-    // public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+     @Override
+     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
 
-    //     float stressBase = calculateAddedStressCapacity();
+         float stressBase = calculateAddedStressCapacity();
 
-    //     CreateLang.translate("gui.goggles.generator_stats")
-    //             .forGoggles(tooltip);
-    //     CreateLang.translate("tooltip.capacityProvided")
-    //             .style(ChatFormatting.GRAY)
-    //             .forGoggles(tooltip);
+         CreateLang.translate("gui.goggles.generator_stats")
+                 .forGoggles(tooltip);
+         CreateLang.translate("tooltip.capacityProvided")
+                 .style(ChatFormatting.GRAY)
+                 .forGoggles(tooltip);
 
-    //     float speed = getTheoreticalSpeed();
-    //     speed = Math.abs(speed);
+         float speed = getTheoreticalSpeed();
+         speed = Math.abs(speed);
 
-    //     float stressTotal = stressBase * speed;
+         float stressTotal = stressBase * speed;
 
-    //     CreateLang.number(stressTotal)
-    //             .translate("generic.unit.stress")
-    //             .style(ChatFormatting.AQUA)
-    //             .space()
-    //             .add(CreateLang.translate("gui.goggles.at_current_speed")
-    //                     .style(ChatFormatting.DARK_GRAY))
-    //             .forGoggles(tooltip, 1);
-    //     return true;
-    // }
+         CreateLang.number(stressTotal)
+                 .translate("generic.unit.stress")
+                 .style(ChatFormatting.AQUA)
+                 .space()
+                 .add(CreateLang.translate("gui.goggles.at_current_speed")
+                         .style(ChatFormatting.DARK_GRAY))
+                 .forGoggles(tooltip, 1);
+         return true;
+     }
 
     @Override
     public void initialize() {
