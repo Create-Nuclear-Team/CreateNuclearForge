@@ -33,14 +33,48 @@ public class ReactorBluePrintItemScreen extends AbstractSimiContainerScreen<Reac
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        int x = leftPos;
-        int y = topPos+38;
+        // Dimensions "logiques" du GUI (texture + inventaire)
+        int guiW = BG.width;
+        int guiH = BG.height + PLAYER_INVENTORY.getHeight();
 
-        BG.render(guiGraphics, x+23, y-19);
-        renderPlayerInventory(guiGraphics, x+23, y+175);
+        // Dimensions réelles de l'écran (la Screen fournit width/height)
+        int screenW = this.width;
+        int screenH = this.height;
 
-        guiGraphics.drawString(font, title, x+26, y-12, 0x592424, false); //ici pour le titre
+        // Calcul du scale pour faire tenir le GUI à l'écran (max 1.0)
+        float scale = Math.min(1.0f, Math.min((float)screenW / (float)guiW, (float)screenH / (float)guiH));
 
+        // Position à l'écran (en pixels) où l'on veut centrer le GUI après scale
+        int scaledGuiW = (int)(guiW * scale);
+        int scaledGuiH = (int)(guiH * scale);
+        int targetX = (screenW - scaledGuiW) / 2;
+        int targetY = (screenH - scaledGuiH) / 2;
+
+        // On pousse la transformation : d'abord on translate au coin supérieur gauche voulu,
+        // puis on scale. Après ce bloc, on dessine en coordonnées locales du GUI (0..guiW, 0..guiH).
+        guiGraphics.pose().pushPose();
+        // Translate en pixels *avant* le scale — on translate en coordonnées écran non-scalées,
+        // donc on translate en targetX,targetY (puis on scale)
+        guiGraphics.pose().translate(targetX, targetY, 0.0f);
+        guiGraphics.pose().scale(scale, scale, 1.0f);
+
+        // Ici on dessine en coordonnées "GUI logique". Si avant tu utilisais `x = leftPos; y = topPos+38;`
+        // adapte : dessiner à (23, -19) etc comme dans ton code original (relatif à l'origine GUI).
+        int originX = 23;     // équivalent à x+23 dans ton code
+        int originY = -19;    // équivalent à y-19 dans ton code
+
+        // Dessin du background dans les coordonnées locales
+        BG.render(guiGraphics, originX, originY);
+
+        // Inventaire joueur (position relative au GUI logique)
+        renderPlayerInventory(guiGraphics, originX, originY + 194); // 175 dans ton code +19 décalage -> adapte si besoin
+
+        // Titre (coordonnées locales aussi)
+        guiGraphics.drawString(font, title, originX + 3, originY + 7, 0x592424, false); // ajuste les offsets si besoin
+
+        guiGraphics.pose().popPose();
+
+        // Si tu veux gérer le hover/clic, convertis mouseX/mouseY en coordonnées GUI locales si scale != 1.
     }
 
     @Override
