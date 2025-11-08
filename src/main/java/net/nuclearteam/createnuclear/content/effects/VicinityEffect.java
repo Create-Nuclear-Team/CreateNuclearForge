@@ -5,6 +5,8 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.nuclearteam.createnuclear.CNBlocks;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -17,6 +19,9 @@ public class VicinityEffect extends MobEffect {
     private final Predicate<LivingEntity> filter;
     private final Supplier<MobEffectInstance>[] effects;
 
+    private int cooldownTicks = 500;
+
+    @SafeVarargs
     protected VicinityEffect(MobEffectCategory category, int color, UnaryOperator<Integer> areaSize, Predicate<LivingEntity> filter, Supplier<MobEffectInstance>... effects) {
         super(category, color);
 
@@ -33,7 +38,13 @@ public class VicinityEffect extends MobEffect {
             LivingEntity nearby = (LivingEntity) nearbyEntity;
 
             for (Supplier<MobEffectInstance> effect : effects) {
-                nearby.addEffect(effect.get());
+                if (cooldownTicks == 0) {
+                        nearby.addEffect(effect.get());
+                    cooldownTicks = 500;
+                } else {
+                    cooldownTicks--;
+                    CreateNuclear.LOGGER.warn("Test Duree: {}, entity: {}", cooldownTicks, nearby.getUUID());
+                }
             }
         }
     }

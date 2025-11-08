@@ -84,6 +84,12 @@ public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
         return this.isBaby() ? dimensions.height * 0.85F : dimensions.height * 0.92F;
     }
 
+    @Override
+    public void tick() {
+        AnimalUtil.tick(this);
+        super.tick();
+    }
+
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 4.0)

@@ -3,14 +3,12 @@ package net.nuclearteam.createnuclear.content.contraptions.irradiated;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface IrradiatedAnimal {
-    Map<EntityType<?>, EntityType<? extends Animal>> VANILLA_TO_IRRADIFIED = new HashMap<>();
+    Map<EntityType<?>, EntityType<? extends Animal>> VANILLA_TO_IRRADIATED = new HashMap<>();
 
     EntityType<? extends Animal> getNormalVariant();
 
