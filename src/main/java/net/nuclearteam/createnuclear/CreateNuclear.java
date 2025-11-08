@@ -10,6 +10,7 @@ import com.simibubi.create.foundation.item.TooltipModifier;
 import net.createmod.catnip.lang.FontHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -21,6 +22,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
@@ -84,6 +86,7 @@ public class CreateNuclear {
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
         event.enqueueWork(CNPotions::registerPotionsRecipes);
+        event.enqueueWork(() -> IrradiatedAnimal.VANILLA_TO_IRRADIATED.put(EntityType.CHICKEN, CNEntityType.IRRADIATED_CHICKEN.get()));
     }
 
     public static void onRegister(final RegisterEvent event) {

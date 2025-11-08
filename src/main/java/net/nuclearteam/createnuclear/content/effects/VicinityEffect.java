@@ -10,6 +10,7 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -22,7 +23,7 @@ public class VicinityEffect extends MobEffect {
     private int cooldownTicks = 500;
 
     @SafeVarargs
-    protected VicinityEffect(MobEffectCategory category, int color, UnaryOperator<Integer> areaSize, Predicate<LivingEntity> filter, Supplier<MobEffectInstance>... effects) {
+    protected VicinityEffect(MobEffectCategory category, int color, UnaryOperator<Integer> areaSize, Predicate<LivingEntity> filter, Consumer<Integer> timer, Supplier<MobEffectInstance>... effects) {
         super(category, color);
 
         this.areaSize = areaSize;

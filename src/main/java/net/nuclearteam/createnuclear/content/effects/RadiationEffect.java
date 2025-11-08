@@ -34,6 +34,7 @@ public class RadiationEffect extends VicinityEffect {
                                 && !isWearingAntiRadiationArmor
                         ;
                 },
+                timer -> {},
                 () -> new MobEffectInstance(CNEffects.RADIATION.get(), 300)); // Custom color (hex value)
 
         // Reduces movement speed by 20%
