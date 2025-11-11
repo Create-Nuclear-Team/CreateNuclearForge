@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "createnuclear:shapeless/cloth/magenta_cloth"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_white_cloth": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "createnuclear:white_cloth"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_white_cloth",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "createnuclear:shapeless/cloth/magenta_cloth"
+    ]
+  },
+  "sends_telemetry_event": false
+}
