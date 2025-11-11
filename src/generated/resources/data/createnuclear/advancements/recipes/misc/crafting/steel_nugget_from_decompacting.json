@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_item": {
+    "has_storage_blocks_steel_nugget": {
       "conditions": {
         "items": [
           {
-            "tag": "forge:storage_blocks/steel"
+            "tag": "forge:ingots/steel"
           }
         ]
       },
@@ -13,20 +13,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "createnuclear:shapeless/steel_ingot_from_decompacting"
+        "recipe": "createnuclear:crafting/steel_nugget_from_decompacting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_item",
+      "has_storage_blocks_steel_nugget",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "createnuclear:shapeless/steel_ingot_from_decompacting"
+      "createnuclear:crafting/steel_nugget_from_decompacting"
     ]
   },
   "sends_telemetry_event": false

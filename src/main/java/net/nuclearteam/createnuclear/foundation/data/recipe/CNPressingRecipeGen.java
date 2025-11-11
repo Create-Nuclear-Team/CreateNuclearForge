@@ -1,17 +1,13 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
-import com.simibubi.create.AllRecipeTypes;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipe;
-import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
+import com.simibubi.create.api.data.recipe.PressingRecipeGen;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
-import java.util.function.UnaryOperator;
-
-public class CNPressingRecipeGen extends CNProcessingRecipeGen {
+public class CNPressingRecipeGen extends PressingRecipeGen {
 
     GeneratedRecipe
         GRAPHENE = create("graphene", b -> b
@@ -20,19 +16,9 @@ public class CNPressingRecipeGen extends CNProcessingRecipeGen {
     )
     ;
 
-
-
-    <T extends ProcessingRecipe<?>> GeneratedRecipe create(String name, UnaryOperator<ProcessingRecipeBuilder<T>> transform) {
-        return create(CreateNuclear.asResource(name), transform);
-    }
-
-
     public CNPressingRecipeGen(PackOutput generator) {
-        super(generator);
+        super(generator, CreateNuclear.MOD_ID);
     }
 
-    @Override
-    protected AllRecipeTypes getRecipeType() {
-        return AllRecipeTypes.PRESSING;
-    }
+
 }
