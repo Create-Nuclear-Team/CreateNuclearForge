@@ -87,7 +87,7 @@ public class CNFanProcessingTypes {
         public List<ItemStack> process(ItemStack stack, Level level) {
             ENRICHED_WRAPPER.setItem(0, stack);
             Optional<EnrichedRecipe> recipe = CNRecipeTypes.ENRICHED.find(ENRICHED_WRAPPER, level);
-            return recipe.map(enrichedRecipe -> RecipeApplier.applyRecipeOn(level, stack, enrichedRecipe)).orElse(null);
+            return recipe.map(enrichedRecipe -> RecipeApplier.applyRecipeOn(level, stack, enrichedRecipe, true)).orElse(null);
         }
 
         @Override
