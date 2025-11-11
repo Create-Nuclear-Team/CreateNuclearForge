@@ -1,6 +1,6 @@
 modLoader="javafml" #mandatory
 loaderVersion="${loader_version_range}" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
-issueTrackerURL="https://github.com/Giovanniricotta2002/CreateNuclearForge/pulls"
+issueTrackerURL="https://github.com/Create-Nuclear-Team/CreateNuclearForge"
 license="${mod_license}"
 
 
