@@ -242,7 +242,11 @@
   "item.minecraft.tipped_arrow.effect.potion_of_radiation_augment_1": "Arrow of Radiation",
   "itemGroup.createnuclear.main": "Create Nuclear",
   "itemgroup.uranium": "Uranium Group",
+<<<<<<< HEAD
   "overlay.event_message": "⚠ Warning ⚠ %s timer",
+=======
+  "overlay.event_message": "âš  Warning âš  %s timer",
+>>>>>>> main
   "reactor.info.assembled.creator": "Reactor has been assembled",
   "reactor.info.assembled.destroyer": "Reactor has been disassembled",
   "reactor.info.assembled.none": "Reactor is not assembled",

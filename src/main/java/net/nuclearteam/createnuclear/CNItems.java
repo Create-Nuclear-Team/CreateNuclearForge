@@ -25,7 +25,12 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
 import net.nuclearteam.createnuclear.foundation.item.DyedItemsList;
@@ -36,7 +41,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-@SuppressWarnings({"unused", "deprecation"})
+@SuppressWarnings({"deprecation"})
 public class CNItems {
 
     public static final ItemEntry<Item>
@@ -73,6 +78,7 @@ public class CNItems {
 
         URANIUM_POWDER = CreateNuclear.REGISTRATE
             .item("uranium_powder", Item::new)
+            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("dusts/uranium"))
             .register(),
 
         STEEL_INGOT = CreateNuclear.REGISTRATE
@@ -87,7 +93,7 @@ public class CNItems {
 
         COAL_DUST = CreateNuclear.REGISTRATE
             .item("coal_dust", Item::new)
-            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("coal_dusts"))
+            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("coal_dusts"), CNTags.forgeItemTag("dusts/coal"))
             .register(),
 
         GRAPHITE_ROD = CreateNuclear.REGISTRATE
@@ -144,8 +150,7 @@ public class CNItems {
 
         return CreateNuclear.REGISTRATE.item(colourName + "_anti_radiation_helmet", p -> new Helmet(p, colour))
                 .tag(
-                    CNTags.forgeItemTag("helmets"),
-                    CNTags.forgeItemTag("armors"),
+                    CNTags.forgeItemTag("armors/helmets")
                     getHelmetTag(colourName),
                     CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
                     CNItemTags.ANTI_RADIATION_HELMET_FULL_DYE.tag
@@ -171,8 +176,7 @@ public class CNItems {
 
         return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_chestplate",  p -> new Chestplate(p, color))
             .tag(
-                CNTags.forgeItemTag("chestplates"),
-                CNTags.forgeItemTag("armors"),
+                CNTags.forgeItemTag("armors/chestplates"),
                 getChestplateTag(colorName),
                 CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
                 CNItemTags.ANTI_RADIATION_CHESTPLATE_FULL_DYE.tag
@@ -198,8 +202,7 @@ public class CNItems {
 
         return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_leggings",  p -> new Leggings(p, colour))
                 .tag(
-                    CNTags.forgeItemTag("leggings"),
-                    CNTags.forgeItemTag("armors"),
+                    CNTags.forgeItemTag("armors/leggings"),
                     getLeggingsTag(colorName),
                     CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
                     CNItemTags.ANTI_RADIATION_LEGGINGS_FULL_DYE.tag
@@ -221,7 +224,12 @@ public class CNItems {
 
     public static final ItemEntry<? extends AntiRadiationArmorItem.Boot>
         ANTI_RADIATION_BOOTS = CreateNuclear.REGISTRATE.item("anti_radiation_boots", Boot::new)
-            .tag(CNTags.forgeItemTag("boots"), CNTags.forgeItemTag("armors"), CNItemTags.ANTI_RADIATION_BOOTS_DYE.tag, CNItemTags.ANTI_RADIATION_ARMOR.tag, CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag)
+            .tag(
+                CNTags.forgeItemTag("armors/boots"),
+                CNItemTags.ANTI_RADIATION_BOOTS_DYE.tag,
+                CNItemTags.ANTI_RADIATION_ARMOR.tag,
+                CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag
+            )
             .lang("Anti Radiation Boots")
             .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
