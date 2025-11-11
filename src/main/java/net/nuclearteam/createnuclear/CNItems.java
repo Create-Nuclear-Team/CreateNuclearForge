@@ -150,7 +150,7 @@ public class CNItems {
 
         return CreateNuclear.REGISTRATE.item(colourName + "_anti_radiation_helmet", p -> new Helmet(p, colour))
                 .tag(
-                    CNTags.forgeItemTag("armors/helmets")
+                    CNTags.forgeItemTag("armors/helmets"),
                     getHelmetTag(colourName),
                     CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
                     CNItemTags.ANTI_RADIATION_HELMET_FULL_DYE.tag
