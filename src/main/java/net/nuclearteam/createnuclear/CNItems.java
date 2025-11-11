@@ -145,13 +145,13 @@ public class CNItems {
             .register()
     ;
 
-    public static final DyedItemsList<Helmet> ANTI_RADIATION_HELMETS = new DyedItemsList<>(colour -> {
-        String colourName = colour.getSerializedName();
+    public static final DyedItemsList<Helmet> ANTI_RADIATION_HELMETS = new DyedItemsList<>(color -> {
+        String colorName = color.getSerializedName();
 
-        return CreateNuclear.REGISTRATE.item(colourName + "_anti_radiation_helmet", p -> new Helmet(p, colour))
+        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_helmet", p -> new Helmet(p, color))
                 .tag(
                     CNTags.forgeItemTag("armors/helmets"),
-                    getHelmetTag(colourName),
+                    getHelmetTag(colorName),
                     CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
                     CNItemTags.ANTI_RADIATION_HELMET_FULL_DYE.tag
                 )
@@ -159,15 +159,15 @@ public class CNItems {
                     ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                             .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                             .define('X', CNTags.forgeItemTag("ingots/lead"))
-                            .define('Y', ClothItem.Cloths.getByColor(colour).get())
+                            .define('Y', ClothItem.Cloths.getByColor(color).get())
                             .define('Z', CNBlocks.REINFORCED_GLASS.asItem())
                             .pattern("YXY")
                             .pattern("XZX")
                             .showNotification(true)
                             .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
                 })
-                .lang(TextUtils.titleCaseConversion(colour.getName()) + " Anti Radiation Helmet")
-                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/helmets/" + colourName + "_anti_radiation_helmet")))
+                .lang(TextUtils.titleCaseConversion(color.getName()) + " Anti Radiation Helmet")
+                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/helmets/" + colorName + "_anti_radiation_helmet")))
             .register();
     });
 
@@ -197,10 +197,10 @@ public class CNItems {
 
     });
 
-    public static final DyedItemsList<Leggings> ANTI_RADIATION_LEGGINGS = new DyedItemsList<>(colour -> {
-        String colorName = colour.getSerializedName();
+    public static final DyedItemsList<Leggings> ANTI_RADIATION_LEGGINGS = new DyedItemsList<>(color -> {
+        String colorName = color.getSerializedName();
 
-        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_leggings",  p -> new Leggings(p, colour))
+        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_leggings",  p -> new Leggings(p, color))
                 .tag(
                     CNTags.forgeItemTag("armors/leggings"),
                     getLeggingsTag(colorName),
@@ -210,13 +210,13 @@ public class CNItems {
                 .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                         .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                         .define('X', CNTags.forgeItemTag("ingots/lead"))
-                        .define('Y', ClothItem.Cloths.getByColor(colour).get())
+                        .define('Y', ClothItem.Cloths.getByColor(color).get())
                         .pattern("YXY")
                         .pattern("X X")
                         .pattern("Y Y")
                         .showNotification(true)
                         .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
-                .lang(TextUtils.titleCaseConversion(colour.getName()) +" Anti Radiation Leggings")
+                .lang(TextUtils.titleCaseConversion(color.getName()) +" Anti Radiation Leggings")
                 .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/leggings/" + colorName + "_anti_radiation_leggings")))
                 .register();
     });
@@ -242,19 +242,19 @@ public class CNItems {
             .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/anti_radiation_boots")))
             .register();
 
-    public static final DyedItemsList<ClothItem> CLOTHS = new DyedItemsList<>(colour -> {
-        String colorName = colour.getSerializedName();
+    public static final DyedItemsList<ClothItem> CLOTHS = new DyedItemsList<>(color -> {
+        String colorName = color.getSerializedName();
         List<Item> ingredients = new ArrayList<>(Arrays.asList(Items.WHITE_DYE, Items.ORANGE_DYE, Items.MAGENTA_DYE, Items.LIGHT_BLUE_DYE, Items.YELLOW_DYE, Items.LIME_DYE, Items.PINK_DYE, Items.GRAY_DYE, Items.LIGHT_GRAY_DYE, Items.CYAN_DYE, Items.PURPLE_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.GREEN_DYE, Items.RED_DYE, Items.BLACK_DYE));
 
-        return CreateNuclear.REGISTRATE.item(colorName+ "_cloth", p -> new ClothItem(p, colour))
+        return CreateNuclear.REGISTRATE.item(colorName+ "_cloth", p -> new ClothItem(p, color))
             .tag(CNItemTags.CLOTH.tag)
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get())
                     .unlockedBy("has_white_cloth", RegistrateRecipeProvider.has(ClothItem.Cloths.WHITE_CLOTH.getItem()))
                     .requires(CNItemTags.CLOTH.tag)
-                    .requires(ingredients.get(colour.ordinal()))
+                    .requires(ingredients.get(color.ordinal()))
                     .save(p, CreateNuclear.asResource("shapeless/cloth/" + c.getName()))
             )
-            .lang(TextUtils.titleCaseConversion(colour.getName()) + " Cloth")
+            .lang(TextUtils.titleCaseConversion(color.getName()) + " Cloth")
             .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/cloth/" + colorName + "_cloth")))
             .register();
     });
