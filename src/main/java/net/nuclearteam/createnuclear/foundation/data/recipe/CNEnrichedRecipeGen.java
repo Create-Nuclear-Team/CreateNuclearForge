@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
-import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
@@ -8,12 +7,12 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.CNRecipeTypes;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.data.recipe.EnrichedRecipeGen;
 
 import java.util.function.Supplier;
 
-public class CNEnrichedRecipeGen extends CNProcessingRecipeGen {
+public class CNEnrichedRecipeGen extends EnrichedRecipeGen {
 
     GeneratedRecipe
         ENRICHING_CAMPFIRES = convert(Items.CAMPFIRE, CNBlocks.ENRICHING_CAMPFIRE),
@@ -33,11 +32,6 @@ public class CNEnrichedRecipeGen extends CNProcessingRecipeGen {
     }
 
     public CNEnrichedRecipeGen(PackOutput output) {
-        super(output);
-    }
-
-    @Override
-    protected IRecipeTypeInfo getRecipeType() {
-        return CNRecipeTypes.ENRICHED;
+        super(output, CreateNuclear.MOD_ID);
     }
 }

@@ -1,13 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_item": {
+    "has_storage_blocks_lead_nugget": {
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:nether_star"
-            ]
+            "tag": "forge:ingots/lead"
           }
         ]
       },
@@ -15,20 +13,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "createnuclear:crafting/enriched_soul_soil"
+        "recipe": "createnuclear:crafting/lead_nugget_from_decompacting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_item",
+      "has_storage_blocks_lead_nugget",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "createnuclear:crafting/enriched_soul_soil"
+      "createnuclear:crafting/lead_nugget_from_decompacting"
     ]
   },
   "sends_telemetry_event": false
