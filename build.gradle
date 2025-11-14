@@ -274,7 +274,7 @@ publishMods {
 
     github {
         accessToken = providers.environmentVariable("GITHUB_TOKEN")
-        repository = "Create-Nuclear-Team/TestExportJar"
+        repository = "Create-Nuclear-Team/CreateNuclearForge"
         commitish = gitHash
         tagName = "mc$minecraft_version-$mod_version"
         file.unset()
