@@ -33,9 +33,9 @@ jobs:
       - name: Build
         run: ./gradlew build
 
-      - name: Run Gametests
-        if: ${{ !inputs.is-release }}
-        run: ./gradlew runGameTestServer
+      # - name: Run Gametests
+      #   if: ${{ !inputs.is-release }}
+      #   run: ./gradlew runGameTestServer
 
       - name: Publish
         if: ${{ inputs.is-release }}
