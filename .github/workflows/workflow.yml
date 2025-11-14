@@ -8,7 +8,7 @@ on:
       is-release:
         description: 'Publish release to Github'
         required: true
-        default: false
+        default: true
         type: boolean
 
 jobs:
