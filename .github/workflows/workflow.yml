@@ -1,8 +1,8 @@
 name: BuildMod.yml
 on:
-  # push:
-  # pull_request:
-  # workflow_call: 
+  push:
+  pull_request:
+  workflow_call: 
   workflow_dispatch:
     inputs:
       is-release:
@@ -38,7 +38,7 @@ jobs:
       #   run: ./gradlew runGameTestServer
 
       - name: Publish
-        if: ${{ inputs.is-release }}
+        # if: ${{ inputs.is-release }}
         env:
 #          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
 #          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
