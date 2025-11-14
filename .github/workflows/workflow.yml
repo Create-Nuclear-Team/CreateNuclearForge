@@ -27,6 +27,9 @@ jobs:
           cache-disabled: ${{ inputs.is-release }}
           cache-read-only: false
 
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
       - name: Build
         run: ./gradlew build
 
