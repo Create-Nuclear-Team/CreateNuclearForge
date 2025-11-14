@@ -1,0 +1,77 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Client",
+      "presentation": {
+        "group": "Mod Development - CreateNuclearForge",
+        "order": 0
+      },
+      "projectName": "CreateNuclearForge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\clientRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\clientRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcreatenuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run",
+      "env": {
+        "MOD_CLASSES": "createnuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
+      },
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Data",
+      "presentation": {
+        "group": "Mod Development - CreateNuclearForge",
+        "order": 1
+      },
+      "projectName": "CreateNuclearForge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\dataRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\dataRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcreatenuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run",
+      "env": {
+        "MOD_CLASSES": "createnuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
+      },
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Server",
+      "presentation": {
+        "group": "Mod Development - CreateNuclearForge",
+        "order": 2
+      },
+      "projectName": "CreateNuclearForge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\serverRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\serverRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcreatenuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run\\server",
+      "env": {
+        "MOD_CLASSES": "createnuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
+      },
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    }
+  ]
+}
