@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_item": {
+    "has_storage_blocks_lead": {
       "conditions": {
         "items": [
           {
-            "tag": "forge:raw_materials/uranium"
+            "tag": "forge:storage_blocks/lead"
           }
         ]
       },
@@ -13,20 +13,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "createnuclear:crafting/raw_uranium_block"
+        "recipe": "createnuclear:crafting/lead_ingot_from_decompacting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_item",
+      "has_storage_blocks_lead",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "createnuclear:crafting/raw_uranium_block"
+      "createnuclear:crafting/lead_ingot_from_decompacting"
     ]
   },
   "sends_telemetry_event": false
