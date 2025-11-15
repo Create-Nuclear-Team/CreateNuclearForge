@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.content.equipment.armor;
 
-import com.simibubi.create.foundation.data.recipe.CreateRecipeProvider.GeneratedRecipe;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
@@ -9,8 +8,6 @@ import net.minecraft.world.item.*;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -238,49 +235,6 @@ public class AntiRadiationArmorItem {
         public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
             return String.valueOf(CreateNuclear.asResource("textures/models/armor/white_anti_radiation_suit_layer_1.png"));
 
-        }
-    }
-
-    public static class DyeRecipeArmorList implements Iterable<GeneratedRecipe> {
-        private static final int COLOR_AMOUNT = DyeColor.values().length;
-
-        protected final GeneratedRecipe[] recipes = new GeneratedRecipe[getColorCount()];
-
-        public DyeRecipeArmorList(Function<@NotNull DyeColor, GeneratedRecipe> filler) {
-            for (DyeColor color : DyeColor.values()) {
-                recipes[color.ordinal()] = filler.apply(color);
-            }
-        }
-
-        protected int getColorCount() {
-            return COLOR_AMOUNT;
-        }
-
-        public GeneratedRecipe get(@Nullable DyeColor color) {
-            return recipes[color.ordinal()];
-        }
-
-        public GeneratedRecipe[] toArrays() {
-            return Arrays.copyOf(recipes, recipes.length);
-        }
-
-        @NotNull
-        @Override
-        public Iterator<GeneratedRecipe> iterator() {
-            return new Iterator<>() {
-                private int index = 0;
-
-                @Override
-                public boolean hasNext() {
-                    return index < recipes.length;
-                }
-
-                @Override
-                public GeneratedRecipe next() {
-                    if (!hasNext()) throw new NoSuchElementException();
-                    return recipes[index++];
-                }
-            };
         }
     }
 

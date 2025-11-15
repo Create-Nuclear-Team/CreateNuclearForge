@@ -1,11 +1,13 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_item": {
+    "has_reactor_casing": {
       "conditions": {
         "items": [
           {
-            "tag": "forge:ingots/steel"
+            "items": [
+              "createnuclear:reactor_casing"
+            ]
           }
         ]
       },
@@ -13,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "createnuclear:shapeless/steel_nugget_from_decompacting"
+        "recipe": "createnuclear:crafting/reactor/reinforced_glass"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_item",
+      "has_reactor_casing",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "createnuclear:shapeless/steel_nugget_from_decompacting"
+      "createnuclear:crafting/reactor/reinforced_glass"
     ]
   },
   "sends_telemetry_event": false
