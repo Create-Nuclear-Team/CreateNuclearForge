@@ -18,7 +18,7 @@ String gitHash = calculateGitHash() + (hasUnstaged() ? "-modified" : "")
 base {
     archivesName = "createnuclear-${artifact_minecraft_version}"
     group = mod_group_id
-    version = mod_version + '-forge' + (dev && buildNumber != null ? "-${buildNumber}" : "")
+    version = 'forge' + (dev && buildNumber != null ? "-${buildNumber}" : "")
 }
 
 println "Java: ${System.getProperty 'java.version'}, " +
@@ -253,32 +253,44 @@ project.publishing {
 
 publishMods {
     file = reobfJar.archiveFile
-    changelog = "Release ${mod_version}"
+    changelog = file("CHANGELOG.md").text
     type = STABLE
-    version = "mc$minecraft_version-$mod_version"
+    version = "$mod_version"
     displayName = "$mod_name $mod_version for mc$minecraft_version"
     modLoaders.add("forge")
     // modLoaders.add("neoforge")
 
     // curseforge {
     //     accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
-    //     projectId = "328085"
+    //     projectId = ""
     //     minecraftVersions.add(minecraft_version)
+
+    //     javaVersions.add(JavaVersion.VERSION_17)
+
+    //     clientRequired = true
+    //     serverRequired = true
     // }
 
     // modrinth {
     //     accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-    //     projectId = "LNytGWDc"
+    //     projectId = ""
     //     minecraftVersions.add(minecraft_version)
+
+    //     requires {
+    //         id = "LNytGWDc"
+    //         slug = "Create"
+    //     }
+    //     optional {
+    //         id = "u6dRKJwZ"
+    //         slug = "JEI"
+    //     }
     // }
 
     github {
         accessToken = providers.environmentVariable("GITHUB_TOKEN")
         repository = "Create-Nuclear-Team/CreateNuclearForge"
         commitish = gitHash
-        tagName = "mc$minecraft_version-$mod_version"
-        file.unset()
-        file.unsetConvention()
+        tagName = "v${mod_version}-${gitHash.substring(0,7)}"
 
         allowEmptyFiles = true
     }
