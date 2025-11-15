@@ -1,14 +1,11 @@
 name: BuildMod.yml
 on:
-  pull_request:
-    branches: [ main ]
-  workflow_call: 
   workflow_dispatch:
     inputs:
       is-release:
         description: 'Publish release to Github'
-        required: true
-        default: true
+        required: false
+        default: false
         type: boolean
 
 jobs:
