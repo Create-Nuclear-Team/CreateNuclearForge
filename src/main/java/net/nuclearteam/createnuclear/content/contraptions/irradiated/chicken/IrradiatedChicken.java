@@ -3,16 +3,23 @@ package net.nuclearteam.createnuclear.content.contraptions.irradiated.chicken;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -23,6 +30,8 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.CNEntityType;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.AnimalUtil;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -30,7 +39,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 @SuppressWarnings("unused")
-public class IrradiatedChicken extends Animal {
+public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
     private static final Ingredient FOOD_ITEMS = Ingredient.of(
             Items.WHEAT_SEEDS, Items.MELON_SEEDS, Items.PUMPKIN_SEEDS,
             Items.BEETROOT_SEEDS, Items.TORCHFLOWER_SEEDS, Items.PITCHER_POD
@@ -44,10 +53,19 @@ public class IrradiatedChicken extends Animal {
     public int eggTime;
     public boolean isChickenJockey;
 
+    private static final EntityDataAccessor<Boolean> DATA_CONVERTING_ID = SynchedEntityData.defineId(IrradiatedChicken.class, EntityDataSerializers.BOOLEAN);
+    private int conversionTime;
+
     public IrradiatedChicken(EntityType<? extends IrradiatedChicken> entityType, Level level) {
         super(entityType, level);
         this.eggTime = this.random.nextInt(6000) + 6000;
         this.setPathfindingMalus(BlockPathTypes.WATER, 0.0F);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(DATA_CONVERTING_ID, false);
     }
 
     @Override
@@ -64,6 +82,12 @@ public class IrradiatedChicken extends Animal {
     @Override
     protected float getStandingEyeHeight(Pose pose, EntityDimensions dimensions) {
         return this.isBaby() ? dimensions.height * 0.85F : dimensions.height * 0.92F;
+    }
+
+    @Override
+    public void tick() {
+        AnimalUtil.tick(this);
+        super.tick();
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -130,12 +154,28 @@ public class IrradiatedChicken extends Animal {
 
     @Override
     public boolean isFood(ItemStack stack) {
-        return FOOD_ITEMS.test(stack);
+        return AnimalUtil.isFood(stack, FOOD_ITEMS);
     }
 
     @Override
     public int getExperienceReward() {
         return this.isChickenJockey() ? 10 : super.getExperienceReward();
+    }
+
+    @Override
+    public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
+        InteractionResult returnValue = AnimalUtil.mobInteract(this, pPlayer, pHand);
+
+        if (returnValue != InteractionResult.PASS)
+            return returnValue;
+
+        return super.mobInteract(pPlayer, pHand);
+    }
+
+    @Override
+    public void handleEntityEvent(byte pId) {
+        if (!AnimalUtil.handleEntityEvent(this, pId))
+            super.handleEntityEvent(pId);
     }
 
     @Override
@@ -146,6 +186,9 @@ public class IrradiatedChicken extends Animal {
             this.eggTime = compound.getInt("EggLayTime");
         }
 
+        if (compound.contains("ConversionTime", Tag.TAG_ANY_NUMERIC) && compound.getInt("ConversionTime") > -1)
+            startConverting(compound.getInt("ConversionTime"));
+
     }
 
     @Override
@@ -153,6 +196,7 @@ public class IrradiatedChicken extends Animal {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("IsChickenJockey", this.isChickenJockey);
         compound.putInt("EggLayTime", this.eggTime);
+        compound.putInt("ConversionTime", isConverting() ? conversionTime : -1);
     }
 
     @Override
@@ -180,5 +224,42 @@ public class IrradiatedChicken extends Animal {
 
     public void setChickenJockey(boolean isChickenJockey) {
         this.isChickenJockey = isChickenJockey;
+    }
+
+    @Override
+    public EntityType<? extends Animal> getNormalVariant() {
+        return EntityType.CHICKEN;
+    }
+
+    @Override
+    public void readFromVanilla(Animal animal) {
+        if (animal instanceof Chicken chicken)
+            setChickenJockey(chicken.isChickenJockey());
+    }
+
+    @Override
+    public void writeToVanilla(Animal animal) {
+        if (animal instanceof Chicken chicken)
+            chicken.setChickenJockey(isChickenJockey());
+    }
+
+    @Override
+    public boolean isConverting() {
+        return getEntityData().get(DATA_CONVERTING_ID);
+    }
+
+    @Override
+    public void setConverting() {
+        getEntityData().set(DATA_CONVERTING_ID, true);
+    }
+
+    @Override
+    public void setConversionTime(int conversionTime) {
+        this.conversionTime = conversionTime;
+    }
+
+    @Override
+    public int getConversionTime() {
+        return conversionTime;
     }
 }
