@@ -327,30 +327,33 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
         ServerPlayer player = new FakePlayer(level, new GameProfile(owner, ownerName));
         player.setPos(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
 
-        for (int x = -rxz; x <= rxz; x++) {
-            for (int z = -rxz; z <= rxz; z++) {
-                mpos.set(pos.getX() + x, 0, pos.getZ() + z);
+        // Populate `blocks` using a spherical scan based on the provided loop
+        int r = Mth.ceil(radius);
 
-                if (!level.isInWorldBounds(mpos)) {
-                    continue;
-                }
+        for (int x = -r; x <= r; x++) {
+            for (int y = -r; y <= r; y++) {
+                for (int z = -r; z <= r; z++) {
+                    BlockPos currentPos = pos.offset(x, y, z);
+                    double distanceSquared = x * x + y * y + z * z;
+                    double distance = Math.sqrt(distanceSquared);
 
-                for (int y = ry1; y >= ry0; y--) {
-                    int y0 = y - pos.getY();
-                    double y1 = y0 / rys;
-                    double dist = (x * x + y1 * y1 + z * z) / (1D - random.nextDouble() * 0.25D);
+                    if (distance <= radius) {
+                        mpos.set(currentPos);
 
-                    if (dist <= rsq) {
-                        mpos.setY(y);
-
-                        if (level.isOutsideBuildHeight(mpos)) {
+                        if (!level.isInWorldBounds(mpos) || level.isOutsideBuildHeight(mpos)) {
                             continue;
                         }
 
-                        BlockPos ipos = mpos.immutable();
-
                         try {
                             BlockState state = level.getBlockState(mpos);
+
+                            double noise = level.random.nextDouble();
+                            // mimic the original outer-noise thinning
+                            if (distance > radius * 0.7 && noise < 0.4) {
+                                continue;
+                            }
+
+                            BlockPos ipos = mpos.immutable();
 
                             if (state.isAir()) {
                                 blocks.put(ipos, FLAG_IN_EXPLOSION | FLAG_IS_AIR | FLAG_INSIDE);
@@ -359,13 +362,13 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
                             } else {
                                 blocks.put(ipos, FLAG_IN_EXPLOSION | FLAG_IS_BLOCK | FLAG_INSIDE);
                             }
+
+                            if (distance >= rsqc) {
+                                crust.add(ipos);
+                            }
                         } catch (Exception ex) {
                             CreateNuclear.LOGGER.warn("Error while calculating nuclear explosion", ex);
-                            blocks.put(ipos, FLAG_IN_EXPLOSION | FLAG_IS_REINFORCED | FLAG_INSIDE);
-                        }
-
-                        if (dist >= rsqc) {
-                            crust.add(ipos);
+                            blocks.put(currentPos.immutable(), FLAG_IN_EXPLOSION | FLAG_IS_REINFORCED | FLAG_INSIDE);
                         }
                     }
                 }
