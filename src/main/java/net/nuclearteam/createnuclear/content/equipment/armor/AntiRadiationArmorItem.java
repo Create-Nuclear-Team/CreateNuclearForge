@@ -1,10 +1,17 @@
 package net.nuclearteam.createnuclear.content.equipment.armor;
 
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import com.tterrag.registrate.util.entry.ItemEntry;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
+import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
@@ -21,12 +28,25 @@ public class AntiRadiationArmorItem {
     public static final ArmorItem.Type BOOTS = ArmorItem.Type.BOOTS;
     public static final ArmorMaterial ARMOR_MATERIAL = ArmorMaterials.ANTI_RADIATION_SUIT;
 
+    private static final EnumMap<ArmorItem.Type, UUID> ARMOR_MODIFIER_UUID_PER_TYPE = Util.make(new EnumMap<>(ArmorItem.Type.class), (p_266744_) -> {
+        p_266744_.put(ArmorItem.Type.BOOTS, UUID.fromString("845DB27C-C624-495F-8C9F-6020A9A58B6B"));
+        p_266744_.put(ArmorItem.Type.LEGGINGS, UUID.fromString("D8499B04-0E66-4726-AB29-64469D734E0D"));
+        p_266744_.put(ArmorItem.Type.CHESTPLATE, UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"));
+        p_266744_.put(ArmorItem.Type.HELMET, UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150"));
+    });
 
     public static class Helmet extends ArmorItem {
         protected final DyeColor color;
+
+        private final Multimap<Attribute, AttributeModifier> attributeModifiers;
+
         public Helmet(Properties properties, DyeColor color) {
             super(ARMOR_MATERIAL, HELMET, properties);
             this.color = color;
+            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+            UUID uuid = ARMOR_MODIFIER_UUID_PER_TYPE.get(HELMET);
+            builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", 42, AttributeModifier.Operation.ADDITION));
+            this.attributeModifiers = builder.build();
         }
 
         @Override
@@ -87,7 +107,10 @@ public class AntiRadiationArmorItem {
                     : CNItemTags.ANTI_RADIATION_HELMET_DYE.tag;
         }
 
-
+        @Override
+        public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot pEquipmentSlot) {
+            return pEquipmentSlot == this.type.getSlot() ? this.attributeModifiers : super.getDefaultAttributeModifiers(pEquipmentSlot);
+        }
     }
 
     public static class Chestplate extends ArmorItem {
