@@ -51,6 +51,7 @@
   "advancement.createnuclear.uranium_rod.desc": "Create your first uranium rod using enriched yellowcake in a mechanical crafter",
   "advancement.createnuclear.yellowcake": "The Yellowcake Process",
   "advancement.createnuclear.yellowcake.desc": "Compact uranium liquid to create yellowcake",
+  "attribute.name.createnuclear.generic.irradiated_resistance": "Radiation Resistance",
   "block.createnuclear.autunite": "Autunite",
   "block.createnuclear.autunite_pillar": "Autunite Pillar",
   "block.createnuclear.cut_autunite": "Cut Autunite",
