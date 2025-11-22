@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear.foundation.data.recipe;
 
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllRecipeTypes;
+import com.simibubi.create.api.data.recipe.CrushingRecipeGen;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipe;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeSerializer;
@@ -21,7 +22,7 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-public class CNCrushingRecipeGen extends CNProcessingRecipeGen {
+public class CNCrushingRecipeGen extends CrushingRecipeGen {
 
     GeneratedRecipe
         COAL_DUST = create("coal", b -> b
@@ -60,28 +61,10 @@ public class CNCrushingRecipeGen extends CNProcessingRecipeGen {
     ;
 
     public CNCrushingRecipeGen(PackOutput generator) {
-        super(generator);
+        super(generator, CreateNuclear.MOD_ID);
     }
 
-    @Override
-    protected AllRecipeTypes getRecipeType() {
-        return AllRecipeTypes.CRUSHING;
-    }
 
-    protected <T extends ProcessingRecipe<?>> GeneratedRecipe create(String namespace,
-                                                                     Supplier<ItemLike> singleIngredient, UnaryOperator<ProcessingRecipeBuilder<T>> transform) {
-        ProcessingRecipeSerializer<T> serializer = getSerializer();
-        GeneratedRecipe generatedRecipe = c -> {
-            ItemLike itemLike = singleIngredient.get();
-            transform
-                    .apply(new ProcessingRecipeBuilder<>(serializer.getFactory(),
-                            new ResourceLocation(namespace, CatnipServices.REGISTRIES.getKeyOrThrow(itemLike.asItem())
-                                    .getPath())).withItemIngredients(Ingredient.of(itemLike)))
-                    .build(c);
-        };
-        all.add(generatedRecipe);
-        return generatedRecipe;
-    }
 
     protected <T extends ProcessingRecipe<?>> GeneratedRecipe createFix(String namespace,
                                                                      Supplier<ItemLike> singleIngredient, UnaryOperator<ProcessingRecipeBuilder<T>> transform) {
@@ -96,10 +79,5 @@ public class CNCrushingRecipeGen extends CNProcessingRecipeGen {
         };
         all.add(generatedRecipe);
         return generatedRecipe;
-    }
-
-    <T extends ProcessingRecipe<?>> GeneratedRecipe create(Supplier<ItemLike> singleIngredient,
-                                                           UnaryOperator<ProcessingRecipeBuilder<T>> transform) {
-        return create(CreateNuclear.MOD_ID, singleIngredient, transform);
     }
 }
