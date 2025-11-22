@@ -38,9 +38,8 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
             int heat = (int) reactorController.configuredPattern.getOrCreateTag().getDouble("heat");
             if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.DANGER) {
                 if (countdownTicks >= 300) { // 300 ticks = 15 secondes
-                    testExplotion(level, getBlockPos());
-//                    float explosionRadius = calculateExplosionRadius(reactorController.countUraniumRod);
-//                    explodeReactorCore(level, getBlockPos(), explosionRadius);
+                    float explosionRadius = calculateExplosionRadius(reactorController.countUraniumRod);
+                    explodeReactorCore(level, getBlockPos(), explosionRadius);
                 } else {
                     countdownTicks++;
                 }
@@ -48,19 +47,6 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
                 countdownTicks = 0; // Reset the countdown if the heat level is not in danger
             }
         }
-    }
-
-    private void testExplotion(Level level, BlockPos pos) {
-        ReactorNuclearExplosion.builder((ServerLevel) level, pos, 20, Util.NIL_UUID, "")
-                .preExplosion(() -> {
-//                    pLevel.getServer().getPlayerList().broadcastChatMessage();
-                    Player player = level.getServer().getPlayerList().getPlayer(Util.NIL_UUID);
-                    if (player != null) {
-                        player.sendSystemMessage(Component.literal(String.format("%s : [%d, %d, %d]", level.dimension().location(), pos.getX(), pos.getY(), pos.getZ())).withStyle(ChatFormatting.GRAY));
-                    }
-                    level.removeBlock(pos, false);
-                })
-                .create();
     }
 
     private float calculateExplosionRadius(int countUraniumRod) {
