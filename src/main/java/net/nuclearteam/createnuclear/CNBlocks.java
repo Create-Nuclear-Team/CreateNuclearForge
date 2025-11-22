@@ -48,6 +48,7 @@ import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.reactorCooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
+import net.nuclearteam.createnuclear.content.multiblock.test.TestBlock;
 import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
 
 import static com.simibubi.create.foundation.data.CreateRegistrate.casingConnectivity;
@@ -484,6 +485,12 @@ public class CNBlocks {
             .defaultLang()
             .simpleItem()
             .register();*/
+
+    public static final BlockEntry<TestBlock> TEST = CreateNuclear.REGISTRATE.block("test_explosion", TestBlock::new)
+            .defaultBlockstate()
+            .defaultLang()
+            .simpleItem()
+            .register();
 
 
     public static void register() {
