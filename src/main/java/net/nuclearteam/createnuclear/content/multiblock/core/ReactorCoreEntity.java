@@ -1,18 +1,11 @@
 package net.nuclearteam.createnuclear.content.multiblock.core;
 
 import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
-import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
@@ -38,8 +31,12 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
             int heat = (int) reactorController.configuredPattern.getOrCreateTag().getDouble("heat");
             if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.DANGER) {
                 if (countdownTicks >= 300) { // 300 ticks = 15 secondes
-                    ExplosionCore core = new ExplosionCore();
-                    core.tick(reactorController.countUraniumRod, level, getBlockPos());
+                    ExplosionCore
+                            .builder((ServerLevel) level, getBlockPos(), reactorController.countUraniumRod)
+                            .create();
+                    ;
+//                    ExplosionCore core = new ExplosionCore();
+//                    core.tick(reactorController.countUraniumRod, level, getBlockPos());
                 } else {
                     countdownTicks++;
                 }
