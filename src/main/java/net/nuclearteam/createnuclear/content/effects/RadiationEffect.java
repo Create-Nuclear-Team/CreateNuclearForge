@@ -23,18 +23,15 @@ public class RadiationEffect extends VicinityEffect {
         super(MobEffectCategory.HARMFUL, 15453236,
                 amplifier -> 10,
                 (e) -> {
-                    boolean isWearingAntiRadiationArmor = false;
 
-                    if (e instanceof Player player) {
-                        isWearingAntiRadiationArmor = AntiRadiationArmorItem.Armor.isArmored(player.getArmorSlots());
+                    boolean isWearingAntiRadiationArmor = AntiRadiationArmorItem.Armor.isFullSet(e.getArmorSlots());
 //                        for (ItemStack armor : e.getArmorSlots()) {
-//                            CreateNuclear.LOGGER.warn("AntiRadiationArmorItem.Armor.isArmored(armor) {}", AntiRadiationArmorItem.Armor.isArmored(armor));
-//                            if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
+//                            CreateNuclear.LOGGER.warn("AntiRadiationArmorItem.Armor.isFullSet(armor) {}", AntiRadiationArmorItem.Armor.isFullSet(armor));
+//                            if (AntiRadiationArmorItem.Armor.isFullSet(armor)) {
 //                                isWearingAntiRadiationArmor = true;
 //                                break;
 //                            }
 //                        }
-                    }
 
                     return !e.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)
                                 && !e.hasEffect(CNEffects.RADIATION.get())
@@ -73,6 +70,12 @@ public class RadiationEffect extends VicinityEffect {
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
         super.applyEffectTick(entity, amplifier);
+
+        // Do not apply damage if the entity is wearing anti-radiation armor
+        boolean wearingAntiRad = AntiRadiationArmorItem.Armor.isFullSet(entity.getArmorSlots());
+        if (wearingAntiRad) {
+            return;
+        }
 
         // Apply radiation damage (magic type), scaled by amplifier
         int damage = 1 << amplifier;

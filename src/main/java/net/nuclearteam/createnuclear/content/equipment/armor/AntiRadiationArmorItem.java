@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
@@ -321,15 +322,21 @@ public class AntiRadiationArmorItem {
             return leggingsMap.get(color);
         }
 
-        public static boolean isArmored(ItemStack item) {
-            return helmetMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) &&
-                chestplateMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) &&
-                leggingsMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) &&
-                CNItems.ANTI_RADIATION_BOOTS.is(item.getItem())
-            ;
+        /**
+         * Returns true if the given ItemStack corresponds to any piece of the anti-radiation armor.
+         */
+        public static boolean isAnyPiece(ItemStack item) {
+            return helmetMap.values().stream().anyMatch(entry -> entry.is(item.getItem()))
+                    || chestplateMap.values().stream().anyMatch(entry -> entry.is(item.getItem()))
+                    || leggingsMap.values().stream().anyMatch(entry -> entry.is(item.getItem()))
+                    || CNItems.ANTI_RADIATION_BOOTS.is(item.getItem());
         }
 
-        public static boolean isArmored(Iterable<ItemStack> armorStacks) {
+        /**
+         * Returns true when the provided armor stacks contain a full anti-radiation set
+         * (helmet, chestplate, leggings and boots).
+         */
+        public static boolean isFullSet(Iterable<ItemStack> armorStacks) {
             boolean hasHelmet = false;
             boolean hasChestplate = false;
             boolean hasLeggings = false;
@@ -351,12 +358,16 @@ public class AntiRadiationArmorItem {
             return hasHelmet && hasChestplate && hasLeggings && hasBoots;
         }
 
+        /**
+         * Returns true when the given entity is fully wearing the anti-radiation set.
+         */
+        public static boolean isFullSet(LivingEntity entity) {
+            return isFullSet(entity.getArmorSlots());
+        }
+
+        /** Alias for {@link #isAnyPiece(ItemStack)} kept for compatibility. */
         public static boolean isArmored2(ItemStack item) {
-            return CNItems.ANTI_RADIATION_HELMETS.contains(item.getItem())
-                    || CNItems.ANTI_RADIATION_CHESTPLATES.contains(item.getItem())
-                    || CNItems.ANTI_RADIATION_LEGGINGS.contains(item.getItem())
-                    || CNItems.ANTI_RADIATION_BOOTS.is(item.getItem())
-                    ;
+            return isAnyPiece(item);
         }
     }
 
