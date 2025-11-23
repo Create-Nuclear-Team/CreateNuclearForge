@@ -12,6 +12,10 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.CNBiomeModifiers;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.CNConfiguredFeatures;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.CNPlacedFeatures;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNDensityFunctions;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNNoiseData;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNNoiseGeneratorSettings;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -23,6 +27,10 @@ public class GeneratedEntriesProvider extends DatapackBuiltinEntriesProvider {
             .add(Registries.CONFIGURED_FEATURE, (RegistryBootstrap) CNConfiguredFeatures::bootstrap)
             .add(Registries.PLACED_FEATURE, CNPlacedFeatures::bootstrap)
             .add(ForgeRegistries.Keys.BIOME_MODIFIERS, CNBiomeModifiers::bootstrap)
+            .add(Registries.BIOME, CNBiomes::bootstrapRegistries)
+            .add(Registries.DENSITY_FUNCTION, CNDensityFunctions::bootstrapRegistries)
+            .add(Registries.NOISE_SETTINGS, CNNoiseGeneratorSettings::bootstrapRegistries)
+            .add(Registries.NOISE, CNNoiseData::bootstrapRegistries)
             ;
 
     public GeneratedEntriesProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {

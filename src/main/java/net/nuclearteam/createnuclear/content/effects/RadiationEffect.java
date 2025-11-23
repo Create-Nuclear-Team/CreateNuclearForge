@@ -4,9 +4,11 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CNTags;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -20,13 +22,18 @@ public class RadiationEffect extends VicinityEffect {
     public RadiationEffect() {
         super(MobEffectCategory.HARMFUL, 15453236,
                 amplifier -> 10,
-                e -> {
+                (e) -> {
                     boolean isWearingAntiRadiationArmor = false;
-                    for (ItemStack armor : e.getArmorSlots()) {
-                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
-                            isWearingAntiRadiationArmor = true;
-                            break;
-                        }
+
+                    if (e instanceof Player player) {
+                        isWearingAntiRadiationArmor = AntiRadiationArmorItem.Armor.isArmored(player.getArmorSlots());
+//                        for (ItemStack armor : e.getArmorSlots()) {
+//                            CreateNuclear.LOGGER.warn("AntiRadiationArmorItem.Armor.isArmored(armor) {}", AntiRadiationArmorItem.Armor.isArmored(armor));
+//                            if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
+//                                isWearingAntiRadiationArmor = true;
+//                                break;
+//                            }
+//                        }
                     }
 
                     return !e.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)

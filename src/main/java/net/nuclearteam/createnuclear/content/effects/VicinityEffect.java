@@ -5,15 +5,10 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 
 public class VicinityEffect extends MobEffect {
     private final UnaryOperator<Integer> areaSize;
@@ -33,10 +28,16 @@ public class VicinityEffect extends MobEffect {
 
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
-        List<Entity> nearbyEntities = entity.level().getEntities(entity, entity.getBoundingBox().inflate(areaSize.apply(amplifier)), e -> e instanceof  LivingEntity target && filter.test(target));
+        List<Entity> nearbyEntities = entity.level().getEntities(entity, entity.getBoundingBox().inflate(areaSize.apply(amplifier)), e -> e instanceof LivingEntity target && filter.test(target));
 
+
+        CreateNuclear.LOGGER.warn("Nearby Entities Count: {}, {}", nearbyEntities.size(), entity.getDisplayName().getString());
         for (Entity nearbyEntity : nearbyEntities) {
             LivingEntity nearby = (LivingEntity) nearbyEntity;
+
+            if (nearby == entity) {
+                continue;
+            }
 
             for (Supplier<MobEffectInstance> effect : effects) {
                 if (cooldownTicks == 0) {

@@ -39,6 +39,7 @@ idea {
 }
 
 minecraft {
+    accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
     // The mappings can be changed at any time and must be in the following format.
     // Channel:   Version:
     // official   MCVersion             Official field/method names from Mojang mapping files
