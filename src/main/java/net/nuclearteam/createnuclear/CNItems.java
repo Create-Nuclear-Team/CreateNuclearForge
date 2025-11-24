@@ -1,20 +1,14 @@
 package net.nuclearteam.createnuclear;
 
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot;
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate.getChestplateTag;
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet.getHelmetTag;
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings;
 
-import static net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings.getLeggingsTag;
 
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
-import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
@@ -27,27 +21,20 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
-import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.DyeItemList;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
 import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
 import java.util.function.Supplier;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
-import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings;
-import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
-import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
 import net.nuclearteam.createnuclear.foundation.item.DyedItemsList;
-import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 
 @SuppressWarnings({"unused", "deprecation"})
 public class CNItems {
@@ -102,16 +89,6 @@ public class CNItems {
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
                 .unlockedBy("has_storage_blocks_raw_lead", RegistrateRecipeProvider.has(CNTags.forgeItemTag("storage_blocks/raw_lead")))
                 .requires(CNTags.forgeItemTag("storage_blocks/raw_lead"))
-                .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
-            )
-            .register(),
-
-        RAW_URANIUM = CreateNuclear.REGISTRATE
-            .item("raw_uranium", Item::new)
-            .tag(CNTags.forgeItemTag("raw_ores"), CNTags.forgeItemTag("raw_materials"), CNTags.forgeItemTag("raw_materials/uranium"))
-            .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
-                .unlockedBy("has_storage_blocks_raw_uranium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("storage_blocks/raw_uranium")))
-                .requires(CNTags.forgeItemTag("storage_blocks/raw_uranium"))
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
             .register(),

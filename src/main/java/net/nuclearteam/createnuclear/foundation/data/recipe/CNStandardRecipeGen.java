@@ -140,7 +140,8 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
             .viaShapeless(b -> b
                     .requires(CNBlocks.RAW_THORIUM_BLOCK.get())
 
-            ),
+            )
+    ;
 
 
     String currentFolder = "";

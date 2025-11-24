@@ -2,26 +2,12 @@ package net.nuclearteam.createnuclear.foundation.data.recipe;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
-import com.simibubi.create.AllRecipeTypes;
-import com.simibubi.create.foundation.data.recipe.MechanicalCraftingRecipeBuilder;
-import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
-import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
-import net.nuclearteam.createnuclear.*;
-
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 
 import com.simibubi.create.api.data.recipe.MechanicalCraftingRecipeGen;
-import net.minecraft.data.PackOutput;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.block.Blocks;
 import net.nuclearteam.createnuclear.*;
 
 public class CNMechanicalCraftingRecipeGen extends MechanicalCraftingRecipeGen {

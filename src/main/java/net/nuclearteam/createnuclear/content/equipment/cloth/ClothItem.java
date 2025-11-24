@@ -1,15 +1,11 @@
 package net.nuclearteam.createnuclear.content.equipment.cloth;
 
-import com.simibubi.create.foundation.data.recipe.CreateRecipeProvider.GeneratedRecipe;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.nuclearteam.createnuclear.CNItems;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class ClothItem extends Item {
