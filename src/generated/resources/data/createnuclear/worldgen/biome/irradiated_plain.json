@@ -15,7 +15,7 @@
     "water_color": 4159204,
     "particle": {
       "options": {
-        "type": "minecraft:crimson_spore"
+        "type": "createnuclear:irradiated_particles"
       },
       "probability": 0.025
     },

@@ -25,6 +25,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
+import net.nuclearteam.createnuclear.content.particles.CNParticleTypes;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
 import org.slf4j.Logger;
@@ -72,6 +73,7 @@ public class CreateNuclear {
         CNCreativeModeTabs.register(modEventBus);
         CNEffects.register(modEventBus);
         CNPotions.register(modEventBus);
+        CNParticleTypes.register(modEventBus);
         CNRecipeTypes.register(modEventBus);
         CNAttributes.register(modEventBus);
 

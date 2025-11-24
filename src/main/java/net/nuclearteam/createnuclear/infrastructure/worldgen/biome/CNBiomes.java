@@ -1,7 +1,6 @@
 package net.nuclearteam.createnuclear.infrastructure.worldgen.biome;
 
 import net.minecraft.core.HolderGetter;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
@@ -10,6 +9,7 @@ import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.content.particles.CNParticleTypes;
 import org.jetbrains.annotations.NotNull;
 
 public class CNBiomes {
@@ -25,11 +25,11 @@ public class CNBiomes {
         BiomeGenerationSettings.Builder genSettings = new BiomeGenerationSettings.Builder(holderGetter, holder2);
         BiomeSpecialEffects.Builder effects = new BiomeSpecialEffects.Builder();
         effects
-                .fogColor(0)
-                .ambientParticle(new AmbientParticleSettings(ParticleTypes.CRIMSON_SPORE, 0.025F))
-                .waterColor(4159204)
-                .waterFogColor(329011)
-                .skyColor(0)
+            .fogColor(0)
+            .ambientParticle(new AmbientParticleSettings(CNParticleTypes.IRRADIATED_PARTICLES, 0.025F))
+            .waterColor(4159204)
+            .waterFogColor(329011)
+            .skyColor(0)
         ;
         return builder
                 .downfall(0)
