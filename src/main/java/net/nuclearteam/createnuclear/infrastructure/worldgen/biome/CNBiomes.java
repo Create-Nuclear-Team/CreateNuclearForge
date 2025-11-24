@@ -9,7 +9,8 @@ import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.particles.CNParticleTypes;
+import net.nuclearteam.createnuclear.CNParticleTypes;
+import net.nuclearteam.createnuclear.content.particles.IrradiatedParticlesData;
 import org.jetbrains.annotations.NotNull;
 
 public class CNBiomes {
@@ -26,7 +27,7 @@ public class CNBiomes {
         BiomeSpecialEffects.Builder effects = new BiomeSpecialEffects.Builder();
         effects
             .fogColor(0)
-            .ambientParticle(new AmbientParticleSettings(CNParticleTypes.IRRADIATED_PARTICLES, 0.025F))
+//            .ambientParticle(new AmbientParticleSettings(new IrradiatedParticlesData(), 1F))
             .waterColor(4159204)
             .waterFogColor(329011)
             .skyColor(0)
