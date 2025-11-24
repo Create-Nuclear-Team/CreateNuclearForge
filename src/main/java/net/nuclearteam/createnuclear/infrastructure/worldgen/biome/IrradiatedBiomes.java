@@ -9,6 +9,7 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.nuclearteam.createnuclear.CNEntityType;
+import net.nuclearteam.createnuclear.content.particles.IrradiatedParticlesData;
 
 public class IrradiatedBiomes {
     public static Biome createPlain(HolderGetter<PlacedFeature> featureLookup, HolderGetter<ConfiguredWorldCarver<?>> carverLookup) {
@@ -37,6 +38,7 @@ public class IrradiatedBiomes {
                 .waterFogColor(329011)
                 .fogColor(329011)
                 .skyColor(0)
+                .ambientParticle(new AmbientParticleSettings(new IrradiatedParticlesData(), 0.025F))
                 .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
         ;
 
