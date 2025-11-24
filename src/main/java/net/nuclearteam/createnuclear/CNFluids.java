@@ -10,6 +10,11 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.common.ForgeMod;
@@ -120,8 +125,9 @@ public class CNFluids {
             };
         }
 
-        private SolidRenderedPlaceableFluidtype(Properties properties, ResourceLocation stillTexture, ResourceLocation flowingTexture) {
-            super(properties, stillTexture, flowingTexture);
+
+        private SolidRenderedPlaceableFluidtype(Properties properties, ResourceLocation stillTecture, ResourceLocation flowingTexture) {
+            super(properties, stillTecture, flowingTexture);
         }
 
         @Override
@@ -131,7 +137,7 @@ public class CNFluids {
 
         @Override
         protected int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-            return 0x00ffffff;
+            return 0x38FF08;
         }
 
         @Override

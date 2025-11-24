@@ -2,7 +2,11 @@
   "type": "create:mixing",
   "ingredients": [
     {
+<<<<<<< HEAD
       "tag": "forge:coal_dusts"
+=======
+      "tag": "forge:dusts/coal"
+>>>>>>> t
     },
     {
       "tag": "forge:ingots/iron"

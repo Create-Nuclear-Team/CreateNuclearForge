@@ -54,7 +54,6 @@ public final class SimpleMultiBlockPattern implements IMultiBlockPattern {
         return new MultiblockMatchResult(List.copyOf(result));
     }
 
-    
     @Override
     public void construct(Level level, BlockPos blockPos, BiPredicate<Character, BlockState> stateBiPredicate) {
         if (level.isClientSide) return;

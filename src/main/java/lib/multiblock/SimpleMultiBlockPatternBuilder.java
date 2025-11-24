@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.multiblock.impl.IMultiBlockPatternBuilder;
+import lib.multiblock.impl.IMultiBlockPatternBuilder;
 import lib.multiblock.impl.IPatternBuilder;
 import lib.multiblock.misc.MultiBlockOffsetPos;
 import net.minecraft.core.BlockPos;

@@ -1,7 +1,10 @@
 {
   "values": [
     "createnuclear:raw_lead",
+<<<<<<< HEAD
     "createnuclear:raw_thorium",
+=======
+>>>>>>> t
     "createnuclear:raw_uranium"
   ]
 }

@@ -1,6 +1,10 @@
 {
   "values": [
+<<<<<<< HEAD
     "createnuclear:thorium_dust",
+=======
+    "createnuclear:uranium_powder",
+>>>>>>> t
     "createnuclear:coal_dust"
   ]
 }

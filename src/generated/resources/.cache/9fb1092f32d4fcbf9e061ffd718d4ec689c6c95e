@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // 1.20.1	2025-10-16T09:11:55.0717773	Recipes
 2033f2859713c27e945069e6b831665a3fda414a data/createnuclear/advancements/recipes/combat/crafting/items/armors/anti_radiation_boots.json
 994c303b720b9195df5332abdb6035fc0663d86b data/createnuclear/advancements/recipes/combat/crafting/items/armors/black_anti_radiation_chestplate.json
@@ -48,10 +49,14 @@ ef9d304a52950c2f241ed965c1c5e2ca87feeaac data/createnuclear/advancements/recipes
 d222771ad3dde39d390e8d89d95918bb523eec93 data/createnuclear/advancements/recipes/combat/crafting/items/armors/yellow_anti_radiation_chestplate.json
 1ca46718d29476420c4ebfd171e36e76770c79b6 data/createnuclear/advancements/recipes/combat/crafting/items/armors/yellow_anti_radiation_helmet.json
 8978bafbd0fc5dc9bcb1789c78f0a9b398bd8d1c data/createnuclear/advancements/recipes/combat/crafting/items/armors/yellow_anti_radiation_leggings.json
+=======
+// 1.20.1	2025-11-11T12:39:11.5491243	Recipes
+>>>>>>> t
 229dafab82da54169697898f94d3be266a77d5ff data/createnuclear/advancements/recipes/misc/blasting/lead_ingot_for_lead.json
 14b3abbc5d9b1950f65ef1cc03f79a36c8820efc data/createnuclear/advancements/recipes/misc/blasting/lead_ingot_for_lead_ore.json
 028d2b4f2f5ec4764791ca5c28c19b6848b00bea data/createnuclear/advancements/recipes/misc/blasting/lead_ingot_for_raw_lead.json
 605ccb2acc7e944ddbce2e962af3278e47a04627 data/createnuclear/advancements/recipes/misc/blasting/raw_uranium_for_uranium_ore.json
+<<<<<<< HEAD
 eaf984d1126a240016bb6d32c08c673deadf2c3a data/createnuclear/advancements/recipes/misc/crafting/enriched_soul_soil.json
 ffca0fb212a8a89c18d88df891c0024cb57d7234 data/createnuclear/advancements/recipes/misc/crafting/enriching_campfire.json
 a72a296cd6cad499e78fa33f74194d74e9d2eef0 data/createnuclear/advancements/recipes/misc/crafting/lead_block_from_compacting.json
@@ -68,6 +73,12 @@ bb066a2d5c537c74e12d9a1d51df1cc68de33388 data/createnuclear/advancements/recipes
 3da43456cfdbd24e8cb72b0a7f89c5ca5aad916a data/createnuclear/advancements/recipes/misc/crafting/thorium_raw/raw_thorium_from_raw_thorium_block_decompacting.json
 58cd0972546abcefcb5b5bdd41f0a8ad79cb9a31 data/createnuclear/advancements/recipes/misc/crafting/thorium_raw/raw_uranium_block.json
 53f567691ff093bc187fe7d514f861fcbac5a4d7 data/createnuclear/advancements/recipes/misc/crafting/thorium_raw/reactor_blueprint_item.json
+=======
+a72a296cd6cad499e78fa33f74194d74e9d2eef0 data/createnuclear/advancements/recipes/misc/crafting/lead_block_from_compacting.json
+c6acb8cd38541f9baf6e9045bf2547666a48dd66 data/createnuclear/advancements/recipes/misc/crafting/lead_ingot_from_compacting.json
+7be9394a2c56bc4683288e45a44bfc5dda6a4b6e data/createnuclear/advancements/recipes/misc/crafting/steel_block_from_compacting.json
+4ad292cd97e78f82b3ed9d4123f5e95c5ddea55c data/createnuclear/advancements/recipes/misc/crafting/steel_ingot_from_compacting.json
+>>>>>>> t
 a98dc6de94e6658d78ec28b77959ae9cb17b1d58 data/createnuclear/advancements/recipes/misc/crafting/white_cloth.json
 067475701d6f059793c064718b7bba4b939ce380 data/createnuclear/advancements/recipes/misc/crafting/white_cloth_wool.json
 d4162de75c52e6106a386dcf4c5c3bc5b74261d6 data/createnuclear/advancements/recipes/misc/smelting/lead_ingot_for_lead.json
@@ -78,6 +89,7 @@ d7cfc6f1ff4d39df0df526ec3723e8d18d198945 data/createnuclear/advancements/recipes
 b2ec2f955ece9110bf315a2773b70999e268f81d data/createnuclear/recipes/blasting/lead_ingot_for_lead_ore.json
 c46810e5000a34edfceed6a8457595afe9d0377d data/createnuclear/recipes/blasting/lead_ingot_for_raw_lead.json
 978cc9d92268673050da5697482f4013a63a65f1 data/createnuclear/recipes/blasting/raw_uranium_for_uranium_ore.json
+<<<<<<< HEAD
 749b8127db160264925c9117d1282fdfceded98d data/createnuclear/recipes/crafting/enriched_soul_soil.json
 3ce1aa65e8260fbe5fe84c9064b8de3745762605 data/createnuclear/recipes/crafting/enriching_campfire.json
 3e12f7186fee08c35956e4a7bd26770830e4d462 data/createnuclear/recipes/crafting/items/armors/anti_radiation_boots.json
@@ -143,6 +155,12 @@ befcdaaf4abf86e29d7f7008d489638c5f3cd6bd data/createnuclear/recipes/crafting/tho
 8f4c8eabbc94a8562646b19d969aac1df83c7456 data/createnuclear/recipes/crafting/thorium_raw/raw_thorium_from_raw_thorium_block_decompacting.json
 62e238496e81bbf9a86fcfc9396a6416e057007c data/createnuclear/recipes/crafting/thorium_raw/raw_uranium_block.json
 77f77148406d34c065b55efa9d6e7a2b107831c5 data/createnuclear/recipes/crafting/thorium_raw/reactor_blueprint_item.json
+=======
+319718ee24e2c5bdeba2b16cd99c55fc7f97f9e4 data/createnuclear/recipes/crafting/lead_block_from_compacting.json
+17e9a54a54b1ed1f6af0a3fbb0771262af585a95 data/createnuclear/recipes/crafting/lead_ingot_from_compacting.json
+8e2e9b598fe86d2238915fb59486bccfac737e16 data/createnuclear/recipes/crafting/steel_block_from_compacting.json
+af5d168185e516ea79c335ac7eb6652b99723143 data/createnuclear/recipes/crafting/steel_ingot_from_compacting.json
+>>>>>>> t
 f2841ff83321c5bf5d43649fb204fa3a97fd596e data/createnuclear/recipes/crafting/white_cloth.json
 93e75639c60d69067daddecfb2fa480a8e2040c4 data/createnuclear/recipes/crafting/white_cloth_wool.json
 165a3c45b53d0a94149f26300f609c2fd7c688f1 data/createnuclear/recipes/smelting/lead_ingot_for_lead.json

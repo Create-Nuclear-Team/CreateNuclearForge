@@ -38,7 +38,11 @@
                   "function": "minecraft:explosion_decay"
                 }
               ],
+<<<<<<< HEAD
               "name": "createnuclear:raw_thorium"
+=======
+              "name": "createnuclear:raw_uranium"
+>>>>>>> t
             }
           ]
         }

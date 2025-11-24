@@ -1,7 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
+<<<<<<< HEAD
     "has_item": {
+=======
+    "has_enriched_soul_soil": {
+>>>>>>> t
       "conditions": {
         "items": [
           {
@@ -22,7 +26,11 @@
   },
   "requirements": [
     [
+<<<<<<< HEAD
       "has_item",
+=======
+      "has_enriched_soul_soil",
+>>>>>>> t
       "has_the_recipe"
     ]
   ],

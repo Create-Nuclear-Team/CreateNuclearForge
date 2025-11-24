@@ -62,7 +62,10 @@
   "block.createnuclear.cut_autunite_stairs": "Cut Autunite Stairs",
   "block.createnuclear.cut_autunite_wall": "Cut Autunite Wall",
   "block.createnuclear.deepslate_lead_ore": "Deepslate Lead Ore",
+<<<<<<< HEAD
   "block.createnuclear.deepslate_thorium_ore": "Deepslate Thorium Ore",
+=======
+>>>>>>> t
   "block.createnuclear.deepslate_uranium_ore": "Deepslate Uranium Ore",
   "block.createnuclear.enriched_soul_soil": "Enriched Soul Soil",
   "block.createnuclear.enriched_soul_soil.tooltip.summary": "The _only_ block who create _enriched fire_.Can be used to _craft_ enriched campfire or just to make a _green fire_.",
@@ -76,7 +79,10 @@
   "block.createnuclear.polished_cut_autunite_stairs": "Polished Cut Autunite Stairs",
   "block.createnuclear.polished_cut_autunite_wall": "Polished Cut Autunite Wall",
   "block.createnuclear.raw_lead_block": "Raw Lead Block",
+<<<<<<< HEAD
   "block.createnuclear.raw_thorium_block": "Raw Thorium Block",
+=======
+>>>>>>> t
   "block.createnuclear.raw_uranium_block": "Raw Uranium Block",
   "block.createnuclear.reactor_casing": "Reactor Casing",
   "block.createnuclear.reactor_casing.tooltip.summary": "_Block_ used to build the _reactor_",
@@ -104,9 +110,12 @@
   "block.createnuclear.small_autunite_brick_stairs": "Small Autunite Brick Stairs",
   "block.createnuclear.small_autunite_brick_wall": "Small Autunite Brick Wall",
   "block.createnuclear.steel_block": "Steel Block",
+<<<<<<< HEAD
   "block.createnuclear.thorium": "Thorium",
   "block.createnuclear.thorium_block": "Thorium Block",
   "block.createnuclear.thorium_ore": "Thorium Ore",
+=======
+>>>>>>> t
   "block.createnuclear.uranium": "Uranium",
   "block.createnuclear.uranium_ore": "Uranium Ore",
   "create.recipe.fan_enriched.fan": "Fan behind Enriched Fire",
@@ -140,7 +149,10 @@
   "entity.createnuclear.irradiated_cat": "Irradiated Cat",
   "entity.createnuclear.irradiated_chicken": "Irradiated Chicken",
   "entity.createnuclear.irradiated_wolf": "Irradiated Wolf",
+<<<<<<< HEAD
   "fluid.createnuclear.thorium": "Liquid Thorium",
+=======
+>>>>>>> t
   "fluid.createnuclear.uranium": "Liquid Uranium",
   "gui.createnuclear.reactor_controller.title": "Reactor Controller",
   "gui.createnuclear.reactor_input.title": "Reactor Input Storage",
@@ -207,7 +219,10 @@
   "item.createnuclear.purple_anti_radiation_leggings": "Purple Anti Radiation Leggings",
   "item.createnuclear.purple_cloth": "Purple Cloth",
   "item.createnuclear.raw_lead": "Raw Lead",
+<<<<<<< HEAD
   "item.createnuclear.raw_thorium": "Raw Thorium",
+=======
+>>>>>>> t
   "item.createnuclear.raw_uranium": "Raw Uranium",
   "item.createnuclear.reactor_blueprint_item": "Reactor Blueprint",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "_Right_ click to fill it.",
@@ -221,10 +236,13 @@
   "item.createnuclear.red_cloth": "Red Cloth",
   "item.createnuclear.steel_ingot": "Steel Ingot",
   "item.createnuclear.steel_nugget": "Steel Nugget",
+<<<<<<< HEAD
   "item.createnuclear.thorium_bucket": "Thorium Bucket",
   "item.createnuclear.thorium_dust": "Thorium Dust",
   "item.createnuclear.thorium_ingot": "Thorium Ingot",
   "item.createnuclear.thorium_nugget": "Thorium Nugget",
+=======
+>>>>>>> t
   "item.createnuclear.uranium_bucket": "Uranium Bucket",
   "item.createnuclear.uranium_powder": "Uranium Powder",
   "item.createnuclear.uranium_rod": "Uranium Rod",
@@ -253,7 +271,11 @@
   "item.minecraft.tipped_arrow.effect.potion_of_radiation_augment_1": "Arrow of Radiation",
   "itemGroup.createnuclear.main": "Create Nuclear",
   "itemgroup.uranium": "Uranium Group",
+<<<<<<< HEAD
   "overlay.event_message": "âš  Warning âš  %s timer",
+=======
+  "overlay.event_message": "⚠ Warning ⚠ %s timer",
+>>>>>>> t
   "reactor.info.assembled.creator": "Reactor has been assembled",
   "reactor.info.assembled.destroyer": "Reactor has been disassembled",
   "reactor.info.assembled.none": "Reactor is not assembled",

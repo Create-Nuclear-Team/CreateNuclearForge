@@ -55,7 +55,6 @@ public class CNConfiguredFeatures {
         );
 
         register(ctx, THORIUM_ORE, Feature.ORE, new OreConfiguration(thoriumTargetStates, 7));
-
         List<LayerPattern> overworldLayerPatterns = List.of(
                 CNLayerPatterns.AUTUNITE.get()
         );

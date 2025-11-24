@@ -2,7 +2,11 @@
   "type": "create:mixing",
   "ingredients": [
     {
+<<<<<<< HEAD
       "item": "createnuclear:uranium_powder"
+=======
+      "tag": "forge:dusts/uranium"
+>>>>>>> t
     }
   ],
   "results": [
