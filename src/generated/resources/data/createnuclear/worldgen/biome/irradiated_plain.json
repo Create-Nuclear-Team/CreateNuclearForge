@@ -11,14 +11,15 @@
       "sound": "minecraft:ambient.cave",
       "tick_delay": 6000
     },
-    "sky_color": 0,
-    "water_color": 4159204,
     "particle": {
       "options": {
-        "type": "createnuclear:irradiated_particles"
+        "type": "createnuclear:irradiated_particles",
+        "t": 0
       },
       "probability": 0.025
     },
+    "sky_color": 0,
+    "water_color": 4159204,
     "water_fog_color": 329011
   },
   "features": [
