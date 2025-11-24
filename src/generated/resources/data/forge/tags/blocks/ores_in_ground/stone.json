@@ -1,11 +1,7 @@
 {
   "values": [
     "createnuclear:lead_ore",
-<<<<<<< HEAD
-    "createnuclear:uranium_ore",
-    "createnuclear:thorium_ore"
-=======
+    "createnuclear:thorium_ore",
     "createnuclear:uranium_ore"
->>>>>>> t
   ]
 }

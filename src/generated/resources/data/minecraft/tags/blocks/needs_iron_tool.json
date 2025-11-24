@@ -2,12 +2,8 @@
   "values": [
     "createnuclear:deepslate_lead_ore",
     "createnuclear:lead_ore",
+    "createnuclear:thorium_ore",
     "createnuclear:deepslate_uranium_ore",
-<<<<<<< HEAD
-    "createnuclear:uranium_ore",
-    "createnuclear:thorium_ore"
-=======
     "createnuclear:uranium_ore"
->>>>>>> t
   ]
 }

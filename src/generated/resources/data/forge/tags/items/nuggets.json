@@ -1,9 +1,6 @@
 {
   "values": [
-<<<<<<< HEAD
     "createnuclear:thorium_nugget",
-=======
->>>>>>> t
     "createnuclear:steel_nugget",
     "createnuclear:lead_nugget"
   ]

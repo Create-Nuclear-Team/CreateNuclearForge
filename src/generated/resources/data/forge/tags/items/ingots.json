@@ -1,9 +1,6 @@
 {
   "values": [
-<<<<<<< HEAD
     "createnuclear:thorium_ingot",
-=======
->>>>>>> t
     "createnuclear:steel_ingot",
     "createnuclear:lead_ingot"
   ]
