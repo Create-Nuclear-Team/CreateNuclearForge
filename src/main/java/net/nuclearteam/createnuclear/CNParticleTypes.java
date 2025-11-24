@@ -1,9 +1,7 @@
-package net.nuclearteam.createnuclear.content.particles;
+package net.nuclearteam.createnuclear;
 
-import com.simibubi.create.AllParticleTypes;
 import com.simibubi.create.foundation.particle.ICustomParticleData;
 import net.createmod.catnip.lang.Lang;
-import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -11,18 +9,14 @@ import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.createmod.catnip.lang.Lang;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.content.particles.IrradiatedParticlesData;
 
 import java.util.function.Supplier;
 
-public enum CNParticleTypes implements ParticleOptions {
+public enum CNParticleTypes {
     IRRADIATED_PARTICLES(IrradiatedParticlesData::new),
     ;
 
@@ -51,20 +45,6 @@ public enum CNParticleTypes implements ParticleOptions {
         return entry.name;
     }
 
-    @Override
-    public ParticleType<?> getType() {
-        return null;
-    }
-
-    @Override
-    public void writeToNetwork(FriendlyByteBuf pBuffer) {
-
-    }
-
-    @Override
-    public String writeToString() {
-        return "";
-    }
 
     private static class ParticleEntry<D extends ParticleOptions> {
         private static final DeferredRegister<ParticleType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, CreateNuclear.MOD_ID);
@@ -79,8 +59,6 @@ public enum CNParticleTypes implements ParticleOptions {
 
             object = REGISTER.register(name, () -> this.typeFactory.get().createType());
         }
-
-
 
         @OnlyIn(Dist.CLIENT)
         public void registerFactory(RegisterParticleProvidersEvent event) {

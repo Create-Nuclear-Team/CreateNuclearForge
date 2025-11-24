@@ -9,30 +9,31 @@ import net.minecraft.client.particle.ParticleEngine.SpriteParticleRegistration;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
+import net.nuclearteam.createnuclear.CNParticleTypes;
 
 import java.util.Locale;
 
 public class IrradiatedParticlesData implements ParticleOptions, ICustomParticleDataWithSprite<IrradiatedParticlesData> {
 
     public static final Codec<IrradiatedParticlesData> CODEC = RecordCodecBuilder.create(i ->
-            i.group(
-                            Codec.INT.fieldOf("t").forGetter(p -> p.t)
-                    )
-                    .apply(i, IrradiatedParticlesData::new)
+        i.group(
+            Codec.INT.fieldOf("t").forGetter(p -> p.t)
+        )
+        .apply(i, IrradiatedParticlesData::new)
     );
 
     public static final Deserializer<IrradiatedParticlesData> DESERIALIZER =
-            new Deserializer<>() {
-                @Override
-                public IrradiatedParticlesData fromCommand(ParticleType<IrradiatedParticlesData> particleType, StringReader reader) throws CommandSyntaxException {
-                    return new IrradiatedParticlesData();
-                }
+        new Deserializer<>() {
+            @Override
+            public IrradiatedParticlesData fromCommand(ParticleType<IrradiatedParticlesData> particleType, StringReader reader) throws CommandSyntaxException {
+                return new IrradiatedParticlesData();
+            }
 
-                @Override
-                public IrradiatedParticlesData fromNetwork(ParticleType<IrradiatedParticlesData> particleType, FriendlyByteBuf buffer) {
-                    return new IrradiatedParticlesData();
-                }
-            };
+            @Override
+            public IrradiatedParticlesData fromNetwork(ParticleType<IrradiatedParticlesData> particleType, FriendlyByteBuf buffer) {
+                return new IrradiatedParticlesData();
+            }
+        };
 
 
     int t;

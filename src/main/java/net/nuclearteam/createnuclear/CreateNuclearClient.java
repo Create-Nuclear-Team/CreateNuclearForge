@@ -10,6 +10,7 @@ public class CreateNuclearClient {
 
     public static void onCtorClient(IEventBus modEventBus, IEventBus forgeEventBus) {
         modEventBus.addListener(CreateNuclearClient::clientInit);
+        modEventBus.addListener(CNParticleTypes::registerFactories);
 
     }
 
