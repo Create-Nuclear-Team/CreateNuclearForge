@@ -75,12 +75,22 @@ public class CNItems {
             .item("thorium_ingot", Item::new)
             .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/thorium_ingot")))
             .tag(CNTags.forgeItemTag("ingots"), CNTags.forgeItemTag("ingots/thorium"))
+            .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
+                .unlockedBy("has_storage_blocks_thorium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("storage_blocks/thorium")))
+                .requires(CNTags.forgeItemTag("storage_blocks/thorium"))
+                .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
+            )
             .register(),
 
         THORIUM_NUGGET = CreateNuclear.REGISTRATE
             .item("thorium_nugget", Item::new)
             .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/thorium_nugget")))
             .tag(CNTags.forgeItemTag("nuggets"), CNTags.forgeItemTag("nuggets/thorium"))
+            .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
+                .unlockedBy("has_storage_blocks_steel_nugget", RegistrateRecipeProvider.has(CNTags.forgeItemTag("ingots/thorium")))
+                .requires(CNTags.forgeItemTag("ingots/thorium"))
+                .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
+            )
             .register(),
 
         RAW_URANIUM = CreateNuclear.REGISTRATE

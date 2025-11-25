@@ -97,43 +97,43 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
             )
     ),
 
-    // 1 block -> 9 ingots (décompactage)
-    THORIUM_BLOCK_TO_INGOTS = create(CNItems.THORIUM_INGOT::get)
-            .withSuffix("_from_thorium_block_decompacting")
-            .returns(9)
-            .unlockedBy(CNBlocks.THORIUM_BLOCK::get)
-            .viaShapeless(b -> b
-                    .requires(CNBlocks.THORIUM_BLOCK.get())
+    // // 1 block -> 9 ingots (décompactage)
+    // THORIUM_BLOCK_TO_INGOTS = create(CNItems.THORIUM_INGOT::get)
+    //         .withSuffix("_from_thorium_block_decompacting")
+    //         .returns(9)
+    //         .unlockedBy(CNBlocks.THORIUM_BLOCK::get)
+    //         .viaShapeless(b -> b
+    //                 .requires(CNBlocks.THORIUM_BLOCK.get())
 
-            ),
+    //         ),
 
-    // 1 ingot -> 9 nuggets (décompactage)
-    THORIUM_INGOT_TO_NUGGETS = create(CNItems.THORIUM_NUGGET::get)
-            .withSuffix("_from_thorium_ingot_decompacting")
-            .returns(9)
-            .unlockedBy(CNItems.THORIUM_INGOT::get)
-            .viaShapeless(b -> b
-                    .requires(CNTags.forgeItemTag("ingots/thorium"))
+    // // 1 ingot -> 9 nuggets (décompactage)
+    // THORIUM_INGOT_TO_NUGGETS = create(CNItems.THORIUM_NUGGET::get)
+    //         .withSuffix("_from_thorium_ingot_decompacting")
+    //         .returns(9)
+    //         .unlockedBy(CNItems.THORIUM_INGOT::get)
+    //         .viaShapeless(b -> b
+    //                 .requires(CNTags.forgeItemTag("ingots/thorium"))
 
-            );
+    //         );
 
     // Bloc RAW: on change de sous-dossier pour rester propre
     private final String CRAFTING_THORIUM_RAW = enterFolder("crafting/thorium_raw");
 
     GeneratedRecipe
             // 9 raw_thorium -> 1 raw_thorium_block
-            RAW_THORIUM_BLOCK = create(CNBlocks.RAW_THORIUM_BLOCK)
-            .unlockedByTag(() -> CNTags.forgeItemTag("raw_materials/thorium"))
-            .viaShaped(b -> b
-                    .define('R', CNTags.forgeItemTag("raw_materials/thorium"))
-                    .pattern("RRR")
-                    .pattern("RRR")
-                    .pattern("RRR")
-                    .showNotification(true)
-            ),
+            // RAW_THORIUM_BLOCK = create(CNBlocks.RAW_THORIUM_BLOCK)
+            // .unlockedByTag(() -> CNTags.forgeItemTag("raw_materials/thorium"))
+            // .viaShaped(b -> b
+            //         .define('R', CNTags.forgeItemTag("raw_materials/thorium"))
+            //         .pattern("RRR")
+            //         .pattern("RRR")
+            //         .pattern("RRR")
+            //         .showNotification(true)
+            // ),
 
-    // 1 raw_block -> 9 raw_thorium
-    RAW_THORIUM_FROM_BLOCK = create(CNItems.RAW_THORIUM::get)
+        // 1 raw_block -> 9 raw_thorium
+        RAW_THORIUM_FROM_BLOCK = create(CNItems.RAW_THORIUM::get)
             .withSuffix("_from_raw_thorium_block_decompacting")
             .returns(9)
             .unlockedBy(CNBlocks.RAW_THORIUM_BLOCK::get)
