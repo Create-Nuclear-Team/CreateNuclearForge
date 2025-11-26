@@ -26,6 +26,7 @@ import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public boolean sendUpdate;
 
     public ReactorControllerBlock controller;
-
+    protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorControllerInventory inventory;
 
     //public LinkedHashSet<LazyOptional<IItemHandler>> attachedInventory;
@@ -217,6 +218,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 ListTag inventoryTag = tag.getCompound("Inventory").getList("Items", Tag.TAG_COMPOUND);
                 fuelItem = ItemStack.of(inventoryTag.getCompound(0));
                 coolerItem = ItemStack.of(inventoryTag.getCompound(1));
+                BlockPos outputPos = pattern.FindOutputPos(getBlockPos(), getLevel(), getLevel().players(), true);
                 if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
                     configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat(tag));
                     if (updateTimers()) {
@@ -224,20 +226,19 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                         be.inventory.extractItem(1, 1, false);
                         total = calculateProgress();
                         int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-
                         if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
-                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4);
+                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), heat/4);
                         } else {
                             // Send a packet to all clients around this block within 16 blocks
                             EventTriggerPacket packet = new EventTriggerPacket(600); // display for 100 ticks
                             CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
                             CNPackets.sendToNear(level, getBlockPos(), 32, packet);
-                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
+                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
                         }
                         return;
                     }
                 } else {
-                    this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
+                    this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
                 }
 
                 /*if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
@@ -364,7 +365,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     private BlockPos getBlockPosForReactor(char character) {
-        BlockPos pos = FindController(character);
+        BlockPos pos = pattern.VerifyPattern(character);
         BlockPos posController = getBlockPos();
         BlockPos posInput = new BlockPos(posController.getX(), posController.getY(), posController.getZ());
 
@@ -404,25 +405,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
 
         return null;
-    }
-
-    private static BlockPos FindController(char character) {
-        return SimpleMultiBlockAislePatternBuilder.start()
-                .aisle(AAAAA, AAAAA, AAAAA, AAAAA, AAAAA)
-                .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
-                .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
-                .aisle(AAIAA, ADADA, BACAB, ADADA, AAAA)
-                .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
-                .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
-                .aisle(AAAAA, AAAAA, AAAAA, AAAAA, AAOAA)
-                .where('A', a -> a.getState().is(CNBlocks.REACTOR_CASING.get()))
-                .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
-                .where('C', a -> a.getState().is(CNBlocks.REACTOR_CORE.get()))
-                .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
-                .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
-                .where('O', a -> a.getState().is(CNBlocks.REACTOR_OUTPUT.get()))
-                .where('I', a -> a.getState().is(CNBlocks.REACTOR_INPUT.get()))
-                .getDistanceController(character);
     }
 
     public void rotate(BlockState state, BlockPos pos, Level level, int rotation) {

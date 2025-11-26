@@ -72,6 +72,7 @@ public class SimpleMultiBlockAislePatternBuilder implements IMultiBlockPatternBu
     public <T extends IMultiBlockPattern> T build(IPatternBuilder<T> builder){
         var data = Util.parseBlockPattern(pattern, lookup.keySet());
         var coreList = data.get('*');
+        CreateNuclear.LOGGER.info("1: {}", coreList.toString());
         if (coreList == null || coreList.size() != 1) {
             throw new IllegalArgumentException("Failed to build pattern due to having more or less than one \"*\" defined! Have: %s Expected: 1".formatted(coreList != null ? coreList.size() : 0));
         }

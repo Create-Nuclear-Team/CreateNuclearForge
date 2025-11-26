@@ -29,6 +29,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,6 +46,8 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
         super(properties);
     }
 
+    protected ReactorPattern pattern =  new ReactorPattern();
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         //builder.add(SPEED);
@@ -57,7 +60,7 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
         if (level.isClientSide)
             return InteractionResult.SUCCESS;
         else {
-            ReactorControllerBlock controller = FindController(pos, level, level.players(), false);
+            ReactorControllerBlock controller = pattern.FindController(pos, level, level.players(), false);
             if (controller != null){
                 ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos.above(3));
                 assert entity != null;
@@ -76,21 +79,21 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, true);
+        pattern.FindController(pos, level, players, true);
     }
 
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, false);
+        pattern.FindController(pos, level, players, false);
     }
 
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         List<? extends Player> players = pLevel.players();
-        FindController(pPos, pLevel, players, false);
+        pattern.FindController(pPos, pLevel, players, false);
     }
 
     @Override
@@ -138,20 +141,5 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
     @Override
     public BlockEntityType<? extends ReactorOutputEntity> getBlockEntityType() {
         return CNBlockEntityTypes.REACTOR_OUTPUT.get();
-    }
-
-    public ReactorControllerBlock FindController(BlockPos blockPos, Level level, List<? extends Player> players, boolean first) {
-        BlockPos newBlock;                                                   // to find the controller and verify the pattern
-        Vec3i pos = new Vec3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        newBlock = new BlockPos(pos.getX(), pos.getY() + 3, pos.getZ());
-        if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) { // verifying the pattern
-            ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(newBlock).getBlock();
-            controller.Verify(level.getBlockState(newBlock), newBlock, level, players, first);
-            ReactorControllerBlockEntity entity = controller.getBlockEntity(level, newBlock);
-            if (entity.created) {
-                return controller;
-            }
-        }
-        return null;
     }
 }

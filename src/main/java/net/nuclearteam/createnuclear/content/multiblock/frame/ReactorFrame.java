@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +29,7 @@ import java.util.List;
 
 public class ReactorFrame extends Block implements IWrenchable {
     public static final Property<Part> PART = EnumProperty.create("part", Part.class);
-
+    protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorFrame(Properties properties) {
         super(properties);
     }
@@ -109,31 +110,13 @@ public class ReactorFrame extends Block implements IWrenchable {
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, true);
+        pattern.FindController(pos, level, players, true);
     }
     @Override // called when the player destroys the block, with or without a tool
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, false);
-    }
-
-    public ReactorControllerBlock FindController(BlockPos blockPos, Level level, List<? extends Player> players, boolean first){ // Function that checks the surrounding blocks in order
-        BlockPos newBlock;                                                   // to find the controller and verify the pattern
-        Vec3i pos = new Vec3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        for (int y = pos.getY()-3; y != pos.getY()+4; y+=1) {
-            for (int x = pos.getX()-5; x != pos.getX()+5; x+=1) {
-                for (int z = pos.getZ()-5; z != pos.getZ()+5; z+=1) {
-                    newBlock = new BlockPos(x, y, z);
-                    if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) { // verifying the pattern
-                        ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(newBlock).getBlock();
-                        controller.Verify(level.getBlockState(newBlock), newBlock, level, players, first);
-                        return controller;
-                    }
-                }
-            }
-        }
-        return null;
+        pattern.FindController(pos, level, players, false);
     }
 
 }

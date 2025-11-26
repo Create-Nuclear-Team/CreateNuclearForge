@@ -34,6 +34,7 @@ import net.nuclearteam.createnuclear.CNShapes;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +42,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ReactorInput extends HorizontalDirectionalReactorBlock implements IWrenchable, IBE<ReactorInputEntity> {
-
+    protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorInput(Properties properties) {
         super(properties);
     }
@@ -71,7 +72,7 @@ public class ReactorInput extends HorizontalDirectionalReactorBlock implements I
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, true);
+        pattern.FindController(pos, level, players, true);
     }
 
     // @Override // ! may be useless
@@ -91,7 +92,7 @@ public class ReactorInput extends HorizontalDirectionalReactorBlock implements I
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, false);
+        pattern.FindController(pos, level, players, false);
     }
 
     @Override
@@ -102,26 +103,7 @@ public class ReactorInput extends HorizontalDirectionalReactorBlock implements I
         pLevel.removeBlockEntity(pPos);
 
         List<? extends Player> players = pLevel.players();
-        FindController(pPos, pLevel, players, false);
-    }
-
-    public ReactorControllerBlock FindController(BlockPos blockPos, Level level, List<? extends Player> players, boolean first){ // Function that checks the surrounding blocks in order
-        BlockPos newBlock;                                                   // to find the controller and verify the pattern
-        Vec3i pos = new Vec3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        for (int x = pos.getX()-5; x != pos.getX()+5; x+=1) {
-            for (int z = pos.getZ()-5; z != pos.getZ()+5; z+=1) {
-                newBlock = new BlockPos(x, pos.getY(), z);
-                if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) { // verifying the pattern
-                    ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(newBlock).getBlock();
-                    controller.Verify(level.getBlockState(newBlock), newBlock, level, players, first);
-                    ReactorControllerBlockEntity entity = controller.getBlockEntity(level, newBlock);
-                    if (entity.created) {
-                        return controller;
-                    }
-                }
-            }
-        }
-        return null;
+        pattern.FindController(pPos, pLevel, players, false);
     }
 
     @Override

@@ -24,6 +24,7 @@ import net.nuclearteam.createnuclear.CNBlocks;
 
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.List;
@@ -36,6 +37,7 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     public int speed = 1;
     public float heat = 0;
 
+    protected ReactorPattern pattern =  new ReactorPattern();
     ReactorControllerBlock controller = null;
     ReactorControllerBlockEntity controllerEntity = null;
 
@@ -105,14 +107,8 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
         if (!hasSource() || getGeneratedSpeed() > getTheoreticalSpeed())
         {
-            FindController(getBlockPos(), Objects.requireNonNull(getLevel()));
-        }
-    }
-
-    public void FindController(BlockPos pos, Level level){
-        if (level.getBlockState(pos.above(3)).getBlock() == CNBlocks.REACTOR_CONTROLLER.get()){
-            ReactorControllerBlock controller = (ReactorControllerBlock)level.getBlockState(pos.above(3)).getBlock();
-            controller.Verify(controller.defaultBlockState(), pos.above(3), level, level.players(), false);
+            assert level != null;
+            pattern.FindController(getBlockPos(), level, level.players(), true);
         }
     }
 
