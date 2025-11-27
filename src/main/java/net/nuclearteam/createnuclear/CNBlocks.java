@@ -52,43 +52,43 @@ import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
 public class CNBlocks {
 
     public static final BlockEntry<ReactorCasing> REACTOR_CASING = CreateNuclear.REGISTRATE
-            .block("reactor_casing", properties -> new ReactorCasing(properties, ReactorCasing.TypeBlock.CASING))
-            .properties(p -> p.explosionResistance(3F)
-                    .destroyTime(4F)
-                    .sound(CNSounds.getSoundType("reactor_casing")))
-            .blockstate((c, p) -> p.getVariantBuilder(c.getEntry()).forAllStates((state) -> ConfiguredModel.builder()
-                    .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/casing/block")))
-                    .build()))
-            .onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(CNSpriteShifts.REACTOR_CASING)))
-            .onRegister(casingConnectivity((block, cc) -> cc.makeCasing(block, CNSpriteShifts.REACTOR_CASING)))
-            .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-            .simpleItem()
-            .transform(pickaxeOnly())
-            .register();
+        .block("reactor_casing", properties -> new ReactorCasing(properties, ReactorCasing.TypeBlock.CASING))
+        .properties(p -> p.explosionResistance(3F)
+                .destroyTime(4F)
+                .sound(CNSounds.getSoundType("reactor_casing")))
+        .blockstate((c, p) -> p.getVariantBuilder(c.getEntry()).forAllStates((state) -> ConfiguredModel.builder()
+                .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/casing/block")))
+                .build()))
+        .onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(CNSpriteShifts.REACTOR_CASING)))
+        .onRegister(casingConnectivity((block, cc) -> cc.makeCasing(block, CNSpriteShifts.REACTOR_CASING)))
+        .tag(BlockTags.NEEDS_DIAMOND_TOOL)
+        .simpleItem()
+        .transform(pickaxeOnly())
+        .register();
 
     public static final BlockEntry<ReactorCore> REACTOR_CORE = CreateNuclear.REGISTRATE
-            .block("reactor_core", ReactorCore::new)
-            .properties(p -> p.explosionResistance(6F))
-            .properties(p -> p.destroyTime(4F))
-            .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-            .blockstate((c, p) -> p.getVariantBuilder(c.getEntry())
-                    .forAllStates(state -> ConfiguredModel.builder()
-                            .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/core/block")))
-                            .uvLock(false)
-                            .build()))
-            .transform(pickaxeOnly())
-            .simpleItem()
-            .register();
+        .block("reactor_core", ReactorCore::new)
+        .properties(p -> p.explosionResistance(6F))
+        .properties(p -> p.destroyTime(4F))
+        .tag(BlockTags.NEEDS_DIAMOND_TOOL)
+        .blockstate((c, p) -> p.getVariantBuilder(c.getEntry())
+        .forAllStates(state -> ConfiguredModel.builder()
+                .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/core/block")))
+                .uvLock(false)
+                .build()))
+        .transform(pickaxeOnly())
+        .simpleItem()
+        .register();
 
     public static final BlockEntry<ReactorFrame> REACTOR_FRAME = CreateNuclear.REGISTRATE
-            .block("reactor_frame", ReactorFrame::new)
-            .initialProperties(SharedProperties::stone)
-            .properties(p -> p.explosionResistance(3F).destroyTime(2F))
-            .addLayer(() -> RenderType::cutoutMipped)
-            .transform(pickaxeOnly())
-            .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-            .blockstate((c, p) -> p.getVariantBuilder(c.getEntry())
-                    .forAllStatesExcept(state -> {
+        .block("reactor_frame", ReactorFrame::new)
+        .initialProperties(SharedProperties::stone)
+        .properties(p -> p.explosionResistance(3F).destroyTime(2F))
+        .addLayer(() -> RenderType::cutoutMipped)
+        .transform(pickaxeOnly())
+        .tag(BlockTags.NEEDS_DIAMOND_TOOL)
+        .blockstate((c, p) -> p.getVariantBuilder(c.getEntry())
+                .forAllStatesExcept(state -> {
                         ReactorFrame.Part part = state.getValue(ReactorFrame.PART);
                         String baseFile = "block/reactor/frame/frame_";
                         ModelFile start = p.models().getExistingFile(p.modLoc(baseFile + "top"));
@@ -96,14 +96,14 @@ public class CNBlocks {
                         ModelFile bottom = p.models().getExistingFile(p.modLoc(baseFile + "bottom"));
                         ModelFile none = p.models().getExistingFile(p.modLoc(baseFile + "none"));
                         return ConfiguredModel.builder().modelFile(switch (part) {
-                            case START -> start;
-                            case MIDDLE -> middle;
-                            case END -> bottom;
-                            default -> none;
+                                case START -> start;
+                                case MIDDLE -> middle;
+                                case END -> bottom;
+                                default -> none;
                         })
-                                .uvLock(false)
-                                .build();
-                    }))
+                        .uvLock(false)
+                        .build();
+                }))
             .item(ReactorframeItem::new)
             .model(AssetLookup.customBlockItemModel("reactor", "frame", "item"))
             .build()
@@ -358,9 +358,9 @@ public class CNBlocks {
             .properties(UraniumOreBlock.litBlockEmission())
             .transform(pickaxeOnly())
             .loot((lt, b) -> lt.add(b,
-                    RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                            lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                                    .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))))))
+                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                        lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
+                                .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))))))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL,
                     BlockTags.NEEDS_IRON_TOOL,
                     CNTags.forgeBlockTag("ores"),
@@ -380,9 +380,9 @@ public class CNBlocks {
             .simpleItem()
             .transform(pickaxeOnly())
             .loot((lt, b) -> lt.add(b,
-                    RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                            lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                                    .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))))))
+                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                        lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
+                                .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))))))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL,
                     BlockTags.NEEDS_IRON_TOOL,
                     CNTags.forgeBlockTag("ores"),
@@ -404,15 +404,12 @@ public class CNBlocks {
             .build()
             .register();
 
-    /*
-     * public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK =
-     * CreateNuclear.REGISTRATE.block("test_event_trigger_block",
-     * EventTriggerBlock::new)
-     * .defaultBlockstate()
-     * .defaultLang()
-     * .simpleItem()
-     * .register();
-     */
+    /*public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK =
+        CreateNuclear.REGISTRATE.block("test_event_trigger_block", EventTriggerBlock::new)
+                .defaultBlockstate()
+                .defaultLang()
+                .simpleItem()
+                .register();*/
 
     public static void register() {
         CreateNuclear.LOGGER.info("Registering ModBlocks for " + CreateNuclear.MOD_ID);

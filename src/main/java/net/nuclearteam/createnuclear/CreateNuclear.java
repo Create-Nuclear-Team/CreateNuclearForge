@@ -35,8 +35,8 @@ public class CreateNuclear {
 
     static {
         REGISTRATE.setTooltipModifierFactory(
-                item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
-                        .andThen(TooltipModifier.mapNull(KineticStats.create(item))));
+            item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
+                .andThen(TooltipModifier.mapNull(KineticStats.create(item))));
     }
 
     public CreateNuclear() {
@@ -77,8 +77,7 @@ public class CreateNuclear {
         modEventBus.addListener(EventPriority.LOWEST, CreateNuclearDatagen::gatherData);
         forgeEventBus.addListener(CNFluids::handleFluidEffect);
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                () -> () -> CreateNuclearClient.onCtorClient(modEventBus, forgeEventBus));
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CreateNuclearClient.onCtorClient(modEventBus, forgeEventBus));
     }
 
     public static void init(final FMLCommonSetupEvent event) {

@@ -6,6 +6,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.level.block.SoundType;
 
 public class CNSounds {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister
@@ -19,19 +20,19 @@ public class CNSounds {
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name,
-                () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(CreateNuclear.MOD_ID, name)));
+                () -> SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(name)));
     }
 
     public static void register(IEventBus eventBus) {
         SOUND_EVENTS.register(eventBus);
     }
 
-    public static net.minecraft.world.level.block.SoundType getSoundType(String id) {
-        return new net.minecraft.world.level.block.SoundType(1.0F, 1.0F,
-                SoundEvent.createVariableRangeEvent(new ResourceLocation(CreateNuclear.MOD_ID, id + "_break")),
-                SoundEvent.createVariableRangeEvent(new ResourceLocation(CreateNuclear.MOD_ID, id + "_step")),
-                SoundEvent.createVariableRangeEvent(new ResourceLocation(CreateNuclear.MOD_ID, id + "_place")),
-                SoundEvent.createVariableRangeEvent(new ResourceLocation(CreateNuclear.MOD_ID, id + "_hit")),
-                SoundEvent.createVariableRangeEvent(new ResourceLocation(CreateNuclear.MOD_ID, id + "_fall")));
+    public static SoundType getSoundType(String id) {
+        return new SoundType(1.0F, 1.0F,
+                SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_break")),
+                SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_step")),
+                SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_place")),
+                SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_hit")),
+                SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_fall")));
     }
 }
