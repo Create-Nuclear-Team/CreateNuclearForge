@@ -35,9 +35,7 @@ public class CNMultiblock {
                         .where('O', stateIs(CNBlocks.REACTOR_CASING.get()))
                         .build()
         );
-    }
 
-    static {
         REGISTRATE_MULTIBLOCK.register("createnuclear:reactor7x7",
                 TypeMultiblock.REACTOR,
                 SimpleMultiBlockAislePatternBuilder.start()
@@ -62,13 +60,12 @@ public class CNMultiblock {
                         .where('I', a -> a.getState().is(CNBlocks.REACTOR_INPUT.get()))
                         .build()
         );
-    }
 
-    static {
         REGISTRATE_MULTIBLOCK.register("createnuclear:reactor9x9",
                 TypeMultiblock.REACTOR,
                 SimpleMultiBlockAislePatternBuilder.start()
                         .aisle("OOOOOOOOO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OOOOOOOOO")
+                        .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
                         .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
                         .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
                         .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")

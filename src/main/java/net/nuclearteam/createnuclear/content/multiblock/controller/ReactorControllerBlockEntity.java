@@ -365,7 +365,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     private BlockPos getBlockPosForReactor(char character) {
-        BlockPos pos = pattern.VerifyPattern(character);
+        BlockPos pos = pattern.VerifyPattern7x7(character);
         BlockPos posController = getBlockPos();
         BlockPos posInput = new BlockPos(posController.getX(), posController.getY(), posController.getZ());
 
