@@ -13,6 +13,12 @@ import java.util.function.Predicate;
 public class CNMultiblock {
     public static final MultiBlockManagerBeta<TypeMultiblock> REGISTRATE_MULTIBLOCK = new MultiBlockManagerBeta<>();
 
+    private static final Predicate<BlockInWorld> blockInWorldAPredicate = state ->
+            stateIs(CNBlocks.REACTOR_CASING.get()).test(state)
+            || stateIs(CNBlocks.REACTOR_OUTPUT.get()).test(state)
+            || stateIs(CNBlocks.REACTOR_INPUT.get()).test(state)
+    ;
+
     static {
         REGISTRATE_MULTIBLOCK.register("createnuclear:reactor5x5",
                 TypeMultiblock.REACTOR,
@@ -24,10 +30,7 @@ public class CNMultiblock {
                         .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OABAO")
                         .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OABAO")
                         .aisle("OOOOO", "OAAAO", "OAAAO", "OAAAO", "OOAOO")
-                        .where('A', state -> stateIs(CNBlocks.REACTOR_CASING.get()).test(state)
-                                        || stateIs(CNBlocks.REACTOR_OUTPUT.get()).test(state)
-                                        || stateIs(CNBlocks.REACTOR_INPUT.get()).test(state)
-                        )
+                        .where('A', blockInWorldAPredicate)
                         .where('B', stateIs(CNBlocks.REACTOR_FRAME.get()))
                         .where('C', stateIs(CNBlocks.REACTOR_CORE.get()))
                         .where('D', stateIs(CNBlocks.REACTOR_COOLER.get()))
@@ -48,10 +51,7 @@ public class CNMultiblock {
                         .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
                         .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
                         .aisle("OOOOOOO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OOOOOOO")
-                        .where('A', a -> a.getState().is(CNBlocks.REACTOR_CASING.get())
-                                || a.getState().is(CNBlocks.REACTOR_OUTPUT.get())
-                                || a.getState().is(CNBlocks.REACTOR_INPUT.get())
-                        )
+                        .where('A', blockInWorldAPredicate)
                         .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
                         .where('C', a -> a.getState().is(CNBlocks.REACTOR_CORE.get()))
                         .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
@@ -75,10 +75,7 @@ public class CNMultiblock {
                         .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
                         .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
                         .aisle("OOOOOOOOO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OOOOOOOOO")
-                        .where('A', a -> a.getState().is(CNBlocks.REACTOR_CASING.get())
-                                || a.getState().is(CNBlocks.REACTOR_OUTPUT.get())
-                                || a.getState().is(CNBlocks.REACTOR_INPUT.get())
-                        )
+                        .where('A', blockInWorldAPredicate)
                         .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
                         .where('C', a -> a.getState().is(CNBlocks.REACTOR_CORE.get()))
                         .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
