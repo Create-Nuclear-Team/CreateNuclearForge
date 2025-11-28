@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraftforge.common.util.ForgeSoundType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -28,11 +29,11 @@ public class CNSounds {
     }
 
     public static SoundType getSoundType(String id) {
-        return new SoundType(1.0F, 1.0F,
-                SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_break")),
-                SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_step")),
-                SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_place")),
-                SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_hit")),
-                SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_fall")));
+        return new ForgeSoundType(1.0F, 1.0F,
+                () -> SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_break")),
+                () -> SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_step")),
+                () -> SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_place")),
+                () -> SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_hit")),
+                () -> SoundEvent.createVariableRangeEvent(CreateNuclear.asResource(id + "_fall")));
     }
 }
