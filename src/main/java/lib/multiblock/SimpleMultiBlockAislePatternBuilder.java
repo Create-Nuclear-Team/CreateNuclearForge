@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class SimpleMultiBlockAislePatternBuilder implements IMultiBlockPatternBuilder {
     public static SimpleMultiBlockAislePatternBuilder start() {
@@ -84,5 +85,11 @@ public class SimpleMultiBlockAislePatternBuilder implements IMultiBlockPatternBu
         var data = Util.parseBlockPattern(pattern, lookup.keySet());
         var coreList = data.get(character);
         return coreList.get(0).pos();
+    }
+
+    public Stream<MultiBlockOffsetPos> getDistanceControllerTest(char character) {
+        Map<Character, List<MultiBlockOffsetPos>> data = Util.parseBlockPattern(pattern, lookup.keySet());
+        List<MultiBlockOffsetPos> coreList = data.get(character);
+        return coreList.stream();
     }
 }
