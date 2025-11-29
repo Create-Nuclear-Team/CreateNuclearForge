@@ -21,7 +21,7 @@ public class CNMultiblock {
 
     static {
         REGISTRATE_MULTIBLOCK.register("createnuclear:reactor5x5",
-                TypeMultiblock.REACTOR,
+                TypeMultiblock.REACTOR_T1,
                 SimpleMultiBlockAislePatternBuilder.start()
                         .aisle("OOOOO", "OAAAO", "OAAAO", "OAAAO", "OOOOO")
                         .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OABAO")
@@ -40,7 +40,7 @@ public class CNMultiblock {
         );
 
         REGISTRATE_MULTIBLOCK.register("createnuclear:reactor7x7",
-                TypeMultiblock.REACTOR,
+                TypeMultiblock.REACTOR_T2,
                 SimpleMultiBlockAislePatternBuilder.start()
                         .aisle("OOOOOOO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OOOOOOO")
                         .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
@@ -62,7 +62,7 @@ public class CNMultiblock {
         );
 
         REGISTRATE_MULTIBLOCK.register("createnuclear:reactor9x9",
-                TypeMultiblock.REACTOR,
+                TypeMultiblock.REACTOR_T3,
                 SimpleMultiBlockAislePatternBuilder.start()
                         .aisle("OOOOOOOOO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OOOOOOOOO")
                         .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")

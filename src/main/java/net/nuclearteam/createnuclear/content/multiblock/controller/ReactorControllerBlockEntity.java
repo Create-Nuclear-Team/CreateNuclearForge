@@ -209,7 +209,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
         if (isEmptyConfiguredPattern()) {
 
-            BlockEntity blockEntity = level.getBlockEntity(getBlockPosForReactor('I'));
+            BlockEntity blockEntity = level.getBlockEntity(getBlockPosForReactor('A'));
 
 
 
@@ -365,7 +365,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     private BlockPos getBlockPosForReactor(char character) {
-        BlockPos pos = pattern.VerifyPattern7x7(character);
+        BlockPos pos = pattern.VerifyPattern5x5(character);
         BlockPos posController = getBlockPos();
         BlockPos posInput = new BlockPos(posController.getX(), posController.getY(), posController.getZ());
 
