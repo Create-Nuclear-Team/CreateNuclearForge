@@ -44,6 +44,8 @@ import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrame;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorframeItem;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorLiquidInput;
+import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorLiquidInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.reactorCooler.ReactorCooler;
@@ -145,6 +147,19 @@ public class CNBlocks {
             .blockstate(new ReactorInputGenerator()::generate)
             .item()
             .transform(customItemModel("reactor", "input", "item"))
+            .register();
+
+    public static final BlockEntry<ReactorLiquidInput> REACTOR_LIQUID_INPUT =
+        CreateNuclear.REGISTRATE.block("reactor_liquid_input", ReactorLiquidInput::regular)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.explosionResistance(6F))
+            .properties(p -> p.destroyTime(2F))
+            .addLayer(() -> RenderType::cutoutMipped)
+            .transform(pickaxeOnly())
+            .tag(BlockTags.NEEDS_DIAMOND_TOOL)
+            .blockstate(new ReactorLiquidInputGenerator()::generate)
+            .item()
+            .transform(customItemModel("reactor", "liquid_input", "item"))
             .register();
 
     public static final BlockEntry<ReactorOutput> REACTOR_OUTPUT =
