@@ -1,9 +1,5 @@
 {
   "variants": {
-    "facing=down": {
-      "model": "createnuclear:block/reactor/input/input_vertical",
-      "x": 180
-    },
     "facing=east": {
       "model": "createnuclear:block/reactor/input/input",
       "y": 270
@@ -14,9 +10,6 @@
     },
     "facing=south": {
       "model": "createnuclear:block/reactor/input/input"
-    },
-    "facing=up": {
-      "model": "createnuclear:block/reactor/input/input_vertical"
     },
     "facing=west": {
       "model": "createnuclear:block/reactor/input/input",

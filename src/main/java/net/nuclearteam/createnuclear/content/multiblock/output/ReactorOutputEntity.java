@@ -24,6 +24,7 @@ import net.nuclearteam.createnuclear.CNBlocks;
 
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import java.util.List;
 import java.util.Objects;
