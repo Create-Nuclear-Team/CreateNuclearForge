@@ -44,12 +44,12 @@ public class CNMultiblock {
                 SimpleMultiBlockAislePatternBuilder.start()
                         .aisle("OOOOOOO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OOOOOOO")
                         .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OAB*BAO")
-                        .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
+                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
+                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
+                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OAB*BAO")
+                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
+                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
+                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
                         .aisle("OOOOOOO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OOOOOOO")
                         .where('A', blockInWorldAPredicate)
                         .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
@@ -57,7 +57,6 @@ public class CNMultiblock {
                         .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
                         .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
                         .where('O', a -> a.getState().is(CNBlocks.REACTOR_CASING.get()))
-                        .where('I', a -> a.getState().is(CNBlocks.REACTOR_INPUT.get()))
                         .build()
         );
 
@@ -81,7 +80,6 @@ public class CNMultiblock {
                         .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
                         .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
                         .where('O', a -> a.getState().is(CNBlocks.REACTOR_CASING.get()))
-                        .where('I', a -> a.getState().is(CNBlocks.REACTOR_INPUT.get()))
                         .build()
         );
     }

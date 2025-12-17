@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.pattern;
 
+import com.simibubi.create.Create;
 import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -9,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.nuclearteam.createnuclear.CNBlocks;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 
 import java.util.List;
@@ -52,12 +54,12 @@ public class ReactorPattern {
         return SimpleMultiBlockAislePatternBuilder.start()
             .aisle("OOOOOOO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OOOOOOO")
             .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OAB*BAO")
-            .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OABABAO", "ADCDCDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
+            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
+            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
+            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OAB*BAO")
+            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
+            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
+            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
             .aisle("OOOOOOO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OOOOOOO")
             .where('A', blockInWorldAPredicate)
             .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
@@ -93,13 +95,14 @@ public class ReactorPattern {
     public ReactorControllerBlock FindController(BlockPos blockPos, Level level, List<? extends Player> players, boolean first){ // Function that checks the surrounding blocks in order
         BlockPos newBlock;                                                   // to find the controller and verify the pattern
         Vec3i pos = new Vec3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        for (int y = pos.getY()-3; y != pos.getY()+4; y+=1) {
-            for (int x = pos.getX()-5; x != pos.getX()+5; x+=1) {
-                for (int z = pos.getZ()-5; z != pos.getZ()+5; z+=1) {
+        for (int y = pos.getY()-5; y != pos.getY()+6; y+=1) {
+            for (int x = pos.getX()-9; x != pos.getX()+10; x+=1) {
+                for (int z = pos.getZ()-9; z != pos.getZ()+10; z+=1) {
                     newBlock = new BlockPos(x, y, z);
                     if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) { // verifying the pattern
                         ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(newBlock).getBlock();
                         controller.Verify(level.getBlockState(newBlock), newBlock, level, players, first);
+                        CreateNuclear.LOGGER.info("trouvé");
                         return controller;
                     }
                 }
