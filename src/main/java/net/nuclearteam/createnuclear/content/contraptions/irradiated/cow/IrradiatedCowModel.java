@@ -1,27 +1,44 @@
-// Made with Blockbench 4.12.2
-// Exported for Minecraft version 1.17+ for Yarn
+// Made with Blockbench 5.0.4
+// Exported for Minecraft version 1.17 or later with Mojang mappings
 // Paste this class into your mod and generate all required imports
-
 package net.nuclearteam.createnuclear.content.contraptions.irradiated.cow;
 
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.model.ColorableAgeableListModel;
+import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.QuadrupedModel;
-import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 
-public class IrradiatedCowModel<T extends IrradiatedCow> extends QuadrupedModel<T> {
-    public IrradiatedCowModel(ModelPart pRoot) {
-        super(pRoot, false, 8.0F, 4.0F, 2.0F, 2.0F, 24);
+public class IrradiatedCowModel<T extends IrradiatedCow> extends AgeableListModel<T> {
+    // This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
+    private final ModelPart head;
+    private final ModelPart pustule;
+    private final ModelPart body;
+    private final ModelPart pustule3;
+    private final ModelPart legs;
+    private final ModelPart leg1;
+    private final ModelPart leg2;
+    private final ModelPart leg3;
+    private final ModelPart leg4;
+    private final ModelPart pustule2;
+
+    public IrradiatedCowModel(ModelPart root) {
+        this.head = root.getChild("head");
+        this.pustule = this.head.getChild("pustule");
+        this.body = root.getChild("body");
+        this.pustule3 = this.body.getChild("pustule3");
+        this.legs = root.getChild("legs");
+        this.leg1 = this.legs.getChild("leg1");
+        this.leg2 = this.legs.getChild("leg2");
+        this.leg3 = this.legs.getChild("leg3");
+        this.leg4 = this.legs.getChild("leg4");
+        this.pustule2 = this.leg4.getChild("pustule2");
     }
 
     public static LayerDefinition createBodyLayer() {
@@ -62,16 +79,31 @@ public class IrradiatedCowModel<T extends IrradiatedCow> extends QuadrupedModel<
         return LayerDefinition.create(meshdefinition, 64, 32);
     }
 
-    public void setupAnim(T pEntity, float pLimbSwing, float pLimbSwingAmount, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
-        this.head.xRot = pHeadPitch * ((float)Math.PI / 180F);
-        this.head.yRot = pNetHeadYaw * ((float)Math.PI / 180F);
-        this.rightHindLeg.xRot = Mth.cos(pLimbSwing * 0.6662F) * 1.4F * pLimbSwingAmount;
-        this.leftHindLeg.xRot = Mth.cos(pLimbSwing * 0.6662F + (float)Math.PI) * 1.4F * pLimbSwingAmount;
-        this.rightFrontLeg.xRot = Mth.cos(pLimbSwing * 0.6662F + (float)Math.PI) * 1.4F * pLimbSwingAmount;
-        this.leftFrontLeg.xRot = Mth.cos(pLimbSwing * 0.6662F) * 1.4F * pLimbSwingAmount;
+    @Override
+    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        this.head.xRot = headPitch * ((float)Math.PI / 180F);
+        this.head.yRot = netHeadYaw * ((float)Math.PI / 180F);
+        this.leg3.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
+        this.leg4.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
+        this.leg1.xRot = Mth.cos(limbSwing * 0.6662F + (float)Math.PI) * 1.4F * limbSwingAmount;
+        this.leg2.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount;
     }
 
-    public ModelPart getHead() {
-        return this.head;
+    @Override
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+        head.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+        legs.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }
+
+    @Override
+    protected Iterable<ModelPart> headParts() {
+        return ImmutableList.of(this.head);
+    }
+
+    @Override
+    protected Iterable<ModelPart> bodyParts() {
+        return ImmutableList.of(this.body, this.leg1, this.leg2, this.leg3, this.leg4);
+    }
+
 }

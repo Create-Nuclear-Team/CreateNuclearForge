@@ -479,6 +479,14 @@ public class CNBlocks {
             .build()
             .register();
 
+    public static final BlockEntry<Block> REACTOR_ALARM =
+        CreateNuclear.REGISTRATE.block("reactor_alarm", Block::new)
+            .initialProperties(SharedProperties::stone)
+            .transform(pickaxeOnly())
+            .item()
+            .build()
+            .register();
+
     /*public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK = CreateNuclear.REGISTRATE.block("test_event_trigger_block", EventTriggerBlock::new)
             .defaultBlockstate()
             .defaultLang()
