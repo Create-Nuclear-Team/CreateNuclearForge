@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller;
 
+import com.google.common.collect.Lists;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -8,6 +9,7 @@ import com.simibubi.create.foundation.utility.IInteractionChecker;
 import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -23,12 +25,14 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import java.util.List;
+import java.util.Objects;
 
 import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
@@ -71,6 +75,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     private ItemStack fuelItem;
     private ItemStack coolerItem;
+
+    public List<ReactorOutput> reactorOutputList = Lists.newArrayList();
+    public List<ReactorInput> reactorInputList = Lists.newArrayList();
+    public int reactorSize;
+    public String reactorFacing;
+    // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
+    public int[] reactorPos;
 
     private final int[][] formattedPattern = new int[][]{
             {99,99,99,0,1,2,99,99,99},
@@ -464,5 +475,77 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             }
         }
         return InteractionResult.PASS;
+    }
+
+    public int[] getStructureBounds(BlockPos startPos, int structureSize, String facing) {
+        int[] northOffsets5x5 = new int[] {-2, 2, -3, 3, 0, 4};
+        int[] northOffsets7x7 = new int[] {-3, 3, -4, 4, 0, 6};
+        int[] northOffsets9x9 = new int[] {-4, 4, -5, 5, 0, 8};
+
+        int[] eastOffsets5x5 = new int[] {-4, 0, -3, 3, -2, 2};
+        int[] eastOffsets7x7 = new int[] {-6, 0, -4, 4, -3, 3};
+        int[] eastOffsets9x9 = new int[] {-8, 0, -5, 5, -4, 4};
+
+        int[] southOffsets5x5 = new int[] {-2, 2, -3, 3, -4, 0};
+        int[] southOffsets7x7 = new int[] {-3, 3, -4, 4, -6, 0};
+        int[] southOffsets9x9 = new int[] {-4, 4, -5, 5, -8, 0};
+
+        int[] westOffsets5x5 = new int[] {0, 4, -3, 3, -2, 2};
+        int[] westOffsets7x7 = new int[] {0, 6, -4, 4, -3, 3};
+        int[] westOffsets9x9 = new int[] {0, 8, -5, 5, -4, 4};
+
+        switch (facing) {
+            case "north":
+                switch (structureSize) {
+                    case 5: return applyOffset(startPos, northOffsets5x5);
+                    case 7: return applyOffset(startPos, northOffsets7x7);
+                    case 9: return applyOffset(startPos, northOffsets9x9);
+                }
+            case "east":
+                switch (structureSize) {
+                    case 5: return applyOffset(startPos, eastOffsets5x5);
+                    case 7: return applyOffset(startPos, eastOffsets7x7);
+                    case 9: return applyOffset(startPos, eastOffsets9x9);
+                }
+            case "south":
+                switch (structureSize) {
+                    case 5: return applyOffset(startPos, southOffsets5x5);
+                    case 7: return applyOffset(startPos, southOffsets7x7);
+                    case 9: return applyOffset(startPos, southOffsets9x9);
+                }
+            case "west":
+                switch (structureSize) {
+                    case 5: return applyOffset(startPos, westOffsets5x5);
+                    case 7: return applyOffset(startPos, westOffsets7x7);
+                    case 9: return applyOffset(startPos, westOffsets9x9);
+                }
+            default: return new int[] {0, 0, 0, 0, 0, 0};
+        }
+    }
+
+    private int[] applyOffset(BlockPos pos, int[] offset) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
+        return new int[] {x + offset[0], x + offset[1], y + offset[2], y + offset[3], z + offset[4], z + offset[5]};
+    }
+
+    public void addInput(ReactorInput input, Level blockIn, BlockPos inputPos) {
+        reactorInputList.add(input);
+        Objects.requireNonNull(input.getBlockEntity(blockIn, inputPos)).setController(this.controller);
+    }
+
+    public void removeInput(ReactorInput input) {
+        reactorInputList.remove(input);
+    }
+
+    public void addOutput(ReactorOutput output, Level blockIn, BlockPos inputPos) {
+        reactorOutputList.add(output);
+        Objects.requireNonNull(output.getBlockEntity(blockIn, inputPos)).setController(this.controller);
+    }
+
+    public void removeOutput(ReactorOutput output) {
+        reactorOutputList.remove(output);
     }
 }

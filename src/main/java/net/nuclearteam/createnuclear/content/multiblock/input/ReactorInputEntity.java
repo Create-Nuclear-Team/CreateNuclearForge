@@ -19,6 +19,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.CNBlocks;
+import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import javax.annotation.Nullable;
@@ -29,6 +30,7 @@ import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider {
     protected BlockPos block;
     //protected ReactorControllerBlockEntity controller;
+    public ReactorControllerBlock controller = null;
 
     public ReactorInputInventory inventory;
     LazyOptional<IItemHandler> inventoryProvider;
@@ -99,5 +101,9 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
         if (isItemHandlerCap(cap))
             return inventoryProvider.cast();
         return super.getCapability(cap, side);
+    }
+
+    public void setController(ReactorControllerBlock controller) {
+        this.controller = controller;
     }
 }

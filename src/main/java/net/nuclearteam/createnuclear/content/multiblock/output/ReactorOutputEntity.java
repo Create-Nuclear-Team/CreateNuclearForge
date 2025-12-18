@@ -24,6 +24,9 @@ import net.nuclearteam.createnuclear.CNBlocks;
 
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,8 +39,8 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     public float heat = 0;
 
     protected ReactorPattern pattern =  new ReactorPattern();
-    ReactorControllerBlock controller = null;
     ReactorControllerBlockEntity controllerEntity = null;
+    public ReactorControllerBlock controller = null;
 
     // protected ScrollValueBehaviour generatedSpeed;
     protected float generatedSpeed;
@@ -207,5 +210,9 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
             return direction.getAxis() != facing.getAxis();
         }
 
+    }
+
+    public void setController(ReactorControllerBlock controller) {
+        this.controller = controller;
     }
 }

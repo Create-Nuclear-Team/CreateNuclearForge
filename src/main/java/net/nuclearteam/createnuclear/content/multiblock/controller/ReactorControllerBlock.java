@@ -23,13 +23,16 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
+import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
 import java.util.List;
 
 @MethodsReturnNonnullByDefault
@@ -149,15 +152,19 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     public void Verify(BlockState state, BlockPos pos, Level level, List<? extends Player> players, boolean create){
         ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(pos).getBlock();
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
-        var result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos); // control the pattern
+        var result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
         if (result != null) { // the pattern is correct
-
+            entity.reactorInputList.clear();
+            entity.reactorOutputList.clear();
             for (Player player : players) {
                 if (create && !entity.created) {
                     player.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
                     level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, true));
                     entity.created = true;
                     entity.destroyed = false;
+
+                    entity.reactorPos = entity.getStructureBounds(pos, entity.reactorSize, entity.reactorFacing);
+                    FindSpecialBlocksInReactor(entity.reactorPos, entity, level);
                 }
             }
             return;
@@ -205,4 +212,35 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         return CNBlockEntityTypes.REACTOR_CONTROLLER.get();
     }
 
+    public void FindSpecialBlocksInReactor(int[] reactorPos, ReactorControllerBlockEntity controllerBlockEntity, Level level){
+        int xMin = reactorPos[0];
+        int xMax = reactorPos[1];
+        int yMin = reactorPos[2];
+        int yMax = reactorPos[3];
+        int zMin = reactorPos[4];
+        int zMax = reactorPos[5];
+
+        for (int y = yMin; y <= yMax; y+=1) {
+            for (int x = xMin; x <= xMax; x+=1) {
+                isSpecialBlock(level, new BlockPos(x, y, zMin), controllerBlockEntity);
+                isSpecialBlock(level, new BlockPos(x, y, zMax), controllerBlockEntity);
+            }
+            for (int z = zMin; z <= zMax; z+=1) {
+                isSpecialBlock(level, new BlockPos(xMin, y, z), controllerBlockEntity);
+                isSpecialBlock(level, new BlockPos(xMax, y, z), controllerBlockEntity);
+            }
+        }
+        CreateNuclear.LOGGER.info("HEHE JE SUIS LA");
+        CreateNuclear.LOGGER.info("input list: {}", controllerBlockEntity.reactorInputList.toString());
+        CreateNuclear.LOGGER.info("output list: {}", controllerBlockEntity.reactorOutputList.toString());
+    }
+
+    public void isSpecialBlock(Level level, BlockPos blockPos, ReactorControllerBlockEntity controllerBlockEntity) {
+        if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_OUTPUT.get())) {
+            controllerBlockEntity.addOutput((ReactorOutput) level.getBlockState(blockPos).getBlock(), level, blockPos);
+        }
+        else if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_INPUT.get())) {
+            controllerBlockEntity.addInput((ReactorInput) level.getBlockState(blockPos).getBlock(), level, blockPos);
+        }
+    }
 }

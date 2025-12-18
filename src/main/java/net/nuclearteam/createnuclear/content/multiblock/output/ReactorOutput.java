@@ -60,7 +60,7 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
         if (level.isClientSide)
             return InteractionResult.SUCCESS;
         else {
-            ReactorControllerBlock controller = pattern.FindController(pos, level, level.players(), false);
+            ReactorControllerBlock controller = Objects.requireNonNull(this.getBlockEntity(level, pos)).controller;
             if (controller != null){
                 ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos.above(3));
                 assert entity != null;
