@@ -1,18 +1,18 @@
 {
   "variants": {
     "facing=east": {
-      "model": "createnuclear:block/reactor/input/block",
+      "model": "createnuclear:block/reactor/input/input",
       "y": 270
     },
     "facing=north": {
-      "model": "createnuclear:block/reactor/input/block",
+      "model": "createnuclear:block/reactor/input/input",
       "y": 180
     },
     "facing=south": {
-      "model": "createnuclear:block/reactor/input/block"
+      "model": "createnuclear:block/reactor/input/input"
     },
     "facing=west": {
-      "model": "createnuclear:block/reactor/input/block",
+      "model": "createnuclear:block/reactor/input/input",
       "y": 90
     }
   }
