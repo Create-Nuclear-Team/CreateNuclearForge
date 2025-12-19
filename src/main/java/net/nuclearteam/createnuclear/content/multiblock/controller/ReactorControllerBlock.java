@@ -221,6 +221,13 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         int zMax = reactorPos[5];
 
         for (int y = yMin; y <= yMax; y+=1) {
+            if (y == yMin || y == yMax) {
+                for (int x = xMin +1; x <= xMax -1; x+=1) {
+                    for (int z = zMin +1; z <= zMax -1; z+=1) {
+                        isSpecialBlock(level, new BlockPos(x, y, z), controllerBlockEntity);
+                    }
+                }
+            }
             for (int x = xMin; x <= xMax; x+=1) {
                 isSpecialBlock(level, new BlockPos(x, y, zMin), controllerBlockEntity);
                 isSpecialBlock(level, new BlockPos(x, y, zMax), controllerBlockEntity);
