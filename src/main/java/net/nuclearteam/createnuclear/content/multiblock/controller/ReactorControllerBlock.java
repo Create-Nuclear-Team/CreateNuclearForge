@@ -219,22 +219,22 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         int yMax = reactorPos[3];
         int zMin = reactorPos[4];
         int zMax = reactorPos[5];
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
-        for (int y = yMin; y <= yMax; y+=1) {
-            if (y == yMin || y == yMax) {
-                for (int x = xMin +1; x <= xMax -1; x+=1) {
-                    for (int z = zMin +1; z <= zMax -1; z+=1) {
-                        isSpecialBlock(level, new BlockPos(x, y, z), controllerBlockEntity);
+        for (int y = yMin; y <= yMax; y++) {
+            boolean isYBoundary = (y == yMin || y == yMax);
+
+            for (int x = xMin; x <= xMax; x++) {
+                for (int z = zMin; z <= zMax; z++) {
+                    boolean isXBoundary = (x == xMin || x == xMax);
+                    boolean isZBoundary = (z == zMin || z == zMax);
+
+                    // On n'exécute la logique que si on est sur une des faces de la boîte
+                    if (isYBoundary || isXBoundary || isZBoundary) {
+                        mutablePos.set(x, y, z);
+                        isSpecialBlock(level, mutablePos, controllerBlockEntity);
                     }
                 }
-            }
-            for (int x = xMin; x <= xMax; x+=1) {
-                isSpecialBlock(level, new BlockPos(x, y, zMin), controllerBlockEntity);
-                isSpecialBlock(level, new BlockPos(x, y, zMax), controllerBlockEntity);
-            }
-            for (int z = zMin; z <= zMax; z+=1) {
-                isSpecialBlock(level, new BlockPos(xMin, y, z), controllerBlockEntity);
-                isSpecialBlock(level, new BlockPos(xMax, y, z), controllerBlockEntity);
             }
         }
         CreateNuclear.LOGGER.info("HEHE JE SUIS LA");
