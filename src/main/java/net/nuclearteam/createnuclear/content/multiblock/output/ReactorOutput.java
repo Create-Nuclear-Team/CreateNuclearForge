@@ -38,7 +38,6 @@ import java.util.Objects;
 
 
 public class ReactorOutput extends DirectionalKineticBlock implements IWrenchable, IBE<ReactorOutputEntity> {
-
     //public static final IntegerProperty SPEED = IntegerProperty.create("speed", 0, 256);
     public static final IntegerProperty DIR = IntegerProperty.create("dir", 0, 2);
 
@@ -79,6 +78,7 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
         List<? extends Player> players = level.players();
+        Objects.requireNonNull(this.getBlockEntity(level, pos)).pos = pos;
         pattern.FindController(pos, level, players, true);
     }
 

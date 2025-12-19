@@ -26,6 +26,7 @@ import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
@@ -154,8 +155,8 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
         var result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
         if (result != null) { // the pattern is correct
-            entity.reactorInputList.clear();
-            entity.reactorOutputList.clear();
+            entity.reactorInputEntityList.clear();
+            entity.reactorOutputEntityList.clear();
             for (Player player : players) {
                 if (create && !entity.created) {
                     player.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
@@ -237,17 +238,14 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                 }
             }
         }
-        CreateNuclear.LOGGER.info("HEHE JE SUIS LA");
-        CreateNuclear.LOGGER.info("input list: {}", controllerBlockEntity.reactorInputList.toString());
-        CreateNuclear.LOGGER.info("output list: {}", controllerBlockEntity.reactorOutputList.toString());
     }
 
     public void isSpecialBlock(Level level, BlockPos blockPos, ReactorControllerBlockEntity controllerBlockEntity) {
         if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_OUTPUT.get())) {
-            controllerBlockEntity.addOutput((ReactorOutput) level.getBlockState(blockPos).getBlock(), level, blockPos);
+            controllerBlockEntity.addOutput((ReactorOutputEntity) level.getBlockEntity(blockPos), level, blockPos);
         }
         else if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_INPUT.get())) {
-            controllerBlockEntity.addInput((ReactorInput) level.getBlockState(blockPos).getBlock(), level, blockPos);
+            controllerBlockEntity.addInput((ReactorInputEntity) level.getBlockEntity(blockPos), level, blockPos);
         }
     }
 }

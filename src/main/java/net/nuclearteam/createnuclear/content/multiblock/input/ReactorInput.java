@@ -41,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorInputEntity> {
     protected ReactorPattern pattern =  new ReactorPattern();
@@ -73,6 +74,7 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
         List<? extends Player> players = level.players();
+        Objects.requireNonNull(this.getBlockEntity(level, pos)).pos = pos;
         pattern.FindController(pos, level, players, true);
     }
 

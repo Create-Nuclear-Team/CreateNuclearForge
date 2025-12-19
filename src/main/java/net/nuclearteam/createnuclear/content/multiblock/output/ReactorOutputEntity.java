@@ -35,6 +35,7 @@ import static net.nuclearteam.createnuclear.content.multiblock.output.ReactorOut
 
 
 public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
+    public BlockPos pos;
     public int speed = 1;
     public float heat = 0;
 
@@ -81,24 +82,38 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 		setChanged();
     }
 
-    @Override
-	protected void read(CompoundTag compound, boolean clientPacket) {
-		super.read(compound, clientPacket);
-		generatedSpeed = compound.getFloat("generatedSpeed");
-	}
+    // Assure-toi d'avoir cette variable définie dans ta classe
+    private BlockPos outputPos;
 
-	
-	
-	@Override
-	public void write(CompoundTag compound, boolean clientPacket) {
-		super.write(compound, clientPacket);
-		compound.putFloat("generatedSpeed", generatedSpeed);
-	}
+    @Override
+    protected void read(CompoundTag compound, boolean clientPacket) {
+        super.read(compound, clientPacket);
+
+        // On récupère la vitesse
+        generatedSpeed = compound.getFloat("generatedSpeed");
+
+        // On récupère la position (seulement si elle existe dans le tag)
+        if (compound.contains("outputPos")) {
+            this.outputPos = BlockPos.of(compound.getLong("outputPos"));
+        }
+    }
+
+    @Override
+    public void write(CompoundTag compound, boolean clientPacket) {
+        super.write(compound, clientPacket);
+
+        // On enregistre la vitesse
+        compound.putFloat("generatedSpeed", generatedSpeed);
+
+        // On enregistre la position si elle n'est pas nulle
+        if (this.outputPos != null) {
+            compound.putLong("outputPos", this.outputPos.asLong());
+        }
+    }
 
     @Override
     public void tick() {
         super.tick();
-
         BlockGetter level = getLevel();
 
         if (level.getBlockState(getBlockPos().above(3)).getBlock() == CNBlocks.REACTOR_CONTROLLER.get()) {
@@ -161,6 +176,10 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     public void setDir(int dir, Level level, BlockPos pos) {
         BlockState state = getBlockState();
         level.setBlockAndUpdate(pos, state.setValue(DIR, dir));
+    }
+
+    public void setPos(BlockPos pos) {
+        this.pos = pos;
     }
 
     @Override

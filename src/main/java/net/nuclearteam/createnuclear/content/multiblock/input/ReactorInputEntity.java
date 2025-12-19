@@ -5,8 +5,13 @@ import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour
 import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -28,9 +33,9 @@ import java.util.List;
 import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 
 public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider {
-    protected BlockPos block;
     //protected ReactorControllerBlockEntity controller;
     public ReactorControllerBlock controller = null;
+    public BlockPos pos;
 
     public ReactorInputInventory inventory;
     LazyOptional<IItemHandler> inventoryProvider;
@@ -46,20 +51,38 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) { }
 
-    @Override
-    protected void read(CompoundTag tag, boolean clientPacket) {
-        if (!clientPacket) {
-            inventory.deserializeNBT(tag.getCompound("Inventory"));
-        }
-        super.read(tag, clientPacket);
-    }
+    // Dans ta classe, j'imagine que tu as ces variables :
+    private BlockPos inputPos;
+    private ResourceKey<Level> inputLevelKey; // On stocke la clé, pas l'objet Level directement
 
     @Override
     protected void write(CompoundTag tag, boolean clientPacket) {
+        super.write(tag, clientPacket); // Toujours appeler le super
+
         if (!clientPacket) {
             tag.put("Inventory", inventory.serializeNBT());
+
+            // Sauvegarder la position (BlockPos -> Long)
+            if (this.inputPos != null) {
+                tag.putLong("InputPos", this.inputPos.asLong());
+            }
         }
-        super.write(tag, clientPacket);
+    }
+
+    @Override
+    protected void read(CompoundTag tag, boolean clientPacket) {
+        super.read(tag, clientPacket);
+
+        if (!clientPacket) {
+            if (tag.contains("Inventory")) {
+                inventory.deserializeNBT(tag.getCompound("Inventory"));
+            }
+
+            // Charger la position (Long -> BlockPos)
+            if (tag.contains("InputPos")) {
+                this.inputPos = BlockPos.of(tag.getLong("InputPos"));
+            }
+        }
     }
 
     public void readInventory(CompoundTag compound) {
@@ -73,6 +96,9 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
         return super.getLevel();
     }
 
+    public void setPos(BlockPos pos) {
+        this.pos = pos;
+    }
 
 
 
