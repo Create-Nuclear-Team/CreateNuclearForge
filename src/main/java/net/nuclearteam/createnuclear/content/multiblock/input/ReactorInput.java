@@ -42,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ReactorInput extends HorizontalDirectionalReactorBlock implements IWrenchable, IBE<ReactorInputEntity> {
+public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorInputEntity> {
     protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorInput(Properties properties) {
         super(properties);

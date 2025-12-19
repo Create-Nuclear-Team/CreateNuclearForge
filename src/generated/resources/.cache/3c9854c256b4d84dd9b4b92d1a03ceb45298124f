@@ -1,4 +1,4 @@
-// 1.20.1	2025-12-17T16:45:24.2257538	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-12-19T08:53:35.8820189	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -29,7 +29,7 @@ f628f8c7aa1e150ad2b5a3ce87dbe7f00b462e74 assets/createnuclear/blockstates/polish
 3c259041f317bb8868fb4f177c457fc12b8d28f5 assets/createnuclear/blockstates/reactor_cooler.json
 3cced3f7d35371f1881b0485ee324788adcd2c74 assets/createnuclear/blockstates/reactor_core.json
 ff68065029f7d47434aaf3f60e5ec3319302d2d8 assets/createnuclear/blockstates/reactor_frame.json
-fac8d9edfaecf7dcdd328f8729025ccaf98040f1 assets/createnuclear/blockstates/reactor_input.json
+bd30dea2e337215430c4510c3eb90e6ec909f4b4 assets/createnuclear/blockstates/reactor_input.json
 20c17a81bb3c63d244af9d66da3dc61857900f6c assets/createnuclear/blockstates/reactor_liquid_input.json
 36ee5c127b0548502d15bc16a638a5bac40df1b6 assets/createnuclear/blockstates/reactor_output.json
 f7504d5f748fe938bf07d2eb5d0ba46bbfa0499d assets/createnuclear/blockstates/reinforced_glass.json
