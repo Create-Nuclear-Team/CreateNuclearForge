@@ -35,7 +35,6 @@ import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider {
     //protected ReactorControllerBlockEntity controller;
     public ReactorControllerBlock controller = null;
-    public BlockPos pos;
 
     public ReactorInputInventory inventory;
     LazyOptional<IItemHandler> inventoryProvider;
@@ -61,11 +60,6 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
 
         if (!clientPacket) {
             tag.put("Inventory", inventory.serializeNBT());
-
-            // Sauvegarder la position (BlockPos -> Long)
-            if (this.inputPos != null) {
-                tag.putLong("InputPos", this.inputPos.asLong());
-            }
         }
     }
 
@@ -76,11 +70,6 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
         if (!clientPacket) {
             if (tag.contains("Inventory")) {
                 inventory.deserializeNBT(tag.getCompound("Inventory"));
-            }
-
-            // Charger la position (Long -> BlockPos)
-            if (tag.contains("InputPos")) {
-                this.inputPos = BlockPos.of(tag.getLong("InputPos"));
             }
         }
     }
@@ -95,12 +84,6 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
     public Level getLevel() {
         return super.getLevel();
     }
-
-    public void setPos(BlockPos pos) {
-        this.pos = pos;
-    }
-
-
 
     @Override
     public Component getDisplayName() {
