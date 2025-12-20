@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManager;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
@@ -78,8 +79,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private ItemStack coolerItem;
 
     public List<ReactorOutputEntity> reactorOutputEntityList = new ArrayList<>();
-    public List<ReactorInputEntity> reactorInputEntityList = new ArrayList<>();
-    public int reactorSize;
+    public int reactorSize = 0;
     public String reactorFacing;
     // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
     public int[] reactorPos;
@@ -100,13 +100,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     };
     private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
-
+    private final ReactorInputManager inputManager;
 
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         inventory = new ReactorControllerInventory(this);
         configuredPattern = ItemStack.EMPTY;
         //attachedInventory = new LinkedHashSet<>();
+        inputManager = new ReactorInputManager();
     }
 
     @Override
@@ -153,6 +154,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     protected void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket); // Toujours en premier pour les coordonnées de base
 
+        // Lecture des Inputs
+        this.inputManager.read(compound);
+
+
         // 1. Tes nouvelles variables simples
         this.reactorSize = compound.getInt("reactorSize");
         this.reactorFacing = compound.getString("reactorFacing");
@@ -172,7 +177,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         // 3. Reconstruction des listes d'entités (via les positions sauvegardées)
         // Note : On vide les listes pour éviter les doublons au rechargement
         this.reactorOutputEntityList.clear();
-        this.reactorInputEntityList.clear();
+//        this.reactorInputEntityList.clear();
 
         if (this.level != null) { // On vérifie que le monde est chargé
             // Lecture des Outputs
@@ -184,28 +189,24 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 }
             }
 
-            // Lecture des Inputs
-            ListTag inputList = compound.getList("inputs", Tag.TAG_COMPOUND);
-            for (int i = 0; i < inputList.size(); i++) {
-                BlockPos p = BlockPos.of(inputList.getCompound(i).getLong("p"));
-                if (level.getBlockEntity(p) instanceof ReactorInputEntity in) {
-                    this.reactorInputEntityList.add(in);
-                }
-            }
+
         }
         this.needsToResolveEntities = true;
-        CreateNuclear.LOGGER.info("liste d'inputs: {}", reactorInputEntityList);
+        CreateNuclear.LOGGER.info("liste d'inputs: {}", this.inputManager.getBlocksPosition().toArray());
     }
 
     @Override
     protected void write(CompoundTag compound, boolean clientPacket) {
+        super.write(compound, clientPacket);
+        this.inputManager.write(compound);
+
 
         // 1. Tes nouvelles variables simples
-        compound.putInt("reactorSize", this.reactorSize);
-        compound.putString("reactorFacing", this.reactorFacing);
-        if (this.reactorPos != null) {
-            compound.putIntArray("reactorPos", this.reactorPos);
-        }
+//        compound.putInt("reactorSize", this.reactorSize);
+//        compound.putString("reactorFacing", this.reactorFacing);
+//        if (this.reactorPos != null) {
+//            compound.putIntArray("reactorPos", this.reactorPos);
+//        }
         compound.putDouble("total", calculateProgress());
 
         // 2. Gestion des items (Ton code existant)
@@ -219,24 +220,15 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (fuelItem != null && !fuelItem.isEmpty()) {
             compound.put("fuel", fuelItem.serializeNBT());
         }
-
-        // 3. Sauvegarde des listes (on transforme les Entités en positions Long)
-        ListTag outputList = new ListTag();
-        for (ReactorOutputEntity out : reactorOutputEntityList) {
-            CompoundTag tag = new CompoundTag();
-            tag.putLong("p", out.getBlockPos().asLong());
-            outputList.add(tag);
-        }
-        compound.put("outputs", outputList);
-
-        ListTag inputList = new ListTag();
-        for (ReactorInputEntity in : reactorInputEntityList) {
-            CompoundTag tag = new CompoundTag();
-            tag.putLong("p", in.getBlockPos().asLong());
-            inputList.add(tag);
-        }
-        compound.put("inputs", inputList);
-        super.write(compound, clientPacket);
+//
+//        // 3. Sauvegarde des listes (on transforme les Entités en positions Long)
+//        ListTag outputList = new ListTag();
+//        for (ReactorOutputEntity out : reactorOutputEntityList) {
+//            CompoundTag tag = new CompoundTag();
+//            tag.putLong("p", out.getBlockPos().asLong());
+//            outputList.add(tag);
+//        }
+//        compound.put("outputs", outputList);
     }
 
     public enum State {
@@ -265,18 +257,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         super.tick();
         if (level.isClientSide)
             return;
+        if (this.inputManager.size() > 0) {
+            for (BlockPos p : this.inputManager.getBlocksPosition()) {
+                CreateNuclear.LOGGER.info("ReactorInputEntity BlockPos {}", p);
+            }
+        }
         if (isEmptyConfiguredPattern()) {
-            getTotalInventoryItems();
-            //BlockEntity blockEntity = level.getBlockEntity(this.controller.);
-            //CreateNuclear.LOGGER.info("inputList: {}", reactorInputEntityList);
             if (this.needsToResolveEntities) {
-                if (!reactorInputEntityList.isEmpty()) {
-                                    for (int x = 0; x <= reactorInputEntityList.size()-1; x++) {
-                        ReactorInputEntity inputEntity = reactorInputEntityList.get(x);
-                        CreateNuclear.LOGGER.info("ReactorInputEntity {}", inputEntity);
-
-                    }
-                }
             }
             BlockEntity blockEntity = level.getBlockEntity(this.worldPosition);
             if (blockEntity instanceof ReactorInputEntity be) {
@@ -587,13 +574,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return new int[] {x + offset[0], x + offset[1], y + offset[2], y + offset[3], z + offset[4], z + offset[5]};
     }
 
-    public void addInput(ReactorInputEntity input, Level blockIn, BlockPos inputPos) {
-        reactorInputEntityList.add(input);
+    public void addInput(BlockPos inputPos) {
+        this.inputManager.addBlock(inputPos);
         this.setChanged();
     }
 
-    public void removeInput(ReactorInputEntity input) {
-        reactorInputEntityList.remove(input);
+    public void removeInput(BlockPos inputPos) {
+        this.inputManager.removeBlock(inputPos);
         this.setChanged();
     }
 
@@ -605,11 +592,5 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public void removeOutput(ReactorOutputEntity output) {
         reactorOutputEntityList.remove(output);
         this.setChanged();
-    }
-
-    private void getTotalInventoryItems() {
-        for (int x = 0; x <= reactorInputEntityList.size(); x++) {
-
-        }
     }
 }
