@@ -155,7 +155,6 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
         var result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
         if (result != null) { // the pattern is correct
-            entity.reactorInputEntityList.clear();
             entity.reactorOutputEntityList.clear();
             for (Player player : players) {
                 if (create && !entity.created) {
@@ -165,7 +164,6 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     entity.destroyed = false;
 
                     entity.reactorPos = entity.getStructureBounds(pos, entity.reactorSize, entity.reactorFacing);
-                    FindSpecialBlocksInReactor(entity.reactorPos, entity, level);
                 }
             }
             return;
@@ -245,7 +243,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             controllerBlockEntity.addOutput((ReactorOutputEntity) level.getBlockEntity(blockPos), level, blockPos);
         }
         else if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_INPUT.get())) {
-            controllerBlockEntity.addInput((ReactorInputEntity) level.getBlockEntity(blockPos), level, blockPos);
+            controllerBlockEntity.addInput(blockPos);
         }
     }
 }
