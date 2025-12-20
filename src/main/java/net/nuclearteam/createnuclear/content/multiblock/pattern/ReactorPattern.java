@@ -106,20 +106,22 @@ public class ReactorPattern {
                     if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) { // verifying the pattern
                         ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(newBlock).getBlock();
                         controller.Verify(level.getBlockState(newBlock), newBlock, level, players, first);
-                        CreateNuclear.LOGGER.info("trouvé");
                     }
                 }
             }
         }
     }
 
-    public BlockPos FindOutputPos(BlockPos blockPos, Level level, List<? extends Player> players, boolean first){ // Function that checks the surrounding blocks in order
+    public BlockPos FindControllerPos(BlockPos blockPos, Level level, List<? extends Player> players, boolean first){
+        BlockPos newBlock;                                                   // to find the controller and verify the pattern
         Vec3i pos = new Vec3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        for (int y = pos.getY()-3; y != pos.getY()+4; y+=1) {
-            for (int x = pos.getX()-5; x != pos.getX()+5; x+=1) {
-                for (int z = pos.getZ()-5; z != pos.getZ()+5; z+=1) {
-                    return new BlockPos(x, y, z);
-
+        for (int y = pos.getY()-5; y != pos.getY()+6; y+=1) {
+            for (int x = pos.getX()-9; x != pos.getX()+10; x+=1) {
+                for (int z = pos.getZ()-9; z != pos.getZ()+10; z+=1) {
+                    newBlock = new BlockPos(x, y, z);
+                    if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) { // verifying the pattern
+                        return newBlock;
+                    }
                 }
             }
         }
