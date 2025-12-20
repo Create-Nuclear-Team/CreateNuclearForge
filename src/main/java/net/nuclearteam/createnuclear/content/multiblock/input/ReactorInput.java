@@ -74,8 +74,15 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
         List<? extends Player> players = level.players();
-        Objects.requireNonNull(this.getBlockEntity(level, pos)).pos = pos;
         pattern.FindController(pos, level, players, true);
+
+        BlockPos controllerPos = pattern.FindControllerPos(pos, level, players, true);
+        if (controllerPos != null) {
+            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
+            if (controllerBlockEntity != null) {
+                controllerBlockEntity.addInput(pos);
+            }
+        }
     }
 
     // @Override // ! may be useless
@@ -96,6 +103,13 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         List<? extends Player> players = level.players();
         pattern.FindController(pos, level, players, false);
+        BlockPos controllerPos = pattern.FindControllerPos(pos, level, players, true);
+        if (controllerPos != null) {
+            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
+            if (controllerBlockEntity != null) {
+                controllerBlockEntity.removeInput(pos);
+            }
+        }
     }
 
     @Override
@@ -107,6 +121,14 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
 
         List<? extends Player> players = pLevel.players();
         pattern.FindController(pPos, pLevel, players, false);
+
+        BlockPos controllerPos = pattern.FindControllerPos(pPos, pLevel, players, true);
+        if (controllerPos != null) {
+            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) pLevel.getBlockEntity(controllerPos);
+            if (controllerBlockEntity != null) {
+                controllerBlockEntity.removeInput(pPos);
+            }
+        }
     }
 
     @Override
