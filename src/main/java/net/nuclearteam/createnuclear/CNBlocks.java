@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.util.ForgeSoundType;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasing;
@@ -55,7 +57,10 @@ public class CNBlocks {
         .block("reactor_casing", properties -> new ReactorCasing(properties, ReactorCasing.TypeBlock.CASING))
         .properties(p -> p.explosionResistance(3F)
                 .destroyTime(4F)
-                .sound(CNSounds.getSoundType("reactor_casing")))
+                .sound(new ForgeSoundType(1, .5f, CNSoundEvents.REACTOR_CASING_BREAD::getMainEvent,
+                        CNSoundEvents.REACTOR_CASING_STEP::getMainEvent, CNSoundEvents.REACTOR_CASING_PLACE::getMainEvent,
+                        CNSoundEvents.REACTOR_CASING_HIT::getMainEvent, CNSoundEvents.REACTOR_CASING_FALL::getMainEvent))
+        )
         .blockstate((c, p) -> p.getVariantBuilder(c.getEntry()).forAllStates((state) -> ConfiguredModel.builder()
                 .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/casing/block")))
                 .build()))

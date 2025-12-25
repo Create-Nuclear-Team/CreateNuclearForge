@@ -54,6 +54,7 @@ public class CreateNuclear {
 
         REGISTRATE.registerEventListeners(modEventBus);
 
+        CNSoundEvents.prepare();
         CNTags.init();
         CNBlocks.register();
         CNBlockEntityTypes.register();
@@ -70,11 +71,12 @@ public class CreateNuclear {
         CNEffects.register(modEventBus);
         CNPotions.register(modEventBus);
         CNRecipeTypes.register(modEventBus);
-        CNSounds.register(modEventBus);
+//        CNSounds.register(modEventBus);
 
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);
         modEventBus.addListener(EventPriority.LOWEST, CreateNuclearDatagen::gatherData);
+        modEventBus.addListener(CNSoundEvents::register);
         forgeEventBus.addListener(CNFluids::handleFluidEffect);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CreateNuclearClient.onCtorClient(modEventBus, forgeEventBus));
