@@ -42,6 +42,11 @@
   "block.createnuclear.enriched_soul_soil.tooltip.summary": "The _only_ block who create _enriched fire_.Can be used to _craft_ enriched campfire or just to make a _green fire_.",
 
 
+  "createnuclear.tooltip.statRod": "Rod Stat Pattern:",
+  "createnuclear.tooltip.baseRodHeat": "Base Rod Heat: %s",
+  "createnuclear.tooltip.proximityRodHeat": "Base Rod Heat: %s",
+  "createnuclear.tooltip.rodTimer": "Base Rod Heat: %s",
+  "createnuclear.tooltip.typeRod": "Base Rod Heat: %s",
 
 
   "tag.item.c.coal_dusts": "Coal Dusts",
