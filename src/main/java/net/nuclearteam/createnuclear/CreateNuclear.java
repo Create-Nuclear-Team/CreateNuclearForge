@@ -25,6 +25,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
+import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public class CreateNuclear {
 
     static {
         REGISTRATE.setTooltipModifierFactory(item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
-                .andThen(TooltipModifier.mapNull(KineticStats.create(item))));
+                .andThen(TooltipModifier.mapNull(KineticStats.create(item))).andThen(RodsStats.create(item)));
     }
 
     public CreateNuclear() {
@@ -92,9 +93,7 @@ public class CreateNuclear {
 
     public static void onRegister(final RegisterEvent event) {
         CNFanProcessingTypes.register();
-
     }
-
 
     public static ResourceLocation asResource(String path) {
         return new ResourceLocation(MOD_ID, path);
