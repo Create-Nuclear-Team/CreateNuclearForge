@@ -26,6 +26,7 @@ import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.List;
 
@@ -59,8 +60,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public int proximityUraniumHeat = 5;
     public int proximityGraphiteHeat = -5;
     public int maxUraniumPerGraphite = 3;
-    public int graphiteTimer = 3600;
-    public int uraniumTimer = 3600;
+    public int graphiteTimer = CNConfigs.common().rods.graphiteRodLifetime.get();
+    public int uraniumTimer = CNConfigs.common().rods.uraniumRodLifetime.get();
     public int countUraniumRod;
     public int countGraphiteRod;
     public int heat;
@@ -142,7 +143,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (ItemStack.of(compound.getCompound("cooler")) != null || ItemStack.of(compound.getCompound("fuel")) != null) {
             coolerItem = ItemStack.of(compound.getCompound("cooler"));
             fuelItem = ItemStack.of(compound.getCompound("fuel"));
-
         }
         /*
         countGraphiteRod = compound.getInt("countGraphiteRod");
