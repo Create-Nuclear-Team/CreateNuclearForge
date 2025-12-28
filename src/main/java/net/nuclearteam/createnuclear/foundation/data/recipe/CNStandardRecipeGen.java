@@ -83,19 +83,10 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
     private final String CRAFTING_THORIUM = enterFolder("crafting/thorium");
 
     GeneratedRecipe
-            // 9 nuggets -> 1 ingot, 9 ingots -> 1 block (comme lead/steel)
-            THORIUM_COMPACTING = metalCompacting(
-            ImmutableList.of(
-                    CNItems.THORIUM_NUGGET,   // -> ingot
-                    CNItems.THORIUM_INGOT,    // -> block
-                    CNBlocks.THORIUM_BLOCK    // fin de chaîne
-            ),
-            ImmutableList.of(
-                    () -> CNTags.forgeItemTag("nuggets/thorium"),
-                    () -> CNTags.forgeItemTag("ingots/thorium"),
-                    () -> CNTags.forgeItemTag("storage_blocks/thorium")
-            )
-    ),
+        THORIUM_COMPACTING = metalCompacting(
+            ImmutableList.of(CNItems.THORIUM_NUGGET, CNItems.THORIUM_INGOT, CNBlocks.THORIUM_BLOCK),
+            ImmutableList.of(() -> CNTags.forgeItemTag("nuggets/thorium"), () -> CNTags.forgeItemTag("ingots/thorium"), () -> CNTags.forgeItemTag("storage_blocks/thorium"))
+        );
 
     // // 1 block -> 9 ingots (décompactage)
     // THORIUM_BLOCK_TO_INGOTS = create(CNItems.THORIUM_INGOT::get)
