@@ -59,5 +59,7 @@
   "tag.item.trinkets.head.face": "Head Face",
 
 
-  "overlay.event_message": "⚠ Warning ⚠ %s timer"
+  "overlay.event_message": "⚠ Warning ⚠ %s timer",
+
+  "attribute.name.createnuclear.generic.irradiated_resistance": "Radiation Resistance"
 }
