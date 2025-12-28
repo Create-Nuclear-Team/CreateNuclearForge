@@ -39,10 +39,6 @@ public record RodsStats(Item item) implements TooltipModifier {
         Level world = player.level();
         List<Component> components = new ArrayList<>();
 
-        CreateNuclearLang.translate("tooltip.statRod")
-            .style(ChatFormatting.GRAY)
-            .addTo(components);
-
         RodType rodType = RodType.getTypeForItem(world.registryAccess(), item)
             .map(Holder.Reference::value)
             .orElseGet(() -> {
@@ -56,14 +52,22 @@ public record RodsStats(Item item) implements TooltipModifier {
             });
 
         if (!rodType.isEmptyItem()) {
+            CreateNuclearLang.translate("tooltip.statRod")
+                .style(ChatFormatting.GRAY)
+                .addTo(components);
+
             CreateNuclearLang.builder()
                 .add(CreateNuclearLang.translate("tooltip.baseRodHeat", rodType.baseRodHeat()))
-                .newLine()
+                .addTo(components);
+            CreateNuclearLang.builder()
                 .add(CreateNuclearLang.translate("tooltip.proximityRodHeat", rodType.proximityRodHeat()))
-                .newLine()
+                .addTo(components);
+            CreateNuclearLang.builder()
                 .add(CreateNuclearLang.translate("tooltip.rodTimer", rodType.rodTimer()))
-                .newLine()
+                .addTo(components);
+            CreateNuclearLang.builder()
                 .add(CreateNuclearLang.translate("tooltip.typeRod", rodType.type().name()))
+                .style(rodType.type().equals(RodType.TypeRod.FUEL) ? ChatFormatting.GREEN : ChatFormatting.AQUA)
                 .addTo(components);
         }
 
