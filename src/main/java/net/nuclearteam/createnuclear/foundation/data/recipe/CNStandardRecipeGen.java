@@ -67,8 +67,10 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
             ImmutableList.of(() -> CNTags.forgeItemTag("nuggets/lead"), () -> CNTags.forgeItemTag("ingots/lead"), () -> CNTags.forgeItemTag("storage_blocks/lead"))),
 
         STEEL_COMPACTING = metalCompacting(ImmutableList.of(CNItems.STEEL_NUGGET, CNItems.STEEL_INGOT, CNBlocks.STEEL_BLOCK),
-            ImmutableList.of(() -> CNTags.forgeItemTag("nuggets/steel"), () -> CNTags.forgeItemTag("ingots/steel"), () -> CNTags.forgeItemTag("storage_blocks/steel")))
+            ImmutableList.of(() -> CNTags.forgeItemTag("nuggets/steel"), () -> CNTags.forgeItemTag("ingots/steel"), () -> CNTags.forgeItemTag("storage_blocks/steel"))),
 
+        THORIUM_COMPACTING = metalCompacting(ImmutableList.of(CNItems.THORIUM_NUGGET, CNItems.THORIUM_INGOT, CNBlocks.THORIUM_BLOCK),
+            ImmutableList.of(() -> CNTags.forgeItemTag("nuggets/thorium"), () -> CNTags.forgeItemTag("ingots/thorium"), () -> CNTags.forgeItemTag("storage_blocks/thorium")))
         ;
 
     private final String BLAST_FURNACE = enterFolder("blast_furnace");
@@ -78,62 +80,6 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
         RAW_LEAD = blastFurnaceRecipeTags(CNItems.LEAD_INGOT::get, () -> CNTags.forgeItemTag("raw_materials/lead"), "_for_raw_lead", 1),
         CRUSHED_RAW_LEAD_TO_LEAD_BLAST_FURNACE = blastFurnaceRecipe(CNItems.LEAD_INGOT::get, AllItems.CRUSHED_LEAD::get, "_for_lead", 1)
     ;
-
-    // On entre dans un sous-dossier pour organiser la sortie des JSON
-    private final String CRAFTING_THORIUM = enterFolder("crafting/thorium");
-
-    GeneratedRecipe
-        THORIUM_COMPACTING = metalCompacting(
-            ImmutableList.of(CNItems.THORIUM_NUGGET, CNItems.THORIUM_INGOT, CNBlocks.THORIUM_BLOCK),
-            ImmutableList.of(() -> CNTags.forgeItemTag("nuggets/thorium"), () -> CNTags.forgeItemTag("ingots/thorium"), () -> CNTags.forgeItemTag("storage_blocks/thorium"))
-        );
-
-    // // 1 block -> 9 ingots (décompactage)
-    // THORIUM_BLOCK_TO_INGOTS = create(CNItems.THORIUM_INGOT::get)
-    //         .withSuffix("_from_thorium_block_decompacting")
-    //         .returns(9)
-    //         .unlockedBy(CNBlocks.THORIUM_BLOCK::get)
-    //         .viaShapeless(b -> b
-    //                 .requires(CNBlocks.THORIUM_BLOCK.get())
-
-    //         ),
-
-    // // 1 ingot -> 9 nuggets (décompactage)
-    // THORIUM_INGOT_TO_NUGGETS = create(CNItems.THORIUM_NUGGET::get)
-    //         .withSuffix("_from_thorium_ingot_decompacting")
-    //         .returns(9)
-    //         .unlockedBy(CNItems.THORIUM_INGOT::get)
-    //         .viaShapeless(b -> b
-    //                 .requires(CNTags.forgeItemTag("ingots/thorium"))
-
-    //         );
-
-    // Bloc RAW: on change de sous-dossier pour rester propre
-    private final String CRAFTING_THORIUM_RAW = enterFolder("crafting/thorium_raw");
-
-    GeneratedRecipe
-            // 9 raw_thorium -> 1 raw_thorium_block
-            // RAW_THORIUM_BLOCK = create(CNBlocks.RAW_THORIUM_BLOCK)
-            // .unlockedByTag(() -> CNTags.forgeItemTag("raw_materials/thorium"))
-            // .viaShaped(b -> b
-            //         .define('R', CNTags.forgeItemTag("raw_materials/thorium"))
-            //         .pattern("RRR")
-            //         .pattern("RRR")
-            //         .pattern("RRR")
-            //         .showNotification(true)
-            // ),
-
-        // 1 raw_block -> 9 raw_thorium
-        RAW_THORIUM_FROM_BLOCK = create(CNItems.RAW_THORIUM::get)
-            .withSuffix("_from_raw_thorium_block_decompacting")
-            .returns(9)
-            .unlockedBy(CNBlocks.RAW_THORIUM_BLOCK::get)
-            .viaShapeless(b -> b
-                    .requires(CNBlocks.RAW_THORIUM_BLOCK.get())
-
-            )
-    ;
-
 
     String currentFolder = "";
 
