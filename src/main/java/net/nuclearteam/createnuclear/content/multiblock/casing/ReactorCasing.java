@@ -47,7 +47,6 @@ import java.util.List;
 @SuppressWarnings({"deprecation", "unused"})
 public class ReactorCasing extends Block implements IWrenchable, IBE<ReactorCasingEntity> {
     private final TypeBlock typeBlock;
-    public boolean biomeUnchanged = true;
 
     public ReactorCasing(Properties properties, TypeBlock tBlock) {
         super(properties);
@@ -58,7 +57,8 @@ public class ReactorCasing extends Block implements IWrenchable, IBE<ReactorCasi
     @Override // Called when the block is placed on the world
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         super.onPlace(state, level, pos, oldState, movedByPiston);
-        changeBiome(CNBiomes.Irradiated.PLAIN, 12, new Vec3(5, 5, 5), (ServerLevel) level);
+        // change nearby chunks' biomes to the mod biome (radius in blocks)
+        changeBiome(CNBiomes.Irradiated.PLAIN, 12, pos, (ServerLevel) level);
         List<? extends Player> players = level.players();
         FindController(pos, level, players, true);
     }
@@ -116,36 +116,31 @@ public class ReactorCasing extends Block implements IWrenchable, IBE<ReactorCasi
         return new Vec3i(Mth.floor(x), Mth.floor(y), Mth.floor(z));
     }
 
-    public void changeBiome(ResourceKey<Biome> biomeResourceKey, int pass, Vec3 effectCenter, ServerLevel serverLevel) {
-        CreateNuclear.LOGGER.info("ReactorBlock.changeBiome: {}", biomeUnchanged);
-        if(!biomeUnchanged) return;
-        double range = 300;
-        double passes = 13;
-        BoundingBox boundingbox = BoundingBox.fromCorners(floorAll(300 + (passes - 1) * 5.0 + effectCenter.x, 300 + (passes - 1) * 5.0 + effectCenter.y, range + (passes - 1) * 5.0 + effectCenter.z), floorAll(effectCenter.x - range + (passes - 1) * 5.0, effectCenter.y - range + (passes - 1) * 5.0, effectCenter.z - range + (passes - 1) * 5.0));
+    public void changeBiome(ResourceKey<Biome> biomeResourceKey, int radius, BlockPos center, ServerLevel serverLevel) {
+        // radius is in blocks; we convert to chunk/section coords
+        Registry<Biome> biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME);
+        Holder<Biome> biomeHolder = biomeRegistry.getHolderOrThrow(biomeResourceKey);
+
+        int minX = center.getX() - radius;
+        int maxX = center.getX() + radius;
+        int minZ = center.getZ() - radius;
+        int maxZ = center.getZ() + radius;
+
         ArrayList<ChunkAccess> chunks = new ArrayList<>();
-        CreateNuclear.LOGGER.info("ReactorBlock.change: {}", boundingbox);
-        for (int k = SectionPos.blockToSectionCoord(boundingbox.minZ()); k <= SectionPos.blockToSectionCoord(boundingbox.maxZ()); ++k) {
-            CreateNuclear.LOGGER.warn("ReactorBlock.for (int k =: {}", k);
-            for (int l = SectionPos.blockToSectionCoord(boundingbox.minX()); l <= SectionPos.blockToSectionCoord(boundingbox.maxX()); ++l) {
-                CreateNuclear.LOGGER.warn("ReactorBlock.int l =: {}, serverLevel.getChunk; {}", l, serverLevel.getChunk(l, k, ChunkStatus.FULL, false));
-                ChunkAccess chunkAccess = serverLevel.getChunk(l, k, ChunkStatus.FULL, false);
-                if (chunkAccess != null)
+
+        for (int cz = SectionPos.blockToSectionCoord(minZ); cz <= SectionPos.blockToSectionCoord(maxZ); ++cz) {
+            for (int cx = SectionPos.blockToSectionCoord(minX); cx <= SectionPos.blockToSectionCoord(maxX); ++cx) {
+                ChunkAccess chunkAccess = serverLevel.getChunk(cx, cz, ChunkStatus.FULL, false);
+                if (chunkAccess != null) {
+                    chunkAccess.fillBiomesFromNoise(makeResolver(biomeHolder), serverLevel.getChunkSource().randomState().sampler());
+                    chunkAccess.setUnsaved(true);
                     chunks.add(chunkAccess);
+                }
             }
         }
 
-        for (ChunkAccess chunkAccess : chunks) {
-            CreateNuclear.LOGGER.warn("test change biome chunk: {}", chunkAccess.getPos());
-            Registry<Biome> biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME);
-            Biome biome = biomeRegistry.get(biomeResourceKey);
-            assert biome != null;
-            chunkAccess.fillBiomesFromNoise(makeResolver(biomeRegistry.wrapAsHolder(biome)), serverLevel.getChunkSource().randomState().sampler());
-            chunkAccess.setUnsaved(true);
-        }
-
+        // Inform players/clients about biome changes for affected chunks
         serverLevel.getChunkSource().chunkMap.resendBiomesForChunks(chunks);
-        biomeUnchanged = false;
-
     }
 
     public static BiomeResolver makeResolver(Holder<Biome> biomeHolder) {
