@@ -1,4 +1,4 @@
-// 1.20.1	2025-11-24T19:12:01.1837971	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-12-28T16:52:54.734217	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -43,6 +43,8 @@ a2fc21fa320e677fe7690b260ee3f57ebdbd50b6 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
+5927028d82db592d0320c6907fb86be33e9ebd0a assets/createnuclear/lang/en_ud.json
+0edd6fa0242ad60aa8c70f32353b38598cc0539b assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -333,6 +335,7 @@ e423dda41c61e3885bd9189db7f485f4a580b64d data/createnuclear/advancements/recipes
 dd349fb2cfe2c8a92fd5091fdf55ae954ea77237 data/createnuclear/advancements/recipes/combat/crafting/items/armors/yellow_anti_radiation_chestplate.json
 009c689264f2b974c72a2387223b2a7eb9f52aba data/createnuclear/advancements/recipes/combat/crafting/items/armors/yellow_anti_radiation_helmet.json
 b8c6c649aec3cd595be961fe43d9ebc3a6013d8c data/createnuclear/advancements/recipes/combat/crafting/items/armors/yellow_anti_radiation_leggings.json
+7a12ea1e92fe1eb20998c28399f041e3684d66aa data/createnuclear/advancements/recipes/decorations/crafting/raw/raw_thorium_block.json
 0d806e128a0eab473c822824e1914cd39d684efa data/createnuclear/advancements/recipes/decorations/crafting/raw_lead_block.json
 570d06b2ab9f3b2d9d8265baac395e896e8b171e data/createnuclear/advancements/recipes/decorations/crafting/raw_uranium_block.json
 eafffaaada04af83623ebf8e940df2b507d933eb data/createnuclear/advancements/recipes/decorations/crafting/reactor/reinforced_glass.json
@@ -343,6 +346,8 @@ cc3ec047cc113f80a1163aeb2277dad33af8e424 data/createnuclear/advancements/recipes
 16c681121078827282f2ce2e16d335d2d7e5e1f2 data/createnuclear/advancements/recipes/misc/crafting/reactor_blueprint_item.json
 e28d26c880c31bb2ca64c9f380e001a13e3a01aa data/createnuclear/advancements/recipes/misc/crafting/steel_ingot_from_decompacting.json
 76e79e1f9fb40d89a0364939158b1aaba8598ab6 data/createnuclear/advancements/recipes/misc/crafting/steel_nugget_from_decompacting.json
+4d798680125ac67e3469e906b43f6d294cbf8fd6 data/createnuclear/advancements/recipes/misc/crafting/thorium_ingot_from_decompacting.json
+fa9fc1d028bc6a7e9c59aab335fa666e05bdef65 data/createnuclear/advancements/recipes/misc/crafting/thorium_nugget_from_decompacting.json
 f38e19487233203d7135f35a7afe65d6b19a5aa7 data/createnuclear/advancements/recipes/misc/shapeless/reactor_blueprint_item_clear.json
 a021646becb7b6411eddd86644e5b17c8365582c data/createnuclear/loot_tables/blocks/autunite.json
 62b7087350b0a9af9007b848c7f619a730e90693 data/createnuclear/loot_tables/blocks/autunite_pillar.json
@@ -445,6 +450,7 @@ e6396835f0c68c87409e25edda2779227b84f5ec data/createnuclear/recipes/crafting/ite
 1d22695a4dd7ce4429529011c6cccee1969abb9e data/createnuclear/recipes/crafting/items/armors/yellow_anti_radiation_leggings.json
 ad29e797fed10865a6c15d95c3de1278c0427df8 data/createnuclear/recipes/crafting/lead_ingot_from_decompacting.json
 42fa720bf96a1d46e206db30cbd38e1b04ea7f63 data/createnuclear/recipes/crafting/lead_nugget_from_decompacting.json
+befcdaaf4abf86e29d7f7008d489638c5f3cd6bd data/createnuclear/recipes/crafting/raw/raw_thorium_block.json
 6d70c403bab3160fc13fbb3efee85d9f77f2e96c data/createnuclear/recipes/crafting/raw_lead_block.json
 62e238496e81bbf9a86fcfc9396a6416e057007c data/createnuclear/recipes/crafting/raw_uranium_block.json
 37547c516596771629592f09199dda9213a99dab data/createnuclear/recipes/crafting/raw_uranium_from_decompacting.json
@@ -452,6 +458,8 @@ a7ff79f9d11a46e52fb25819a7c9e9604e8a317a data/createnuclear/recipes/crafting/rea
 77f77148406d34c065b55efa9d6e7a2b107831c5 data/createnuclear/recipes/crafting/reactor_blueprint_item.json
 ae6d07dc30751bfa39edbcdb8758a2faababa5da data/createnuclear/recipes/crafting/steel_ingot_from_decompacting.json
 5fb04284d66de4bf54471a3db0d9a3bfa6b7a18c data/createnuclear/recipes/crafting/steel_nugget_from_decompacting.json
+047c50559746a9ffb5835ff960ba500400e7e299 data/createnuclear/recipes/crafting/thorium_ingot_from_decompacting.json
+428e74b7762c3b5b74e80850a5c75d27960c73c9 data/createnuclear/recipes/crafting/thorium_nugget_from_decompacting.json
 ebfe438f4284101e07538accdf15789d06140c94 data/createnuclear/recipes/cut_autunite_bricks_from_stone_types_autunite_stonecutting.json
 4b86d48cdf03dcfaa383552881a7f52b7bebe9c5 data/createnuclear/recipes/cut_autunite_brick_slab.json
 b9d828959c4614caa4a0f3ac82f322dd538c6219 data/createnuclear/recipes/cut_autunite_brick_slab_from_stone_types_autunite_stonecutting.json
@@ -506,6 +514,8 @@ a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/createnuclear/tags/blocks/enrichin
 509b5baa813ae0dc3345fd97754e4088132359ec data/createnuclear/tags/blocks/fan_processing_catalysts/enriched.json
 925cb97bc13b3122fe17e59ff3ec2fe4d1eaacd5 data/createnuclear/tags/blocks/lead_ores.json
 bad88bea18fec41c7ad6fa4d396feacc0346a137 data/createnuclear/tags/blocks/uranium_ores.json
+ccbc67cba973a8e1e43d0166ddfa5645f6a82aea data/createnuclear/tags/entity_types/irradiated_immune.json
+dd07a117bf2a657aba3d776ee718829150a1c0af data/createnuclear/tags/fluids/thorium.json
 bfd5a561b60a7d59d7f7c248ec75e3571a0f2fed data/createnuclear/tags/fluids/uranium.json
 7422c4cd9d6dd716f91311faa1fb7e26aa9ac345 data/createnuclear/tags/items/all_anti_radiation_armors.json
 e3fe4325aafb669d287c17b5b30953e4fb709110 data/createnuclear/tags/items/anti_radiation_armor.json

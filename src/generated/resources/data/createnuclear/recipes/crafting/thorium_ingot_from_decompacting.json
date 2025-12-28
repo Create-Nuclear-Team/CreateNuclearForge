@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "createnuclear:thorium_block"
+      "tag": "forge:storage_blocks/thorium"
     }
   ],
   "result": {
