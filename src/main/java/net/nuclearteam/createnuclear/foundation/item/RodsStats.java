@@ -39,17 +39,7 @@ public record RodsStats(Item item) implements TooltipModifier {
         Level world = player.level();
         List<Component> components = new ArrayList<>();
 
-        RodType rodType = RodType.getTypeForItem(world.registryAccess(), item)
-            .map(Holder.Reference::value)
-            .orElseGet(() -> {
-                RodType fromItem = ItemRodTypesValue.getRodType(item);
-                return !fromItem.isEmptyItem()
-                    ? fromItem
-                    : world.registryAccess()
-                        .registryOrThrow(CreateNuclearRegistries.ROD_TYPE)
-                        .getHolderOrThrow(CNRodTypes.FALLBACK)
-                        .value();
-            });
+        RodType rodType = RodType.resolveRodType(item, world);
 
         if (!rodType.isEmptyItem()) {
             CreateNuclearLang.translate("tooltip.statRod")
