@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_storage_blocks_raw_uranium": {
+    "has_storage_blocks_raw_thorium": {
       "conditions": {
         "items": [
           {
-            "tag": "forge:storage_blocks/raw_uranium"
+            "tag": "forge:storage_blocks/raw_thorium"
           }
         ]
       },
@@ -13,20 +13,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "createnuclear:crafting/raw_uranium_from_decompacting"
+        "recipe": "createnuclear:crafting/raw_thorium_from_decompacting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_storage_blocks_raw_uranium",
+      "has_storage_blocks_raw_thorium",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "createnuclear:crafting/raw_uranium_from_decompacting"
+      "createnuclear:crafting/raw_thorium_from_decompacting"
     ]
   },
   "sends_telemetry_event": false

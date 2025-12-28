@@ -1,7 +1,7 @@
 {
   "values": [
-    "createnuclear:thorium_nugget",
     "createnuclear:steel_nugget",
-    "createnuclear:lead_nugget"
+    "createnuclear:lead_nugget",
+    "createnuclear:thorium_nugget"
   ]
 }

@@ -6,7 +6,7 @@
         "items": [
           {
             "items": [
-              "createnuclear:thorium_ingot"
+              "createnuclear:thorium_nugget"
             ]
           }
         ]
@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "createnuclear:crafting/thorium/thorium_block_from_compacting"
+        "recipe": "createnuclear:crafting/thorium_ingot_from_compacting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "createnuclear:crafting/thorium/thorium_block_from_compacting"
+      "createnuclear:crafting/thorium_ingot_from_compacting"
     ]
   },
   "sends_telemetry_event": false

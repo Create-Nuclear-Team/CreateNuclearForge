@@ -1,4 +1,4 @@
-// 1.20.1	2025-12-28T16:52:54.734217	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2025-12-28T17:09:33.3213562	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -342,7 +342,9 @@ eafffaaada04af83623ebf8e940df2b507d933eb data/createnuclear/advancements/recipes
 0221cf60748260f92b94be675249afc98de1d707 data/createnuclear/advancements/recipes/misc/crafting/enriching_campfire.json
 cc3ec047cc113f80a1163aeb2277dad33af8e424 data/createnuclear/advancements/recipes/misc/crafting/lead_ingot_from_decompacting.json
 58477747b204491c22a9aecb751d99054f71310b data/createnuclear/advancements/recipes/misc/crafting/lead_nugget_from_decompacting.json
-79c4b31035e7d6cb04628ec5a15ebdf0bdb576d9 data/createnuclear/advancements/recipes/misc/crafting/raw_uranium_from_decompacting.json
+2f3e459eff3d7404e49d23b9544b199caba741c9 data/createnuclear/advancements/recipes/misc/crafting/raw_lead_from_decompacting.json
+ebab14dadd0650c76722c7e324ec4330539ee208 data/createnuclear/advancements/recipes/misc/crafting/raw_thorium_from_decompacting.json
+a9d692d44743f8fcabfc45046ad17a039c594747 data/createnuclear/advancements/recipes/misc/crafting/raw_uranium_from_decompacting.json
 16c681121078827282f2ce2e16d335d2d7e5e1f2 data/createnuclear/advancements/recipes/misc/crafting/reactor_blueprint_item.json
 e28d26c880c31bb2ca64c9f380e001a13e3a01aa data/createnuclear/advancements/recipes/misc/crafting/steel_ingot_from_decompacting.json
 76e79e1f9fb40d89a0364939158b1aaba8598ab6 data/createnuclear/advancements/recipes/misc/crafting/steel_nugget_from_decompacting.json
@@ -452,8 +454,10 @@ ad29e797fed10865a6c15d95c3de1278c0427df8 data/createnuclear/recipes/crafting/lea
 42fa720bf96a1d46e206db30cbd38e1b04ea7f63 data/createnuclear/recipes/crafting/lead_nugget_from_decompacting.json
 befcdaaf4abf86e29d7f7008d489638c5f3cd6bd data/createnuclear/recipes/crafting/raw/raw_thorium_block.json
 6d70c403bab3160fc13fbb3efee85d9f77f2e96c data/createnuclear/recipes/crafting/raw_lead_block.json
+7bf77189b1a9bc533e5ac0bb72ec87e8d5221691 data/createnuclear/recipes/crafting/raw_lead_from_decompacting.json
+06b7a11d4472cf36542c67d113acff6c3dccfd5f data/createnuclear/recipes/crafting/raw_thorium_from_decompacting.json
 62e238496e81bbf9a86fcfc9396a6416e057007c data/createnuclear/recipes/crafting/raw_uranium_block.json
-37547c516596771629592f09199dda9213a99dab data/createnuclear/recipes/crafting/raw_uranium_from_decompacting.json
+997f2bf339dd63253d9a98d16a9efeffac4eea81 data/createnuclear/recipes/crafting/raw_uranium_from_decompacting.json
 a7ff79f9d11a46e52fb25819a7c9e9604e8a317a data/createnuclear/recipes/crafting/reactor/reinforced_glass.json
 77f77148406d34c065b55efa9d6e7a2b107831c5 data/createnuclear/recipes/crafting/reactor_blueprint_item.json
 ae6d07dc30751bfa39edbcdb8758a2faababa5da data/createnuclear/recipes/crafting/steel_ingot_from_decompacting.json
@@ -553,28 +557,27 @@ b5d23f0bc26a4e3a72cde40f3c6d59c03c818b4d data/forge/tags/items/armors/helmets.js
 bebad856ee0f047735060f28544eb6149d8c2b20 data/forge/tags/items/armors/leggings.json
 c53aa7c19dc2c02afdab4bc7e3188ca2b2224af6 data/forge/tags/items/buckets/thorium.json
 9ac9f967f480bbbe186815331a7e1771c8feea57 data/forge/tags/items/buckets/uranium.json
-25c93720c5221fac9aeb0ae47182ef59e0a0c2bb data/forge/tags/items/coal_dusts.json
 6c2e44175fc9799f1cf69287a6b21ef3f8c659e1 data/forge/tags/items/dusts.json
 25c93720c5221fac9aeb0ae47182ef59e0a0c2bb data/forge/tags/items/dusts/coal.json
 d6176bfd8cf296e3d5b5601ff2da8fc59620a092 data/forge/tags/items/dusts/thorium.json
 69b53861489d10b3a836be9812af97c999833470 data/forge/tags/items/dusts/uranium.json
 75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/forge/tags/items/glass.json
-e3f1ddf60fe95ede418d0f9d18d73cb508cfeca7 data/forge/tags/items/ingots.json
+69b0ac78e6b1f46e527de8e63aba797c335290f9 data/forge/tags/items/ingots.json
 30fa647448df4131c1d6460756f18583a493ee31 data/forge/tags/items/ingots/lead.json
 24bc6e0cdae825d9e5d1500567ae81d83c15a88d data/forge/tags/items/ingots/steel.json
 a50840c5dc4023ab62b7faa86a5fd9f032a50caf data/forge/tags/items/ingots/thorium.json
-07a9254cf46aa1c6c12fc8ea880605c6b267ec24 data/forge/tags/items/nuggets.json
+a77ba3f79cd096f38bd53b5f1b6a5696b864e9df data/forge/tags/items/nuggets.json
 41ff866ec94383906342a0d1594554e3063b9d0f data/forge/tags/items/nuggets/lead.json
 1ec402fda0c91947be220066973f79f3e522663f data/forge/tags/items/nuggets/steel.json
 31d6f68b8cbb51e44700987c1b242a855e120b33 data/forge/tags/items/nuggets/thorium.json
 925cb97bc13b3122fe17e59ff3ec2fe4d1eaacd5 data/forge/tags/items/ores/lead.json
 3f665c928bcdfaa68700d1da7a28fddcbb7bf802 data/forge/tags/items/ores/thorium.json
 bad88bea18fec41c7ad6fa4d396feacc0346a137 data/forge/tags/items/ores/uranium.json
-95b4d551c30bc7e4223cbbe5c0eef18735ee8a31 data/forge/tags/items/raw_materials.json
+fd86e3b3265d7069f3cfff0cfb5d086eea5a813a data/forge/tags/items/raw_materials.json
 610ed700de0886bcb4b1c90100c35f3034c53940 data/forge/tags/items/raw_materials/lead.json
 61f6f1f4b16790c36a45f769141900772ce4529a data/forge/tags/items/raw_materials/thorium.json
 03a88f0d9f44d3c338b82bf92b22a14dec490bef data/forge/tags/items/raw_materials/uranium.json
-95b4d551c30bc7e4223cbbe5c0eef18735ee8a31 data/forge/tags/items/raw_ores.json
+fd86e3b3265d7069f3cfff0cfb5d086eea5a813a data/forge/tags/items/raw_ores.json
 c1ad472460350e6abd024de7785cd870dad05cd9 data/forge/tags/items/rods.json
 a7258ae3454252e874b324fbd81b880ce52759c4 data/forge/tags/items/storage_blocks/lead.json
 2b32fe875f887d4a406700d35e0fe5a93548ebb7 data/forge/tags/items/storage_blocks/raw_lead.json

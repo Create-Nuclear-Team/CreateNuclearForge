@@ -6,7 +6,7 @@
         "items": [
           {
             "items": [
-              "createnuclear:raw_thorium_block"
+              "createnuclear:thorium_ingot"
             ]
           }
         ]
@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "createnuclear:crafting/thorium_raw/raw_thorium_from_raw_thorium_block_decompacting"
+        "recipe": "createnuclear:crafting/thorium_block_from_compacting"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "createnuclear:crafting/thorium_raw/raw_thorium_from_raw_thorium_block_decompacting"
+      "createnuclear:crafting/thorium_block_from_compacting"
     ]
   },
   "sends_telemetry_event": false
