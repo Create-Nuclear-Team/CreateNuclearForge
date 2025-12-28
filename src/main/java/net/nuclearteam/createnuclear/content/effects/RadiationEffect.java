@@ -4,9 +4,12 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CNTags;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -21,8 +24,12 @@ public class RadiationEffect extends VicinityEffect {
         super(MobEffectCategory.HARMFUL, 15453236,
                 amplifier -> 10,
                 e -> {
+//                    CreateNuclear.LOGGER.warn("attribute: {}", e.getAttributes().save());
+//                    CreateNuclear.LOGGER.warn("attribute irradiated: {}", e.getAttributeValue(CNAttributes.IRRADIATED_RESISTANCE.get()));
+
                     boolean isWearingAntiRadiationArmor = false;
                     for (ItemStack armor : e.getArmorSlots()) {
+//                        CreateNuclear.LOGGER.warn("attribute irradiated: {}", armor.getAttributeModifiers(ArmorItem.Type.HELMET.getSlot()));
                         if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
                             isWearingAntiRadiationArmor = true;
                             break;
