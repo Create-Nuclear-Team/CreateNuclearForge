@@ -41,6 +41,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -112,14 +113,18 @@ public class ReactorCasing extends Block implements IWrenchable, IBE<ReactorCasi
         return null;
     }
 
-    public static Vec3i floorAll(double x, double y, double z) {
-        return new Vec3i(Mth.floor(x), Mth.floor(y), Mth.floor(z));
-    }
-
     public void changeBiome(ResourceKey<Biome> biomeResourceKey, int radius, BlockPos center, ServerLevel serverLevel) {
         // radius is in blocks; we convert to chunk/section coords
         Registry<Biome> biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME);
         Holder<Biome> biomeHolder = biomeRegistry.getHolderOrThrow(biomeResourceKey);
+
+        // If the center biome is already the target biome, skip whole operation
+        Holder<Biome> current = serverLevel.getBiome(center);
+        Optional<ResourceKey<Biome>> currentKey = current.unwrapKey();
+        if (currentKey.isPresent() && currentKey.get().equals(biomeResourceKey)) {
+            CreateNuclear.LOGGER.info("changeBiome: center already irradiated: {}", currentKey.get());
+            return;
+        }
 
         int minX = center.getX() - radius;
         int maxX = center.getX() + radius;
