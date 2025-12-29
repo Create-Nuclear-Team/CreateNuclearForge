@@ -2,22 +2,19 @@ package net.nuclearteam.createnuclear.foundation.data.recipe;
 
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.data.PackOutput;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.nuclearteam.createnuclear.CNBlocks;
+import net.nuclearteam.createnuclear.CNFluids;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.data.recipe.SnowPowderRecipeGen;
 
 import java.util.function.Supplier;
 
-import net.nuclearteam.createnuclear.api.data.recipe.EnrichedRecipeGen;
-
-public class CNEnrichedRecipeGen extends EnrichedRecipeGen {
+public class CNSnowPowderRecipeGen extends SnowPowderRecipeGen {
 
     GeneratedRecipe
-        ENRICHING_CAMPFIRES = convert(Items.CAMPFIRE, CNBlocks.ENRICHING_CAMPFIRE),
-        ENRICHED_YELLOWCAKE = convert(() -> Ingredient.of(CNItems.YELLOWCAKE), () -> CNItems.ENRICHED_YELLOWCAKE)
+            COOLED_NITROGEN_CONCENTRATE = convert(CNItems.NITROGEN_CONCENTRATE, CNItems.COOLED_NITROGEN_CONCENTRATE)
     ;
 
     public GeneratedRecipe convert(ItemLike input, ItemLike result) {
@@ -26,13 +23,13 @@ public class CNEnrichedRecipeGen extends EnrichedRecipeGen {
 
     public GeneratedRecipe convert(Supplier<Ingredient> input, Supplier<ItemLike> result) {
         return create(CreateNuclear.asResource(CatnipServices.REGISTRIES.getKeyOrThrow(result.get()
-                .asItem())
-                .getPath()),
+                                .asItem())
+                        .getPath()),
                 p -> p.withItemIngredients(input.get())
                         .output(result.get()));
     }
 
-    public CNEnrichedRecipeGen(PackOutput output) {
-        super(output, CreateNuclear.MOD_ID);
+    public CNSnowPowderRecipeGen(PackOutput generator) {
+        super(generator, CreateNuclear.MOD_ID);
     }
 }

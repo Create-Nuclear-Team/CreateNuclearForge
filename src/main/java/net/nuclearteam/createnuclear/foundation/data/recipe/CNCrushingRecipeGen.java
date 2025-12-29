@@ -69,6 +69,12 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
             .output(1, AllItems.CRUSHED_COPPER, 1)
             .output(.75f, AllItems.EXP_NUGGET, 1)
             .output(.15f, CNItems.LEAD_NUGGET,1)
+        ),
+
+        BIOMASS = create("biomass", b -> b
+            .require(CNTags.CNItemTags.COMPOSTABLE.tag)
+            .duration(250)
+            .output(CNItems.BIOMASS)
         )
     ;
 

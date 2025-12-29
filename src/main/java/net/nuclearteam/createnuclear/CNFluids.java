@@ -9,12 +9,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.common.ForgeMod;
@@ -79,6 +76,30 @@ public class CNFluids {
                     .build()
                     .register();
 
+    public static final FluidEntry<ForgeFlowingFluid.Flowing> LIQUID_NITROGEN =
+        CreateNuclear.REGISTRATE.standardFluid("nitrogen", SolidRenderedPlaceableFluidtype.create(0x121212, () -> 1f / 16f))
+            .lang("Liquid Nitrogen")
+            .tag(CNFluidTags.NITROGEN.tag)
+            .properties(p -> p.viscosity(1000)
+                .density(0)
+                .canSwim(true)
+                .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_AXOLOTL)
+                .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_FISH)
+                .canDrown(false)
+            )
+            .fluidProperties(f -> f.levelDecreasePerBlock(5)
+                .tickRate(10)
+                .slopeFindDistance(6)
+                .explosionResistance(100f)
+            )
+            .source(ForgeFlowingFluid.Source::new)
+            .bucket()
+            .lang("Nitrogen Bucket")
+            .tag(CNTags.forgeItemTag("buckets/nitrogen"))
+            .build()
+            .register();
+
+
     public static void register() {}
 
     public static void handleFluidEffect(LivingEvent.LivingTickEvent event) {
@@ -87,6 +108,12 @@ public class CNFluids {
             if (entity.tickCount % 20 == 0) return;
             if (entity.isInFluidType(URANIUM.getType())) {
                 entity.addEffect(new MobEffectInstance(CNEffects.RADIATION.get(), 100, 0));
+            } else if (entity.isInFluidType(LIQUID_NITROGEN.getType())) {
+                entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
+                entity.setIsInPowderSnow(true);
+//                if (entity.getTicksFrozen() == 0) {
+//                    entity.setTicksFrozen(140);
+//                }
             }
         }
 

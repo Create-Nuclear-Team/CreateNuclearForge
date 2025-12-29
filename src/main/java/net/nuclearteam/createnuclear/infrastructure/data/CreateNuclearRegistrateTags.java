@@ -6,11 +6,13 @@ import com.tterrag.registrate.providers.RegistrateTagsProvider;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.Tags;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.CNTags;
@@ -43,6 +45,10 @@ public class CreateNuclearRegistrateTags {
                 .add(CNBlocks.ENRICHING_FIRE.get())
         ;
 
+        prov.tag(CNBlockTags.FAN_PROCESSING_CATALYSTS_SNOW_POWDER.tag)
+                .add(Blocks.POWDER_SNOW)
+        ;
+
         for (CNBlockTags tag : CNBlockTags.values()) {
             if (tag.alwaysDatagen) {
                 prov.getOrCreateRawBuilder(tag.tag);
@@ -52,6 +58,12 @@ public class CreateNuclearRegistrateTags {
 
     private static void genItemTags(RegistrateTagsProvider<Item> provIn) {
         CreateTagsProvider<Item> prov = new CreateTagsProvider<>(provIn, Item::builtInRegistryHolder);
+
+        prov.tag(CNItemTags.COMPOSTABLE.tag)
+                .add(Items.KELP)
+                .add(Items.BONE_MEAL)
+                .add(Items.ROTTEN_FLESH)
+                .addTag(ItemTags.LEAVES);
 
         for (CNItemTags tag : CNItemTags.values()) {
             if (tag.alwaysDatagen) {
@@ -69,6 +81,10 @@ public class CreateNuclearRegistrateTags {
 
         prov.tag(FluidTags.LAVA)
                 .addTag(CNFluidTags.URANIUM.tag)
+        ;
+
+        prov.tag(FluidTags.WATER)
+                .addTag(CNFluidTags.NITROGEN.tag)
         ;
 
 
