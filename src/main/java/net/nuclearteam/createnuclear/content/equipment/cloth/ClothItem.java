@@ -6,7 +6,6 @@ import net.minecraft.world.item.Item;
 import net.nuclearteam.createnuclear.CNItems;
 
 import java.util.*;
-import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class ClothItem extends Item {

@@ -126,6 +126,7 @@ public class CreateNuclearJEI implements IModPlugin {
             return addRecipeListConsumer(recipes -> recipes.addAll(collection.get()));
         }
 
+        @SuppressWarnings("unchecked")
         public CategoryBuilder<T> addAllRecipesIf(Predicate<Recipe<?>> pred) {
             return addRecipeListConsumer(recipes -> consumeAllRecipes(recipe -> {
                 if (pred.test(recipe)) {

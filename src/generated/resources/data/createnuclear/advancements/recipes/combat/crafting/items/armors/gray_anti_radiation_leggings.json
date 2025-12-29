@@ -1,7 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
+<<<<<<< HEAD
+    "has_item": {
+=======
     "has_cloth": {
+>>>>>>> t
       "conditions": {
         "items": [
           {
@@ -20,7 +24,11 @@
   },
   "requirements": [
     [
+<<<<<<< HEAD
+      "has_item",
+=======
       "has_cloth",
+>>>>>>> t
       "has_the_recipe"
     ]
   ],

@@ -1,6 +1,10 @@
 {
   "type": "minecraft:crafting_shaped",
+<<<<<<< HEAD
+  "category": "misc",
+=======
   "category": "building",
+>>>>>>> t
   "key": {
     "N": {
       "item": "minecraft:nether_star"

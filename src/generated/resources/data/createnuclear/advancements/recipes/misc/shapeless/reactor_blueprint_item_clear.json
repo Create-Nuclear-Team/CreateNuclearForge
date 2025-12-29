@@ -1,12 +1,20 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
+<<<<<<< HEAD
+    "has_item": {
+=======
     "has_reactor_blueprint": {
+>>>>>>> t
       "conditions": {
         "items": [
           {
             "items": [
+<<<<<<< HEAD
+              "createnuclear:reactor_blueprint_item"
+=======
               "createnuclear:reactor_controller"
+>>>>>>> t
             ]
           }
         ]
@@ -22,7 +30,11 @@
   },
   "requirements": [
     [
+<<<<<<< HEAD
+      "has_item",
+=======
       "has_reactor_blueprint",
+>>>>>>> t
       "has_the_recipe"
     ]
   ],

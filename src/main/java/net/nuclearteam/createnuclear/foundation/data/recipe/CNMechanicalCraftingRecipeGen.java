@@ -2,11 +2,12 @@ package net.nuclearteam.createnuclear.foundation.data.recipe;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
-import com.simibubi.create.api.data.recipe.MechanicalCraftingRecipeGen;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
+
+import com.simibubi.create.api.data.recipe.MechanicalCraftingRecipeGen;
 import net.nuclearteam.createnuclear.*;
 
 public class CNMechanicalCraftingRecipeGen extends MechanicalCraftingRecipeGen {
@@ -85,6 +86,7 @@ public class CNMechanicalCraftingRecipeGen extends MechanicalCraftingRecipeGen {
             .patternLine("CPSPC")
             .patternLine("CCCCC")
     );
+
 
     public CNMechanicalCraftingRecipeGen(PackOutput output) {
         super(output, CreateNuclear.MOD_ID);
