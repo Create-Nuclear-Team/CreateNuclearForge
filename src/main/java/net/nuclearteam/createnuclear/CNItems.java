@@ -46,7 +46,7 @@ public class CNItems {
                 .nutrition(20)
                 .saturationMod(0.3F)
                 .alwaysEat()
-                .effect((new MobEffectInstance(CNEffects.RADIATION.get(),600,2)) , 1.0F)
+                .effect(new MobEffectInstance(CNEffects.RADIATION.get(),600,2), 1.0F)
                 .build())
             )
             .register(),
