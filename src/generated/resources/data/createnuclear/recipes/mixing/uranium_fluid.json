@@ -1,0 +1,14 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/uranium"
+    }
+  ],
+  "results": [
+    {
+      "amount": 25,
+      "fluid": "createnuclear:uranium"
+    }
+  ]
+}

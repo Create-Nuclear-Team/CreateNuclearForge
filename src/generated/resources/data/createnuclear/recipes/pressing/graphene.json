@@ -1,0 +1,13 @@
+{
+  "type": "create:pressing",
+  "ingredients": [
+    {
+      "tag": "forge:dusts/coal"
+    }
+  ],
+  "results": [
+    {
+      "item": "createnuclear:graphene"
+    }
+  ]
+}
