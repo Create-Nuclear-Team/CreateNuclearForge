@@ -7,6 +7,7 @@ import net.createmod.ponder.api.registration.PonderSceneRegistrationHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.infrastructure.ponder.scenes.CNPonderReactorScenes;
 
 
 public class CNPonderIndex {
@@ -16,12 +17,12 @@ public class CNPonderIndex {
 
         // Reactor
         HELPER.forComponents(CNBlocks.REACTOR_CONTROLLER)
-                .addStoryBoard("reactor/setup", CNPonderReactor::init)
-                .addStoryBoard("reactor/setup", CNPonderReactor::enable);
+                .addStoryBoard("reactor/setup", CNPonderReactorScenes::init)
+                .addStoryBoard("reactor/setup", CNPonderReactorScenes::enable);
 
 
         HELPER.forComponents(CNItems.REACTOR_BLUEPRINT)
-                .addStoryBoard("reactor/setup", CNPonderReactor::enable);
+                .addStoryBoard("reactor/setup", CNPonderReactorScenes::enable);
 
         ;
 
