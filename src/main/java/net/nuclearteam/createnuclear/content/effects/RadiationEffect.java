@@ -10,6 +10,7 @@ import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.nuclearteam.createnuclear.foundation.damageTypes.CreateNuclearDamageSources;
 
 public class RadiationEffect extends VicinityEffect {
 
@@ -69,6 +70,6 @@ public class RadiationEffect extends VicinityEffect {
 
         // Apply radiation damage (magic type), scaled by amplifier
         int damage = 1 << amplifier;
-        entity.hurt(entity.damageSources().magic(), damage);
+        entity.hurt(CreateNuclearDamageSources.radiation(entity.level()), damage);
     }
 }

@@ -136,6 +136,8 @@
   "createnuclear.tooltip.item.graphene.rod": "Graphite Rod: ",
   "createnuclear.tooltip.item.unknown.rod": "Unknown: ",
   "createnuclear.tooltip.item.uranium.rod": "Uranium Rod: ",
+  "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast",
+  "death.attack.createnuclear.radiation": "%1$s died from radiation",
   "effect.createnuclear.radiation": "Radiation",
   "emi.category.createnuclear.fan_enriched": "Bulk Enriching",
   "entity.createnuclear.irradiated_cat": "Irradiated Cat",
