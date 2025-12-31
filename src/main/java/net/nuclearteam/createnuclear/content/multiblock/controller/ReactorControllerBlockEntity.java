@@ -12,9 +12,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
@@ -36,21 +33,11 @@ import static net.nuclearteam.createnuclear.content.multiblock.controller.Reacto
 public class ReactorControllerBlockEntity extends SmartBlockEntity implements IInteractionChecker, IHaveGoggleInformation {
     public boolean destroyed = false;
     public boolean created = false;
-    public boolean test = true;
-    public int speed = 16; // This is the result speed of the reactor, change this to change the total capacity
-
-    public boolean sendUpdate;
 
     public ReactorControllerBlock controller;
 
     public ReactorControllerInventory inventory;
 
-    //public LinkedHashSet<LazyOptional<IItemHandler>> attachedInventory;
-
-    //private boolean powered;
-    public State powered = State.OFF;
-    public float reactorPower;
-    public float lastReactorPower;
     int overFlowHeatTimer = 0;
     int overFlowLimiter = 30;
     double overHeat = 0;
@@ -65,7 +52,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public int countGraphiteRod;
     public int heat;
     public double total;
-    public CompoundTag screen_pattern = new CompoundTag();
     public ItemStack configuredPattern;
 
     private ItemStack fuelItem;
@@ -83,8 +69,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             {99,99,99,54,55,56,99,99,99}
     };
     private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
-
-
 
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -132,7 +116,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
 
-    //(Si les methode read et write ne sont pas implémenté alors lorsque l'on relance le monde minecraft les items dans le composant auront disparu !)
+    // (Si les methode read et write ne sont pas implémenté alors lorsque l'on relance le monde minecraft les items dans le composant auront disparu !)
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) { //Permet de stocker les item 1/2
         if (!clientPacket) {
@@ -144,22 +128,15 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             fuelItem = ItemStack.of(compound.getCompound("fuel"));
 
         }
-        /*
-        countGraphiteRod = compound.getInt("countGraphiteRod");
-        countUraniumRod = compound.getInt("countUraniumRod");
-        graphiteTimer = compound.getInt("graphiteTimer");
-        uraniumTimer = compound.getInt("uraniumTimer");
-        heat = compound.getInt("heat");
-*/
+
         total = compound.getDouble("total");
         super.read(compound, clientPacket);
     }
 
     @Override
-    protected void write(CompoundTag compound, boolean clientPacket) { //Permet de stocker les item 2/2
+    protected void write(CompoundTag compound, boolean clientPacket) { // Permet de stocker les item 2/2
         if (!clientPacket) {
             compound.put("pattern", inventory.serializeNBT());
-            //compound.putBoolean("powered", isPowered());
         }
         compound.put("items", configuredPattern.serializeNBT());
 
@@ -167,37 +144,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             compound.put("cooler", coolerItem.serializeNBT());
             compound.put("fuel", fuelItem.serializeNBT());
         }
-        /*compound.putInt("countGraphiteRod", countGraphiteRod);
-        compound.putInt("countUraniumRod", countUraniumRod);
-        compound.putInt("graphiteTimer", graphiteTimer);
-        compound.putInt("uraniumTimer", uraniumTimer);
-        compound.putInt("heat", heat);
-        compound.putString("state", powered.name());
-        compound.put("screen_pattern", screen_pattern);
-*/
+
         compound.putDouble("total", calculateProgress());
         super.write(compound, clientPacket);
-    }
-
-    public enum State {
-        ON, OFF
-    }
-
-    private void explodeReactorCore(Level level, BlockPos pos) {
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    BlockPos currentPos = pos.offset(x, y, z);
-                    //le problème viens de la il ne rentre pas dans le if
-                    if (level.getBlockState(currentPos).is(CNBlocks.REACTOR_CORE.get())) {
-                        // Create and execute the explosion
-                        Explosion explosion = new Explosion(level, null, currentPos.getX(), currentPos.getY(), currentPos.getZ(), 4.0F, false, Explosion.BlockInteraction.DESTROY);
-                        explosion.explode();
-                        explosion.finalizeExplosion(true);
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -209,8 +158,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (isEmptyConfiguredPattern()) {
 
             BlockEntity blockEntity = level.getBlockEntity(getBlockPosForReactor('I'));
-
-
 
             if (blockEntity instanceof ReactorInputEntity be) {
                 CompoundTag tag = be.serializeNBT();
@@ -240,27 +187,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                     this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
                 }
 
-                /*if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
-                    configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat(tag));
-                    if (updateTimers()) {
-                        TransferUtil.extract(be.inventory, ItemVariant.of(fuelItem), 1);
-                        TransferUtil.extract(be.inventory, ItemVariant.of(coolerItem), 1);
-                        total = calculateProgress();
-                        int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-
-                        if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
-                            //j'ai divisé la chaleur par 4, car maintenant on a mis la chaleur sur 1000 et non plus sur 200 en ayant rajouté 1/5 de bonus
-                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4);
-                        } else {
-                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
-                        }
-                        return;
-                    }
-                } else {
-                    this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
-                }
-                */
-
                 this.notifyUpdate();
             }
         }
@@ -271,7 +197,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     private boolean updateTimers() {
-
         total -= 1;
         return total <= 0;//(total/constTotal) <= 0;
     }
@@ -279,8 +204,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private double calculateProgress() {
         countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
         countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
-        // graphiteTimer = configuredPattern.getOrCreateTag().getInt("graphiteTime");
-        // uraniumTimer = configuredPattern.getOrCreateTag().getInt("uraniumTime");
 
         double totalGraphiteRodLife = (double) graphiteTimer / countGraphiteRod;
         double totalUraniumRodLife = (double) uraniumTimer / countUraniumRod;
@@ -387,7 +310,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return posInput;
     }
 
-    private CompoundTag convertePattern(CompoundTag compoundTag) {
+    private CompoundTag convertedPattern(CompoundTag compoundTag) {
         ListTag pattern = compoundTag.getList("Items", Tag.TAG_COMPOUND);
 
         int[][] list = new int[][]{
@@ -401,7 +324,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 {99,99,49,50,51,52,53,99,99},
                 {99,99,99,54,55,56,99,99,99}
         };
-
 
         return null;
     }
@@ -439,7 +361,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 entity.updateSpeed = true;
                 entity.updateGeneratedRotation();
                 entity.setSpeed(rotation);
-
             }
         }
         else {
@@ -451,36 +372,5 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 entity.updateGeneratedRotation();
             }
         }
-    }
-
-    public InteractionResult onClick(Player player, InteractionHand hand) {
-        ItemStack heldItem = player.getItemInHand(hand);
-        if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && !heldItem.isEmpty()) {
-            if (configuredPattern.isEmpty()) {
-                inventory.setStackInSlot(0, heldItem);
-                configuredPattern = heldItem;
-                //player.setItemInHand(hand, ItemStack.EMPTY);
-            }
-            notifyUpdate();
-            return InteractionResult.SUCCESS;
-        }
-        else if (heldItem.isEmpty()) {
-            if (configuredPattern.isEmpty()) {
-                if (!level.isClientSide) {
-                    if (player.addItem(configuredPattern)){
-                        configuredPattern = ItemStack.EMPTY;
-                    }
-                    else {
-                        player.setItemInHand(hand, configuredPattern);
-                        inventory.setStackInSlot(0, ItemStack.EMPTY);
-                    }
-                    notifyUpdate();
-                    return InteractionResult.CONSUME;
-                    //return InteractionResult.FAIL;
-                }
-                else return InteractionResult.SUCCESS;
-            }
-        }
-        return InteractionResult.PASS;
     }
 }
