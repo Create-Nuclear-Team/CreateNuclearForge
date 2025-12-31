@@ -172,6 +172,8 @@ public class CNBlocks {
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate(new ReactorControllerGenerator()::generate)
             .transform(displaySource(CNDisplaySources.PATTERN_COUNT_RODS))
+            .transform(displaySource(CNDisplaySources.HEAT))
+            .transform(displaySource(CNDisplaySources.LIQUID_LEVEL))
             .item()
             .transform(customItemModel("reactor", "controller", "item"))
             .register();
