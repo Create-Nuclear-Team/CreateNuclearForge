@@ -27,6 +27,16 @@
   "createnuclear.generic.unit.count.rod": "Counts %s Rod",
   "createnuclear.display_source.reactor_count_rod": "Count Rod in Pattern",
   "createnuclear.display_source.reactor_controller_count_rod.fuel": "Fuel",
-  "createnuclear.display_source.reactor_controller_count_rod.cooled": "Cooled"
+  "createnuclear.display_source.reactor_controller_count_rod.cooled": "Cooled",
 
+  "createnuclear.generic.unit.heat.value": "Q",
+  "createnuclear.generic.unit.heat.rotation": "RPM",
+  "createnuclear.generic.unit.heat.type": "Heat Level: %s",
+  "createnuclear.display_source.heat": "Heat",
+  "createnuclear.display_source.heat.value": "Q",
+  "createnuclear.display_source.heat.rotation": "RPM",
+  "createnuclear.display_source.heat.type": "Heat level",
+
+  "createnuclear.generic.unit.liquid": "WIP",
+  "createnuclear.display_source.liquid": "Liquid Level"
 }
