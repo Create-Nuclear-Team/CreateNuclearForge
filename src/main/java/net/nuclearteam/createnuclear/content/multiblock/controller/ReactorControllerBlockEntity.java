@@ -1,15 +1,12 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller;
 
-import com.google.common.collect.Lists;
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
-import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -26,7 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManager;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
@@ -34,30 +30,19 @@ import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
 @SuppressWarnings({"unused"})
 public class ReactorControllerBlockEntity extends SmartBlockEntity implements IInteractionChecker, IHaveGoggleInformation {
     public boolean destroyed = false;
     public boolean created = false;
-    public boolean test = true;
     public int speed = 16; // This is the result speed of the reactor, change this to change the total capacity
-
-    public boolean sendUpdate;
 
     public ReactorControllerBlock controller;
     protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorControllerInventory inventory;
 
-    //public LinkedHashSet<LazyOptional<IItemHandler>> attachedInventory;
-
-    //private boolean powered;
-    public State powered = State.OFF;
-    public float reactorPower;
-    public float lastReactorPower;
     int overFlowHeatTimer = 0;
     int overFlowLimiter = 30;
     double overHeat = 0;
@@ -80,11 +65,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     public List<ReactorOutputEntity> reactorOutputEntityList = new ArrayList<>();
     public int reactorSize = 0;
-    public String reactorFacing;
+    public String reactorFacing = "null";
     // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
     public int[] reactorPos;
-    public int nbUraniumRod;
-    public int nbGraphiteRod;
     private boolean needsToResolveEntities = false;
 
     private final int[][] formattedPattern = new int[][]{
@@ -106,7 +89,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         super(type, pos, state);
         inventory = new ReactorControllerInventory(this);
         configuredPattern = ItemStack.EMPTY;
-        //attachedInventory = new LinkedHashSet<>();
+
         inputManager = new ReactorInputManager();
     }
 
@@ -161,7 +144,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         // 1. Tes nouvelles variables simples
         this.reactorSize = compound.getInt("reactorSize");
         this.reactorFacing = compound.getString("reactorFacing");
-        this.reactorPos = compound.getIntArray("reactorPos");
+        this.reactorPos = compound.getIntArray("reactorPose");
         this.total = compound.getDouble("total");
 
         // 2. Gestion des items (Ton code existant)
@@ -175,24 +158,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         }
 
         // 3. Reconstruction des listes d'entités (via les positions sauvegardées)
-        // Note : On vide les listes pour éviter les doublons au rechargement
         this.reactorOutputEntityList.clear();
-//        this.reactorInputEntityList.clear();
 
-        if (this.level != null) { // On vérifie que le monde est chargé
-            // Lecture des Outputs
-            ListTag outputList = compound.getList("outputs", Tag.TAG_COMPOUND);
-            for (int i = 0; i < outputList.size(); i++) {
-                BlockPos p = BlockPos.of(outputList.getCompound(i).getLong("p"));
-                if (level.getBlockEntity(p) instanceof ReactorOutputEntity out) {
-                    this.reactorOutputEntityList.add(out);
-                }
-            }
-
-
-        }
         this.needsToResolveEntities = true;
-        CreateNuclear.LOGGER.info("liste d'inputs: {}", this.inputManager.getBlocksPosition().toArray());
     }
 
     @Override
@@ -202,11 +170,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
 
         // 1. Tes nouvelles variables simples
-//        compound.putInt("reactorSize", this.reactorSize);
-//        compound.putString("reactorFacing", this.reactorFacing);
-//        if (this.reactorPos != null) {
-//            compound.putIntArray("reactorPos", this.reactorPos);
-//        }
+        compound.putInt("reactorSize", this.reactorSize);
+        compound.putString("reactorFacing", this.reactorFacing);
+        if (this.reactorPos != null) {
+            compound.putIntArray("reactorPose", this.reactorPos);
+        }
         compound.putDouble("total", calculateProgress());
 
         // 2. Gestion des items (Ton code existant)
@@ -220,15 +188,16 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (fuelItem != null && !fuelItem.isEmpty()) {
             compound.put("fuel", fuelItem.serializeNBT());
         }
-//
-//        // 3. Sauvegarde des listes (on transforme les Entités en positions Long)
-//        ListTag outputList = new ListTag();
-//        for (ReactorOutputEntity out : reactorOutputEntityList) {
-//            CompoundTag tag = new CompoundTag();
-//            tag.putLong("p", out.getBlockPos().asLong());
-//            outputList.add(tag);
-//        }
-//        compound.put("outputs", outputList);
+    }
+
+    public void test() {
+        CreateNuclear.LOGGER.warn("List d'input: {}", this.inputManager.size());
+        for (BlockPos p : this.inputManager.getBlocksPosition()) {
+                CreateNuclear.LOGGER.info("ReactorInputEntity BlockPos {}", p);
+        }
+        for (BlockPos p : this.inputManager.getBlocksPosition(level)) {
+            CreateNuclear.LOGGER.warn("List vrais input: {}", p);
+        }
     }
 
     public enum State {
@@ -258,9 +227,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (level.isClientSide)
             return;
         if (this.inputManager.size() > 0) {
-            for (BlockPos p : this.inputManager.getBlocksPosition()) {
-                CreateNuclear.LOGGER.info("ReactorInputEntity BlockPos {}", p);
-            }
+//             for (BlockPos p : this.inputManager.getBlocksPosition()) {
+//                 CreateNuclear.LOGGER.info("ReactorInputEntity BlockPos {}", p);
+//             }
         }
         if (isEmptyConfiguredPattern()) {
             if (this.needsToResolveEntities) {
@@ -442,25 +411,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return posInput;
     }
 
-    private CompoundTag convertePattern(CompoundTag compoundTag) {
-        ListTag pattern = compoundTag.getList("Items", Tag.TAG_COMPOUND);
-
-        int[][] list = new int[][]{
-                {99,99,99,0,1,2,99,99,99},
-                {99,99,3,4,5,6,7,99,99},
-                {99,8,9,10,11,12,13,14,99},
-                {15,16,17,18,19,20,21,22,23},
-                {24,25,26,27,28,29,30,31,32},
-                {33,34,35,36,37,38,39,40,41},
-                {99,42,43,44,45,46,47,48,99},
-                {99,99,49,50,51,52,53,99,99},
-                {99,99,99,54,55,56,99,99,99}
-        };
-
-
-        return null;
-    }
-
     public void rotate(BlockState state, BlockPos pos, Level level, int rotation) {
         if (level.getBlockState(pos).is(CNBlocks.REACTOR_OUTPUT.get()) && rotation > 0) {
             if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
@@ -487,37 +437,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 entity.updateGeneratedRotation();
             }
         }
-    }
-
-    public InteractionResult onClick(Player player, InteractionHand hand) {
-        ItemStack heldItem = player.getItemInHand(hand);
-        if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && !heldItem.isEmpty()) {
-            if (configuredPattern.isEmpty()) {
-                inventory.setStackInSlot(0, heldItem);
-                configuredPattern = heldItem;
-                //player.setItemInHand(hand, ItemStack.EMPTY);
-            }
-            notifyUpdate();
-            return InteractionResult.SUCCESS;
-        }
-        else if (heldItem.isEmpty()) {
-            if (configuredPattern.isEmpty()) {
-                if (!level.isClientSide) {
-                    if (player.addItem(configuredPattern)){
-                        configuredPattern = ItemStack.EMPTY;
-                    }
-                    else {
-                        player.setItemInHand(hand, configuredPattern);
-                        inventory.setStackInSlot(0, ItemStack.EMPTY);
-                    }
-                    notifyUpdate();
-                    return InteractionResult.CONSUME;
-                    //return InteractionResult.FAIL;
-                }
-                else return InteractionResult.SUCCESS;
-            }
-        }
-        return InteractionResult.PASS;
     }
 
     public int[] getStructureBounds(BlockPos startPos, int structureSize, String facing) {
@@ -591,6 +510,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     public void removeOutput(ReactorOutputEntity output) {
         reactorOutputEntityList.remove(output);
+        this.setChanged();
+    }
+
+    public void removeIOAll() {
+        this.inputManager.clearInvalid(level);
         this.setChanged();
     }
 }
