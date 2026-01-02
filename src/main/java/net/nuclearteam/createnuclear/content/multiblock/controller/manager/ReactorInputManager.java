@@ -11,6 +11,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,5 +87,14 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
         }
 
         positions.removeAll(toRemove);
+    }
+
+    public List<BlockPos> getBlocksPosition(Level level) {
+        List<BlockPos> positions = new ArrayList<>();
+
+        for (BlockPos p : this.getBlocksPosition()) {
+            if (level.getBlockEntity(p) instanceof ReactorInputEntity) positions.add(p);
+        }
+        return List.copyOf(positions);
     }
 }
