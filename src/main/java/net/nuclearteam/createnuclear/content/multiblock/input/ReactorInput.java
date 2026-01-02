@@ -40,9 +40,11 @@ import net.nuclearteam.createnuclear.foundation.block.MultiDirectionalReactorBlo
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Objects;
 
+@ParametersAreNonnullByDefault
 public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorInputEntity> {
     protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorInput(Properties properties) {
