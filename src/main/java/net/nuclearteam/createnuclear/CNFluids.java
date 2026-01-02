@@ -5,13 +5,22 @@ import com.tterrag.registrate.builders.FluidBuilder.FluidTypeFactory;
 import com.tterrag.registrate.util.entry.FluidEntry;
 import net.createmod.catnip.theme.Color;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockSource;
+import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.DispensibleContainerItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.common.ForgeMod;
@@ -48,6 +57,7 @@ public class CNFluids {
             )
             .source(ForgeFlowingFluid.Source::new)
             .bucket()
+            .onRegister(CNFluids::registerFluidDispenseBehavior)
             .tag(CNTags.forgeItemTag("buckets/uranium"))
             .lang("Uranium Bucket")
             .build()
@@ -71,6 +81,7 @@ public class CNFluids {
                     )
                     .source(ForgeFlowingFluid.Source::new)
                     .bucket()
+                    .onRegister(CNFluids::registerFluidDispenseBehavior)
                     .tag(CNTags.forgeItemTag("buckets/thorium"))
                     .lang("Thorium Bucket")
                     .build()
@@ -94,6 +105,7 @@ public class CNFluids {
             )
             .source(ForgeFlowingFluid.Source::new)
             .bucket()
+            .onRegister(CNFluids::registerFluidDispenseBehavior)
             .lang("Nitrogen Bucket")
             .tag(CNTags.forgeItemTag("buckets/nitrogen"))
             .build()
@@ -102,18 +114,22 @@ public class CNFluids {
 
     public static void register() {}
 
+    public static int TICK = 0;
+
     public static void handleFluidEffect(LivingEvent.LivingTickEvent event) {
+
         LivingEntity entity = event.getEntity();
         if (entity.isAlive() && !(entity.isSpectator())) {
             if (entity.tickCount % 20 == 0) return;
             if (entity.isInFluidType(URANIUM.getType())) {
                 entity.addEffect(new MobEffectInstance(CNEffects.RADIATION.get(), 100, 0));
             } else if (entity.isInFluidType(LIQUID_NITROGEN.getType())) {
+                if (!entity.isFullyFrozen()) {
+                    entity.setTicksFrozen(CNFluids.TICK++);
+                }
                 entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
-                entity.setIsInPowderSnow(true);
-//                if (entity.getTicksFrozen() == 0) {
-//                    entity.setTicksFrozen(140);
-//                }
+            } else {
+                CNFluids.TICK = 0;
             }
         }
 
@@ -176,5 +192,23 @@ public class CNFluids {
         protected float getFogDistanceModifier() {
             return fogDistance.get();
         }
+    }
+
+    private static final DispenseItemBehavior DEFAULT = new DefaultDispenseItemBehavior();
+    private static final DispenseItemBehavior DISPENSE_FLUID = new DefaultDispenseItemBehavior(){
+        @Override
+        protected ItemStack execute(BlockSource pSource, ItemStack pStack) {
+            DispensibleContainerItem dispensibleContainerItem = (DispensibleContainerItem) pStack.getItem();
+            BlockPos pos = pSource.getPos().relative(pSource.getBlockState().getValue(DispenserBlock.FACING));
+            Level level = pSource.getLevel();
+            if (dispensibleContainerItem.emptyContents(null, level, pos, null, pStack)) {
+                return new ItemStack(Items.BUCKET);
+            }
+            return DEFAULT.dispense(pSource, pStack);
+        }
+    };
+
+    private static void registerFluidDispenseBehavior(BucketItem bucket) {
+        DispenserBlock.registerBehavior(bucket, DISPENSE_FLUID);
     }
 }
