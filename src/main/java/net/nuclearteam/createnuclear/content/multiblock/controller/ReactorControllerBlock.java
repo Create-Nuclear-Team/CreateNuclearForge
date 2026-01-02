@@ -11,6 +11,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -24,6 +25,7 @@ import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
@@ -78,6 +80,9 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
         }
         else {
+            if (heldItem.is(Items.PAPER)) {
+                withBlockEntityDo(worldIn, pos, ReactorControllerBlockEntity::test);
+            }
             if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.inventory.getItem(0).isEmpty()){
                 withBlockEntityDo(worldIn, pos, be -> {
                     be.inventory.setStackInSlot(0, heldItem);
@@ -147,14 +152,17 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         for (Player p : players) {
             p.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
         }
+        entity.removeIOAll();
     }
 
     // this is the Function that verifies if the pattern is correct (as a test, we added the energy output)
     public void Verify(BlockState state, BlockPos pos, Level level, List<? extends Player> players, boolean create){
         ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(pos).getBlock();
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
-        var result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
+        if (entity == null) return;
+        BlockPattern<?> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
         if (result != null) { // the pattern is correct
+            entity.removeIOAll();
             entity.reactorOutputEntityList.clear();
             for (Player player : players) {
                 if (create && !entity.created) {
@@ -164,6 +172,9 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     entity.destroyed = false;
 
                     entity.reactorPos = entity.getStructureBounds(pos, entity.reactorSize, entity.reactorFacing);
+                    // Register existing special blocks (inputs/outputs) so the controller
+                    // detects ReactorInput/ReactorOutput placed before the controller.
+                    FindSpecialBlocksInReactor(entity.reactorPos, entity, level);
                 }
             }
             return;
