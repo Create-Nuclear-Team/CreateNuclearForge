@@ -26,6 +26,7 @@ import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
+import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
@@ -63,7 +64,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     @Override
     public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos,
                                 boolean isMoving) {
-        withBlockEntityDo(worldIn, pos, be -> be.created = false);
+        withBlockEntityDo(worldIn, pos, be -> be.setAssembled(false));
     }
 
     @Override
@@ -145,8 +146,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         ReactorControllerBlock controller = (ReactorControllerBlock) state.getBlock();
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
-        if (!entity.created)
-            return;
+        if (!entity.isAssembled()) return;
         controller.Rotate(state, pos.below(3), level, 0);
         List<? extends Player> players = level.players();
         for (Player p : players) {
@@ -160,16 +160,17 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(pos).getBlock();
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
         if (entity == null) return;
-        BlockPattern<?> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
+        BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
         if (result != null) { // the pattern is correct
+            CreateNuclear.LOGGER.warn("Verify@BlockPattern<TypeMultiblock> id: {}, data<TypeMultiblock>$getSize: {}, data<TypeMultiblock>$getName: {}", result.id(), result.data().getSize(), result.data().getName());
             entity.removeIOAll();
             entity.reactorOutputEntityList.clear();
             for (Player player : players) {
-                if (create && !entity.created) {
+                if (create && !entity.isAssembled()) {
                     player.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
                     level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, true));
-                    entity.created = true;
-                    entity.destroyed = false;
+                    entity.reactorSize = result.data().getSize();
+                    entity.setAssembled(true);
 
                     entity.reactorPos = entity.getStructureBounds(pos, entity.reactorSize, entity.reactorFacing);
                     // Register existing special blocks (inputs/outputs) so the controller
@@ -182,12 +183,11 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
 
         // the pattern is incorrect
         for (Player player : players) {
-            if (!create && !entity.destroyed)
-            {
+            if (!create && entity.isAssembled()) {
                 player.sendSystemMessage(Component.translatable("reactor.info.assembled.destroyer"));
                 level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false));
-                entity.created = false;
-                entity.destroyed = true;
+                entity.setAssembled(false);
+                entity.removeIOAll();
                 Rotate(state, pos.below(3), level, 0);
             }
         }

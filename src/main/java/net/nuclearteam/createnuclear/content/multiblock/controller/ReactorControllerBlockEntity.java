@@ -35,8 +35,9 @@ import static net.nuclearteam.createnuclear.content.multiblock.controller.Reacto
 
 @SuppressWarnings({"unused"})
 public class ReactorControllerBlockEntity extends SmartBlockEntity implements IInteractionChecker, IHaveGoggleInformation {
-    public boolean destroyed = false;
-    public boolean created = false;
+    /** The assembled state is stored in the block state (`ReactorControllerBlock.ASSEMBLED`).
+     *  Use the helper accessors below to query or toggle it to keep entity/blockstate consistent.
+     */
     public int speed = 16; // This is the result speed of the reactor, change this to change the total capacity
 
     public ReactorControllerBlock controller;
@@ -91,6 +92,21 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         configuredPattern = ItemStack.EMPTY;
 
         inputManager = new ReactorInputManager();
+    }
+
+    public boolean isAssembled() {
+        if (level == null) return false;
+        try {
+            return level.getBlockState(worldPosition).getValue(ASSEMBLED);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void setAssembled(boolean assembled) {
+        if (level == null) return;
+        level.setBlockAndUpdate(worldPosition, getBlockState().setValue(ASSEMBLED, assembled));
+        this.setChanged();
     }
 
     @Override
@@ -200,27 +216,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         }
     }
 
-    public enum State {
-        ON, OFF
-    }
-
-    private void explodeReactorCore(Level level, BlockPos pos) {
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    BlockPos currentPos = pos.offset(x, y, z);
-                    //le problème viens de la il ne rentre pas dans le if
-                    if (level.getBlockState(currentPos).is(CNBlocks.REACTOR_CORE.get())) {
-                        // Create and execute the explosion
-                        Explosion explosion = new Explosion(level, null, currentPos.getX(), currentPos.getY(), currentPos.getZ(), 4.0F, false, Explosion.BlockInteraction.DESTROY);
-                        explosion.explode();
-                        explosion.finalizeExplosion(true);
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public void tick() {
         super.tick();
@@ -263,27 +258,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 } else {
                     //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
                 }
-
-                /*if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
-                    configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat(tag));
-                    if (updateTimers()) {
-                        TransferUtil.extract(be.inventory, ItemVariant.of(fuelItem), 1);
-                        TransferUtil.extract(be.inventory, ItemVariant.of(coolerItem), 1);
-                        total = calculateProgress();
-                        int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-
-                        if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
-                            //j'ai divisé la chaleur par 4, car maintenant on a mis la chaleur sur 1000 et non plus sur 200 en ayant rajouté 1/5 de bonus
-                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4);
-                        } else {
-                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
-                        }
-                        return;
-                    }
-                } else {
-                    this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
-                }
-                */
 
                 this.notifyUpdate();
             }
