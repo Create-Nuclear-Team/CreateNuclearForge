@@ -25,23 +25,12 @@ public class MultiBlockManagerBeta <T> {
         directions.add(Direction.WEST);
         directions.add(Direction.EAST);
         directions.add(Direction.SOUTH);
-        record id(String id, int size) {};
-        List<id> ids = List.of(
-                new id("createnuclear:reactor5x5", 5),
-                new id("createnuclear:reactor7x7", 7),
-                new id("createnuclear:reactor9x9",9)
-        );
 
         for (Direction direction : directions) {
             for (BlockPattern<T> structure : structures) {
-                var result = structure.structure().matches(level, pos, direction);
+                boolean result = structure.structure().matches(level, pos, direction);
                 if (result){
                     entity.reactorFacing = direction.getCounterClockWise().getName();
-                    entity.reactorSize = ids.stream()
-                            .filter(item -> item.id().equals(structure.id()))
-                            .findFirst()
-                            .map(id::size)
-                            .orElse(-1);
                     return structure;
                 }
             }
