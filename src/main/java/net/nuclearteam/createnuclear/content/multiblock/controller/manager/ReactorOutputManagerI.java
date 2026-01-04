@@ -1,8 +1,10 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.manager;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 
+import java.util.List;
 import java.util.function.BiFunction;
 
 /**
@@ -19,4 +21,7 @@ public interface ReactorOutputManagerI extends ReactorIOManager {
      * Returns the remaining amount that was not inserted.
      */
     double distributeSU(double totalSU, Level level, BiFunction<ReactorOutputEntity, Double, Double> inserter);
+
+    /** Returns an immutable copy of tracked positions. */
+    List<BlockPos> getBlocksPosition(Level level);
 }

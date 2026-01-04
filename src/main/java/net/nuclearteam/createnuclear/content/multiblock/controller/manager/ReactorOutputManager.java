@@ -128,4 +128,14 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
         }
         positions.removeAll(toRemove);
     }
+
+    @Override
+    public List<BlockPos> getBlocksPosition(Level level) {
+        List<BlockPos> positions = new ArrayList<>();
+
+        for (BlockPos p : this.getBlocksPosition()) {
+            if (level.getBlockEntity(p) instanceof ReactorOutputEntity) positions.add(p);
+        }
+        return List.copyOf(positions);
+    }
 }

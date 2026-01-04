@@ -140,6 +140,7 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
         positions.removeAll(toRemove);
     }
 
+    @Override
     public List<BlockPos> getBlocksPosition(Level level) {
         List<BlockPos> positions = new ArrayList<>();
 
