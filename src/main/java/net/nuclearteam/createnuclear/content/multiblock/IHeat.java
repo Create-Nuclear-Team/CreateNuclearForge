@@ -66,6 +66,10 @@ public interface IHeat extends IWrenchable {
             return NONE;
         }
 
+        public static boolean isNotDanger(int heat) {
+            return of(heat) != DANGER || of(heat) != NONE;
+        }
+
         public static LangBuilder getFormattedHeatText(int heat) {
             HeatLevel heatLevel = of(heat);
             LangBuilder builder = CreateLang.builder(CreateNuclear.MOD_ID).text(TooltipHelper.makeProgressBar(5, heatLevel.ordinal()+1));
