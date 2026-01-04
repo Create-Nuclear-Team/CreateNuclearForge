@@ -6,7 +6,6 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
-import net.createmod.catnip.nbt.NBTHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -14,20 +13,18 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
-import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs.VirtualReactorInputsR;
+import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManager;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManagerI;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
-import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -231,7 +228,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (isEmptyConfiguredPattern()) {
             if (this.inputManager.size() > 0) {
                 List<IItemHandler> handlers = inputManager.getItemHandlers(level);
-                VirtualReactorInputsR virtualReactorInputs = inputManager.getInventory(level);
+                VirtualReactorInputs virtualReactorInputs = inputManager.getInventory(level);
 
                 bigFuelItem = virtualReactorInputs.getBigFuelRod();
                 bigCoolerItem = virtualReactorInputs.getBigCooledRod();
@@ -326,7 +323,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private double calculateHeat() {
         countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
         countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
-//        CreateNuclear.LOGGER.warn("countGraphiteRod: {}, countUraniumRod: {}", configuredPattern.getOrCreateTag().getInt("countGraphiteRod"), configuredPattern.getOrCreateTag().getInt("countUraniumRod"));
         heat = 0;
 
         // if more than maxUraniumPerGraphite of the rods are uranium, the reactor will overheat
