@@ -11,16 +11,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
-import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
-import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs.VirtualReactorInputsR;
+import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * Manager for reactor input positions (`ReactorInput`).
@@ -75,9 +72,9 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
     }
 
     @Override
-    public VirtualReactorInputsR getInventory(Level level) {
+    public VirtualReactorInputs getInventory(Level level) {
         List<IItemHandler> handlers = this.getItemHandlers(level);
-        if (handlers.isEmpty()) return new VirtualReactorInputsR();
+        if (handlers.isEmpty()) return new VirtualReactorInputs();
 
         int totalFuel = 0;
         int totalCooler = 0;
@@ -90,13 +87,7 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
             }
         }
 
-//        ItemStack fuelItem = totalFuel > 0 ? new ItemStack(CNItems.URANIUM_ROD.asItem(), totalFuel) : ItemStack.EMPTY;
-//        ItemStack coolerItem = totalCooler > 0 ? new ItemStack(CNItems.GRAPHITE_ROD.asItem(), totalCooler) : ItemStack.EMPTY;
-
-//        inventory.insertFuelItem(fuelItem, false);
-//        inventory.insertCoolerItem(coolerItem, false);
-
-        return new VirtualReactorInputsR(totalFuel, totalCooler);
+        return new VirtualReactorInputs(totalFuel, totalCooler);
     }
 
     @Override

@@ -3,7 +3,7 @@ package net.nuclearteam.createnuclear.content.multiblock.controller.manager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.IItemHandler;
-import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs.VirtualReactorInputsR;
+import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public interface ReactorInputManagerI extends ReactorIOManager {
     /** Returns an immutable copy of tracked positions. */
     List<BlockPos> getBlocksPosition(Level level);
 
-    VirtualReactorInputsR getInventory(Level level);
+    VirtualReactorInputs getInventory(Level level);
 
     boolean extractItems(Level level, int fuelNeeded, int coolerNeeded);
 }
