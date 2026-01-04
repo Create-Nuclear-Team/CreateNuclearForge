@@ -5,12 +5,17 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.CNTags;
+import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs.VirtualReactorInputsR;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 
 import java.util.ArrayList;
@@ -42,7 +47,7 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
     @Override
     public void read(CompoundTag compound) {
         positions.clear();
-        CreateNuclear.LOGGER.warn("ReactorInputManager::read start: {} {}", compound.contains(NBT_KEY), compound.getList(NBT_KEY, Tag.TAG_COMPOUND));
+//        CreateNuclear.LOGGER.warn("ReactorInputManager::read start: {} {}", compound.contains(NBT_KEY), compound.getList(NBT_KEY, Tag.TAG_COMPOUND));
         if (!compound.contains(NBT_KEY)) return;
         ListTag list = compound.getList(NBT_KEY, Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); ++i) {
@@ -67,6 +72,61 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
         }
 
         return handlers;
+    }
+
+    @Override
+    public VirtualReactorInputsR getInventory(Level level) {
+        List<IItemHandler> handlers = this.getItemHandlers(level);
+        if (handlers.isEmpty()) return new VirtualReactorInputsR();
+
+        int totalFuel = 0;
+        int totalCooler = 0;
+        for (IItemHandler h : handlers) {
+            int slots = h.getSlots();
+            for (int s = 0; s < slots; s++) {
+                ItemStack st = h.getStackInSlot(s);
+                if (st.is(CNTags.CNItemTags.FUEL.tag)) totalFuel += st.getCount();
+                else if (st.is(CNTags.CNItemTags.COOLER.tag)) totalCooler += st.getCount();
+            }
+        }
+
+//        ItemStack fuelItem = totalFuel > 0 ? new ItemStack(CNItems.URANIUM_ROD.asItem(), totalFuel) : ItemStack.EMPTY;
+//        ItemStack coolerItem = totalCooler > 0 ? new ItemStack(CNItems.GRAPHITE_ROD.asItem(), totalCooler) : ItemStack.EMPTY;
+
+//        inventory.insertFuelItem(fuelItem, false);
+//        inventory.insertCoolerItem(coolerItem, false);
+
+        return new VirtualReactorInputsR(totalFuel, totalCooler);
+    }
+
+    @Override
+    public boolean extractItems(Level level, int fuelNeeded, int coolerNeeded) {
+        if (level == null) return false;
+        List<IItemHandler> handlers = getItemHandlers(level);
+        if (handlers.isEmpty()) return false;
+
+        int fuelRemaining = fuelNeeded;
+        int coolerRemaining = coolerNeeded;
+
+        for (IItemHandler handler : handlers) {
+            int slots = handler.getSlots();
+            for (int s = 0; s < slots && (fuelRemaining > 0 || coolerRemaining > 0); s++) {
+                ItemStack stack = handler.getStackInSlot(s);
+                if (stack.isEmpty()) continue;
+                if (fuelRemaining > 0 && stack.is(CNItemTags.FUEL.tag)) {
+                    int toExtract = Math.min(fuelRemaining, stack.getCount());
+                    handler.extractItem(s, toExtract, false);
+                    fuelRemaining -= toExtract;
+                } else if (coolerRemaining > 0 && stack.is(CNItemTags.COOLER.tag)) {
+                    int toExtract = Math.min(coolerRemaining, stack.getCount());
+                    handler.extractItem(s, toExtract, false);
+                    coolerRemaining -= toExtract;
+                }
+            }
+            if (fuelRemaining <= 0 && coolerRemaining <= 0) break;
+        }
+
+        return fuelRemaining <= 0 && coolerRemaining <= 0;
     }
 
     /**
