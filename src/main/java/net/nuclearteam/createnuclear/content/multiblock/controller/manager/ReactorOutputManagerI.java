@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
  * among valid outputs and use an `inserter` to apply quantities to each
  * `ReactorOutputEntity`.
  */
-public interface ReactorOutputManagerI {
+public interface ReactorOutputManagerI extends ReactorIOManager {
     /**
      * Distributes `totalSU` among valid outputs in `level`.
      * The `inserter` receives the target entity and the proposed amount and
