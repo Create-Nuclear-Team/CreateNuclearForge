@@ -11,19 +11,16 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs.VirtualReactorInputsR;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManager;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManagerI;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
@@ -84,7 +81,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     };
     private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
-    private final ReactorInputManager inputManager;
+    private final ReactorInputManagerI inputManager;
 
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -173,6 +170,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             fuelItem = ItemStack.of(compound.getCompound("fuel"));
         }
 
+
         // 3. Reconstruction des listes d'entités (via les positions sauvegardées)
         this.reactorOutputEntityList.clear();
 
@@ -221,46 +219,73 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         super.tick();
         if (level.isClientSide)
             return;
-        if (this.inputManager.size() > 0) {
-//             for (BlockPos p : this.inputManager.getBlocksPosition()) {
-//                 CreateNuclear.LOGGER.info("ReactorInputEntity BlockPos {}", p);
-//             }
-        }
         if (isEmptyConfiguredPattern()) {
-            if (this.needsToResolveEntities) {
-            }
-            BlockEntity blockEntity = level.getBlockEntity(this.worldPosition);
-            if (blockEntity instanceof ReactorInputEntity be) {
-                CompoundTag tag = be.serializeNBT();
-                ListTag inventoryTag = tag.getCompound("Inventory").getList("Items", Tag.TAG_COMPOUND);
-                CreateNuclear.LOGGER.info("TAG: {}", inventoryTag);
-                fuelItem = ItemStack.of(inventoryTag.getCompound(0));
-                coolerItem = ItemStack.of(inventoryTag.getCompound(1));
-                //BlockPos outputPos = pattern.FindOutputPos(getBlockPos(), getLevel(), getLevel().players(), true);
+            if (this.inputManager.size() > 0) {
+                List<IItemHandler> handlers = inputManager.getItemHandlers(level);
+                VirtualReactorInputsR virtualReactorInputs = inputManager.getInventory(level);
+
+                fuelItem = virtualReactorInputs.getFuelRod();
+                coolerItem = virtualReactorInputs.getCooledRod();
+
+                CreateNuclear.LOGGER.warn("totalFuel: {}, totalCooler: {}, fuelItem, {}, coolerItem: {}",
+                        virtualReactorInputs.fuel(), virtualReactorInputs.cooler(), fuelItem, coolerItem);
                 if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
-                    configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat(tag));
+                    configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat());
                     if (updateTimers()) {
-                        be.inventory.extractItem(0, 1, false);
-                        be.inventory.extractItem(1, 1, false);
-                        total = calculateProgress();
-                        int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-                        if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
-                            //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), heat/4);
-                        } else {
-                            // Send a packet to all clients around this block within 16 blocks
-                            EventTriggerPacket packet = new EventTriggerPacket(600); // display for 100 ticks
-                            CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
-                            CNPackets.sendToNear(level, getBlockPos(), 32, packet);
-                            //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
+                        boolean extracted = inputManager.extractItems(level, 1, 1);
+                        if (extracted) {
+                            total = calculateProgress();
+                            int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+                            if (IHeat.HeatLevel.isNotDanger(heat)) {
+                                //...
+                            } else {
+                                EventTriggerPacket packet = new EventTriggerPacket(600);
+                                CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
+                                CNPackets.sendToNear(level, getBlockPos(), 32, packet);
+                            }
+                            return;
                         }
-                        return;
                     }
                 } else {
-                    //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
+//                    //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
                 }
 
                 this.notifyUpdate();
             }
+//            if (this.needsToResolveEntities) {
+//            }
+//            BlockEntity blockEntity = level.getBlockEntity(this.worldPosition);
+//            if (blockEntity instanceof ReactorInputEntity be) {
+//                CompoundTag tag = be.serializeNBT();
+//                ListTag inventoryTag = tag.getCompound("Inventory").getList("Items", Tag.TAG_COMPOUND);
+//                CreateNuclear.LOGGER.info("TAG: {}", inventoryTag);
+//                fuelItem = ItemStack.of(inventoryTag.getCompound(0));
+//                coolerItem = ItemStack.of(inventoryTag.getCompound(1));
+//                //BlockPos outputPos = pattern.FindOutputPos(getBlockPos(), getLevel(), getLevel().players(), true);
+//                if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
+//                    configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat());
+//                    if (updateTimers()) {
+//                        be.inventory.extractItem(0, 1, false);
+//                        be.inventory.extractItem(1, 1, false);
+//                        total = calculateProgress();
+//                        int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+//                        if (IHeat.HeatLevel.isNotDanger(heat)) {
+//                            //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), heat/4);
+//                        } else {
+//                            // Send a packet to all clients around this block within 16 blocks
+//                            EventTriggerPacket packet = new EventTriggerPacket(600); // display for 100 ticks
+//                            CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
+//                            CNPackets.sendToNear(level, getBlockPos(), 32, packet);
+//                            //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
+//                        }
+//                        return;
+//                    }
+//                } else {
+//                    //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
+//                }
+//
+//                this.notifyUpdate();
+//            }
         }
     }
 
@@ -286,9 +311,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return totalGraphiteRodLife + totalUraniumRodLife;
     }
 
-    private double calculateHeat(CompoundTag tag) {
+    private double calculateHeat() {
         countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
         countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
+//        CreateNuclear.LOGGER.warn("countGraphiteRod: {}, countUraniumRod: {}", configuredPattern.getOrCreateTag().getInt("countGraphiteRod"), configuredPattern.getOrCreateTag().getInt("countUraniumRod"));
         heat = 0;
 
         // if more than maxUraniumPerGraphite of the rods are uranium, the reactor will overheat

@@ -152,7 +152,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         for (Player p : players) {
             p.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
         }
-        entity.removeIOAll();
+//        entity.removeIOAll();
     }
 
     // this is the Function that verifies if the pattern is correct (as a test, we added the energy output)
@@ -163,7 +163,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
         if (result != null) { // the pattern is correct
             CreateNuclear.LOGGER.warn("Verify@BlockPattern<TypeMultiblock> id: {}, data<TypeMultiblock>$getSize: {}, data<TypeMultiblock>$getName: {}", result.id(), result.data().getSize(), result.data().getName());
-            entity.removeIOAll();
+//            entity.removeIOAll();
             entity.reactorOutputEntityList.clear();
             for (Player player : players) {
                 if (create && !entity.isAssembled()) {
@@ -187,7 +187,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                 player.sendSystemMessage(Component.translatable("reactor.info.assembled.destroyer"));
                 level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false));
                 entity.setAssembled(false);
-                entity.removeIOAll();
+//                entity.removeIOAll();
                 Rotate(state, pos.below(3), level, 0);
             }
         }
@@ -242,7 +242,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     // On n'exécute la logique que si on est sur une des faces de la boîte
                     if (isYBoundary || isXBoundary || isZBoundary) {
                         mutablePos.set(x, y, z);
-                        isSpecialBlock(level, mutablePos, controllerBlockEntity);
+//                        isSpecialBlock(level, mutablePos, controllerBlockEntity);
                     }
                 }
             }
