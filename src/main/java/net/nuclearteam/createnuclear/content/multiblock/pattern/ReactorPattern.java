@@ -106,7 +106,7 @@ public class ReactorPattern {
         }
     }
 
-    public BlockPos FindControllerPos(BlockPos blockPos, Level level, List<? extends Player> players, boolean first){
+    public BlockPos findControllerPos(BlockPos blockPos, Level level, List<? extends Player> players, boolean first){
         BlockPos newBlock;                                                   // to find the controller and verify the pattern
         Vec3i pos = new Vec3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
         for (int y = pos.getY()-5; y != pos.getY()+6; y+=1) {
