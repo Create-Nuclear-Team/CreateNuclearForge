@@ -35,7 +35,6 @@ import static net.nuclearteam.createnuclear.content.multiblock.output.ReactorOut
 
 
 public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
-    public BlockPos pos;
     public int speed = 1;
     public float heat = 0;
 
@@ -176,10 +175,6 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     public void setDir(int dir, Level level, BlockPos pos) {
         BlockState state = getBlockState();
         level.setBlockAndUpdate(pos, state.setValue(DIR, dir));
-    }
-
-    public void setPos(BlockPos pos) {
-        this.pos = pos;
     }
 
     @Override

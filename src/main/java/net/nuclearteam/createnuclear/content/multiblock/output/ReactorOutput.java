@@ -78,8 +78,15 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
         List<? extends Player> players = level.players();
-        Objects.requireNonNull(this.getBlockEntity(level, pos)).pos = pos;
         pattern.FindController(pos, level, players, true);
+
+        BlockPos controllerPos = pattern.findControllerPos(pos, level, players, true);
+        if (controllerPos != null) {
+            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
+            if (controllerBlockEntity != null) {
+                controllerBlockEntity.addOutput(pos);
+            }
+        }
     }
 
     @Override
@@ -87,6 +94,14 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         List<? extends Player> players = level.players();
         pattern.FindController(pos, level, players, false);
+
+        BlockPos controllerPos = pattern.findControllerPos(pos, level, players, true);
+        if (controllerPos != null) {
+            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
+            if (controllerBlockEntity != null) {
+                controllerBlockEntity.removeOutput(pos);
+            }
+        }
     }
 
     @Override
@@ -94,6 +109,14 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         List<? extends Player> players = pLevel.players();
         pattern.FindController(pPos, pLevel, players, false);
+
+        BlockPos controllerPos = pattern.findControllerPos(pPos, pLevel, players, true);
+        if (controllerPos != null) {
+            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) pLevel.getBlockEntity(controllerPos);
+            if (controllerBlockEntity != null) {
+                controllerBlockEntity.removeOutput(pPos);
+            }
+        }
     }
 
     @Override
