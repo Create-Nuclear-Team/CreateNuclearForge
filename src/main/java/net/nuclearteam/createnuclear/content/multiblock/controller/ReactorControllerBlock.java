@@ -164,7 +164,6 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         if (result != null) { // the pattern is correct
             CreateNuclear.LOGGER.warn("Verify@BlockPattern<TypeMultiblock> id: {}, data<TypeMultiblock>$getSize: {}, data<TypeMultiblock>$getName: {}", result.id(), result.data().getSize(), result.data().getName());
 //            entity.removeIOAll();
-            entity.reactorOutputEntityList.clear();
             for (Player player : players) {
                 if (create && !entity.isAssembled()) {
                     player.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
@@ -251,7 +250,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
 
     public void isSpecialBlock(Level level, BlockPos blockPos, ReactorControllerBlockEntity controllerBlockEntity) {
         if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_OUTPUT.get())) {
-            controllerBlockEntity.addOutput((ReactorOutputEntity) level.getBlockEntity(blockPos), level, blockPos);
+            controllerBlockEntity.addOutput(blockPos);
         }
         else if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_INPUT.get())) {
             controllerBlockEntity.addInput(blockPos);

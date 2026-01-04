@@ -22,6 +22,8 @@ import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManager;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManagerI;
+import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorOutputManager;
+import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorOutputManagerI;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
@@ -62,7 +64,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private BigItemStack bigFuelItem;
     private BigItemStack bigCoolerItem;
 
-    public List<ReactorOutputEntity> reactorOutputEntityList = new ArrayList<>();
     public int reactorSize = 0;
     public String reactorFacing = "null";
     // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
@@ -83,6 +84,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
     private final ReactorInputManagerI inputManager;
+    private final ReactorOutputManagerI outputManager;
 
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -90,6 +92,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         configuredPattern = ItemStack.EMPTY;
 
         inputManager = new ReactorInputManager();
+        outputManager = new ReactorOutputManager();
 
         bigFuelItem = new BigItemStack(ItemStack.EMPTY);
         bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
@@ -156,6 +159,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
         // Lecture des Inputs
         this.inputManager.read(compound);
+        this.outputManager.read(compound);
 
         // 1. Tes nouvelles variables simples
         this.reactorSize = compound.getInt("reactorSize");
@@ -172,9 +176,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         bigFuelItem = BigItemStack.read(compound.getCompound("bigFuel"));
         bigCoolerItem = BigItemStack.read(compound.getCompound("bigCooler"));
 
-        // 3. Reconstruction des listes d'entités (via les positions sauvegardées)
-        this.reactorOutputEntityList.clear();
-
         this.needsToResolveEntities = true;
     }
 
@@ -182,6 +183,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     protected void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
         this.inputManager.write(compound);
+        this.outputManager.write(compound);
 
         // 1. Tes nouvelles variables simples
         compound.putInt("reactorSize", this.reactorSize);
@@ -206,8 +208,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         for (BlockPos p : this.inputManager.getBlocksPosition()) {
                 CreateNuclear.LOGGER.info("ReactorInputEntity BlockPos {}", p);
         }
+        for (BlockPos p : this.outputManager.getBlocksPosition()) {
+            CreateNuclear.LOGGER.info("ReactorOutputEntity BlockPos {}", p);
+        }
         for (BlockPos p : this.inputManager.getBlocksPosition(level)) {
             CreateNuclear.LOGGER.warn("List vrais input: {}", p);
+        }
+        for (BlockPos p : this.outputManager.getBlocksPosition(level)) {
+            CreateNuclear.LOGGER.warn("List vrais output: {}", p);
         }
     }
 
@@ -511,18 +519,19 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.setChanged();
     }
 
-    public void addOutput(ReactorOutputEntity output, Level blockIn, BlockPos inputPos) {
-        reactorOutputEntityList.add(output);
+    public void addOutput(BlockPos outputPos) {
+        this.outputManager.addBlock(outputPos);
         this.setChanged();
     }
 
-    public void removeOutput(ReactorOutputEntity output) {
-        reactorOutputEntityList.remove(output);
+    public void removeOutput(BlockPos outputPos) {
+        this.outputManager.removeBlock(outputPos);
         this.setChanged();
     }
 
     public void removeIOAll() {
         this.inputManager.clearInvalid(level);
+        this.outputManager.clearInvalid(level);
         this.setChanged();
     }
 }
