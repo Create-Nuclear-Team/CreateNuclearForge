@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.content.multiblock;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import com.simibubi.create.foundation.utility.CreateLang;
 import net.createmod.catnip.lang.Lang;
@@ -109,6 +110,10 @@ public interface IHeat extends IWrenchable {
             ;
 
             return builder;
+        }
+
+        public static LangBuilder getFormattedItemText(BigItemStack itemRod, Boolean IsEmpty) {
+            return getFormattedItemText(new ItemStack(itemRod.stack.getItem(), itemRod.count), IsEmpty);
         }
 
         public static LangBuilder getName(String name) {
