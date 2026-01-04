@@ -1,10 +1,12 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller;
 
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
+import net.createmod.catnip.nbt.NBTHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -12,6 +14,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,6 +27,7 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.manager.React
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +62,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public CompoundTag screen_pattern = new CompoundTag();
     public ItemStack configuredPattern;
 
-    private ItemStack fuelItem;
-    private ItemStack coolerItem;
+    private BigItemStack bigFuelItem;
+    private BigItemStack bigCoolerItem;
 
     public List<ReactorOutputEntity> reactorOutputEntityList = new ArrayList<>();
     public int reactorSize = 0;
@@ -89,6 +93,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         configuredPattern = ItemStack.EMPTY;
 
         inputManager = new ReactorInputManager();
+
+        bigFuelItem = new BigItemStack(ItemStack.EMPTY);
+        bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
     }
 
     public boolean isAssembled() {
@@ -126,18 +133,18 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
             IHeat.HeatLevel.getFormattedHeatText(configuredPattern.getOrCreateTag().getInt("heat")).forGoggles(tooltip);
 
-            if (fuelItem.isEmpty()) {
+            if (bigFuelItem.stack.isEmpty()) {
                 // if rod empty we initialize it at 1 (and display it as 0) to avoid having air item displayed instead of the rod
                 IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.URANIUM_ROD.asItem(), 1), true).forGoggles(tooltip);
             } else {
-                IHeat.HeatLevel.getFormattedItemText(fuelItem, false).forGoggles(tooltip);
+                IHeat.HeatLevel.getFormattedItemText(bigFuelItem, false).forGoggles(tooltip);
             }
 
-            if (fuelItem.isEmpty()) {
+            if (bigCoolerItem.stack.isEmpty()) {
                 // if rod empty we initialize it at 1 (and display it as 0) to avoid having air item displayed instead of the rod
                 IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.GRAPHITE_ROD.asItem(), 1), true).forGoggles(tooltip);
             } else {
-                IHeat.HeatLevel.getFormattedItemText(coolerItem, false).forGoggles(tooltip);
+                IHeat.HeatLevel.getFormattedItemText(bigCoolerItem, false).forGoggles(tooltip);
             }
         }
 
@@ -153,7 +160,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         // Lecture des Inputs
         this.inputManager.read(compound);
 
-
         // 1. Tes nouvelles variables simples
         this.reactorSize = compound.getInt("reactorSize");
         this.reactorFacing = compound.getString("reactorFacing");
@@ -165,11 +171,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             inventory.deserializeNBT(compound.getCompound("pattern"));
         }
         configuredPattern = ItemStack.of(compound.getCompound("items"));
-        if (compound.contains("cooler") || compound.contains("fuel")) {
-            coolerItem = ItemStack.of(compound.getCompound("cooler"));
-            fuelItem = ItemStack.of(compound.getCompound("fuel"));
-        }
 
+        bigFuelItem = BigItemStack.read(compound.getCompound("bigFuel"));
+        bigCoolerItem = BigItemStack.read(compound.getCompound("bigCooler"));
 
         // 3. Reconstruction des listes d'entités (via les positions sauvegardées)
         this.reactorOutputEntityList.clear();
@@ -181,7 +185,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     protected void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
         this.inputManager.write(compound);
-
 
         // 1. Tes nouvelles variables simples
         compound.putInt("reactorSize", this.reactorSize);
@@ -196,12 +199,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             compound.put("pattern", inventory.serializeNBT());
         }
         compound.put("items", configuredPattern.serializeNBT());
-        if (coolerItem != null && !coolerItem.isEmpty()) {
-            compound.put("cooler", coolerItem.serializeNBT());
-        }
-        if (fuelItem != null && !fuelItem.isEmpty()) {
-            compound.put("fuel", fuelItem.serializeNBT());
-        }
+
+        compound.put("bigFuel", bigFuelItem.write());
+        compound.put("bigCooler", bigCoolerItem.write());
     }
 
     public void test() {
@@ -219,21 +219,33 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         super.tick();
         if (level.isClientSide)
             return;
+
+        
+        if (needsToResolveEntities) {
+            List<IItemHandler> handlers = inputManager.getItemHandlers(level);
+            CreateNuclear.LOGGER.warn("Resolving inputs after load, handlers found: {}", handlers.size());
+            needsToResolveEntities = false;
+            this.setChanged();
+        }
+
         if (isEmptyConfiguredPattern()) {
             if (this.inputManager.size() > 0) {
                 List<IItemHandler> handlers = inputManager.getItemHandlers(level);
                 VirtualReactorInputsR virtualReactorInputs = inputManager.getInventory(level);
 
-                fuelItem = virtualReactorInputs.getFuelRod();
-                coolerItem = virtualReactorInputs.getCooledRod();
+                bigFuelItem = virtualReactorInputs.getBigFuelRod();
+                bigCoolerItem = virtualReactorInputs.getBigCooledRod();
 
-                CreateNuclear.LOGGER.warn("totalFuel: {}, totalCooler: {}, fuelItem, {}, coolerItem: {}",
-                        virtualReactorInputs.fuel(), virtualReactorInputs.cooler(), fuelItem, coolerItem);
-                if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
+                this.setChanged();
+                this.notifyUpdate();
+
+                if (bigFuelItem.count > 0 && bigCoolerItem.count > 0) {
                     configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat());
                     if (updateTimers()) {
                         boolean extracted = inputManager.extractItems(level, 1, 1);
                         if (extracted) {
+                            this.setChanged();
+                            this.notifyUpdate();
                             total = calculateProgress();
                             int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
                             if (IHeat.HeatLevel.isNotDanger(heat)) {
