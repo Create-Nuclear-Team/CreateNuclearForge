@@ -9,6 +9,7 @@ import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 
@@ -30,7 +31,7 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
         if (level.getBlockEntity(controllerPos) instanceof ReactorControllerBlockEntity reactorController) {
             int heat = (int) reactorController.configuredPattern.getOrCreateTag().getDouble("heat");
             if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.DANGER) {
-                if (countdownTicks >= 600) { // 300 ticks = 15 secondes
+                if (countdownTicks >= CNConfigs.common().explode.time.get()) { // 300 ticks = 15 secondes
                     explodeReactorCore(level, getBlockPos());
                 } else {
                     countdownTicks++;
