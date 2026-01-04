@@ -25,11 +25,15 @@ public interface ReactorIOManager {
     /** Writes state to an NBT tag (serialization). */
     void write(CompoundTag compound);
 
-    /** Adds a position; returns true if added. */
-    boolean addBlock(BlockPos pos);
+    /**
+     * Adds a position; returns true if added.
+     */
+    void addBlock(BlockPos pos);
 
-    /** Removes a position; returns true if it was present and removed. */
-    boolean removeBlock(BlockPos pos);
+    /**
+     * Removes a position; returns true if it was present and removed.
+     */
+    void removeBlock(BlockPos pos);
 
     /** Returns an immutable copy of tracked positions. */
     List<BlockPos> getBlocksPosition();

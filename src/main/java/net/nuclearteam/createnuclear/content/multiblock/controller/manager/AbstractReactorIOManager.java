@@ -21,21 +21,23 @@ public abstract class AbstractReactorIOManager implements ReactorIOManager {
     /** List of `BlockPos` instances tracked by this manager. */
     protected final List<BlockPos> positions = new ArrayList<>();
 
-    /** Adds `pos` if non-null and not already present; returns true when added. */
+    /**
+     * Adds `pos` if non-null and not already present; returns true when added.
+     */
     @Override
-    public boolean addBlock(BlockPos pos) {
-        if (pos == null) return false;
+    public void addBlock(BlockPos pos) {
+        if (pos == null) return;
         if (!contains(pos)) {
             positions.add(pos);
-            return true;
         }
-        return false;
     }
 
-    /** Removes `pos` if present. */
+    /**
+     * Removes `pos` if present.
+     */
     @Override
-    public boolean removeBlock(BlockPos pos) {
-        return positions.remove(pos);
+    public void removeBlock(BlockPos pos) {
+        positions.remove(pos);
     }
 
     /** Tests whether `pos` is present. */
