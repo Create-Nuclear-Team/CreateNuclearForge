@@ -1,13 +1,14 @@
 package net.nuclearteam.createnuclear.impl.registry;
 
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(bus = Bus.MOD)
 public class CreateNuclearRegistriesImpl {
     @Internal
     @SubscribeEvent
