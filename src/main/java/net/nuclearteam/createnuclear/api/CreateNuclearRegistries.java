@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.api;
 
-import com.simibubi.create.Create;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.nuclearteam.createnuclear.CreateNuclear;
