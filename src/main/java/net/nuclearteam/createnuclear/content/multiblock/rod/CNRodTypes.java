@@ -20,7 +20,7 @@ public class CNRodTypes {
      * multiblock (for example, fuel rods and cooler rods). The examples below
      * show how to create a {@code RodType} via its {@code RodType.Builder}.</p>
      *
-     * <p>Example — Fuel Rod:</p>
+     * <p>Example — Custom Rod:</p>
      * <pre>{@code
      * register(ctx, "name", new RodType.Builder()
      *     .baseRodHeat(int)
@@ -28,17 +28,6 @@ public class CNRodTypes {
      *     .rodTimer(int)
      *     .addItems(Item)
      *     .fuelRodType()
-     *     .build());
-     * }</pre>
-     *
-     * <p>Example — Cooler Rod:</p>
-     * <pre>{@code
-     * register(ctx, "name", new RodType.Builder()
-     *     .baseRodHeat(int)
-     *     .proximityRodHeat(int)
-     *     .rodTimer(int)
-     *     .addItems(Item)
-     *     .coolerRodType()
      *     .build());
      * }</pre>
      *
