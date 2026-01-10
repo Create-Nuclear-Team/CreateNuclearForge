@@ -96,9 +96,7 @@ public class CNItems {
         GRAPHITE_ROD = CreateNuclear.REGISTRATE
             .item("graphite_rod", Item::new)
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .baseRodHeat(-10)
-                .proximityRodHeat(-5)
-                .rodTimer(3000)
+                .setRodConfig()
                 .coolerRodType()))
             .tag(CNTags.forgeItemTag("rods"), CNItemTags.COOLER.tag)
             .register(),
@@ -126,9 +124,7 @@ public class CNItems {
         URANIUM_ROD = CreateNuclear.REGISTRATE
             .item("uranium_rod", Item::new)
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .baseRodHeat(25)
-                .proximityRodHeat(5)
-                .rodTimer(3000)
+                .setRodConfig()
                 .fuelRodType()))
             .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register(),
