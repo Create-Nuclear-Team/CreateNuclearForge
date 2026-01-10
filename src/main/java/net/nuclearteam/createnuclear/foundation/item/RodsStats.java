@@ -2,17 +2,13 @@ package net.nuclearteam.createnuclear.foundation.item;
 
 import com.simibubi.create.foundation.item.TooltipModifier;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
-import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
-import net.nuclearteam.createnuclear.content.multiblock.rod.CNRodTypes;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.ArrayList;
@@ -41,7 +37,7 @@ public record RodsStats(Item item) implements TooltipModifier {
 
         RodType rodType = RodType.resolveRodType(item, world);
 
-        if (!rodType.isEmptyItem()) {
+        if (rodType.isNotEmptyItem()) {
             CreateNuclearLang.translate("tooltip.statRod")
                 .style(ChatFormatting.GRAY)
                 .addTo(components);
