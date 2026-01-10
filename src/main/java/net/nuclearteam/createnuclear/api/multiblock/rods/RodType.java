@@ -13,9 +13,11 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.content.multiblock.rod.CNRodTypes;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,15 +33,22 @@ import java.util.Optional;
 @MethodsReturnNonnullByDefault
 public record RodType(HolderSet<Item> items,
                       int baseRodHeat, int proximityRodHeat,
-                      int rodTimer, TypeRod type) {
+                      int rodTimer, TypeRod type, boolean useConfig) {
+
+    public RodType(HolderSet<Item> items,
+                   int baseRodHeat, int proximityRodHeat,
+                   int rodTimer, TypeRod type) {
+        this(items, baseRodHeat, proximityRodHeat, rodTimer, type, false);
+    }
+
     /**
      * Serialization codec for saving/loading {@link RodType} instances.
      */
     public static final Codec<RodType> CODEC = RecordCodecBuilder.create(i -> i.group(
-        RegistryCodecs.homogeneousList(Registries.ITEM).optionalFieldOf("items", HolderSet.direct()).forGetter(RodType::items),
-        Codec.INT.optionalFieldOf("baseRodHeat", 0).forGetter(RodType::baseRodHeat),
-        Codec.INT.optionalFieldOf("proximityRodHeat", 0).forGetter(RodType::proximityRodHeat),
-        Codec.INT.optionalFieldOf("rodTimer", 0).forGetter(RodType::rodTimer),
+        RegistryCodecs.homogeneousList(Registries.ITEM).fieldOf("items").forGetter(RodType::items),
+        Codec.INT.fieldOf("baseRodHeat").forGetter(RodType::baseRodHeat),
+        Codec.INT.fieldOf("proximityRodHeat").forGetter(RodType::proximityRodHeat),
+        Codec.INT.fieldOf("rodTimer").forGetter(RodType::rodTimer),
         StringRepresentable.fromEnum(TypeRod::values).optionalFieldOf("type", TypeRod.MIXTE).forGetter(RodType::type)
     ).apply(i, RodType::new));
 
@@ -55,7 +64,7 @@ public record RodType(HolderSet<Item> items,
     public static Optional<Reference<RodType>> getTypeForItem(RegistryAccess registryAccess, Item item) {
         return registryAccess.lookupOrThrow(CreateNuclearRegistries.ROD_TYPE)
             .listElements()
-            .filter(ref -> ref.value().items.contains(item.builtInRegistryHolder()))
+            .filter(ref -> ref.value().items.contains(ForgeRegistries.ITEMS.getDelegateOrThrow(item)))
             .findFirst();
     }
 
@@ -73,7 +82,7 @@ public record RodType(HolderSet<Item> items,
             .map(Holder.Reference::value)
             .orElseGet(() -> {
                 RodType fromItem = ItemRodTypesValue.getRodType(item);
-                return !fromItem.isEmptyItem()
+                return fromItem.isNotEmptyItem()
                         ? fromItem
                         : world.registryAccess()
                         .registryOrThrow(CreateNuclearRegistries.ROD_TYPE)
@@ -87,8 +96,8 @@ public record RodType(HolderSet<Item> items,
      *
      * @return {@code true} if no items are defined, {@code false} otherwise
      */
-    public boolean isEmptyItem() {
-        return this.items.size() < 1;
+    public boolean isNotEmptyItem() {
+        return this.items.size() >= 1;
     }
 
     /**
@@ -103,6 +112,7 @@ public record RodType(HolderSet<Item> items,
         private int proximityRodHeat = 0;
         private int rodTimer = 0;
         private TypeRod type = TypeRod.MIXTE;
+        private boolean useConfig = false;
 
         private boolean itemsSet = false;
         private boolean baseRodHeatSet = false;
@@ -192,6 +202,11 @@ public record RodType(HolderSet<Item> items,
             return this;
         }
 
+        public Builder setRodConfig() {
+            this.useConfig = true;
+            return this;
+        }
+
         /**
          * Builds the immutable {@link RodType} instance.
          *
@@ -201,15 +216,68 @@ public record RodType(HolderSet<Item> items,
         public RodType build() {
             List<String> missing = new ArrayList<>();
             if (!itemsSet || items.isEmpty()) missing.add("items");
-            if (!baseRodHeatSet) missing.add("baseRodHeat");
-            if (!proximityRodHeatSet) missing.add("proximityRodHeat");
-            if (!rodTimerSet) missing.add("rodTimer");
             if (!typeSet) missing.add("type");
+
+            if (!this.useConfig) {
+                if (!baseRodHeatSet) missing.add("baseRodHeat");
+                if (!proximityRodHeatSet) missing.add("proximityRodHeat");
+                if (!rodTimerSet) missing.add("rodTimer");
+            } else {
+                /* Lazy config resolution: don't access CNConfigs here during registration.
+                 * The actual values will be read at runtime via the resolved* accessors.
+                 * Only MIXTE is considered an error for "useConfig" because there are
+                 * no configuration defaults for the mixed type.
+                 */
+                if (this.type == TypeRod.MIXTE)
+                    missing.add("Configuration defaults cannot be applied to the MIXTE (mixed) rod type");
+            }
 
             if (!missing.isEmpty())
                 throw new IllegalStateException("Missing required RodType fields: " + String.join(", ", missing));
 
-            return new RodType(HolderSet.direct(items), baseRodHeat, proximityRodHeat, rodTimer, type);
+            return new RodType(HolderSet.direct(items), baseRodHeat, proximityRodHeat, rodTimer, type, useConfig);
+        }
+    }
+
+    @Override
+    public int baseRodHeat() {
+        if (!useConfig) return baseRodHeat;
+        try {
+            return switch (type) {
+                case FUEL -> CNConfigs.common().rods.baseValueUranium.get();
+                case COOLER -> CNConfigs.common().rods.baseValueGraphite.get();
+                default -> baseRodHeat;
+            };
+        } catch (IllegalStateException e) {
+            return baseRodHeat;
+        }
+    }
+
+    @Override
+    public int proximityRodHeat() {
+        if (!useConfig) return proximityRodHeat;
+        try {
+            return switch (type) {
+                case FUEL -> CNConfigs.common().rods.uraniumProxyBonus.get();
+                case COOLER -> CNConfigs.common().rods.graphiteProxyMalus.get();
+                default -> proximityRodHeat;
+            };
+        } catch (IllegalStateException e) {
+            return proximityRodHeat;
+        }
+    }
+
+    @Override
+    public int rodTimer() {
+        if (!useConfig) return rodTimer;
+        try {
+            return switch (type) {
+                case FUEL -> CNConfigs.common().rods.uraniumRodLifetime.get();
+                case COOLER -> CNConfigs.common().rods.graphiteRodLifetime.get();
+                default -> rodTimer;
+            };
+        } catch (IllegalStateException e) {
+            return rodTimer;
         }
     }
 
