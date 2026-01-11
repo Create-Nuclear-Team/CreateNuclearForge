@@ -262,6 +262,8 @@ public class CNItems {
     public static final ItemEntry<ForgeSpawnEggItem> SPAWN_WOLF = registerSpawnEgg("wolf_irradiated_spawn_egg", CNEntityType.IRRADIATED_WOLF, 0x42452B,0x4C422B, "Irradiated Wolf Spawn Egg");
     public static final ItemEntry<ForgeSpawnEggItem> SPAWN_CAT = registerSpawnEgg("cat_irradiated_spawn_egg", CNEntityType.IRRADIATED_CAT, 0x382C19, 0x742728, "Irradiated Cat Spawn Egg");
     public static final ItemEntry<ForgeSpawnEggItem> SPAWN_CHICKEN = registerSpawnEgg("chicken_irradiated_spawn_egg", CNEntityType.IRRADIATED_CHICKEN, 0x6B9455, 0x95393C, "Irradiated Chicken Spawn Egg");
+    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_COW = registerSpawnEgg("cow_irradiated_spawn_egg", CNEntityType.IRRADIATED_COW, 0x4A403A, 0x7A5A52, "Irradiated Cow Spawn Egg");
+    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_ZOMBIE = registerSpawnEgg("zombie_irradiated_spawn_egg", CNEntityType.IRRADIATED_ZOMBIE, 0x3D6B4A, 0x73422B, "Irradiated Zombie Spawn Egg");
 
     public static final ItemEntry<ReactorBluePrintItem> REACTOR_BLUEPRINT = CreateNuclear.REGISTRATE
         .item("reactor_blueprint_item", ReactorBluePrintItem::new)

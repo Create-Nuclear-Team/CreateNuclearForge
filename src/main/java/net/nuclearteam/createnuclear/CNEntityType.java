@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear;
 
 import com.tterrag.registrate.util.entry.EntityEntry;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -18,6 +19,9 @@ import net.nuclearteam.createnuclear.content.contraptions.irradiated.cow.Irradia
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolf;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfModel;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfRenderer;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.zombie.IrradiatedZombie;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.zombie.IrradiatedZombieModel;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.zombie.IrradiatedZombieRenderer;
 
 public class CNEntityType {
 
@@ -61,11 +65,23 @@ public class CNEntityType {
             .attributes(IrradiatedCow::createAttributes)
             .register();
 
+    public static final EntityEntry<IrradiatedZombie> IRRADIATED_ZOMBIE = CreateNuclear.REGISTRATE
+        .entity("irradiated_zombie", IrradiatedZombie::new, MobCategory.MONSTER)
+        .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
+        .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
+        .properties(p -> p.sized(0.6f, 1.95f))
+        .lang("Irradiated Zombie")
+        .renderer(() -> IrradiatedZombieRenderer::new)
+        .attributes(IrradiatedZombie::createAttributes)
+        .register();
+
+
    public static void registerModelLayer(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(CNModelLayers.IRRADIATED_CAT, IrradiatedCatModel::createBodyLayer);
         event.registerLayerDefinition(CNModelLayers.IRRADIATED_CHICKEN, IrradiatedChickenModel::createBodyLayer);
         event.registerLayerDefinition(CNModelLayers.IRRADIATED_WOLF, IrradiatedWolfModel::createBodyLayer);
         event.registerLayerDefinition(CNModelLayers.IRRADIATED_COW, IrradiatedCowModel::createBodyLayer);
+        event.registerLayerDefinition(CNModelLayers.IRRADIATED_ZOMBIE, IrradiatedZombieModel::createBodyLayer);
 
    }
 
