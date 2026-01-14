@@ -123,6 +123,7 @@
   "createnuclear.ponder.reactor.text_9": "Floor 6",
   "createnuclear.ponder.reactor_blueprint.header": "Controller Activation",
   "createnuclear.ponder.reactor_blueprint.text_1": "Reactor Blueprint: the most important element; it allows the reactor to be configured according to specific models.",
+  "createnuclear.subtitle.reactor_alarm": "Reactor Alarm",
   "createnuclear.subtitle.reactor_casing_break": "Break Reactor Casing",
   "createnuclear.subtitle.reactor_casing_fall": "Reactor Casing Fall",
   "createnuclear.subtitle.reactor_casing_hit": "Hit Reactor Casing",

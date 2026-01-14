@@ -58,7 +58,12 @@ public class CNSoundEvents {
         REACTOR_CASING_FALL = create("reactor_casing", "fall")
             .subtitle("Reactor Casing Fall")
             .category(SoundSource.BLOCKS)
-            .build()
+            .build(),
+
+        REACTOR_ALARM = create("reactor_alarm")
+                .subtitle("Reactor Alarm")
+                .category(SoundSource.BLOCKS)
+                .build()
     ;
 
 
@@ -349,4 +354,5 @@ public class CNSoundEvents {
         }
 
     }
+
 }

@@ -36,6 +36,7 @@ import net.minecraftforge.common.util.ForgeSoundType;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
+import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasing;
 import net.nuclearteam.createnuclear.CNTags.CNBlockTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
@@ -458,13 +459,15 @@ public class CNBlocks {
             .build()
             .register();
 
-    public static final BlockEntry<Block> REACTOR_ALARM =
-        CreateNuclear.REGISTRATE.block("reactor_alarm", Block::new)
-            .initialProperties(SharedProperties::stone)
-            .transform(pickaxeOnly())
-            .item()
-            .build()
-            .register();
+    public static final BlockEntry<ReactorAlarm> REACTOR_ALARM =
+            CreateNuclear.REGISTRATE.block("reactor_alarm", ReactorAlarm::new)
+                    .initialProperties(SharedProperties::stone)
+                    .transform(pickaxeOnly())
+                    .item()
+                    .build()
+                    .register();
+
+
 
     /*public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK =
         CreateNuclear.REGISTRATE.block("test_event_trigger_block", EventTriggerBlock::new)
