@@ -1,18 +1,14 @@
 package net.nuclearteam.createnuclear.content.multiblock.core;
 
 import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
-import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.GameRules;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
@@ -21,7 +17,9 @@ import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 
 @SuppressWarnings({"unused"})
 public class ReactorCoreEntity extends ReactorCasingEntity {
+
     private int countdownTicks = 0;
+    private boolean hasExploded = false;
 
     public ReactorCoreEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -31,81 +29,75 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
     public void tick() {
         super.tick();
 
-        if (level.isClientSide()) return;
+        if (level.isClientSide() || hasExploded) return;
 
         BlockPos controllerPos = getBlockPosForReactor();
-        if (level.getBlockEntity(controllerPos) instanceof ReactorControllerBlockEntity reactorController) {
-            int heat = (int) reactorController.configuredPattern.getOrCreateTag().getDouble("heat");
-            if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.DANGER) {
-                if (countdownTicks >= 300) { // 300 ticks = 15 secondes
-                    testExplotion(level, getBlockPos());
-//                    float explosionRadius = calculateExplosionRadius(reactorController.countUraniumRod);
-//                    explodeReactorCore(level, getBlockPos(), explosionRadius);
-                } else {
-                    countdownTicks++;
-                }
-            } else {
-                countdownTicks = 0; // Reset the countdown if the heat level is not in danger
+        if (!(level.getBlockEntity(controllerPos) instanceof ReactorControllerBlockEntity reactorController)) {
+            countdownTicks = 0;
+            return;
+        }
+
+        int heat = (int) reactorController.configuredPattern
+                .getOrCreateTag()
+                .getDouble("heat");
+
+        if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.DANGER) {
+
+            countdownTicks++;
+
+            // 300 ticks = 15 secondes
+            if (countdownTicks >= 300) {
+                hasExploded = true;
+
+                triggerNuclearExplosion(
+                        (ServerLevel) level,
+                        getBlockPos(),
+                        reactorController.countUraniumRod
+                );
+
+                // Supprime le cœur (optionnel mais logique)
+                level.removeBlock(getBlockPos(), false);
             }
+
+        } else {
+            countdownTicks = 0;
         }
     }
 
-    private void testExplotion(Level level, BlockPos pos) {
-        ReactorNuclearExplosion.builder((ServerLevel) level, pos, 20, Util.NIL_UUID, "")
-                .preExplosion(() -> {
-//                    pLevel.getServer().getPlayerList().broadcastChatMessage();
-                    Player player = level.getServer().getPlayerList().getPlayer(Util.NIL_UUID);
-                    if (player != null) {
-                        player.sendSystemMessage(Component.literal(String.format("%s : [%d, %d, %d]", level.dimension().location(), pos.getX(), pos.getY(), pos.getZ())).withStyle(ChatFormatting.GRAY));
-                    }
-                    level.removeBlock(pos, false);
-                })
-                .create();
+    /**
+     * Déclenche l’explosion nucléaire du réacteur
+     */
+    private void triggerNuclearExplosion(ServerLevel level, BlockPos pos, int uraniumRodCount) {
+
+        /*
+        NuclearExplosionEntity explosion =
+                new NuclearExplosionEntity(
+                        CNEntityType.NUCLEAR_EXPLOSION.get(),
+                        level
+                );
+
+        explosion.setPos(
+                pos.getX() + 0.5D,
+                pos.getY() + 10.0D,
+                pos.getZ() + 0.5D
+        );
+
+        // Mapping uranium -> puissance
+        float size = Mth.clamp(uraniumRodCount * 0.5F, 1.0F, 6.0F);
+        explosion.setSize(size);
+
+        // Respect gamerule mobGriefing
+        boolean griefing =
+                level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+
+        explosion.setNoGriefing(!griefing);
+        explosion.setIntentionalGameDesign(false);
+
+        level.addFreshEntity(explosion);
+         */
     }
 
-    private float calculateExplosionRadius(int countUraniumRod) {
-        return 10F + countUraniumRod; // Ajuste selon tes besoins
-    }
-
-    private void explodeReactorCore(Level level, BlockPos center, float radius) {
-        int r = (int) Math.ceil(radius);
-
-        for (int x = -r; x <= r; x++) {
-            for (int y = -r; y <= r; y++) {
-                for (int z = -r; z <= r; z++) {
-                    BlockPos currentPos = center.offset(x, y, z);
-                    double distanceSquared = x * x + y * y + z * z;
-                    double distance = Math.sqrt(distanceSquared);
-
-                    if (distance <= radius) {
-                        BlockState blockState = level.getBlockState(currentPos);
-                        if (!blockState.isAir() && !blockState.is(Blocks.BEDROCK)) {
-                            double probability = distance / radius;
-                            double noise = level.random.nextDouble();
-
-                            if (distance > radius * 0.7 && noise < 0.4) {
-                                continue;
-                            }
-
-                            level.destroyBlock(currentPos, false);
-
-                            // Ajoute du feu au-dessus des blocs détruits avec une probabilité de 20%
-                            if (level.random.nextDouble() < 0.2) { // 20% de chance de feu
-                                BlockPos abovePos = currentPos.above();
-                                BlockState blockBelow = level.getBlockState(currentPos.below(1));
-                                BlockState blockAbove = level.getBlockState(abovePos);
-                                CreateNuclear.LOGGER.warn("Fire added at {} | blockAbove.isAir() {} | !blockBelow.isAir() {}", abovePos, blockAbove.isAir(), !blockBelow.isAir());
-                                // Vérifie que le bloc au-dessus est de l'air et que le bloc en dessous est solide (pas remplacé par de l'air)
-                                level.setBlock(abovePos, Blocks.FIRE.defaultBlockState(), 3);
-                                CreateNuclear.LOGGER.warn("Fire added at: " + abovePos);
-
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    /* ===================== MULTIBLOCK ===================== */
 
     private static BlockPos FindController(char character) {
         return SimpleMultiBlockAislePatternBuilder.start()
@@ -127,28 +119,24 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
     }
 
     private BlockPos getBlockPosForReactor() {
-        BlockPos posController = getBlockPos();
-        BlockPos posInput = new BlockPos(posController.getX(), posController.getY(), posController.getZ());
+        BlockPos origin = getBlockPos();
 
         int[][][] directions = {
-                {{0, 2, 2}, {0, 1, 2}, {0, 0, 2}, {0, -1, 2}, {0, -2, 2}}, // NORTH
+                {{0, 2, 2}, {0, 1, 2}, {0, 0, 2}, {0, -1, 2}, {0, -2, 2}},   // NORTH
                 {{0, 2, -2}, {0, 1, -2}, {0, 0, -2}, {0, -1, -2}, {0, -2, -2}}, // SOUTH
-
-                {{2, 2, 0}, {2, 1, 0}, {2, 0, 0}, {2, -1, 0}, {2, -2, 0}}, // EAST
+                {{2, 2, 0}, {2, 1, 0}, {2, 0, 0}, {2, -1, 0}, {2, -2, 0}},   // EAST
                 {{-2, 2, 0}, {-2, 1, 0}, {-2, 0, 0}, {-2, -1, 0}, {-2, -2, 0}} // WEST
         };
 
-
         for (int[][] direction : directions) {
             for (int[] dir : direction) {
-                BlockPos newPos = posController.offset(dir[0], dir[1], dir[2]);
-                if (level.getBlockState(newPos).is(CNBlocks.REACTOR_CONTROLLER.get())) {
-                    posInput = newPos;
-                    break;
+                BlockPos check = origin.offset(dir[0], dir[1], dir[2]);
+                if (level.getBlockState(check).is(CNBlocks.REACTOR_CONTROLLER.get())) {
+                    return check;
                 }
             }
         }
 
-        return posInput;
+        return origin;
     }
 }

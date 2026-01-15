@@ -1,13 +1,10 @@
 package net.nuclearteam.createnuclear.content.multiblock.core;
 
-import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.GameRules;
@@ -16,29 +13,25 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.GrassBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.util.FakePlayer;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CNFluids;
-import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-public class ReactorNuclearExplosion extends Thread implements Comparator<ReactorNuclearExplosion.NukeTask> {
-    public static final int FLAG_IN_EXPLOSION = 1 << 0;
-    public static final int FLAG_IS_REINFORCED = 1 << 1;
-    public static final int FLAG_DESTROY = 1 << 2;
-    public static final int FLAG_IS_AIR = 1 << 3;
-    public static final int FLAG_IS_BLOCK = 1 << 4;
-    public static final int FLAG_INSIDE = 1 << 5;
-    public static final int FLAG_OUTSIDE = 1 << 6;
+public class ExplosionCore implements Comparator<ExplosionCore.NukeTask> {
 
-    public static final Runnable NO_ACTION = () -> {
-    };
+     public static final int FLAG_IN_EXPLOSION = 1 << 0;
+     public static final int FLAG_IS_REINFORCED = 1 << 1;
+     public static final int FLAG_DESTROY = 1 << 2;
+     public static final int FLAG_IS_AIR = 1 << 3;
+     public static final int FLAG_IS_BLOCK = 1 << 4;
+     public static final int FLAG_INSIDE = 1 << 5;
+     public static final int FLAG_OUTSIDE = 1 << 6;
+    private final Level level;
+    private final BlockPos pos;
+    private final Double radius;
 
     public static boolean hasFlag(int flags, int flag) {
         return (flags & flag) != 0;
@@ -56,191 +49,49 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
         return flags & ~flag;
     }
 
-    public static Builder builder(ServerLevel level, BlockPos pos, double radius, UUID owner, String ownerName) {
-        return new Builder(level, pos, radius, owner, ownerName);
-    }
-
-    private record CrustFilter(Object2IntMap<BlockPos> blocks, BlockPos.MutableBlockPos mpos) implements Predicate<BlockPos> {
-        @Override
-        public boolean test(BlockPos pos) {
-            for (Direction dir : Direction.values()) {
-                mpos.set(pos.getX() + dir.getStepX(), pos.getY() + dir.getStepY(), pos.getZ() + dir.getStepZ());
-
-                if (!blocks.containsKey(mpos)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-    }
-
-    public static class NukeTask {
-        public final BlockPos pos;
-
-        public NukeTask(BlockPos pos) {
-            this.pos = pos;
-        }
-
-        public int distance(ReactorNuclearExplosion explosion) {
-            int x = explosion.pos.getX() - pos.getX();
-            int y = explosion.pos.getY() - pos.getY();
-            int z = explosion.pos.getZ() - pos.getZ();
-            return x * x + y * y + z * z;
-        }
-
-        public int horizontalDistance(ReactorNuclearExplosion explosion) {
-            int x = explosion.pos.getX() - pos.getX();
-            int z = explosion.pos.getZ() - pos.getZ();
-            return x * x + z * z;
-        }
-
-        public int getOrder() {
-            return 0;
-        }
-
-        public int compare(ReactorNuclearExplosion explosion, NukeTask o) {
-            return distance(explosion) - o.distance(explosion);
-        }
-
-        public double group(ReactorNuclearExplosion explosion, double group) {
-            return Math.sqrt(distance(explosion)) / group;
-        }
-
-        public void execute(ReactorNuclearExplosion explosion) {
-        }
-    }
-
-    public static class BlockModification extends NukeTask {
-        public final BlockState state;
-        public final int flags;
-        public final int neighborUpdates;
-
-        public BlockModification(BlockPos pos, BlockState state, int flags, int neighborUpdates) {
-            super(pos);
-            this.state = state;
-            this.flags = flags;
-            this.neighborUpdates = neighborUpdates;
-        }
-
-        public BlockModification(BlockPos pos, BlockState state) {
-            this(pos, state, 2, 64);
-        }
-
-        @Override
-        public int getOrder() {
-            return state.getBlock() instanceof FireBlock ? 2 : (flags != 2 || neighborUpdates != 0) ? 0 : 1;
-        }
-
-        @Override
-        public void execute(ReactorNuclearExplosion explosion) {
-            explosion.level.setBlock(pos, state, ((flags & 1) != 0) ? flags : (flags | 0x80), neighborUpdates);
-        }
-    }
-
-    public static class LightUpdate extends NukeTask {
-        private final BlockState old;
-        private final BlockState state;
-        private final int oldLight;
-        private final int oldOpacity;
-
-        public LightUpdate(BlockPos pos, BlockState old, BlockState state, int oldLight, int oldOpacity) {
-            super(pos);
-            this.old = old;
-            this.state = state;
-            this.oldLight = oldLight;
-            this.oldOpacity = oldOpacity;
-        }
-
-        @Override
-        public int getOrder() {
-            return 10;
-        }
-
-        @Override
-        public int compare(ReactorNuclearExplosion explosion, NukeTask o) {
-            int i = horizontalDistance(explosion) - o.horizontalDistance(explosion);
-            int y1 = pos.getY() - explosion.pos.getY();
-            int y2 = o.pos.getY() - explosion.pos.getY();
-            return i == 0 ? (y1 - y2) : i;
-        }
-
-        @Override
-        public double group(ReactorNuclearExplosion explosion, double group) {
-            return Math.sqrt(horizontalDistance(explosion)) / group;
-        }
-
-        @Override
-        public void execute(ReactorNuclearExplosion explosion) {
-            if (state.useShapeForLightOcclusion() || old.useShapeForLightOcclusion() || state.getLightBlock(explosion.level, pos) != oldOpacity || state.getLightEmission(explosion.level, pos) != oldLight) {
-                explosion.level.getProfiler().push("queueCheckLight");
-                explosion.level.getLightEngine().checkBlock(pos);
-                explosion.level.getProfiler().pop();
-            }
-        }
+    public static Builder builder(ServerLevel level, BlockPos pos, int countUraniumRod) {
+        return new Builder(level, pos, countUraniumRod);
     }
 
     public static final class Builder {
         private final ServerLevel level;
         private final BlockPos pos;
         private final double radius;
-        private final UUID owner;
-        private final String ownerName;
-        private long delay;
-        private Runnable preExplosion;
+        private final int countUraniumRod;
 
-        private Builder(ServerLevel level, BlockPos pos, double radius, UUID owner, String ownerName) {
+        private Builder(ServerLevel level, BlockPos pos, int countUraniumRod) {
             this.level = level;
             this.pos = pos;
-            this.radius = Math.min(radius, 100D);
-            this.owner = owner;
-            this.ownerName = ownerName;
-            this.delay = 0L;
-            this.preExplosion = NO_ACTION;
+            this.radius = Math.min(calculateExplosionRadius(countUraniumRod), 100D);
+            this.countUraniumRod = countUraniumRod;
         }
 
-        public Builder delay(long delay) {
-            this.delay = delay;
-            return this;
-        }
-
-        public Builder preExplosion(Runnable preExplosion) {
-            this.preExplosion = preExplosion;
-            return this;
+        private float calculateExplosionRadius(int countUraniumRod) {
+            return 10F + countUraniumRod; // Ajuste selon tes besoins
         }
 
         public void create() {
-            ReactorNuclearExplosion explosion = new ReactorNuclearExplosion(level, pos, radius, owner, ownerName, delay, preExplosion);
+            ExplosionCore explosion = new ExplosionCore(level, pos, radius);
+            explosion.explodeReactorCoreTest();
+        }
 
-            if (CNConfigs.common().NUCLEAR.nuclear_explosion_daemon_thread.get()) {
-                explosion.setDaemon(true);
-            }
+        public void createOldExplosionType() {
+            ExplosionCore explosion = new ExplosionCore(level, pos, radius);
 
-            explosion.start();
+            explosion.tick(countUraniumRod, level, pos);
+            explosion.explodeReactorCoreTest();
         }
     }
 
-    public final MinecraftServer server;
-    public final ServerLevel level;
-    public final BlockPos pos;
-    public final double radius;
-    public final List<NukeTask> tasks;
-    public final UUID owner;
-    public final String ownerName;
-    public final long delay;
-    public final Runnable preExplosion;
-
-    private ReactorNuclearExplosion(ServerLevel level, BlockPos pos, double radius, UUID owner, String ownerName, long delay, Runnable preExplosion) {
-        super("NuclearExplosion/dn=" + level.dimension().location().getNamespace() + "/dp=" + level.dimension().location().getPath() + "/p=" + pos.getX() + "," + pos.getY() + "," + pos.getZ() + "/r=" + radius + "/o=" + owner + "/on=" + ownerName);
-        this.server = level.getServer();
+    public ExplosionCore(Level level, BlockPos pos, double radius) {
         this.level = level;
         this.pos = pos;
-        this.radius = Math.min(radius, 100D);
-        this.tasks = new ArrayList<>();
-        this.owner = owner;
-        this.ownerName = ownerName;
-        this.delay = delay;
-        this.preExplosion = preExplosion;
+        this.radius = radius;
+    }
+
+    public void tick(int CountUraniumRod, Level level, BlockPos center) {
+        float explosionRadius = calculateExplosionRadius(CountUraniumRod);
+        explodeReactorCore(level, center, explosionRadius);
     }
 
     private float calculateExplosionRadius(int countUraniumRod) {
@@ -248,6 +99,7 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
     }
 
     private void explodeReactorCore(Level level, BlockPos center, float radius) {
+        /*
         int r = (int) Math.ceil(radius);
 
         for (int x = -r; x <= r; x++) {
@@ -285,62 +137,180 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
                 }
             }
         }
+        */
+
     }
 
-    @Override
-    public void run() {
+    private record CrustFilter(Object2IntMap<BlockPos> blocks, BlockPos.MutableBlockPos mpos) implements Predicate<BlockPos> {
+        @Override
+        public boolean test(BlockPos pos) {
+            for (Direction dir : Direction.values()) {
+                mpos.set(pos.getX() + dir.getStepX(), pos.getY() + dir.getStepY(), pos.getZ() + dir.getStepZ());
+
+                if (!blocks.containsKey(mpos)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    }
+
+    public static class NukeTask {
+        public final BlockPos pos;
+
+        public NukeTask(BlockPos pos) {
+            this.pos = pos;
+        }
+
+        public int distance(ExplosionCore explosion) {
+            int x = explosion.pos.getX() - pos.getX();
+            int y = explosion.pos.getY() - pos.getY();
+            int z = explosion.pos.getZ() - pos.getZ();
+            return x * x + y * y + z * z;
+        }
+
+        public int horizontalDistance(ExplosionCore explosion) {
+            int x = explosion.pos.getX() - pos.getX();
+            int z = explosion.pos.getZ() - pos.getZ();
+            return x * x + z * z;
+        }
+
+        public int getOrder() {
+            return 0;
+        }
+
+        public int compare(ExplosionCore explosion, NukeTask o) {
+            return distance(explosion) - o.distance(explosion);
+        }
+
+        public double group(ExplosionCore explosion, double group) {
+            return Math.sqrt(distance(explosion)) / group;
+        }
+
+        public void execute(ExplosionCore explosion) {
+        }
+    }
+
+    public static class BlockModification extends NukeTask {
+        public final BlockState state;
+        public final int flags;
+        public final int neighborUpdates;
+
+        public BlockModification(BlockPos pos, BlockState state, int flags, int neighborUpdates) {
+            super(pos);
+            this.state = state;
+            this.flags = flags;
+            this.neighborUpdates = neighborUpdates;
+        }
+
+        public BlockModification(BlockPos pos, BlockState state) {
+            this(pos, state, 2, 64);
+        }
+
+        @Override
+        public int getOrder() {
+            return state.getBlock() instanceof FireBlock ? 2 : (flags != 2 || neighborUpdates != 0) ? 0 : 1;
+        }
+
+        @Override
+        public void execute(ExplosionCore explosion) {
+            explosion.level.setBlock(pos, state, ((flags & 1) != 0) ? flags : (flags | 0x80), neighborUpdates);
+        }
+    }
+
+    public static class LightUpdate extends NukeTask {
+        private final BlockState old;
+        private final BlockState state;
+        private final int oldLight;
+        private final int oldOpacity;
+
+        public LightUpdate(BlockPos pos, BlockState old, BlockState state, int oldLight, int oldOpacity) {
+            super(pos);
+            this.old = old;
+            this.state = state;
+            this.oldLight = oldLight;
+            this.oldOpacity = oldOpacity;
+        }
+
+        @Override
+        public int getOrder() {
+            return 10;
+        }
+
+        @Override
+        public int compare(ExplosionCore explosion, NukeTask o) {
+            int i = horizontalDistance(explosion) - o.horizontalDistance(explosion);
+            int y1 = pos.getY() - explosion.pos.getY();
+            int y2 = o.pos.getY() - explosion.pos.getY();
+            return i == 0 ? (y1 - y2) : i;
+        }
+
+        @Override
+        public double group(ExplosionCore explosion, double group) {
+            return Math.sqrt(horizontalDistance(explosion)) / group;
+        }
+
+        @Override
+        public void execute(ExplosionCore explosion) {
+            if (state.useShapeForLightOcclusion() || old.useShapeForLightOcclusion() || state.getLightBlock(explosion.level, pos) != oldOpacity || state.getLightEmission(explosion.level, pos) != oldLight) {
+                explosion.level.getProfiler().push("queueCheckLight");
+                explosion.level.getLightEngine().checkBlock(pos);
+                explosion.level.getProfiler().pop();
+            }
+        }
+    }
+
+    private void explodeReactorCoreTest() {
         long startTime = System.currentTimeMillis();
 
-        int rxz = Mth.ceil(radius);
-        double ry = Math.min(radius * 0.75D, 60);
-        double rys = ry / radius;
-        int ry0 = Math.max(pos.getY() - Mth.ceil(ry * 2D), level.getMinBuildHeight());
-        int ry1 = Math.min(pos.getY() + Mth.ceil(ry * 2D), level.getHeight()) - 1;
-        double rsq = radius * radius;
-        double rsqc = (radius * 0.65D) * (radius * 0.65D);
-        long seed = System.currentTimeMillis() + pos.hashCode();
-        Random random0 = new Random(seed);
-        Random random = new Random(seed);
+        int r = (int) Math.ceil(radius);
+        double radiusSquared = radius * radius;
+
+        long seed = startTime;
+        Random random0 = new Random(seed); // utilisé pour la perturbation globale (forme irrégulière)
+        Random random = new Random(seed);  // utilisé pour décisions locales (feu, skip, ...)
 
         int volume = 0;
 
-        for (int x = -rxz; x <= rxz; x++) {
-            for (int z = -rxz; z <= rxz; z++) {
-                for (int y = ry1; y >= ry0; y--) {
-                    int y0 = y - pos.getY();
-                    double y1 = y0 / rys;
-                    double dist = (x * x + y1 * y1 + z * z) / (1D - random0.nextDouble() * 0.25D);
 
-                    if (dist <= rsq) {
+        for (int x = -r; x <= r; x++) {
+            for (int y = -r; y <= r; y++) {
+                for (int z = -r; z <= r; z++) {
+
+                    // Distance au carré au centre de l'explosion
+                    double distanceSquared = x * x + y * y + z * z;
+
+                    // Si le point est dans la sphère
+                    if (distanceSquared <= radiusSquared) {
                         volume++;
                     }
                 }
             }
         }
 
-        CreateNuclear.LOGGER.warn(String.format("%s/%s created a nuclear explosion with radius %f at %s:%d,%d,%d with up to %d blocks to check", ownerName, owner, radius, level.dimension().location(), pos.getX(), pos.getY(), pos.getZ(), volume));
 
         BlockPos.MutableBlockPos mpos = new BlockPos.MutableBlockPos();
         Object2IntOpenHashMap<BlockPos> blocks = new Object2IntOpenHashMap<>(volume);
         blocks.defaultReturnValue(0);
         List<BlockPos> crust = new ArrayList<>();
-        ServerPlayer player = new FakePlayer(level, new GameProfile(owner, ownerName));
-        player.setPos(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
 
-        for (int x = -rxz; x <= rxz; x++) {
-            for (int z = -rxz; z <= rxz; z++) {
-                mpos.set(pos.getX() + x, 0, pos.getZ() + z);
+        for (int x = -r; x <= r; x++) {
+            for (int z = -r; z <= r; z++) {
+                mpos.move(pos.getX() + x, 0, pos.getZ() + z);
+
+                boolean blockProtected = false;
 
                 if (!level.isInWorldBounds(mpos)) {
                     continue;
                 }
 
-                for (int y = ry1; y >= ry0; y--) {
-                    int y0 = y - pos.getY();
-                    double y1 = y0 / rys;
-                    double dist = (x * x + y1 * y1 + z * z) / (1D - random.nextDouble() * 0.25D);
+                for (int y = -r; y <= r; y++) {
+                    BlockPos currentPos = pos.offset(x, y, z);
+                    double distanceSquared = x * x + y * y + z * z;
+                    double distance = Math.sqrt(distanceSquared)  / (1D - random.nextDouble() * 0.25D);
 
-                    if (dist <= rsq) {
+                    if (distance <= radius) {
                         mpos.setY(y);
 
                         if (level.isOutsideBuildHeight(mpos)) {
@@ -351,20 +321,21 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
 
                         try {
                             BlockState state = level.getBlockState(mpos);
-
-                            if (state.isAir()) {
+                            if (blockProtected) {
+                                blocks.put(ipos, FLAG_IN_EXPLOSION | FLAG_IS_REINFORCED | FLAG_INSIDE);
+                            } else if (state.isAir()) {
                                 blocks.put(ipos, FLAG_IN_EXPLOSION | FLAG_IS_AIR | FLAG_INSIDE);
-                            } else if (state.is(CNTags.CNBlockTags.ENRICHING_FIRE_BASE_BLOCKS.tag) || state.getDestroySpeed(level, mpos) < 0F) {
+                            } else if (state.is(CNBlocks.REINFORCED_GLASS.get()) || state.getDestroySpeed(level, mpos) < 0F) {
                                 blocks.put(ipos, FLAG_IN_EXPLOSION | FLAG_IS_REINFORCED | FLAG_INSIDE);
                             } else {
                                 blocks.put(ipos, FLAG_IN_EXPLOSION | FLAG_IS_BLOCK | FLAG_INSIDE);
                             }
-                        } catch (Exception ex) {
-                            CreateNuclear.LOGGER.warn("Error while calculating nuclear explosion", ex);
+                        } catch (Exception e) {
+                            CreateNuclear.LOGGER.warn("Exception in block checking", e);
                             blocks.put(ipos, FLAG_IN_EXPLOSION | FLAG_IS_REINFORCED | FLAG_INSIDE);
                         }
 
-                        if (dist >= rsqc) {
+                        if (distance >= radiusSquared) {
                             crust.add(ipos);
                         }
                     }
@@ -376,14 +347,13 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
 
         List<NukeTask> tasks = new ArrayList<>();
         BlockState air = Blocks.AIR.defaultBlockState();
-        BlockState podzol = CNBlocks.DEEPSLATE_LEAD_ORE.get().defaultBlockState();
-        BlockState coarseDirt = CNBlocks.DEEPSLATE_URANIUM_ORE.get().defaultBlockState();
+        BlockState podzol = Blocks.PODZOL.defaultBlockState();
+        BlockState coarseDirt = Blocks.COARSE_DIRT.defaultBlockState();
         BlockState fire = Blocks.FIRE.defaultBlockState();
-        BlockState cobble = CNBlocks.REACTOR_COOLER.get().defaultBlockState();
-//        BlockState exfluid = CNFluids.URANIUM.getBlock().get().defaultBlockState();
+        BlockState cobble = Blocks.COBBLESTONE.defaultBlockState();
 
         if (!hasFlag(blocks.getOrDefault(pos, 0), FLAG_IS_REINFORCED)) {
-            tasks.add(new BlockModification(pos, air, 3, rxz));
+            tasks.add(new BlockModification(pos, air, 3, Mth.ceil(radius)));
         }
 
         double step = 0.5D;
@@ -430,52 +400,6 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
             }
         }
 
-        List<Object2IntMap.Entry<BlockPos>> destroyEntries = new ArrayList<>();
-
-        for (Object2IntMap.Entry<BlockPos> entry : blocks.object2IntEntrySet()) {
-            int flags = entry.getIntValue();
-
-            if (!hasFlag(flags, FLAG_IS_REINFORCED) && !hasFlag(flags, FLAG_DESTROY)) {
-                BlockPos p = entry.getKey();
-                int x0 = pos.getX() - p.getX();
-                int y0 = pos.getY() - p.getY();
-                int z0 = pos.getZ() - p.getZ();
-                int distSq = x0 * x0 + y0 * y0 + z0 * z0;
-                double dist = Math.sqrt(distSq);
-
-                int px = 0;
-                int py = 0;
-                int pz = 0;
-
-                for (double l = 0D; l <= dist; l += step) {
-                    int x = Mth.floor(x0 * l / dist + 0.5D);
-                    int y = Mth.floor(y0 * l / dist + 0.5D);
-                    int z = Mth.floor(z0 * l / dist + 0.5D);
-
-                    if (px == x && py == y && pz == z) {
-                        continue;
-                    }
-
-                    px = x;
-                    py = y;
-                    pz = z;
-
-                    mpos.set(pos.getX() + x, pos.getY() + y, pos.getZ() + z);
-                    int flags1 = blocks.getOrDefault(mpos, 0);
-
-                    if (hasFlag(flags1, FLAG_IS_REINFORCED)) {
-                        break;
-                    } else if (hasFlag(flags1, FLAG_IN_EXPLOSION) && !hasFlag(flags1, FLAG_DESTROY)) {
-                        destroyEntries.add(entry);
-                    }
-                }
-            }
-        }
-
-        for (Object2IntMap.Entry<BlockPos> entry : destroyEntries) {
-            entry.setValue(entry.getIntValue() | FLAG_DESTROY);
-        }
-
         for (Object2IntMap.Entry<BlockPos> entry : blocks.object2IntEntrySet()) {
             int flags = entry.getIntValue();
 
@@ -510,7 +434,7 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
                     } else if (state.is(BlockTags.DIRT)) {
                         tasks.add(new BlockModification(p, coarseDirt));
                         tasks.add(new LightUpdate(p, state, coarseDirt, oldLight, oldOpacity));
-                    } else if (state.is(Tags.Blocks.GRAVEL) || state.is(Tags.Blocks.SAND)) {
+                    } else if (state.is(Tags.Blocks.STONE) || state.is(Tags.Blocks.GRAVEL) || state.is(Tags.Blocks.SAND)) {
                         if (random.nextInt(10) == 0) {
                             BlockState burnt = getBurntBlock(random);
                             tasks.add(new BlockModification(p, burnt));
@@ -528,9 +452,6 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
                             tasks.add(new BlockModification(p, cobble));
                             tasks.add(new LightUpdate(p, state, cobble, oldLight, oldOpacity));
                         }
-                    } else if ( level.getFluidState(p).getType() != Fluids.EMPTY) {
-//                        tasks.add(new BlockModification(p, exfluid));
-//                        tasks.add(new LightUpdate(p, state, exfluid, oldLight, oldOpacity));
                     } else {
                         tasks.add(new LightUpdate(p, state, state, oldLight, oldOpacity));
                     }
@@ -544,12 +465,7 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
                     int oldLight = state.getLightEmission(level, pos);
                     int oldOpacity = state.getLightBlock(level, pos);
 
-                    if (random.nextInt(60) == 0) {
-//                        tasks.add(new BlockModification(p, exfluid));
-//                        tasks.add(new LightUpdate(p, state, exfluid, oldLight, oldOpacity));
-                    } else {
-                        tasks.add(new LightUpdate(p, state, state, oldLight, oldOpacity));
-                    }
+                    tasks.add(new LightUpdate(p, state, state, oldLight, oldOpacity));
                 } catch (Exception ex) {
                     CreateNuclear.LOGGER.warn("Error while calculating nuclear explosion", ex);
                 }
@@ -563,22 +479,6 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
                 modifiedBlocks++;
             }
         }
-
-        long endTime = System.currentTimeMillis();
-
-        CreateNuclear.LOGGER.warn(String.format("It modified %d/%d blocks and it took %d ms to calculate", modifiedBlocks, blocks.size(), endTime - startTime));
-
-        long delay1 = delay - (System.currentTimeMillis() - startTime);
-
-        if (delay1 > 0L) {
-            try {
-                Thread.sleep(delay1);
-            } catch (Exception ex) {
-                CreateNuclear.LOGGER.warn("Error while calculating nuclear explosion", ex);
-            }
-        }
-
-        server.submitAsync(preExplosion);
 
         while (!tasks.isEmpty()) {
             tasks.sort(this);
@@ -605,41 +505,33 @@ public class ReactorNuclearExplosion extends Thread implements Comparator<Reacto
             tasks.addAll(lowPriority);
             lists.removeIf(List::isEmpty);
 
-            for (int i = 0, listsSize = lists.size(); i < listsSize; i++) {
-                List<NukeTask> list = lists.get(i);
+            for (List<NukeTask> list : lists) {
+                //                if (!server.isRunning()) {
+//                    return;
+//                }
 
-                if (!server.isRunning()) {
-                    return;
-                }
-
-                server.submitAsync(() -> execute(list));
-
-                if (i != listsSize - 1) {
-                    try {
-                        Thread.sleep(Math.min(Math.max(lists.get(i + 1).size() / 20L, 50L), 150L));
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
+//                server.submitAsync(() -> execute(list));
+                execute(list, level);
             }
         }
     }
 
-    private void execute(List<NukeTask> list) {
+    private void execute(List<NukeTask> list, Level level) {
         boolean blockDrops = level.getGameRules().getBoolean(GameRules.RULE_DOBLOCKDROPS);
-        level.getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS).set(false, server);
+        level.getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS).set(false, level.getServer());
 
         for (NukeTask task : list) {
             task.execute(this);
         }
 
-        level.getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS).set(blockDrops, server);
+        level.getGameRules().getRule(GameRules.RULE_DOBLOCKDROPS).set(blockDrops, level.getServer());
     }
 
     private BlockState getBurntBlock(Random random) {
         return switch (random.nextInt(3)) {
             case 0 -> Blocks.MAGMA_BLOCK.defaultBlockState();
             case 1 -> Blocks.BASALT.defaultBlockState();
+            case 2 -> CNBlocks.ENRICHING_FIRE.get().defaultBlockState();
             default -> Blocks.BLACKSTONE.defaultBlockState();
         };
     }

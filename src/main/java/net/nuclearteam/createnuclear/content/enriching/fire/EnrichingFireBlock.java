@@ -4,6 +4,7 @@ import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseFireBlock;
@@ -35,8 +36,23 @@ public class EnrichingFireBlock extends BaseFireBlock {
 
     @Override
     public boolean canSurvive(BlockState state, LevelReader worldIn, BlockPos pos) {
-        return EnrichingFireBlock.canSurviveOnBlock(worldIn.getBlockState(pos.below()));
+        BlockPos blockpos = pos.below();
+      return worldIn.getBlockState(blockpos).isFaceSturdy(worldIn, blockpos, Direction.UP) || this.isValidFireLocation(worldIn, pos);
     }
+
+    private boolean isValidFireLocation(BlockGetter pLevel, BlockPos pPos) {
+      for(Direction direction : Direction.values()) {
+         if (this.canCatchFire(pLevel, pPos.relative(direction), direction.getOpposite())) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public boolean canCatchFire(BlockGetter world, BlockPos pos, Direction face) {
+      return world.getBlockState(pos).isFlammable(world, pos, face);
+   }
 
     @Override
     protected boolean canBurn(BlockState p_49284_) {
