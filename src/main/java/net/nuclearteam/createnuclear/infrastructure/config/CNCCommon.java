@@ -16,6 +16,6 @@ public class CNCCommon extends ConfigBase {
     private static class Comments {
         static String worldGen = "Modify CreateNuclear's impact on your terrain";
         static String rods = "Modify rods time and config";
-        static String explode = "Explose: pas d'idée";
+        static String explode = "Modify the parameters of the explosion";
     }
 }

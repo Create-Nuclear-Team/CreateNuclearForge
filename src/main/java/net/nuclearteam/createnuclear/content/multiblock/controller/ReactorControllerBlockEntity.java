@@ -39,6 +39,7 @@ import net.nuclearteam.createnuclear.content.multiblock.core.NuclearExplosionEnt
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 
@@ -208,22 +209,48 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (level.isClientSide || isExploding)
             return;
 
-        // --- LOGIQUE D'EXPLOSION ---
         int currentHeat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+
+        // Récupération des configs pour l'utilitaire
+        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
         if (IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER) {
             explosionCountdown++;
 
-            // Toutes les secondes (20 ticks), on peut ajouter un son d'alerte ou des particules
+            // --- AFFICHAGE DU COMPTE À REBOURS ---
+            // Toutes les secondes (20 ticks)
             if (explosionCountdown % 20 == 0) {
-                // Optionnel : level.playSound(...) pour une alarme
+                int secondsLeft = (300 - explosionCountdown) / 20;
+
+                if (secondsLeft > 0) {
+                    NotifyUtil.sendTitle(
+                        level, getBlockPos(),
+                        "ALERTE : FUSION DU CŒUR",
+                        "Explosion dans " + secondsLeft + "s",
+                        ChatFormatting.RED,
+                        configRadius, configWarnAll,
+                        0, 25, 5 // Apparition instantanée pour le timer
+                    );
+                }
             }
 
-            if (explosionCountdown >= 300) { // 15 secondes
+            if (explosionCountdown >= 300) {
                 triggerNuclearExplosion();
             }
         } else {
-            explosionCountdown = 0; // Reset si la température redescend
+            // --- MESSAGE SI L'EXPLOSION EST ANNULÉE ---
+            if (explosionCountdown > 0) {
+                NotifyUtil.sendTitle(
+                    level, getBlockPos(),
+                    "CŒUR STABILISÉ",
+                    "Le réacteur refroidit...",
+                    ChatFormatting.GREEN,
+                    configRadius, configWarnAll,
+                    10, 40, 10
+                );
+            }
+            explosionCountdown = 0;
         }
 
         if (isEmptyConfiguredPattern()) {
@@ -287,41 +314,45 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     private void triggerNuclearExplosion() {
-    if (isExploding) return;
-    isExploding = true;
+        if (isExploding) return;
+        isExploding = true;
 
-    // On cherche la position du Core central pour faire exploser à partir de là
-    // Ou on utilise simplement la position du Controller
-    BlockPos explosionPos = getBlockPos().above(2); // Par défaut 2 blocs au dessus du controller
+        BlockPos explosionPos = getBlockPos().above(2);
+        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
-    if (level instanceof ServerLevel serverLevel) {
-        NuclearExplosionEntity explosion = new NuclearExplosionEntity(
-                CNEntityType.NUCLEAR_EXPLOSION.get(),
-                serverLevel
-        );
+        if (level instanceof ServerLevel serverLevel) {
+            // --- MESSAGE D'EXPLOSION FINALE ---
+            NotifyUtil.sendTitle(
+                level, getBlockPos(),
+                "RÉACTEUR DÉTRUIT",
+                "Fusion critique terminée",
+                ChatFormatting.DARK_RED,
+                configRadius, configWarnAll,
+                10, 60, 20
+            );
 
-        explosion.setPos(
-                explosionPos.getX() + 0.5D,
-                explosionPos.getY() + 10.0D,
-                explosionPos.getZ() + 2.0D
-        );
+            NuclearExplosionEntity explosion = new NuclearExplosionEntity(
+                    CNEntityType.NUCLEAR_EXPLOSION.get(),
+                    serverLevel
+            );
 
-        // Puissance basée sur l'uranium
-        float size = Mth.clamp(countUraniumRod * 0.075F, 1.0F, 4.0F);
-        explosion.setSize(size);
+            explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() + 2.0D);
 
-        // Respect des règles du serveur
-        boolean griefing = serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
-        explosion.setNoGriefing(!griefing);
+            float size = Mth.clamp(countUraniumRod * 0.075F, 1.0F, 4.0F);
+            explosion.setSize(size);
 
-        serverLevel.addFreshEntity(explosion);
+            boolean griefing = serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+            explosion.setNoGriefing(!griefing);
 
-        // Détruire le contrôleur pour stopper la machine
-        level.destroyBlock(getBlockPos(), false);
+            serverLevel.addFreshEntity(explosion);
 
-        changeBiome(CNBiomes.Irradiated.PLAIN, 30, explosionPos, (ServerLevel) level);
+            // On détruit le bloc après avoir envoyé les messages
+            level.destroyBlock(getBlockPos(), false);
+
+            changeBiome(CNBiomes.Irradiated.PLAIN, 30, explosionPos, serverLevel);
+        }
     }
-}
 
     public void changeBiome(ResourceKey<Biome> biomeResourceKey, int radius, BlockPos center, ServerLevel serverLevel) {
         // radius is in blocks; we convert to chunk/section coords
