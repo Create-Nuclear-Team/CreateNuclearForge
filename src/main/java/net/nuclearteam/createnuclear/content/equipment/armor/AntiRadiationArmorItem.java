@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
@@ -38,15 +39,15 @@ public class AntiRadiationArmorItem {
     public static class Helmet extends ArmorItem {
         protected final DyeColor color;
 
-        private final Multimap<Attribute, AttributeModifier> attributeModifiers;
+//        private final Multimap<Attribute, AttributeModifier> attributeModifiers;
 
         public Helmet(Properties properties, DyeColor color) {
             super(ARMOR_MATERIAL, HELMET, properties);
             this.color = color;
-            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-            UUID uuid = ARMOR_MODIFIER_UUID_PER_TYPE.get(HELMET);
-            builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", 42, AttributeModifier.Operation.ADDITION));
-            this.attributeModifiers = builder.build();
+//            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+//            UUID uuid = ARMOR_MODIFIER_UUID_PER_TYPE.get(HELMET);
+//            builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", 42, AttributeModifier.Operation.ADDITION));
+//            this.attributeModifiers = builder.build();
         }
 
         @Override
@@ -107,10 +108,10 @@ public class AntiRadiationArmorItem {
                     : CNItemTags.ANTI_RADIATION_HELMET_DYE.tag;
         }
 
-        @Override
-        public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot pEquipmentSlot) {
-            return pEquipmentSlot == this.type.getSlot() ? this.attributeModifiers : super.getDefaultAttributeModifiers(pEquipmentSlot);
-        }
+//        @Override
+//        public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot pEquipmentSlot) {
+//            return pEquipmentSlot == this.type.getSlot() ? this.attributeModifiers : super.getDefaultAttributeModifiers(pEquipmentSlot);
+//        }
     }
 
     public static class Chestplate extends ArmorItem {
@@ -321,18 +322,52 @@ public class AntiRadiationArmorItem {
             return leggingsMap.get(color);
         }
 
-        public static boolean isArmored(ItemStack item) {
-            return helmetMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) ||
-                    chestplateMap.values().stream().anyMatch(entry -> entry.is(item.getItem())) ||
-                    leggingsMap.values().stream().anyMatch(entry -> entry.is(item.getItem()));
+        /**
+         * Returns true if the given ItemStack corresponds to any piece of the anti-radiation armor.
+         */
+        public static boolean isAnyPiece(ItemStack item) {
+            return helmetMap.values().stream().anyMatch(entry -> entry.is(item.getItem()))
+                    || chestplateMap.values().stream().anyMatch(entry -> entry.is(item.getItem()))
+                    || leggingsMap.values().stream().anyMatch(entry -> entry.is(item.getItem()))
+                    || CNItems.ANTI_RADIATION_BOOTS.is(item.getItem());
         }
 
+        /**
+         * Returns true when the provided armor stacks contain a full anti-radiation set
+         * (helmet, chestplate, leggings and boots).
+         */
+        public static boolean isFullSet(Iterable<ItemStack> armorStacks) {
+            boolean hasHelmet = false;
+            boolean hasChestplate = false;
+            boolean hasLeggings = false;
+            boolean hasBoots = false;
+
+            for (ItemStack itemStack : armorStacks) {
+                Item item = itemStack.getItem();
+                if (CNItems.ANTI_RADIATION_HELMETS.contains(item)) {
+                    hasHelmet = true;
+                } else if (CNItems.ANTI_RADIATION_CHESTPLATES.contains(item)) {
+                    hasChestplate = true;
+                } else if (CNItems.ANTI_RADIATION_LEGGINGS.contains(item)) {
+                    hasLeggings = true;
+                } else if (CNItems.ANTI_RADIATION_BOOTS.is(item)) {
+                    hasBoots = true;
+                }
+            }
+
+            return hasHelmet && hasChestplate && hasLeggings && hasBoots;
+        }
+
+        /**
+         * Returns true when the given entity is fully wearing the anti-radiation set.
+         */
+        public static boolean isFullSet(LivingEntity entity) {
+            return isFullSet(entity.getArmorSlots());
+        }
+
+        /** Alias for {@link #isAnyPiece(ItemStack)} kept for compatibility. */
         public static boolean isArmored2(ItemStack item) {
-            return CNItems.ANTI_RADIATION_HELMETS.contains(item.getItem())
-                    || CNItems.ANTI_RADIATION_CHESTPLATES.contains(item.getItem())
-                    || CNItems.ANTI_RADIATION_LEGGINGS.contains(item.getItem())
-                    || CNItems.ANTI_RADIATION_BOOTS.is(item.getItem())
-                    ;
+            return isAnyPiece(item);
         }
     }
 

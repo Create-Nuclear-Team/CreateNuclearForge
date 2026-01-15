@@ -8,33 +8,52 @@ import com.simibubi.create.foundation.utility.IInteractionChecker;
 import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.core.NuclearExplosionEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
 @SuppressWarnings({"unused"})
 public class ReactorControllerBlockEntity extends SmartBlockEntity implements IInteractionChecker, IHaveGoggleInformation {
+    public int explosionCountdown = 0;
+    private boolean isExploding = false;
+
     public boolean destroyed = false;
     public boolean created = false;
     public boolean test = true;
@@ -183,28 +202,29 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         ON, OFF
     }
 
-    private void explodeReactorCore(Level level, BlockPos pos) {
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    BlockPos currentPos = pos.offset(x, y, z);
-                    //le problème viens de la il ne rentre pas dans le if
-                    if (level.getBlockState(currentPos).is(CNBlocks.REACTOR_CORE.get())) {
-                        // Create and execute the explosion
-                        Explosion explosion = new Explosion(level, null, currentPos.getX(), currentPos.getY(), currentPos.getZ(), 4.0F, false, Explosion.BlockInteraction.DESTROY);
-                        explosion.explode();
-                        explosion.finalizeExplosion(true);
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public void tick() {
         super.tick();
-        if (level.isClientSide)
+        if (level.isClientSide || isExploding)
             return;
+
+        // --- LOGIQUE D'EXPLOSION ---
+        int currentHeat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+
+        if (IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER) {
+            explosionCountdown++;
+
+            // Toutes les secondes (20 ticks), on peut ajouter un son d'alerte ou des particules
+            if (explosionCountdown % 20 == 0) {
+                // Optionnel : level.playSound(...) pour une alarme
+            }
+
+            if (explosionCountdown >= 300) { // 15 secondes
+                triggerNuclearExplosion();
+            }
+        } else {
+            explosionCountdown = 0; // Reset si la température redescend
+        }
 
         if (isEmptyConfiguredPattern()) {
 
@@ -264,6 +284,82 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 this.notifyUpdate();
             }
         }
+    }
+
+    private void triggerNuclearExplosion() {
+    if (isExploding) return;
+    isExploding = true;
+
+    // On cherche la position du Core central pour faire exploser à partir de là
+    // Ou on utilise simplement la position du Controller
+    BlockPos explosionPos = getBlockPos().above(2); // Par défaut 2 blocs au dessus du controller
+
+    if (level instanceof ServerLevel serverLevel) {
+        NuclearExplosionEntity explosion = new NuclearExplosionEntity(
+                CNEntityType.NUCLEAR_EXPLOSION.get(),
+                serverLevel
+        );
+
+        explosion.setPos(
+                explosionPos.getX() + 0.5D,
+                explosionPos.getY() + 10.0D,
+                explosionPos.getZ() + 2.0D
+        );
+
+        // Puissance basée sur l'uranium
+        float size = Mth.clamp(countUraniumRod * 0.075F, 1.0F, 4.0F);
+        explosion.setSize(size);
+
+        // Respect des règles du serveur
+        boolean griefing = serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+        explosion.setNoGriefing(!griefing);
+
+        serverLevel.addFreshEntity(explosion);
+
+        // Détruire le contrôleur pour stopper la machine
+        level.destroyBlock(getBlockPos(), false);
+
+        changeBiome(CNBiomes.Irradiated.PLAIN, 30, explosionPos, (ServerLevel) level);
+    }
+}
+
+    public void changeBiome(ResourceKey<Biome> biomeResourceKey, int radius, BlockPos center, ServerLevel serverLevel) {
+        // radius is in blocks; we convert to chunk/section coords
+        Registry<Biome> biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME);
+        Holder<Biome> biomeHolder = biomeRegistry.getHolderOrThrow(biomeResourceKey);
+
+        // If the center biome is already the target biome, skip whole operation
+        Holder<Biome> current = serverLevel.getBiome(center);
+        Optional<ResourceKey<Biome>> currentKey = current.unwrapKey();
+        if (currentKey.isPresent() && currentKey.get().equals(biomeResourceKey)) {
+            CreateNuclear.LOGGER.info("changeBiome: center already irradiated: {}", currentKey.get());
+            return;
+        }
+
+        int minX = center.getX() - radius;
+        int maxX = center.getX() + radius;
+        int minZ = center.getZ() - radius;
+        int maxZ = center.getZ() + radius;
+
+        ArrayList<ChunkAccess> chunks = new ArrayList<>();
+
+        for (int cz = SectionPos.blockToSectionCoord(minZ); cz <= SectionPos.blockToSectionCoord(maxZ); ++cz) {
+            for (int cx = SectionPos.blockToSectionCoord(minX); cx <= SectionPos.blockToSectionCoord(maxX); ++cx) {
+                ChunkAccess chunkAccess = serverLevel.getChunk(cx, cz, ChunkStatus.FULL, false);
+                if (chunkAccess != null) {
+                    chunkAccess.fillBiomesFromNoise(makeResolver(biomeHolder), serverLevel.getChunkSource().randomState().sampler());
+                    chunkAccess.setUnsaved(true);
+                    chunks.add(chunkAccess);
+                }
+            }
+        }
+
+        // Inform players/clients about biome changes for affected chunks
+        serverLevel.getChunkSource().chunkMap.resendBiomesForChunks(chunks);
+    }
+
+    public static BiomeResolver makeResolver(Holder<Biome> biomeHolder) {
+        return (x, y, z, climateSampler) -> biomeHolder;
     }
 
     private boolean isEmptyConfiguredPattern() {

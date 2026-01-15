@@ -5,7 +5,7 @@ import net.createmod.catnip.config.ConfigBase;
 public class CExplose extends ConfigBase {
     public final ConfigInt size = i(10, "Size of the reactor explosion");
     public final ConfigInt type = i(1, 0, 2, "Type of explosion", Comments.type);
-    public final ConfigInt time = i(600, 100, 1200, "Duration before exploration", Comments.explosionTime, Comments.hintExplosion);
+    public final ConfigInt time = i(300, 100, 1200, "Duration before exploration", Comments.explosionTime, Comments.hintExplosion);
 
     @Override
     public String getName() {
