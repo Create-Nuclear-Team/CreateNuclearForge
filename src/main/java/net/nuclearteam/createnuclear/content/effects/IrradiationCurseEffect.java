@@ -26,7 +26,7 @@ public class IrradiationCurseEffect extends VicinityEffect {
     public IrradiationCurseEffect(MobEffectCategory category, int color) {
         super(category, color,
                 amplifier -> 15,
-                e -> !e.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag) && !e.hasEffect(CNEffects.RADIATION.get()),
+                (e) -> !e.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag) && !e.hasEffect(CNEffects.RADIATION.get()),
                 timer -> {},
                 () -> new MobEffectInstance(MobEffects.ABSORPTION, 300));
     }
