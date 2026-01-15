@@ -1,8 +1,8 @@
-// 1.20.1	2025-11-24T20:36:32.0462092	CreateNuclear Generated Registry Entries
+// 1.20.1	2026-01-15T11:39:38.0567887	CreateNuclear Generated Registry Entries
 5edbd74546f4088818e02bb7a5c5eb2ecfe25623 data/createnuclear/forge/biome_modifier/lead_ore.json
 72173023e6a31748692e750db0f5fa8c555d1009 data/createnuclear/forge/biome_modifier/striated_ores_overworld.json
 fa32145101dc12ec914684fec8c5cbb995d2c051 data/createnuclear/forge/biome_modifier/uranium_ore.json
-bec3aa19be2740b8347902856a2ad920b0641804 data/createnuclear/worldgen/biome/irradiated_plain.json
+68758bb77506c0b9edafcada610c5c45222f50b2 data/createnuclear/worldgen/biome/irradiated_plain.json
 b68555f371c9700aa4ecfa9370b010de8fe25b60 data/createnuclear/worldgen/configured_feature/lead_ore.json
 4f11c0a518c0de7857919983fc638ba551c6630a data/createnuclear/worldgen/configured_feature/striated_ores_overworld.json
 b0e1ee7314412507fd7346cb48b29d105f6186ad data/createnuclear/worldgen/configured_feature/uranium_ore.json

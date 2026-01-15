@@ -151,7 +151,6 @@ public class ExplosionCore implements Comparator<ExplosionCore.NukeTask> {
                     return false;
                 }
             }
-
             return true;
         }
     }

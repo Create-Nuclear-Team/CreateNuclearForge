@@ -36,6 +36,8 @@
   "has_precipitation": false,
   "spawn_costs": {},
   "spawners": {
+    "alexscaves:cave_creature": [],
+    "alexscaves:deep_sea_creature": [],
     "ambient": [],
     "axolotls": [],
     "creature": [],
