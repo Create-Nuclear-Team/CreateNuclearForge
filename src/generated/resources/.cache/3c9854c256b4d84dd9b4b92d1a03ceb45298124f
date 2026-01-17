@@ -1,4 +1,4 @@
-// 1.20.1	2025-11-26T13:57:16.8768726	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-01-17T18:26:54.0244303	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -38,8 +38,8 @@ a2fc21fa320e677fe7690b260ee3f57ebdbd50b6 assets/createnuclear/blockstates/small_
 57c846a957e9250bc45f2f1091bf3f78b2a77344 assets/createnuclear/blockstates/steel_block.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-64a69d8b4ed209ac210e65a5ca3143b1bbb452f1 assets/createnuclear/lang/en_ud.json
-ec998cb8901e09dcef0c5c37712009a8fae5ff7e assets/createnuclear/lang/en_us.json
+00142a8f73f5d5d7a9100b85476ecee5af9ce08c assets/createnuclear/lang/en_ud.json
+f50a1b3f289888f7216d72d30b67aa38bd97320c assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -113,6 +113,7 @@ ce17b82389ca226bc9e55072ae0dab1ef049e96f assets/createnuclear/models/item/brown_
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/createnuclear/models/item/cat_irradiated_spawn_egg.json
 63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/createnuclear/models/item/chicken_irradiated_spawn_egg.json
 047d097f30f9586494547715d07271c6994acd18 assets/createnuclear/models/item/coal_dust.json
+63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/createnuclear/models/item/cow_irradiated_spawn_egg.json
 0c682ff48601bf7f42c8561819ecede780664fbf assets/createnuclear/models/item/cut_autunite.json
 11220bd60ab51e05a978a8322511c224d15bf886 assets/createnuclear/models/item/cut_autunite_bricks.json
 d43ffb4c5491fcd8c98451649c3f4ceb271e8875 assets/createnuclear/models/item/cut_autunite_brick_slab.json
@@ -215,6 +216,7 @@ ea04609e8b5c12a7805b1c564bca07fefd6d38ba assets/createnuclear/models/item/uraniu
 953491d658ba39add0f080137ebfafc9ac07ee1d assets/createnuclear/models/item/yellow_anti_radiation_helmet.json
 b20aeafcdcd235c7d89067d5331b823535b82522 assets/createnuclear/models/item/yellow_anti_radiation_leggings.json
 a1970879fd57836f5ae5d23352cdca277095bc7d assets/createnuclear/models/item/yellow_cloth.json
+63ec6c618a3a23eab4cab9c52d7d3250de9b516e assets/createnuclear/models/item/zombie_irradiated_spawn_egg.json
 72b0cec0c98e9ead9562ff0cc1231a5028e2a22f data/createnuclear/advancements/recipes/building_blocks/autunite_from_stone_types_autunite_stonecutting.json
 e7967751f132676cb1d523743adaac3aea1f0814 data/createnuclear/advancements/recipes/building_blocks/autunite_pillar_from_stone_types_autunite_stonecutting.json
 8e9cfc8ab1ddd7b818cb52cbd0fb60c0c4713bad data/createnuclear/advancements/recipes/building_blocks/crafting/enriched_soul_soil.json
@@ -370,6 +372,7 @@ fba1a7bdb0835c034aa5ef52ebf589123d41b33e data/createnuclear/loot_tables/entities
 2d8f5d7d7babd2b02ae836846e62daabf84de427 data/createnuclear/loot_tables/entities/irradiated_chicken.json
 900719d49cec9385da31bb392649c65f4297288c data/createnuclear/loot_tables/entities/irradiated_cow.json
 f91f43a39c80f583f878ea1a0d944798c05f2388 data/createnuclear/loot_tables/entities/irradiated_wolf.json
+a46a338c217f3ad9e5431d096542ee2d67823e9d data/createnuclear/loot_tables/entities/irradiated_zombie.json
 4c985d77908c367245c3b4d56e1302a843522eff data/createnuclear/recipes/autunite_from_stone_types_autunite_stonecutting.json
 9819e80259d08c1518b30ee9d4cf5c18689d3efc data/createnuclear/recipes/autunite_pillar_from_stone_types_autunite_stonecutting.json
 af0091392c2d5784455a57783bfa62d0d60d13ae data/createnuclear/recipes/crafting/enriched_soul_soil.json
@@ -487,7 +490,7 @@ a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/createnuclear/tags/blocks/enrichin
 509b5baa813ae0dc3345fd97754e4088132359ec data/createnuclear/tags/blocks/fan_processing_catalysts/enriched.json
 925cb97bc13b3122fe17e59ff3ec2fe4d1eaacd5 data/createnuclear/tags/blocks/lead_ores.json
 bad88bea18fec41c7ad6fa4d396feacc0346a137 data/createnuclear/tags/blocks/uranium_ores.json
-ccbc67cba973a8e1e43d0166ddfa5645f6a82aea data/createnuclear/tags/entity_types/irradiated_immune.json
+3cdb2ff3aacc0e5e078f46f4061758561c66ec31 data/createnuclear/tags/entity_types/irradiated_immune.json
 bfd5a561b60a7d59d7f7c248ec75e3571a0f2fed data/createnuclear/tags/fluids/uranium.json
 7422c4cd9d6dd716f91311faa1fb7e26aa9ac345 data/createnuclear/tags/items/all_anti_radiation_armors.json
 e3fe4325aafb669d287c17b5b30953e4fb709110 data/createnuclear/tags/items/anti_radiation_armor.json
