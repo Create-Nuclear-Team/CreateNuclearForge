@@ -4,8 +4,8 @@ import net.createmod.catnip.config.ConfigBase;
 
 public class CNotify extends ConfigBase {
 
-    public final ConfigBase.ConfigBool warnAllPlayers = b(false, "Warn all players", Comments.warning);
-    public final ConfigBase.ConfigInt distanceOfWarning = i(100, 30, 5000, "Distance of warning", Comments.rangeOfWarning);
+    public final ConfigBool warnAllPlayers = b(false, "Warn all players", Comments.warning);
+    public final ConfigInt distanceOfWarning = i(100, 30, 5000, "Distance of warning", Comments.rangeOfWarning);
 
     @Override
     public String getName() {

@@ -17,7 +17,7 @@ public class NotifyUtil {
 
     /**
      * Envoie un titre et un sous-titre à un groupe de joueurs défini par les paramètres.
-     * * @param level         Le monde (Serveur)
+     * @param level         Le monde (Serveur)
      * @param pos           Position d'origine (ignorée si warnAll est vrai)
      * @param title         Texte principal
      * @param subtitle      Texte secondaire
