@@ -167,7 +167,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.reactorPos = compound.getIntArray("reactorPose");
         this.total = compound.getDouble("total");
 
-        // 2. Gestion des items (Ton code existant)
+        // 2. Gestion des items
         if (!clientPacket) {
             inventory.deserializeNBT(compound.getCompound("pattern"));
         }
@@ -233,42 +233,46 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             this.setChanged();
         }
 
-        if (isEmptyConfiguredPattern()) {
-            if (this.inputManager.size() > 0) {
-                List<IItemHandler> handlers = inputManager.getItemHandlers(level);
-                VirtualReactorInputs virtualReactorInputs = inputManager.getInventory(level);
+        if (isAssembled()) {
+            if (!isEmptyConfiguredPattern()) {
+                if (this.inputManager.size() > 0) {
+                    List<IItemHandler> handlers = inputManager.getItemHandlers(level);
+                    VirtualReactorInputs virtualReactorInputs = inputManager.getInventory(level);
+                    bigFuelItem = virtualReactorInputs.getBigFuelRod();
+                    bigCoolerItem = virtualReactorInputs.getBigCooledRod();
+                    this.setChanged();
+                    this.notifyUpdate();
 
-                bigFuelItem = virtualReactorInputs.getBigFuelRod();
-                bigCoolerItem = virtualReactorInputs.getBigCooledRod();
-
-                this.setChanged();
-                this.notifyUpdate();
-
-                if (bigFuelItem.count > 0 && bigCoolerItem.count > 0) {
-                    configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat());
-                    if (updateTimers()) {
-                        boolean extracted = inputManager.extractItems(level, 1, 1);
-                        if (extracted) {
-                            this.setChanged();
-                            this.notifyUpdate();
-                            total = calculateProgress();
-                            int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-                            if (IHeat.HeatLevel.isNotDanger(heat)) {
-                                //...
-                            } else {
-                                EventTriggerPacket packet = new EventTriggerPacket(600);
-                                CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
-                                CNPackets.sendToNear(level, getBlockPos(), 32, packet);
-                            }
-                            return;
+                    if (bigFuelItem.count > 0 && bigCoolerItem.count > 0) {
+                        configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat());
+                        if (!this.outputManager.getBlocksPosition().isEmpty()) {
+                            rotate(getBlockState(), getLevel(), heat);
                         }
-                    }
-                } else {
-//                    //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
-                }
 
-                this.notifyUpdate();
-            }
+                        if (updateTimers()) {
+                            boolean extracted = inputManager.extractItems(level, 1, 1);
+                            if (extracted) {
+                                this.setChanged();
+                                this.notifyUpdate();
+                                total = calculateProgress();
+                                int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+                                CreateNuclear.LOGGER.info("heat: {}", heat);
+                                if (IHeat.HeatLevel.isNotDanger(heat)) {
+                                    //...
+                                } else {
+                                    EventTriggerPacket packet = new EventTriggerPacket(600);
+                                    CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
+                                    CNPackets.sendToNear(level, getBlockPos(), 32, packet);
+                                }
+                                return;
+                            }
+                        }
+                    } else {
+                        rotate(getBlockState(), getLevel(), 0);
+                    }
+
+                    this.notifyUpdate();
+                }
 //            if (this.needsToResolveEntities) {
 //            }
 //            BlockEntity blockEntity = level.getBlockEntity(this.worldPosition);
@@ -303,11 +307,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 //
 //                this.notifyUpdate();
 //            }
+            }
         }
     }
 
     private boolean isEmptyConfiguredPattern() {
-        return !configuredPattern.isEmpty() || !configuredPattern.getOrCreateTag().isEmpty();
+        return configuredPattern.isEmpty() || configuredPattern.getOrCreateTag().isEmpty();
     }
 
     private boolean updateTimers() {
@@ -427,30 +432,34 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return posInput;
     }
 
-    public void rotate(BlockState state, BlockPos pos, Level level, int rotation) {
-        if (level.getBlockState(pos).is(CNBlocks.REACTOR_OUTPUT.get()) && rotation > 0) {
-            if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
-                ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
-                if (state.getValue(ASSEMBLED)) { // Starting the energy
-                    entity.speed = rotation;
-                    entity.heat = rotation;
-                } else { // stopping the energy
-                    entity.speed = 0;
-                    entity.heat = 0;
-                }
-                entity.updateSpeed = true;
-                entity.updateGeneratedRotation();
-                entity.setSpeed(rotation);
+    public void rotate(BlockState state, Level level, int rotation) {
+        rotation /= this.outputManager.getBlocksPosition().size();
+        for (int i = 0; i < this.outputManager.getBlocksPosition().size(); i++) {
+            BlockPos pos =  this.outputManager.getBlocksPosition().get(i);
 
-            }
-        }
-        else {
-            if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
-                ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
-                entity.setSpeed(0);
-                entity.heat = 0;
-                entity.updateSpeed = true;
-                entity.updateGeneratedRotation();
+            if (rotation > 0) {
+                if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
+                    ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
+                    if (state.getValue(ASSEMBLED)) { // Starting the energy
+                        entity.speed = rotation;
+                        entity.heat = rotation;
+                    } else { // stopping the energy
+                        entity.speed = 0;
+                        entity.heat = 0;
+                    }
+                    entity.updateSpeed = true;
+                    entity.updateGeneratedRotation();
+                    entity.setSpeed(rotation);
+
+                }
+            } else {
+                if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
+                    ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
+                    entity.setSpeed(0);
+                    entity.heat = 0;
+                    entity.updateSpeed = true;
+                    entity.updateGeneratedRotation();
+                }
             }
         }
     }

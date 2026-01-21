@@ -9,8 +9,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.nuclearteam.createnuclear.CNBlocks;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
+import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -38,7 +41,7 @@ public class ReactorPattern {
                 .aisle("OABAO", "ODDDO", "BDCDB", "ODDDO", "OA*AO")
                 .aisle("OABAO", "ODDDO", "BDCDB", "ODDDO", "OABAO")
                 .aisle("OABAO", "ODDDO", "BDCDB", "ODDDO", "OABAO")
-                .aisle("OOOOO", "OAAAO", "OAAAO", "OAAAO", "OOAOO")
+                .aisle("OOOOO", "OAAAO", "OAAAO", "OAAAO", "OOOOO")
                 .where('A', blockInWorldAPredicate)
                 .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
                 .where('C', a -> a.getState().is(CNBlocks.REACTOR_CORE.get()))
@@ -114,11 +117,22 @@ public class ReactorPattern {
                 for (int z = pos.getZ()-9; z != pos.getZ()+10; z+=1) {
                     newBlock = new BlockPos(x, y, z);
                     if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) { // verifying the pattern
-                        return newBlock;
+                        ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(newBlock).getBlock();
+                        ReactorControllerBlockEntity entity = controller.getBlockEntity(level, newBlock);
+                        if  (entity != null) {
+                            if (isInReactorRange(entity.reactorPos, blockPos)) {
+                                return newBlock;
+                            }
+                        }
                     }
                 }
             }
         }
         return null;
+    }
+
+    public boolean isInReactorRange(int []reactorPos, BlockPos blockPos) {
+        //[xMin, xMax, yMin, yMax, zMin, zMax]
+        return blockPos.getX() >= reactorPos[0] && blockPos.getX() <= reactorPos[1] && blockPos.getY() >= reactorPos[2] && blockPos.getY() <= reactorPos[3] && blockPos.getZ() >= reactorPos[4] && blockPos.getZ() <= reactorPos[5];
     }
 }

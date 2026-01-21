@@ -100,7 +100,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     be.inventory.setStackInSlot(0, ItemStack.EMPTY);
                     be.configuredPattern = ItemStack.EMPTY;
                     be.total = 0.0;
-                    be.rotate(be.getBlockState(), new BlockPos(be.getBlockPos().getX(), be.getBlockPos().getY() + (-3), be.getBlockPos().getZ()), be.getLevel(), 0);
+                    be.rotate(be.getBlockState(), be.getLevel(), 0);
                     be.notifyUpdate();
                 });
                 state.setValue(ASSEMBLED, false);
@@ -181,14 +181,14 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         }
 
         // the pattern is incorrect
-        for (Player player : players) {
-            if (!create && entity.isAssembled()) {
+        if (!create && entity.isAssembled()) {
+            for (Player player : players) {
                 player.sendSystemMessage(Component.translatable("reactor.info.assembled.destroyer"));
-                level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false));
-                entity.setAssembled(false);
-//                entity.removeIOAll();
-                Rotate(state, pos.below(3), level, 0);
             }
+            level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false));
+            entity.setAssembled(false);
+//                entity.removeIOAll();
+            Rotate(state, pos.below(3), level, 0);
         }
     }
     public void Rotate(BlockState state, BlockPos pos, Level level, int rotation) {
@@ -241,7 +241,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     // On n'exécute la logique que si on est sur une des faces de la boîte
                     if (isYBoundary || isXBoundary || isZBoundary) {
                         mutablePos.set(x, y, z);
-//                        isSpecialBlock(level, mutablePos, controllerBlockEntity);
+                        //isSpecialBlock(level, mutablePos, controllerBlockEntity);
                     }
                 }
             }
