@@ -1,17 +1,13 @@
-package net.nuclearteam.createnuclear.content.multiblock.reactorCooler;
+package net.nuclearteam.createnuclear.content.multiblock.cooler;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import javax.annotation.Nullable;
