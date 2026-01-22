@@ -48,6 +48,21 @@
     "createnuclear:green_anti_radiation_leggings",
     "createnuclear:red_anti_radiation_leggings",
     "createnuclear:black_anti_radiation_leggings",
-    "createnuclear:anti_radiation_boots"
+    "createnuclear:white_anti_radiation_boots",
+    "createnuclear:orange_anti_radiation_boots",
+    "createnuclear:magenta_anti_radiation_boots",
+    "createnuclear:light_blue_anti_radiation_boots",
+    "createnuclear:yellow_anti_radiation_boots",
+    "createnuclear:lime_anti_radiation_boots",
+    "createnuclear:pink_anti_radiation_boots",
+    "createnuclear:gray_anti_radiation_boots",
+    "createnuclear:light_gray_anti_radiation_boots",
+    "createnuclear:cyan_anti_radiation_boots",
+    "createnuclear:purple_anti_radiation_boots",
+    "createnuclear:blue_anti_radiation_boots",
+    "createnuclear:brown_anti_radiation_boots",
+    "createnuclear:green_anti_radiation_boots",
+    "createnuclear:red_anti_radiation_boots",
+    "createnuclear:black_anti_radiation_boots"
   ]
 }
