@@ -232,18 +232,16 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             needsToResolveEntities = false;
             this.setChanged();
         }
-
         if (isAssembled()) {
-            if (!isEmptyConfiguredPattern()) {
+            List<IItemHandler> handlers = inputManager.getItemHandlers(level);
+            VirtualReactorInputs virtualReactorInputs = inputManager.getInventory(level);
+            bigFuelItem = virtualReactorInputs.getBigFuelRod();
+            bigCoolerItem = virtualReactorInputs.getBigCooledRod();
+
+            if (!isEmptyConfiguredPattern() && bigFuelItem.count > 0 && bigCoolerItem.count > 0) {
                 if (this.inputManager.size() > 0) {
-                    List<IItemHandler> handlers = inputManager.getItemHandlers(level);
-                    VirtualReactorInputs virtualReactorInputs = inputManager.getInventory(level);
-                    bigFuelItem = virtualReactorInputs.getBigFuelRod();
-                    bigCoolerItem = virtualReactorInputs.getBigCooledRod();
                     this.setChanged();
                     this.notifyUpdate();
-
-                    if (bigFuelItem.count > 0 && bigCoolerItem.count > 0) {
                         configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat());
                         if (!this.outputManager.getBlocksPosition().isEmpty()) {
                             rotate(getBlockState(), getLevel(), heat);
@@ -267,46 +265,18 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                                 return;
                             }
                         }
-                    } else {
-                        rotate(getBlockState(), getLevel(), 0);
-                    }
 
+                    this.setChanged();
                     this.notifyUpdate();
                 }
-//            if (this.needsToResolveEntities) {
-//            }
-//            BlockEntity blockEntity = level.getBlockEntity(this.worldPosition);
-//            if (blockEntity instanceof ReactorInputEntity be) {
-//                CompoundTag tag = be.serializeNBT();
-//                ListTag inventoryTag = tag.getCompound("Inventory").getList("Items", Tag.TAG_COMPOUND);
-//                CreateNuclear.LOGGER.info("TAG: {}", inventoryTag);
-//                fuelItem = ItemStack.of(inventoryTag.getCompound(0));
-//                coolerItem = ItemStack.of(inventoryTag.getCompound(1));
-//                //BlockPos outputPos = pattern.FindOutputPos(getBlockPos(), getLevel(), getLevel().players(), true);
-//                if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
-//                    configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat());
-//                    if (updateTimers()) {
-//                        be.inventory.extractItem(0, 1, false);
-//                        be.inventory.extractItem(1, 1, false);
-//                        total = calculateProgress();
-//                        int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-//                        if (IHeat.HeatLevel.isNotDanger(heat)) {
-//                            //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), heat/4);
-//                        } else {
-//                            // Send a packet to all clients around this block within 16 blocks
-//                            EventTriggerPacket packet = new EventTriggerPacket(600); // display for 100 ticks
-//                            CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
-//                            CNPackets.sendToNear(level, getBlockPos(), 32, packet);
-//                            //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
-//                        }
-//                        return;
-//                    }
-//                } else {
-//                    //this.rotate(getBlockState(), new BlockPos(getBlockPos().getX() + outputPos.getX(), getBlockPos().getY() + outputPos.getY(), getBlockPos().getZ() + outputPos.getZ()), getLevel(), 0);
-//                }
-//
-//                this.notifyUpdate();
-//            }
+            } else {
+                configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat());
+                CreateNuclear.LOGGER.info("heat2: {}", heat);
+                if (!this.outputManager.getBlocksPosition().isEmpty()) {
+                    rotate(getBlockState(), getLevel(), 0);
+                }
+                this.setChanged();
+                this.notifyUpdate();
             }
         }
     }
@@ -338,6 +308,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
         heat = 0;
 
+        if (bigFuelItem.count <= 0 || bigCoolerItem.count <= 0) {
+            CreateNuclear.LOGGER.warn("heat = 0");
+            return 0;
+        }
         // if more than maxUraniumPerGraphite of the rods are uranium, the reactor will overheat
         if (countUraniumRod > countGraphiteRod * maxUraniumPerGraphite) {
             overFlowHeatTimer++;
