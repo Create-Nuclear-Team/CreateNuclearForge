@@ -254,7 +254,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                                 this.notifyUpdate();
                                 total = calculateProgress();
                                 int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-                                CreateNuclear.LOGGER.info("heat: {}", heat);
                                 if (IHeat.HeatLevel.isNotDanger(heat)) {
                                     //...
                                 } else {
@@ -271,7 +270,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 }
             } else {
                 configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat());
-                CreateNuclear.LOGGER.info("heat2: {}", heat);
                 if (!this.outputManager.getBlocksPosition().isEmpty()) {
                     rotate(getBlockState(), getLevel(), 0);
                 }
@@ -309,7 +307,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         heat = 0;
 
         if (bigFuelItem.count <= 0 || bigCoolerItem.count <= 0) {
-            CreateNuclear.LOGGER.warn("heat = 0");
             return 0;
         }
         // if more than maxUraniumPerGraphite of the rods are uranium, the reactor will overheat
