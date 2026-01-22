@@ -316,7 +316,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (isExploding) return;
         isExploding = true;
 
-        BlockPos explosionPos = getBlockPos().above(2);
+        BlockPos explosionPos = getBlockPos().above(5);
         int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
         boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
@@ -336,7 +336,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                     serverLevel
             );
 
-            explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() + 2.0D);
+            explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() - 2.0D);
 
             float size = Mth.clamp(countUraniumRod * 0.075F, 1.0F, 4.0F);
             explosion.setSize(size);
@@ -349,47 +349,69 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             // On détruit le bloc après avoir envoyé les messages
             level.destroyBlock(getBlockPos(), false);
 
-            changeBiome(CNBiomes.Irradiated.PLAIN, 30, explosionPos, serverLevel);
+            changeBiome(CNBiomes.Irradiated.PLAIN, (int)size*30, explosionPos, serverLevel);
         }
     }
 
     public void changeBiome(ResourceKey<Biome> biomeResourceKey, int radius, BlockPos center, ServerLevel serverLevel) {
-        // radius is in blocks; we convert to chunk/section coords
-        Registry<Biome> biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME);
-        Holder<Biome> biomeHolder = biomeRegistry.getHolderOrThrow(biomeResourceKey);
+    Registry<Biome> biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME);
+    Holder<Biome> targetBiomeHolder = biomeRegistry.getHolderOrThrow(biomeResourceKey);
 
-        // If the center biome is already the target biome, skip whole operation
-        Holder<Biome> current = serverLevel.getBiome(center);
-        Optional<ResourceKey<Biome>> currentKey = current.unwrapKey();
-        if (currentKey.isPresent() && currentKey.get().equals(biomeResourceKey)) {
-            CreateNuclear.LOGGER.info("changeBiome: center already irradiated: {}", currentKey.get());
-            return;
-        }
-
-        int minX = center.getX() - radius;
-        int maxX = center.getX() + radius;
-        int minZ = center.getZ() - radius;
-        int maxZ = center.getZ() + radius;
-
-        ArrayList<ChunkAccess> chunks = new ArrayList<>();
-
-        for (int cz = SectionPos.blockToSectionCoord(minZ); cz <= SectionPos.blockToSectionCoord(maxZ); ++cz) {
-            for (int cx = SectionPos.blockToSectionCoord(minX); cx <= SectionPos.blockToSectionCoord(maxX); ++cx) {
-                ChunkAccess chunkAccess = serverLevel.getChunk(cx, cz, ChunkStatus.FULL, false);
-                if (chunkAccess != null) {
-                    chunkAccess.fillBiomesFromNoise(makeResolver(biomeHolder), serverLevel.getChunkSource().randomState().sampler());
-                    chunkAccess.setUnsaved(true);
-                    chunks.add(chunkAccess);
-                }
-            }
-        }
-
-        // Inform players/clients about biome changes for affected chunks
-        serverLevel.getChunkSource().chunkMap.resendBiomesForChunks(chunks);
+    // Vérification rapide du centre
+    Holder<Biome> current = serverLevel.getBiome(center);
+    if (current.is(biomeResourceKey)) {
+        return;
     }
 
-    public static BiomeResolver makeResolver(Holder<Biome> biomeHolder) {
-        return (x, y, z, climateSampler) -> biomeHolder;
+    // Définition de la zone de recherche (Bounding Box carrée qui contient le cercle)
+    int minX = center.getX() - radius;
+    int maxX = center.getX() + radius;
+    int minZ = center.getZ() - radius;
+    int maxZ = center.getZ() + radius;
+
+    double radiusSq = (double) radius * radius;
+    ArrayList<ChunkAccess> chunks = new ArrayList<>();
+
+    // On parcourt les chunks impactés
+    for (int cz = SectionPos.blockToSectionCoord(minZ); cz <= SectionPos.blockToSectionCoord(maxZ); ++cz) {
+        for (int cx = SectionPos.blockToSectionCoord(minX); cx <= SectionPos.blockToSectionCoord(maxX); ++cx) {
+            ChunkAccess chunkAccess = serverLevel.getChunk(cx, cz, ChunkStatus.FULL, false);
+            if (chunkAccess != null) {
+                // On utilise un resolver personnalisé qui vérifie la distance
+                chunkAccess.fillBiomesFromNoise(
+                    createCircularResolver(targetBiomeHolder, center, radiusSq, serverLevel),
+                    serverLevel.getChunkSource().randomState().sampler()
+                );
+                chunkAccess.setUnsaved(true);
+                chunks.add(chunkAccess);
+            }
+        }
+    }
+
+    // Notification aux clients
+    serverLevel.getChunkSource().chunkMap.resendBiomesForChunks(chunks);
+}
+
+    // Le resolver magique pour la forme circulaire
+    private BiomeResolver createCircularResolver(Holder<Biome> targetBiome, BlockPos center, double radiusSq, ServerLevel level) {
+        return (x, y, z, noise) -> {
+            // x, y, z ici sont en "biome coordinates" (1 unité = 4 blocs)
+            // On les multiplie par 4 pour revenir à une échelle de blocs
+            int blockX = x << 2;
+            int blockZ = z << 2;
+
+            double distX = blockX - center.getX();
+            double distZ = blockZ - center.getZ();
+
+            // Equation du cercle : x² + z² <= r²
+            if ((distX * distX) + (distZ * distZ) <= radiusSq) {
+                return targetBiome;
+            }
+
+            // Si hors du cercle, on garde le biome d'origine (ou on laisse le bruit faire)
+            // Note : Ici on demande au niveau le biome actuel à cette position
+            return level.getBiome(new BlockPos(blockX, y << 2, blockZ));
+        };
     }
 
     private boolean isEmptyConfiguredPattern() {
