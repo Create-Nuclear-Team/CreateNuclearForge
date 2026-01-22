@@ -35,7 +35,6 @@ public class HeatManager {
     private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
     public double calculateHeat(BigItemStack bigFuelItem, BigItemStack bigCoolerItem, int countGraphiteRod, int countUraniumRod, ReactorControllerInventory inventory) {
-        CreateNuclear.LOGGER.info("bigFuelItem: {}, bigCoolerItem: {}, countGraphiteRod: {}, countUraniumRod: {}, inventory: {}", bigFuelItem, bigCoolerItem, countGraphiteRod, countUraniumRod, inventory);
         heat = 0;
 
         if (bigFuelItem.count <= 0 || bigCoolerItem.count <= 0) {
