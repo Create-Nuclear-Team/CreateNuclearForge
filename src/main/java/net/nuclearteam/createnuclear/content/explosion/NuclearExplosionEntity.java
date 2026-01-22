@@ -1,13 +1,5 @@
 package net.nuclearteam.createnuclear.content.explosion;
 
-import com.github.alexmodguy.alexscaves.AlexsCaves;
-import com.github.alexmodguy.alexscaves.server.block.ACBlockRegistry;
-import com.github.alexmodguy.alexscaves.server.block.TremorzillaEggBlock;
-import com.github.alexmodguy.alexscaves.server.entity.living.RaycatEntity;
-import com.github.alexmodguy.alexscaves.server.entity.living.TremorzillaEntity;
-import com.github.alexmodguy.alexscaves.server.misc.ACDamageTypes;
-import com.github.alexmodguy.alexscaves.server.misc.ACMath;
-import com.github.alexmodguy.alexscaves.server.misc.ACTagRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -31,11 +23,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.world.ForgeChunkManager;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.PlayMessages;
-import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CNEntityType;
-import net.nuclearteam.createnuclear.CNParticleRegistry;
+import net.nuclearteam.createnuclear.*;
+import net.nuclearteam.createnuclear.CNMaths.CNMath;
+import net.nuclearteam.createnuclear.compat.alexscave.AlexscaveCompat;
+import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
 
 import java.util.List;
 import java.util.Stack;
@@ -51,8 +45,11 @@ public class NuclearExplosionEntity extends Entity {
 
     private Explosion dummyExplosion;
 
+    private AlexscaveCompat alexscaveHandler;
+
     public NuclearExplosionEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
+        this.alexscaveHandler = new AlexscaveCompat();
     }
 
     public NuclearExplosionEntity(PlayMessages.SpawnEntity spawnEntity, Level level) {
@@ -112,18 +109,16 @@ public class NuclearExplosionEntity extends Entity {
                 Vec3 vec3 = entity.position().subtract(this.position()).add(0, 0.3, 0).normalize();
                 float playerFling = entity instanceof Player ? 0.5F * flingStrength : flingStrength;
                 if (damage > 0) {
-                    if (entity instanceof RaycatEntity) {
-                        damage = 0;
-                    } else if (entity.getType().is(ACTagRegistry.RESISTS_RADIATION)) {
+                    if (ModList.get().isLoaded("alexscaves"))
+                        alexscaveHandler.RaycatImmunity(entity, damage);
+                    if (entity.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)) {
                         damage *= 0.25F;
                         playerFling *= 0.1F;
-                        if(entity instanceof TremorzillaEntity){
-                            playerFling = 0;
-                            damage = 0;
-                        }
+                        if (ModList.get().isLoaded("alexscaves"))
+                            alexscaveHandler.TremorzillaImmunity(entity, damage, playerFling);
                     }
                     if(damage > 0){
-                        entity.hurt(isIntentionalGameDesign() ? ACDamageTypes.causeIntentionalGameDesign(level().registryAccess()) : ACDamageTypes.causeNukeDamage(level().registryAccess()), damage);
+                        entity.hurt(CNDamageSources.radiation(entity.level()), damage);
                     }
                 }
                 entity.setDeltaMovement(vec3.scale(damage * 0.1F * playerFling));
@@ -151,7 +146,7 @@ public class NuclearExplosionEntity extends Entity {
             int dist = Math.max(getChunksAffected(), serverLevel.getServer().getPlayerList().getViewDistance() / 2);
             for (int i = -dist; i <= dist; i++) {
                 for (int j = -dist; j <= dist; j++) {
-                    ForgeChunkManager.forceChunk(serverLevel, AlexsCaves.MODID, this, chunkPos.x + i, chunkPos.z + j, load, load);
+                    ForgeChunkManager.forceChunk(serverLevel, CreateNuclear.MOD_ID, this, chunkPos.x + i, chunkPos.z + j, load, load);
                 }
             }
         }
@@ -170,9 +165,14 @@ public class NuclearExplosionEntity extends Entity {
         carve.set(chunkCorner);
         carveBelow.set(chunkCorner);
         float itemDropModifier = 0.025F / Math.min(1, this.getSize());
-        if (AlexsCaves.COMMON_CONFIG.nukeMaxBlockExplosionResistance.get() <= 0) {
-            return;
+
+        if (ModList.get().isLoaded("alexscaves")){
+            boolean resBool = alexscaveHandler.ACResConfig();
+            if (resBool) {
+                return;
+            }
         }
+
         if (dummyExplosion == null) {
             dummyExplosion = new Explosion(level(), null, this.getX(), this.getY(), this.getZ(), 10.0F, List.of());
         }
@@ -181,8 +181,8 @@ public class NuclearExplosionEntity extends Entity {
                 for (int y = 15; y >= 0; y--) {
                     boolean canSetToFire = false;
                     carve.set(chunkCorner.getX() + x, Mth.clamp(chunkCorner.getY() + y, level().getMinBuildHeight(), level().getMaxBuildHeight()), chunkCorner.getZ() + z);
-                    float widthSimplexNoise1 = (ACMath.sampleNoise3D(carve.getX(), carve.getY(), carve.getZ(), radius) - 0.5F) * 0.45F + 0.55F;
-                    double yDist = ACMath.smin(0.6F - Math.abs(this.blockPosition().getY() - carve.getY()) / (float) radius, 0.6F, 0.2F);
+                    float widthSimplexNoise1 = (CNMath.sampleNoise3D(carve.getX(), carve.getY(), carve.getZ(), radius) - 0.5F) * 0.45F + 0.55F;
+                    double yDist = CNMath.smin(0.6F - Math.abs(this.blockPosition().getY() - carve.getY()) / (float) radius, 0.6F, 0.2F);
                     double distToCenter = carve.distToLowCornerSqr(this.blockPosition().getX(), carve.getY() - 1, this.blockPosition().getZ());
                     double targetRadius = yDist * (radius + widthSimplexNoise1 * radius) * radius;
                     if (distToCenter <= targetRadius) {
@@ -190,12 +190,8 @@ public class NuclearExplosionEntity extends Entity {
                         if ((!state.isAir() || !state.getFluidState().isEmpty()) && isDestroyable(state)) {
                             carveBelow.set(carve.getX(), carve.getY() - 1, carve.getZ());
                             canSetToFire = true;
-                            if(state.is(ACBlockRegistry.TREMORZILLA_EGG.get()) && state.getBlock() instanceof TremorzillaEggBlock tremorzillaEggBlock){
-                                tremorzillaEggBlock.spawnDinosaurs(level(), carve, state);
-                            }else if (AlexsCaves.COMMON_CONFIG.nukesSpawnItemDrops.get() && random.nextFloat() < itemDropModifier && state.getFluidState().isEmpty()) {
-                                level().destroyBlock(carve, true);
-                            } else {
-                                state.onBlockExploded(level(), carve, dummyExplosion);
+                            if (ModList.get().isLoaded("alexscaves")){
+                                alexscaveHandler.MobSpawn(state, level(), carve, itemDropModifier, dummyExplosion);
                             }
                         }
                     }
@@ -208,7 +204,10 @@ public class NuclearExplosionEntity extends Entity {
     }
 
     private boolean isDestroyable(BlockState state) {
-        return (!state.is(ACTagRegistry.NUKE_PROOF) && state.getBlock().getExplosionResistance() < AlexsCaves.COMMON_CONFIG.nukeMaxBlockExplosionResistance.get()) || state.is(ACBlockRegistry.TREMORZILLA_EGG.get());
+        if (ModList.get().isLoaded("alexscaves")) {
+            return alexscaveHandler.ACDestroyable(state);
+        }
+        return true;
     }
 
     @Override
@@ -251,6 +250,5 @@ public class NuclearExplosionEntity extends Entity {
     @Override
     protected void addAdditionalSaveData(CompoundTag compoundTag) {
         compoundTag.putBoolean("WasLoadingChunks", loadingChunks);
-
     }
 }

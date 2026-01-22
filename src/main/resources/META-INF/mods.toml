@@ -31,3 +31,9 @@ mandatory=true
 versionRange="${create_version_range}"
 ordering="NONE"
 side="BOTH"
+[[dependencies.${mod_id}]]
+modId = "alexscaves"
+mandatory = false
+versionRange = "[1.0,)" # La version minimale requise
+ordering = "AFTER"
+side = "BOTH"
