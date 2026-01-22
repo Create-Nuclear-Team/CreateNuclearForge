@@ -52,7 +52,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public int proximityUraniumHeat = 5;
     public int proximityGraphiteHeat = -5;
     public int maxUraniumPerGraphite = 3;
-    public int reactorOutputMultiplier = 10240;
     public int graphiteTimer = 3600;
     public int uraniumTimer = 3600;
     public int countUraniumRod;
@@ -310,25 +309,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (bigFuelItem.count <= 0 || bigCoolerItem.count <= 0) {
             return 0;
         }
-        // if more than maxUraniumPerGraphite of the rods are uranium, the reactor will overheat
-        if (countUraniumRod > countGraphiteRod * maxUraniumPerGraphite) {
-            overFlowHeatTimer++;
-            if (overFlowHeatTimer >= overFlowLimiter) {
-                overHeat+=1;
-                overFlowHeatTimer= 0;
-                if (overFlowLimiter > 2) {
-                    overFlowLimiter -= 1;
-                }
-            }
-        } else {
-            overFlowHeatTimer = 0;
-            overFlowLimiter = 30;
-            if (overHeat > 0) {
-                overHeat -= 2;
-            } else {
-                overHeat = 0;
-            }
-        }
+
+        updateOverheatState(countGraphiteRod, countUraniumRod);
+
         // the offsets for the four directions (down, up, right, left) is int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} }; (defined at the top of the class)
         String currentRod = "";
         ListTag list = inventory.getStackInSlot(0).getOrCreateTag().getCompound("pattern").getList("Items", Tag.TAG_COMPOUND);
@@ -380,6 +363,28 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return heat + overHeat;
     }
 
+    private void updateOverheatState(int countGraphiteRod, int countUraniumRod) {
+        // if more than maxUraniumPerGraphite of the rods are uranium, the reactor will overheat
+        if (countUraniumRod > countGraphiteRod * maxUraniumPerGraphite) {
+            overFlowHeatTimer++;
+            if (overFlowHeatTimer >= overFlowLimiter) {
+                overHeat+=1;
+                overFlowHeatTimer= 0;
+                if (overFlowLimiter > 2) {
+                    overFlowLimiter -= 1;
+                }
+            }
+        } else {
+            overFlowHeatTimer = 0;
+            overFlowLimiter = 30;
+            if (overHeat > 0) {
+                overHeat -= 2;
+            } else {
+                overHeat = 0;
+            }
+        }
+    }
+
     private BlockPos getBlockPosForReactor(char character) {
         BlockPos pos = pattern.VerifyPattern5x5(character);
         BlockPos posController = getBlockPos();
@@ -405,23 +410,25 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     public void rotate(BlockState state, Level level, int rotation) {
-        rotation = (rotation * reactorOutputMultiplier) / this.outputManager.getBlocksPosition().size();
+        int remainingRotation = rotation % this.outputManager.getBlocksPosition().size();
         for (int i = 0; i < this.outputManager.getBlocksPosition().size(); i++) {
+            int dividedRotation = rotation / this.outputManager.getBlocksPosition().size() + remainingRotation;
+            remainingRotation = 0;
             BlockPos pos =  this.outputManager.getBlocksPosition().get(i);
 
-            if (rotation > 0) {
+            if (dividedRotation > 0) {
                 if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
                     ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
                     if (state.getValue(ASSEMBLED)) { // Starting the energy
-                        entity.speed = rotation;
-                        entity.heat = rotation;
+                        entity.speed = dividedRotation;
+                        entity.heat = dividedRotation;
                     } else { // stopping the energy
                         entity.speed = 0;
                         entity.heat = 0;
                     }
                     entity.updateSpeed = true;
                     entity.updateGeneratedRotation();
-                    entity.setSpeed(rotation);
+                    entity.setSpeed(dividedRotation);
 
                 }
             } else {

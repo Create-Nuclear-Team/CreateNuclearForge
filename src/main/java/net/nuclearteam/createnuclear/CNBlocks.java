@@ -170,7 +170,7 @@ public class CNBlocks {
             .tag(AllTags.AllBlockTags.SAFE_NBT.tag, BlockTags.NEEDS_DIAMOND_TOOL)
             .transform(pickaxeOnly())
             .blockstate(new ReactorOutputGenerator()::generate)
-            .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 1.0))
+            .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 10240.0))
             .item()
             .transform(customItemModel("reactor", "output", "item"))
             .register();
