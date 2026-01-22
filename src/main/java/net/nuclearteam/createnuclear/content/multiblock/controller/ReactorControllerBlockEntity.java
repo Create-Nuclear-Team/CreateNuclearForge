@@ -52,6 +52,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public int proximityUraniumHeat = 5;
     public int proximityGraphiteHeat = -5;
     public int maxUraniumPerGraphite = 3;
+    public int reactorOutputMultiplier = 10240;
     public int graphiteTimer = 3600;
     public int uraniumTimer = 3600;
     public int countUraniumRod;
@@ -404,7 +405,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     public void rotate(BlockState state, Level level, int rotation) {
-        rotation /= this.outputManager.getBlocksPosition().size();
+        rotation = (rotation * reactorOutputMultiplier) / this.outputManager.getBlocksPosition().size();
         for (int i = 0; i < this.outputManager.getBlocksPosition().size(); i++) {
             BlockPos pos =  this.outputManager.getBlocksPosition().get(i);
 
