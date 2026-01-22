@@ -20,7 +20,7 @@ import net.nuclearteam.createnuclear.content.contraptions.irradiated.cow.Irradia
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolf;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfModel;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfRenderer;
-import net.nuclearteam.createnuclear.content.multiblock.core.NuclearExplosionEntity;
+import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
 
 public class CNEntityType {
 

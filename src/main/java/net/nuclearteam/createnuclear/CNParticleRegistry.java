@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.particles;
+package net.nuclearteam.createnuclear;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.particles.BlockParticleOption;

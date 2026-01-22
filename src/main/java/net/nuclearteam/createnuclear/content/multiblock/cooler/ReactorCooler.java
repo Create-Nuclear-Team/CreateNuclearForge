@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.multiblock.reactorCooler;
+package net.nuclearteam.createnuclear.content.multiblock.cooler;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import net.minecraft.core.BlockPos;

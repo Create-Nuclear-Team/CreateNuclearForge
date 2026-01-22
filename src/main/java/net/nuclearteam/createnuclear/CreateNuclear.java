@@ -25,7 +25,6 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
-import net.nuclearteam.createnuclear.content.particles.CNParticleRegistry;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
 import org.slf4j.Logger;
@@ -35,7 +34,7 @@ public class CreateNuclear {
     public static final String MOD_ID = "createnuclear";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static CommonProxy PROXY = DistExecutor.runForDist(() -> CreateNuclearClient::new, () -> CommonProxy::new);
+    public static CNCommonProxy PROXY = DistExecutor.runForDist(() -> CreateNuclearClient::new, () -> CNCommonProxy::new);
 
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID)
            .defaultCreativeTab((ResourceKey<CreativeModeTab>) null);

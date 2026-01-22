@@ -1,6 +1,6 @@
 package net.nuclearteam.createnuclear;
 
-public class CommonProxy {
+public class CNCommonProxy {
 
     public void commonInit() {
     }
