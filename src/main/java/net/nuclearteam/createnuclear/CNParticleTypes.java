@@ -12,14 +12,13 @@ import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.nuclearteam.createnuclear.content.particles.IrradiatedExplosionParticles;
 import net.nuclearteam.createnuclear.content.particles.IrradiatedParticlesData;
 
 import java.util.function.Supplier;
 
 public enum CNParticleTypes {
+
     IRRADIATED_PARTICLES(IrradiatedParticlesData::new),
-    IRRADIATED_EXPLOSION_PARTICLES(IrradiatedExplosionParticles::new)
     ;
 
     private final ParticleEntry<?> entry;

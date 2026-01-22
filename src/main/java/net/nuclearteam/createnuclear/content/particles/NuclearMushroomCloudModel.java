@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 
-public class IrradiatedExplosionModel extends AdvancedEntityModel {
+public class NuclearMushroomCloudModel extends AdvancedEntityModel {
     private final AdvancedModelBox mushroom_cloud;
     private final AdvancedModelBox lightBall;
     private final AdvancedModelBox lowerCloud;
@@ -32,7 +32,7 @@ public class IrradiatedExplosionModel extends AdvancedEntityModel {
     private final AdvancedModelBox upperRing;
     private final AdvancedModelBox lowerRing;
 
-    public IrradiatedExplosionModel() {
+    public NuclearMushroomCloudModel() {
         texWidth = 512;
         texHeight = 512;
 

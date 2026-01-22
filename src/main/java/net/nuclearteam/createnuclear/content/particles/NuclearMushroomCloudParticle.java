@@ -2,7 +2,9 @@ package net.nuclearteam.createnuclear.content.particles;
 
 import com.github.alexmodguy.alexscaves.AlexsCaves;
 import com.github.alexmodguy.alexscaves.client.ClientProxy;
+import com.github.alexmodguy.alexscaves.client.model.MushroomCloudModel;
 import com.github.alexmodguy.alexscaves.client.particle.ACParticleRegistry;
+import com.github.alexmodguy.alexscaves.client.render.ACRenderTypes;
 import com.github.alexmodguy.alexscaves.client.sound.NuclearExplosionSound;
 import com.github.alexmodguy.alexscaves.server.misc.ACMath;
 import com.github.alexmodguy.alexscaves.server.misc.ACSoundRegistry;
@@ -17,7 +19,6 @@ import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -25,9 +26,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
-public class IrradiatedExplosionParticles extends Particle {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(CreateNuclear.MOD_ID, "textures/particle/mushroom_cloud.png");
-    private static final IrradiatedExplosionModel MODEL = new IrradiatedExplosionModel();
+public class NuclearMushroomCloudParticle extends Particle {
+
+    private static final ResourceLocation TEXTURE = new ResourceLocation (CreateNuclear.MOD_ID, "textures/particle/nuclear_mushroom_cloud.png");
+    private static final ResourceLocation TEXTURE_GLOW = new ResourceLocation(CreateNuclear.MOD_ID, "textures/particle/nuclear_mushroom_cloud_glow.png");
+    private static final ResourceLocation TEXTURE_PINK = new ResourceLocation(CreateNuclear.MOD_ID, "textures/particle/nuclear_mushroom_cloud_pink.png");
+    private static final ResourceLocation TEXTURE_PINK_GLOW = new ResourceLocation(CreateNuclear.MOD_ID, "textures/particle/nuclear_mushroom_cloud_pink_glow.png");
+    private static final NuclearMushroomCloudModel MODEL = new NuclearMushroomCloudModel();
     private static final int BALL_FOR = 10;
     private static final int GLOW_FOR = 20;
     private static final int FADE_SPEED = 10;
@@ -39,7 +44,7 @@ public class IrradiatedExplosionParticles extends Particle {
 
     private final boolean pink;
 
-    public IrradiatedExplosionParticles(ClientLevel level, double x, double y, double z, float scale, boolean pink) {
+    protected NuclearMushroomCloudParticle(ClientLevel level, double x, double y, double z, float scale, boolean pink) {
         super(level, x, y, z);
         this.gravity = 0.0F;
         this.lifetime = (int) Math.ceil(133.33F * scale);
@@ -110,7 +115,12 @@ public class IrradiatedExplosionParticles extends Particle {
         int left = lifetime - age;
         float alpha = left <= FADE_SPEED ? left / (float) FADE_SPEED : 1.0F;
         MODEL.animateParticle(age, ACMath.smin(life, 1.0F, 0.5F), partialTick);
-        VertexConsumer baseConsumer = multibuffersource$buffersource.getBuffer(RenderType.entityTranslucent(TEXTURE));
+        VertexConsumer baseConsumer = multibuffersource$buffersource.getBuffer(RenderType.entityTranslucent(pink ? TEXTURE_PINK : TEXTURE));
+        MODEL.renderToBuffer(posestack, baseConsumer, getLightColor(partialTick), OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
+        VertexConsumer glowConsumer1 = multibuffersource$buffersource.getBuffer(ACRenderTypes.getEyesAlphaEnabled(pink ? TEXTURE_PINK : TEXTURE));
+        MODEL.renderToBuffer(posestack, glowConsumer1, 240, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
+        VertexConsumer glowConsumer2 = multibuffersource$buffersource.getBuffer(ACRenderTypes.getEyesAlphaEnabled(pink ? TEXTURE_PINK_GLOW : TEXTURE_GLOW));
+        MODEL.renderToBuffer(posestack, glowConsumer2, 240, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, glowLife * alpha);
         multibuffersource$buffersource.endBatch();
         posestack.popPose();
     }
@@ -126,7 +136,7 @@ public class IrradiatedExplosionParticles extends Particle {
             if (xSpeed == 0.0) {
                 xSpeed = 1.0F;
             }
-            return new IrradiatedExplosionParticles(worldIn, x, y, z, (float) Math.max(0.5F, xSpeed), ySpeed >= 1.0F);
+            return new NuclearMushroomCloudParticle(worldIn, x, y, z, (float) Math.max(0.5F, xSpeed), ySpeed >= 1.0F);
         }
     }
 }
