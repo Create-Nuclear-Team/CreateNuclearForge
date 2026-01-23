@@ -2,10 +2,7 @@ package net.nuclearteam.createnuclear.content.particles;
 
 import com.github.alexmodguy.alexscaves.AlexsCaves;
 import com.github.alexmodguy.alexscaves.client.ClientProxy;
-import com.github.alexmodguy.alexscaves.client.particle.ACParticleRegistry;
-import com.github.alexmodguy.alexscaves.client.render.ACRenderTypes;
 import com.github.alexmodguy.alexscaves.client.sound.NuclearExplosionSound;
-import com.github.alexmodguy.alexscaves.server.misc.ACMath;
 import com.github.alexmodguy.alexscaves.server.misc.ACSoundRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -23,6 +20,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import net.nuclearteam.createnuclear.CNMaths.CNMath;
+import net.nuclearteam.createnuclear.CNParticleRegistry;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
 public class NuclearMushroomCloudParticle extends Particle {
@@ -78,11 +77,11 @@ public class NuclearMushroomCloudParticle extends Particle {
             for (int i = 0; i < (1 + random.nextInt(2)) * scale; i++) {
                 Vec3 from = new Vec3(level.random.nextFloat() - 0.5F, level.random.nextFloat() - 0.5F, level.random.nextFloat() - 0.5F).scale(scale * 1.4F).add(this.x, this.y, this.z);
                 Vec3 away = new Vec3(level.random.nextFloat() - 0.5F, level.random.nextFloat() - 0.5F, level.random.nextFloat() - 0.5F).scale(2.34F);
-                this.level.addParticle(ACParticleRegistry.MUSHROOM_CLOUD_SMOKE.get(), from.x, from.y, from.z, away.x, away.y, away.z);
+                this.level.addParticle(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD_SMOKE.get(), from.x, from.y, from.z, away.x, away.y, away.z);
             }
             for (int j = 0; j < scale * scale; j++) {
                 Vec3 explosionBase = new Vec3((level.random.nextFloat() - 0.5F) * explosionSpread, (-0.6F + level.random.nextFloat() * 0.5F) * explosionSpread * 0.1F, (level.random.nextFloat() - 0.5F) * explosionSpread).add(this.x, this.y, this.z);
-                this.level.addParticle(ACParticleRegistry.MUSHROOM_CLOUD_EXPLOSION.get(), explosionBase.x, explosionBase.y, explosionBase.z, 0, 0, 0);
+                this.level.addParticle(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD_EXPLOSION.get(), explosionBase.x, explosionBase.y, explosionBase.z, 0, 0, 0);
             }
             if(age > BALL_FOR){
                 if(!playedRumble){
@@ -113,13 +112,9 @@ public class NuclearMushroomCloudParticle extends Particle {
         float glowLife = life < 1F ? 1F - life : 0;
         int left = lifetime - age;
         float alpha = left <= FADE_SPEED ? left / (float) FADE_SPEED : 1.0F;
-        MODEL.animateParticle(age, ACMath.smin(life, 1.0F, 0.5F), partialTick);
+        MODEL.animateParticle(age, CNMath.smin(life, 1.0F, 0.5F), partialTick);
         VertexConsumer baseConsumer = multibuffersource$buffersource.getBuffer(RenderType.entityTranslucent(pink ? TEXTURE_PINK : TEXTURE));
         MODEL.renderToBuffer(posestack, baseConsumer, getLightColor(partialTick), OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
-        VertexConsumer glowConsumer1 = multibuffersource$buffersource.getBuffer(ACRenderTypes.getEyesAlphaEnabled(pink ? TEXTURE_PINK : TEXTURE));
-        MODEL.renderToBuffer(posestack, glowConsumer1, 240, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, alpha);
-        VertexConsumer glowConsumer2 = multibuffersource$buffersource.getBuffer(ACRenderTypes.getEyesAlphaEnabled(pink ? TEXTURE_PINK_GLOW : TEXTURE_GLOW));
-        MODEL.renderToBuffer(posestack, glowConsumer2, 240, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, glowLife * alpha);
         multibuffersource$buffersource.endBatch();
         posestack.popPose();
     }

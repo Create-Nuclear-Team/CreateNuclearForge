@@ -6,6 +6,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.nuclearteam.createnuclear.content.particles.NuclearMushroomCloudParticle;
+import net.nuclearteam.createnuclear.content.particles.SmallNuclearExplosionParticle;
 import net.nuclearteam.createnuclear.foundation.ponder.CreateNuclearPonderPlugin;
 
 @SuppressWarnings("unused")
@@ -31,5 +32,7 @@ public class CreateNuclearClient extends CNCommonProxy {
     public void setupParticles(RegisterParticleProvidersEvent registry) {
         CreateNuclear.LOGGER.debug("Registered particle factories");
         registry.registerSpecial(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD.get(), new NuclearMushroomCloudParticle.Factory());
+        registry.registerSpriteSet(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD_SMOKE.get(), SmallNuclearExplosionParticle.NukeFactory::new);
+        registry.registerSpriteSet(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD_EXPLOSION.get(), SmallNuclearExplosionParticle.NukeFactory::new);
     }
 }
