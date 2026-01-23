@@ -114,8 +114,10 @@ public class NuclearExplosionEntity extends Entity {
                     if (entity.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)) {
                         damage *= 0.25F;
                         playerFling *= 0.1F;
-                        if (ModList.get().isLoaded("alexscaves"))
+                        if (ModList.get().isLoaded("alexscaves")) {
+                            CreateNuclear.LOGGER.warn("Entity explosion compatibility with Alex's Cave");
                             alexscaveHandler.TremorzillaImmunity(entity, damage, playerFling);
+                        }
                     }
                     if(damage > 0){
                         entity.hurt(CNDamageSources.radiation(entity.level()), damage);

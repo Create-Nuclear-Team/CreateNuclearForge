@@ -11,6 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.nuclearteam.createnuclear.CreateNuclear;
 
 import static com.github.alexmodguy.alexscaves.client.ClientProxy.random;
 
@@ -19,6 +20,7 @@ public class AlexscaveCompat {
     public AlexscaveCompat() {}
 
     public void MobSpawn(BlockState state, Level level, BlockPos.MutableBlockPos carve, float itemDropModifier, Explosion dummyExplosion){
+        CreateNuclear.LOGGER.warn("Entity explosion compatibility with Alex's Cave - In the function");
         if(state.is(ACBlockRegistry.TREMORZILLA_EGG.get()) && state.getBlock() instanceof TremorzillaEggBlock tremorzillaEggBlock){
             tremorzillaEggBlock.spawnDinosaurs(level, carve, state);
         }else if (AlexsCaves.COMMON_CONFIG.nukesSpawnItemDrops.get() && random.nextFloat() < itemDropModifier && state.getFluidState().isEmpty()) {
