@@ -45,11 +45,15 @@ public class NuclearExplosionEntity extends Entity {
 
     private Explosion dummyExplosion;
 
-    private AlexscaveCompat alexscaveHandler;
+    // Changé en Object pour éviter le crash ClassNotFound si Alex's Caves n'est pas installé
+    private Object alexscaveHandler;
 
     public NuclearExplosionEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
-        this.alexscaveHandler = new AlexscaveCompat();
+        // On instancie la compatibilité SEULEMENT si le mod est présent
+        if (ModList.get().isLoaded("alexscaves")) {
+            this.alexscaveHandler = new AlexscaveCompat();
+        }
     }
 
     public NuclearExplosionEntity(PlayMessages.SpawnEntity spawnEntity, Level level) {
@@ -103,23 +107,38 @@ public class NuclearExplosionEntity extends Entity {
             AABB killBox = this.getBoundingBox().inflate(radius + radius * 0.5F, radius * 0.6, radius + radius * 0.5F);
             float flingStrength = getSize() * 0.33F;
             float maximumDistance = radius + radius * 0.5F + 1;
+
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, killBox)) {
                 float dist = entity.distanceTo(this);
                 float damage = calculateDamage(dist, maximumDistance);
                 Vec3 vec3 = entity.position().subtract(this.position()).add(0, 0.3, 0).normalize();
                 float playerFling = entity instanceof Player ? 0.5F * flingStrength : flingStrength;
+
                 if (damage > 0) {
-                    if (ModList.get().isLoaded("alexscaves"))
-                        alexscaveHandler.RaycatImmunity(entity, damage);
+                    // Gestion Raycat (Avec accolades obligatoires)
+                    if (ModList.get().isLoaded("alexscaves") && alexscaveHandler != null) {
+                        // isRaycat doit retourner un boolean dans votre Compat
+                        if (((AlexscaveCompat) alexscaveHandler).isRaycat(entity)) {
+                            damage = 0;
+                        }
+                    }
+
                     if (entity.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)) {
                         damage *= 0.25F;
                         playerFling *= 0.1F;
-                        if (ModList.get().isLoaded("alexscaves")) {
-                            CreateNuclear.LOGGER.warn("Entity explosion compatibility with Alex's Cave");
-                            alexscaveHandler.TremorzillaImmunity(entity, damage, playerFling);
+
+                        // Gestion Tremorzilla
+                        if (ModList.get().isLoaded("alexscaves") && alexscaveHandler != null) {
+                            // isTremorzilla doit retourner un boolean dans votre Compat
+                            if (((AlexscaveCompat) alexscaveHandler).isTremorzilla(entity)) {
+                                CreateNuclear.LOGGER.warn("Entity explosion compatibility with Alex's Cave");
+                                damage = 0;
+                                playerFling = 0;
+                            }
                         }
                     }
-                    if(damage > 0){
+
+                    if (damage > 0) {
                         entity.hurt(CNDamageSources.radiation(entity.level()), damage);
                     }
                 }
@@ -168,8 +187,8 @@ public class NuclearExplosionEntity extends Entity {
         carveBelow.set(chunkCorner);
         float itemDropModifier = 0.025F / Math.min(1, this.getSize());
 
-        if (ModList.get().isLoaded("alexscaves")){
-            boolean resBool = alexscaveHandler.ACResConfig();
+        if (ModList.get().isLoaded("alexscaves") && alexscaveHandler != null){
+            boolean resBool = ((AlexscaveCompat) alexscaveHandler).ACResConfig();
             if (resBool) {
                 return;
             }
@@ -187,14 +206,22 @@ public class NuclearExplosionEntity extends Entity {
                     double yDist = CNMath.smin(0.6F - Math.abs(this.blockPosition().getY() - carve.getY()) / (float) radius, 0.6F, 0.2F);
                     double distToCenter = carve.distToLowCornerSqr(this.blockPosition().getX(), carve.getY() - 1, this.blockPosition().getZ());
                     double targetRadius = yDist * (radius + widthSimplexNoise1 * radius) * radius;
+
                     if (distToCenter <= targetRadius) {
                         BlockState state = level().getBlockState(carve);
                         if ((!state.isAir() || !state.getFluidState().isEmpty()) && isDestroyable(state)) {
                             carveBelow.set(carve.getX(), carve.getY() - 1, carve.getZ());
                             canSetToFire = true;
-                            if (ModList.get().isLoaded("alexscaves")){
-                                alexscaveHandler.MobSpawn(state, level(), carve, itemDropModifier, dummyExplosion);
+
+                            // GESTION SPAWN MOBS
+                            boolean handledByAlex = false;
+                            if (ModList.get().isLoaded("alexscaves") && alexscaveHandler != null){
+                                // MobSpawn doit retourner TRUE si un oeuf a éclos
+                                handledByAlex = ((AlexscaveCompat) alexscaveHandler).MobSpawn(state, level(), carve, itemDropModifier, dummyExplosion);
                             }
+
+                            // Si c'était un oeuf, on CONTINUE la boucle pour ne pas mettre de feu ni détruire le bloc (c'est déjà fait)
+                            if (handledByAlex) continue;
                         }
                     }
                     if (canSetToFire && random.nextFloat() < 0.15 && !level().getBlockState(carveBelow).isAir()) {
@@ -206,8 +233,8 @@ public class NuclearExplosionEntity extends Entity {
     }
 
     private boolean isDestroyable(BlockState state) {
-        if (ModList.get().isLoaded("alexscaves")) {
-            return alexscaveHandler.ACDestroyable(state);
+        if (ModList.get().isLoaded("alexscaves") && alexscaveHandler != null) {
+            return ((AlexscaveCompat) alexscaveHandler).ACDestroyable(state);
         }
         return !(state.getBlock().getExplosionResistance() >= 3600000);
     }

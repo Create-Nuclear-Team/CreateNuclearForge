@@ -11,7 +11,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.nuclearteam.createnuclear.CreateNuclear;
 
 import static com.github.alexmodguy.alexscaves.client.ClientProxy.random;
 
@@ -19,28 +18,30 @@ public class AlexscaveCompat {
 
     public AlexscaveCompat() {}
 
-    public void MobSpawn(BlockState state, Level level, BlockPos.MutableBlockPos carve, float itemDropModifier, Explosion dummyExplosion){
-        CreateNuclear.LOGGER.warn("Entity explosion compatibility with Alex's Cave - In the function");
+    // J'ai changé void en boolean
+    public boolean MobSpawn(BlockState state, Level level, BlockPos.MutableBlockPos carve, float itemDropModifier, Explosion dummyExplosion){
+        // Si c'est un oeuf de Tremorzilla
         if(state.is(ACBlockRegistry.TREMORZILLA_EGG.get()) && state.getBlock() instanceof TremorzillaEggBlock tremorzillaEggBlock){
+            // On fait éclore le dinosaure
             tremorzillaEggBlock.spawnDinosaurs(level, carve, state);
-        }else if (AlexsCaves.COMMON_CONFIG.nukesSpawnItemDrops.get() && random.nextFloat() < itemDropModifier && state.getFluidState().isEmpty()) {
+            // On retourne TRUE pour dire "J'ai géré ce bloc, ne fais rien d'autre"
+            return true;
+        }
+        // Logique normale pour les autres blocs Alex Caves
+        else if (AlexsCaves.COMMON_CONFIG.nukesSpawnItemDrops.get() && random.nextFloat() < itemDropModifier && state.getFluidState().isEmpty()) {
             level.destroyBlock(carve, true);
         } else {
             state.onBlockExploded(level, carve, dummyExplosion);
         }
+        return false;
     }
 
-    public void RaycatImmunity(LivingEntity entity, float damage){
-        if (entity instanceof RaycatEntity) {
-            damage = 0;
-        }
+    public boolean isRaycat(LivingEntity entity) {
+        return entity instanceof RaycatEntity;
     }
 
-    public void TremorzillaImmunity(LivingEntity entity, float damage, float playerFling){
-        if(entity instanceof TremorzillaEntity){
-            playerFling = 0;
-            damage = 0;
-        }
+    public boolean isTremorzilla(LivingEntity entity){
+        return entity instanceof TremorzillaEntity;
     }
 
     public boolean ACResConfig(){
@@ -49,7 +50,7 @@ public class AlexscaveCompat {
 
     public boolean ACDestroyable(BlockState state) {
         return !state.is(ACTagRegistry.NUKE_PROOF) &&
-               (state.getBlock().getExplosionResistance() < AlexsCaves.COMMON_CONFIG.nukeMaxBlockExplosionResistance.get()
-               || state.is(ACBlockRegistry.TREMORZILLA_EGG.get()));
+                (state.getBlock().getExplosionResistance() < AlexsCaves.COMMON_CONFIG.nukeMaxBlockExplosionResistance.get()
+                        || state.is(ACBlockRegistry.TREMORZILLA_EGG.get()));
     }
 }
