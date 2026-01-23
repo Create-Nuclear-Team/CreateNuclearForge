@@ -207,7 +207,7 @@ public class NuclearExplosionEntity extends Entity {
         if (ModList.get().isLoaded("alexscaves")) {
             return alexscaveHandler.ACDestroyable(state);
         }
-        return true;
+        return !(state.getBlock().getExplosionResistance() >= 3600000);
     }
 
     @Override
