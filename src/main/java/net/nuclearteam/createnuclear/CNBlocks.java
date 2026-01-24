@@ -155,7 +155,7 @@ public class CNBlocks {
             .register();
 
     public static final BlockEntry<ReactorLiquidInput> REACTOR_LIQUID_INPUT =
-        CreateNuclear.REGISTRATE.block("reactor_liquid_input", ReactorLiquidInput::regular)
+        CreateNuclear.REGISTRATE.block("reactor_liquid_input", ReactorLiquidInput::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(2F))
