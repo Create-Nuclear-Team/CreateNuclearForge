@@ -27,6 +27,10 @@ public class CNConfigs {
         return common;
     }
 
+    public static CNCServer server() {
+        return server;
+    }
+
     public static ConfigBase byType(ModConfig.Type type) {
         return CONFIGS.get(type);
     }
@@ -46,6 +50,7 @@ public class CNConfigs {
 
     public static void register(ModLoadingContext context) {
         common = register(CNCCommon::new, ModConfig.Type.COMMON);
+        server = register(CNCServer::new, ModConfig.Type.SERVER);
 
         for (Entry<ModConfig.Type, ConfigBase> entry : CONFIGS.entrySet()) {
             context.registerConfig(entry.getKey(), entry.getValue().specification);
