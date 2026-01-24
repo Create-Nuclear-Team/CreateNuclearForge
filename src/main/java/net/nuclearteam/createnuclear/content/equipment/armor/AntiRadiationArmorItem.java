@@ -133,7 +133,6 @@ public class AntiRadiationArmorItem {
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
             builder.putAll(super.getDefaultAttributeModifiers(HELMET.getSlot()));
             irradiatedArmorAttribute(builder, HELMET);
-            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
             UUID uuid = ARMOR_MODIFIER_UUID_PER_TYPE.get(HELMET);
             builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", 42, AttributeModifier.Operation.ADDITION));
             this.attributeModifiers = builder.build();
@@ -362,7 +361,7 @@ public class AntiRadiationArmorItem {
     public static class Boot extends ArmorItem {
         private final Multimap<Attribute, AttributeModifier> attributeModifiers;
         protected final DyeColor color;
-        public Boot(Properties properties) {
+        public Boot(Properties properties, DyeColor color) {
             super(ARMOR_MATERIAL, BOOTS, properties);
 
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();

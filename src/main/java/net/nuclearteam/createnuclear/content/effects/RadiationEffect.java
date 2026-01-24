@@ -31,9 +31,6 @@ public class RadiationEffect extends VicinityEffect {
 
                     boolean isWearingAntiRadiationArmor = false;
                     for (ItemStack armor : e.getArmorSlots()) {
-//                        CreateNuclear.LOGGER.warn("attribute irradiated: {}", armor.getAttributeModifiers(ArmorItem.Type.HELMET.getSlot()));
-                    boolean isWearingAntiRadiationArmor = false;
-                    for (ItemStack armor : e.getArmorSlots()) {
                         if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
                             isWearingAntiRadiationArmor = true;
                             break;

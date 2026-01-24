@@ -118,11 +118,6 @@ public class CNItems {
             )
             .register(),
 
-        COAL_DUST = CreateNuclear.REGISTRATE
-            .item("coal_dust", Item::new)
-            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("coal_dusts"), CNTags.forgeItemTag("dusts/coal"))
-            .register(),
-
         GRAPHITE_ROD = CreateNuclear.REGISTRATE
             .item("graphite_rod", Item::new)
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
@@ -190,16 +185,6 @@ public class CNItems {
                 .requires(CNTags.forgeItemTag("ingots/thorium"))
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
-            .register(),
-
-        GRAPHITE_ROD = CreateNuclear.REGISTRATE
-            .item("graphite_rod", Item::new)
-            .tag(CNTags.forgeItemTag("rods"), CNItemTags.COOLER.tag)
-            .register(),
-
-        URANIUM_ROD = CreateNuclear.REGISTRATE
-            .item("uranium_rod", Item::new)
-            .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register()
     ;
 

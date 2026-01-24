@@ -143,6 +143,8 @@
   "createnuclear.tooltip.rodTimer": "Rod Duration: %d tick",
   "createnuclear.tooltip.statRod": "Rod Stat Pattern:",
   "createnuclear.tooltip.typeRod": "Rod Type: %s",
+  "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast",
+  "death.attack.createnuclear.radiation": "%1$s died from radiation",
   "effect.createnuclear.radiation": "Radiation",
   "emi.category.createnuclear.fan_enriched": "Bulk Enriching",
   "entity.createnuclear.irradiated_cat": "Irradiated Cat",

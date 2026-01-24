@@ -143,6 +143,8 @@
   "createnuclear.tooltip.rodTimer": "ʞɔıʇ %d :uoıʇɐɹnᗡ poᴚ",
   "createnuclear.tooltip.statRod": ":uɹǝʇʇɐԀ ʇɐʇS poᴚ",
   "createnuclear.tooltip.typeRod": "%s :ǝdʎ⟘ poᴚ",
+  "death.attack.createnuclear.fan_radiation": "ʇsɐןq uoıʇɐıpɐɹ ɯoɹɟ pǝıp %1$s",
+  "death.attack.createnuclear.radiation": "uoıʇɐıpɐɹ ɯoɹɟ pǝıp %1$s",
   "effect.createnuclear.radiation": "uoıʇɐıpɐᴚ",
   "emi.category.createnuclear.fan_enriched": "buıɥɔıɹuƎ ʞןnᗺ",
   "entity.createnuclear.irradiated_cat": "ʇɐƆ pǝʇɐıpɐɹɹI",

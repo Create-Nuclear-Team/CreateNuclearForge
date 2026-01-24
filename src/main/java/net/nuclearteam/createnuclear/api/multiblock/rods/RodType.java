@@ -244,8 +244,8 @@ public record RodType(HolderSet<Item> items,
         if (!useConfig) return baseRodHeat;
         try {
             return switch (type) {
-                case FUEL -> CNConfigs.common().rods.baseValueUranium.get();
-                case COOLER -> CNConfigs.common().rods.baseValueGraphite.get();
+                case FUEL -> CNConfigs.server().rods.baseValueUranium.get();
+                case COOLER -> CNConfigs.server().rods.baseValueGraphite.get();
                 default -> baseRodHeat;
             };
         } catch (IllegalStateException e) {
@@ -258,8 +258,8 @@ public record RodType(HolderSet<Item> items,
         if (!useConfig) return proximityRodHeat;
         try {
             return switch (type) {
-                case FUEL -> CNConfigs.common().rods.uraniumProxyBonus.get();
-                case COOLER -> CNConfigs.common().rods.graphiteProxyMalus.get();
+                case FUEL -> CNConfigs.server().rods.uraniumProxyBonus.get();
+                case COOLER -> CNConfigs.server().rods.graphiteProxyMalus.get();
                 default -> proximityRodHeat;
             };
         } catch (IllegalStateException e) {
@@ -272,8 +272,8 @@ public record RodType(HolderSet<Item> items,
         if (!useConfig) return rodTimer;
         try {
             return switch (type) {
-                case FUEL -> CNConfigs.common().rods.uraniumRodLifetime.get();
-                case COOLER -> CNConfigs.common().rods.graphiteRodLifetime.get();
+                case FUEL -> CNConfigs.server().rods.uraniumRodLifetime.get();
+                case COOLER -> CNConfigs.server().rods.graphiteRodLifetime.get();
                 default -> rodTimer;
             };
         } catch (IllegalStateException e) {
