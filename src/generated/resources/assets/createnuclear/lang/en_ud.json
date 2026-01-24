@@ -72,6 +72,7 @@
   "block.createnuclear.layered_autunite": "ǝʇıunʇnⱯ pǝɹǝʎɐꞀ",
   "block.createnuclear.lead_block": "ʞɔoןᗺ pɐǝꞀ",
   "block.createnuclear.lead_ore": "ǝɹO pɐǝꞀ",
+  "block.createnuclear.nitrogen": "uǝboɹʇıN",
   "block.createnuclear.polished_cut_autunite": "ǝʇıunʇnⱯ ʇnƆ pǝɥsıןoԀ",
   "block.createnuclear.polished_cut_autunite_slab": "qɐןS ǝʇıunʇnⱯ ʇnƆ pǝɥsıןoԀ",
   "block.createnuclear.polished_cut_autunite_stairs": "sɹıɐʇS ǝʇıunʇnⱯ ʇnƆ pǝɥsıןoԀ",
@@ -112,6 +113,7 @@
   "block.createnuclear.uranium": "ɯnıuɐɹ∩",
   "block.createnuclear.uranium_ore": "ǝɹO ɯnıuɐɹ∩",
   "create.recipe.fan_enriched.fan": "ǝɹıℲ pǝɥɔıɹuƎ puıɥǝq uɐℲ",
+  "create.recipe.fan_snow_powder.fan": "ʍouS ɹǝpʍoԀ puıɥǝq uɐℲ",
   "createnuclear.enriched.fan.recipe": "buıɥɔıɹuƎ ʞןnᗺ",
   "createnuclear.generic.unit.heat": "Ὁ",
   "createnuclear.gui.reactor_controller.info_header.title": "ǝnןɐʌ ʇɐǝH",
@@ -128,7 +130,11 @@
   "createnuclear.ponder.reactor.text_9": "9 ɹooןℲ",
   "createnuclear.ponder.reactor_blueprint.header": "uoıʇɐʌıʇɔⱯ ɹǝןןoɹʇuoƆ",
   "createnuclear.ponder.reactor_blueprint.text_1": "˙sןǝpoɯ ɔıɟıɔǝds oʇ buıpɹoɔɔɐ pǝɹnbıɟuoɔ ǝq oʇ ɹoʇɔɐǝɹ ǝɥʇ sʍoןןɐ ʇı ؛ʇuǝɯǝןǝ ʇuɐʇɹodɯı ʇsoɯ ǝɥʇ :ʇuıɹdǝnןᗺ ɹoʇɔɐǝᴚ",
+<<<<<<< HEAD
+  "createnuclear.snow_powder.fan.recipe": "uɐɟ ɔıuǝboʎɹƆ",
+=======
   "createnuclear.tooltip.baseRodHeat": "Ὁ %d :ʇɐǝH poᴚ ǝsɐᗺ",
+>>>>>>> V2
   "createnuclear.tooltip.heatLevel": "ןǝʌǝꞀ ʇɐǝH",
   "createnuclear.tooltip.heatLevel.caution": "uoıʇnɐƆ",
   "createnuclear.tooltip.heatLevel.danger": "ɹǝbuɐᗡ",
@@ -144,15 +150,22 @@
   "createnuclear.tooltip.typeRod": "%s :ǝdʎ⟘ poᴚ",
   "effect.createnuclear.radiation": "uoıʇɐıpɐᴚ",
   "emi.category.createnuclear.fan_enriched": "buıɥɔıɹuƎ ʞןnᗺ",
+  "emi.category.createnuclear.snow_powder": "uɐɟ ɔıuǝboʎɹƆ",
   "entity.createnuclear.irradiated_cat": "ʇɐƆ pǝʇɐıpɐɹɹI",
   "entity.createnuclear.irradiated_chicken": "uǝʞɔıɥƆ pǝʇɐıpɐɹɹI",
   "entity.createnuclear.irradiated_cow": "ʍoƆ pǝʇɐıpɐɹɹI",
   "entity.createnuclear.irradiated_wolf": "ɟןoM pǝʇɐıpɐɹɹI",
+  "fluid.createnuclear.nitrogen": "uǝboɹʇıN pınbıꞀ",
   "fluid.createnuclear.thorium": "ɯnıɹoɥ⟘ pınbıꞀ",
   "fluid.createnuclear.uranium": "ɯnıuɐɹ∩ pınbıꞀ",
   "gui.createnuclear.reactor_controller.title": "ɹǝןןoɹʇuoƆ ɹoʇɔɐǝᴚ",
   "gui.createnuclear.reactor_input.title": "ǝbɐɹoʇS ʇnduI ɹoʇɔɐǝᴚ",
+<<<<<<< HEAD
+  "item.createnuclear.anti_radiation_boots": "sʇooᗺ uoıʇɐıpɐᴚ ıʇuⱯ",
+  "item.createnuclear.biomass": "ssɐɯoıᗺ",
+=======
   "item.createnuclear.black_anti_radiation_boots": "sʇooᗺ uoıʇɐıpɐᴚ ıʇuⱯ ʞɔɐןᗺ",
+>>>>>>> V2
   "item.createnuclear.black_anti_radiation_chestplate": "ǝʇɐןdʇsǝɥƆ uoıʇɐıpɐᴚ ıʇuⱯ ʞɔɐןᗺ",
   "item.createnuclear.black_anti_radiation_helmet": "ʇǝɯןǝH uoıʇɐıpɐᴚ ıʇuⱯ ʞɔɐןᗺ",
   "item.createnuclear.black_anti_radiation_leggings": "sbuıbbǝꞀ uoıʇɐıpɐᴚ ıʇuⱯ ʞɔɐןᗺ",
@@ -170,7 +183,11 @@
   "item.createnuclear.cat_irradiated_spawn_egg": "bbƎ uʍɐdS ʇɐƆ pǝʇɐıpɐɹɹI",
   "item.createnuclear.chicken_irradiated_spawn_egg": "bbƎ uʍɐdS uǝʞɔıɥƆ pǝʇɐıpɐɹɹI",
   "item.createnuclear.coal_dust": "ʇsnᗡ ןɐoƆ",
+<<<<<<< HEAD
+  "item.createnuclear.cooled_nitrogen_concentrate": "ǝʇɐɹʇuǝɔuoƆ uǝboɹʇıN pǝןooƆ",
+=======
   "item.createnuclear.cyan_anti_radiation_boots": "sʇooᗺ uoıʇɐıpɐᴚ ıʇuⱯ uɐʎƆ",
+>>>>>>> V2
   "item.createnuclear.cyan_anti_radiation_chestplate": "ǝʇɐןdʇsǝɥƆ uoıʇɐıpɐᴚ ıʇuⱯ uɐʎƆ",
   "item.createnuclear.cyan_anti_radiation_helmet": "ʇǝɯןǝH uoıʇɐıpɐᴚ ıʇuⱯ uɐʎƆ",
   "item.createnuclear.cyan_anti_radiation_leggings": "sbuıbbǝꞀ uoıʇɐıpɐᴚ ıʇuⱯ uɐʎƆ",
@@ -211,7 +228,14 @@
   "item.createnuclear.magenta_anti_radiation_helmet": "ʇǝɯןǝH uoıʇɐıpɐᴚ ıʇuⱯ ɐʇuǝbɐW",
   "item.createnuclear.magenta_anti_radiation_leggings": "sbuıbbǝꞀ uoıʇɐıpɐᴚ ıʇuⱯ ɐʇuǝbɐW",
   "item.createnuclear.magenta_cloth": "ɥʇoןƆ ɐʇuǝbɐW",
+<<<<<<< HEAD
+  "item.createnuclear.nitrate": "ǝʇɐɹʇıN",
+  "item.createnuclear.nitrate_sludge": "ǝbpnןS ǝʇɐɹʇıN",
+  "item.createnuclear.nitrogen_bucket": "ʇǝʞɔnᗺ uǝboɹʇıN",
+  "item.createnuclear.nitrogen_concentrate": "ǝʇɐɹʇuǝɔuoƆ uǝboɹʇıN",
+=======
   "item.createnuclear.orange_anti_radiation_boots": "sʇooᗺ uoıʇɐıpɐᴚ ıʇuⱯ ǝbuɐɹO",
+>>>>>>> V2
   "item.createnuclear.orange_anti_radiation_chestplate": "ǝʇɐןdʇsǝɥƆ uoıʇɐıpɐᴚ ıʇuⱯ ǝbuɐɹO",
   "item.createnuclear.orange_anti_radiation_helmet": "ʇǝɯןǝH uoıʇɐıpɐᴚ ıʇuⱯ ǝbuɐɹO",
   "item.createnuclear.orange_anti_radiation_leggings": "sbuıbbǝꞀ uoıʇɐıpɐᴚ ıʇuⱯ ǝbuɐɹO",

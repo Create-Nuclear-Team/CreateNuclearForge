@@ -1,0 +1,16 @@
+{
+  "type": "create:mixing",
+  "heatRequirement": "superheated",
+  "ingredients": [
+    {
+      "item": "createnuclear:cooled_nitrogen_concentrate"
+    }
+  ],
+  "processingTime": 30,
+  "results": [
+    {
+      "amount": 1000,
+      "fluid": "createnuclear:nitrogen"
+    }
+  ]
+}
