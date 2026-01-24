@@ -26,6 +26,7 @@ import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public int baseGraphiteHeat = -10;
     public int proximityUraniumHeat = 5;
     public int proximityGraphiteHeat = -5;
-    public int maxUraniumPerGraphite = 3;
+    public int maxUraniumPerGraphite = CNConfigs.common().rods.rodFuelMaxForCoolerRod.get();
     public int graphiteTimer = 3600;
     public int uraniumTimer = 3600;
     public int countUraniumRod;

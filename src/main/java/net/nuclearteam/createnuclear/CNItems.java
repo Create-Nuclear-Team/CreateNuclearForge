@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear;
 
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate.getChestplateTag;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet.getHelmetTag;
+
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings.getLeggingsTag;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot.getBootTag;
 
@@ -25,6 +26,9 @@ import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
 import java.util.function.Supplier;
 import net.minecraft.world.item.Items;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
+import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet;
@@ -114,6 +118,19 @@ public class CNItems {
             )
             .register(),
 
+        COAL_DUST = CreateNuclear.REGISTRATE
+            .item("coal_dust", Item::new)
+            .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("coal_dusts"), CNTags.forgeItemTag("dusts/coal"))
+            .register(),
+
+        GRAPHITE_ROD = CreateNuclear.REGISTRATE
+            .item("graphite_rod", Item::new)
+            .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
+                .setRodConfig()
+                .coolerRodType()))
+            .tag(CNTags.forgeItemTag("rods"), CNItemTags.COOLER.tag)
+            .register(),
+
         LEAD_INGOT = CreateNuclear.REGISTRATE
             .item("lead_ingot", Item::new)
             .tag(CNTags.forgeItemTag("ingots"), CNTags.forgeItemTag("ingots/lead"))
@@ -144,6 +161,14 @@ public class CNItems {
                     .requires(CNTags.forgeItemTag("ingots/steel"))
                     .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
+            .register(),
+
+        URANIUM_ROD = CreateNuclear.REGISTRATE
+            .item("uranium_rod", Item::new)
+            .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
+                .setRodConfig()
+                .fuelRodType()))
+            .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register(),
 
         LEAD_NUGGET = CreateNuclear.REGISTRATE
