@@ -18,6 +18,15 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.*;
 import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
@@ -88,6 +97,7 @@ public class AntiRadiationArmorItem {
                 if (original instanceof HumanoidModel) {
                     HumanoidModel<LivingEntity> castedOriginal = (HumanoidModel<LivingEntity>) original;
 
+
                     // Copie des états (accroupi, bébé, chevauchement...)
                     castedOriginal.copyPropertiesTo(this.model);
 
@@ -114,15 +124,18 @@ public class AntiRadiationArmorItem {
   
     public static class Helmet extends ArmorItem {
         protected final DyeColor color;
+
         private final Multimap<Attribute, AttributeModifier> attributeModifiers;
 
         public Helmet(Properties properties, DyeColor color) {
             super(ARMOR_MATERIAL, HELMET, properties);
             this.color = color;
-
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
             builder.putAll(super.getDefaultAttributeModifiers(HELMET.getSlot()));
             irradiatedArmorAttribute(builder, HELMET);
+            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+            UUID uuid = ARMOR_MODIFIER_UUID_PER_TYPE.get(HELMET);
+            builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", 42, AttributeModifier.Operation.ADDITION));
             this.attributeModifiers = builder.build();
         }
 

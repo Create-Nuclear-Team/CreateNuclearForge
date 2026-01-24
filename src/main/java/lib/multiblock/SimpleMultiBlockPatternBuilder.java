@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import lib.multiblock.impl.IMultiBlockPattern;
+import net.nuclearteam.createnuclear.CreateNuclear;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,6 +61,7 @@ public final class SimpleMultiBlockPatternBuilder implements IMultiBlockPatternB
 
     public <T extends IMultiBlockPattern> T build(IPatternBuilder<T> builder) {
         var coreList = multiBlockOffsetPosList.get('*');
+        CreateNuclear.LOGGER.info("2: {}", coreList.toString());
         if (coreList == null || coreList.size() != 1)
             throw new IllegalArgumentException("Failed to build pattern due to having more or less than one \"*\" defined! Have: %s Expected: 1".formatted(coreList != null ? coreList.size() : 0));
         List<MultiBlockOffsetPos> list = Lists.newArrayList();

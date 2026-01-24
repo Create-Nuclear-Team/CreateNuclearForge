@@ -4,6 +4,8 @@ import lib.multiblock.impl.IMultiBlockPattern;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +19,7 @@ public class MultiBlockManagerBeta <T> {
         structures.add(new BlockPattern<>(id, data, blockPattern));
     }
 
-    public BlockPattern<T> findStructure(Level level, BlockPos pos) {
+    public BlockPattern<T> findStructure(Level level, BlockPos pos, ReactorControllerBlockEntity entity) {
         List<Direction> directions = new ArrayList<>();
         directions.add(Direction.NORTH);
         directions.add(Direction.WEST);
@@ -26,8 +28,11 @@ public class MultiBlockManagerBeta <T> {
 
         for (Direction direction : directions) {
             for (BlockPattern<T> structure : structures) {
-                var result = structure.structure().matches(level, pos, direction);
-                if (result) return structure;
+                boolean result = structure.structure().matches(level, pos, direction);
+                if (result){
+                    entity.reactorFacing = direction.getCounterClockWise().getName();
+                    return structure;
+                }
             }
         }
 

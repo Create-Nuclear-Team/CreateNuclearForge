@@ -10,10 +10,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.nbt.CompoundTag;
+
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -31,27 +31,28 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.property.Properties;
 import net.minecraftforge.network.NetworkHooks;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
-import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNShapes;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.block.MultiDirectionalReactorBlock;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
+
+@ParametersAreNonnullByDefault
 public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorInputEntity> {
-
-
+    protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorInput(Properties properties) {
         super(properties);
     }
@@ -81,7 +82,16 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, true);
+        pattern.FindController(pos, level, players, true);
+
+        BlockPos controllerPos = pattern.findControllerPos(pos, level, players, true);
+        if (controllerPos != null) {
+            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
+            if (controllerBlockEntity != null) {
+                CreateNuclear.LOGGER.warn("place input: {}---{}", controllerBlockEntity, pos);
+                controllerBlockEntity.addInput(pos);
+            }
+        }
     }
 
     // @Override // ! may be useless
@@ -102,7 +112,14 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, false);
+        pattern.FindController(pos, level, players, false);
+        BlockPos controllerPos = pattern.findControllerPos(pos, level, players, true);
+        if (controllerPos != null) {
+            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
+            if (controllerBlockEntity != null) {
+                controllerBlockEntity.removeInput(pos);
+            }
+        }
     }
 
     @Override
@@ -113,26 +130,15 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
         pLevel.removeBlockEntity(pPos);
 
         List<? extends Player> players = pLevel.players();
-        FindController(pPos, pLevel, players, false);
-    }
+        pattern.FindController(pPos, pLevel, players, false);
 
-    public ReactorControllerBlock FindController(BlockPos blockPos, Level level, List<? extends Player> players, boolean first){ // Function that checks the surrounding blocks in order
-        BlockPos newBlock;                                                   // to find the controller and verify the pattern
-        Vec3i pos = new Vec3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        for (int x = pos.getX()-5; x != pos.getX()+5; x+=1) {
-            for (int z = pos.getZ()-5; z != pos.getZ()+5; z+=1) {
-                newBlock = new BlockPos(x, pos.getY(), z);
-                if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) { // verifying the pattern
-                    ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(newBlock).getBlock();
-                    controller.Verify(level.getBlockState(newBlock), newBlock, level, players, first);
-                    ReactorControllerBlockEntity entity = controller.getBlockEntity(level, newBlock);
-                    if (entity.created) {
-                        return controller;
-                    }
-                }
+        BlockPos controllerPos = pattern.findControllerPos(pPos, pLevel, players, true);
+        if (controllerPos != null) {
+            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) pLevel.getBlockEntity(controllerPos);
+            if (controllerBlockEntity != null) {
+                controllerBlockEntity.removeInput(pPos);
             }
         }
-        return null;
     }
 
     @Override

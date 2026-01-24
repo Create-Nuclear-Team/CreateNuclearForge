@@ -38,7 +38,6 @@ import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
 import net.minecraftforge.common.Tags;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
-import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasing;
 import net.nuclearteam.createnuclear.CNTags.CNBlockTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
@@ -53,7 +52,7 @@ import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorLiqui
 import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorLiquidInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
-import net.nuclearteam.createnuclear.content.multiblock.reactorCooler.ReactorCooler;
+import net.nuclearteam.createnuclear.content.multiblock.cooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
 import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
 
@@ -560,6 +559,14 @@ public class CNBlocks {
             .tag(CNTags.forgeBlockTag("storage_blocks/steel"))
             .item()
             .tag(CNTags.forgeItemTag("storage_blocks/steel"))
+            .build()
+            .register();
+
+    public static final BlockEntry<Block> REACTOR_ALARM =
+        CreateNuclear.REGISTRATE.block("reactor_alarm", Block::new)
+            .initialProperties(SharedProperties::stone)
+            .transform(pickaxeOnly())
+            .item()
             .build()
             .register();
 

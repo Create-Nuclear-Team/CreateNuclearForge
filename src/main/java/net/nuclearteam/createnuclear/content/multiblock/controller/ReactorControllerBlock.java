@@ -11,6 +11,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -23,13 +24,19 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
+import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
+import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
 import java.util.List;
 
 @MethodsReturnNonnullByDefault
@@ -57,7 +64,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     @Override
     public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos,
                                 boolean isMoving) {
-        withBlockEntityDo(worldIn, pos, be -> be.created = false);
+        withBlockEntityDo(worldIn, pos, be -> be.setAssembled(false));
     }
 
     @Override
@@ -74,6 +81,9 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
         }
         else {
+            if (heldItem.is(Items.PAPER)) {
+                withBlockEntityDo(worldIn, pos, ReactorControllerBlockEntity::test);
+            }
             if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.inventory.getItem(0).isEmpty()){
                 withBlockEntityDo(worldIn, pos, be -> {
                     be.inventory.setStackInSlot(0, heldItem);
@@ -90,7 +100,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     be.inventory.setStackInSlot(0, ItemStack.EMPTY);
                     be.configuredPattern = ItemStack.EMPTY;
                     be.total = 0.0;
-                    be.rotate(be.getBlockState(), new BlockPos(be.getBlockPos().getX(), be.getBlockPos().getY() + (-3), be.getBlockPos().getZ()), be.getLevel(), 0);
+                    be.rotate(be.getBlockState(), be.getLevel(), 0);
                     be.notifyUpdate();
                 });
                 state.setValue(ASSEMBLED, false);
@@ -136,43 +146,49 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         ReactorControllerBlock controller = (ReactorControllerBlock) state.getBlock();
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
-        if (!entity.created)
-            return;
+        if (!entity.isAssembled()) return;
         controller.Rotate(state, pos.below(3), level, 0);
         List<? extends Player> players = level.players();
         for (Player p : players) {
             p.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
         }
+//        entity.removeIOAll();
     }
 
     // this is the Function that verifies if the pattern is correct (as a test, we added the energy output)
     public void Verify(BlockState state, BlockPos pos, Level level, List<? extends Player> players, boolean create){
         ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(pos).getBlock();
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
-        var result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos); // control the pattern
+        if (entity == null) return;
+        BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
         if (result != null) { // the pattern is correct
-
+            CreateNuclear.LOGGER.warn("Verify@BlockPattern<TypeMultiblock> id: {}, data<TypeMultiblock>$getSize: {}, data<TypeMultiblock>$getName: {}", result.id(), result.data().getSize(), result.data().getName());
+//            entity.removeIOAll();
             for (Player player : players) {
-                if (create && !entity.created) {
+                if (create && !entity.isAssembled()) {
                     player.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
                     level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, true));
-                    entity.created = true;
-                    entity.destroyed = false;
+                    entity.reactorSize = result.data().getSize();
+                    entity.setAssembled(true);
+
+                    entity.reactorPos = entity.getStructureBounds(pos, entity.reactorSize, entity.reactorFacing);
+                    // Register existing special blocks (inputs/outputs) so the controller
+                    // detects ReactorInput/ReactorOutput placed before the controller.
+                    FindSpecialBlocksInReactor(entity.reactorPos, entity, level);
                 }
             }
             return;
         }
 
         // the pattern is incorrect
-        for (Player player : players) {
-            if (!create && !entity.destroyed)
-            {
+        if (!create && entity.isAssembled()) {
+            for (Player player : players) {
                 player.sendSystemMessage(Component.translatable("reactor.info.assembled.destroyer"));
-                level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false));
-                entity.created = false;
-                entity.destroyed = true;
-                Rotate(state, pos.below(3), level, 0);
             }
+            level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false));
+            entity.setAssembled(false);
+//                entity.removeIOAll();
+            Rotate(state, pos.below(3), level, 0);
         }
     }
     public void Rotate(BlockState state, BlockPos pos, Level level, int rotation) {
@@ -205,4 +221,39 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         return CNBlockEntityTypes.REACTOR_CONTROLLER.get();
     }
 
+    public void FindSpecialBlocksInReactor(int[] reactorPos, ReactorControllerBlockEntity controllerBlockEntity, Level level){
+        int xMin = reactorPos[0];
+        int xMax = reactorPos[1];
+        int yMin = reactorPos[2];
+        int yMax = reactorPos[3];
+        int zMin = reactorPos[4];
+        int zMax = reactorPos[5];
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+
+        for (int y = yMin; y <= yMax; y++) {
+            boolean isYBoundary = (y == yMin || y == yMax);
+
+            for (int x = xMin; x <= xMax; x++) {
+                for (int z = zMin; z <= zMax; z++) {
+                    boolean isXBoundary = (x == xMin || x == xMax);
+                    boolean isZBoundary = (z == zMin || z == zMax);
+
+                    // On n'exécute la logique que si on est sur une des faces de la boîte
+                    if (isYBoundary || isXBoundary || isZBoundary) {
+                        mutablePos.set(x, y, z);
+                        //isSpecialBlock(level, mutablePos, controllerBlockEntity);
+                    }
+                }
+            }
+        }
+    }
+
+    public void isSpecialBlock(Level level, BlockPos blockPos, ReactorControllerBlockEntity controllerBlockEntity) {
+        if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_OUTPUT.get())) {
+            controllerBlockEntity.addOutput(blockPos);
+        }
+        else if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_INPUT.get())) {
+            controllerBlockEntity.addInput(blockPos);
+        }
+    }
 }
