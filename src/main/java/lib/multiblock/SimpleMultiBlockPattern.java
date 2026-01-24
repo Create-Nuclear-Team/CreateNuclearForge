@@ -18,6 +18,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+@SuppressWarnings("null")
 public final class SimpleMultiBlockPattern implements IMultiBlockPattern {
     private final List<MultiBlockOffsetPos> multiBlockOffsetPosList;
     private final Map<Character, Predicate<BlockInWorld>> predicateHashMap;
