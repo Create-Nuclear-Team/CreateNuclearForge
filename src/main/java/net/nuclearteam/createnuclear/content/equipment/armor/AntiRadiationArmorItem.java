@@ -349,7 +349,7 @@ public class AntiRadiationArmorItem {
     public static class Boot extends ArmorItem {
         private final Multimap<Attribute, AttributeModifier> attributeModifiers;
         protected final DyeColor color;
-        public Boot(Properties properties) {
+        public Boot(Properties properties, DyeColor color) {
             super(ARMOR_MATERIAL, BOOTS, properties);
 
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();

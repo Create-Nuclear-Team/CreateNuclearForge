@@ -59,7 +59,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public int baseGraphiteHeat = -10;
     public int proximityUraniumHeat = 5;
     public int proximityGraphiteHeat = -5;
-    public int maxUraniumPerGraphite = CNConfigs.common().rods.rodFuelMaxForCoolerRod.get();
+    public int maxUraniumPerGraphite = CNConfigs.server().rods.rodFuelMaxForCoolerRod.get();
     public int graphiteTimer = 3600;
     public int uraniumTimer = 3600;
     public int countUraniumRod;

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-// 1.20.1	2025-12-29T15:26:15.4926775	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
-=======
-// 1.20.1	2025-12-17T14:48:11.3988415	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
->>>>>>> V2
+// 1.20.1	2026-01-24T11:08:28.0414426	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -49,13 +45,8 @@ a2fc21fa320e677fe7690b260ee3f57ebdbd50b6 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-<<<<<<< HEAD
-95e99bd1dd31f195efdce267bfdd4165d4238bba assets/createnuclear/lang/en_ud.json
-1be9d22ca30a88918733d62eccb57e546f5602e6 assets/createnuclear/lang/en_us.json
-=======
-0e4cf096d2e3460aece2954aaaa3a11c8ef8857c assets/createnuclear/lang/en_ud.json
-c362ba0aab9277eadebc6d2d283511d34d687abc assets/createnuclear/lang/en_us.json
->>>>>>> V2
+c0e4114ce8584a0b921e3b880e9340a640be3a76 assets/createnuclear/lang/en_ud.json
+be52ce0c6b83ffb9e2387f636a9edcbc487e7f07 assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -119,11 +110,8 @@ d234edb3b6bc81b7300ee65722973b66db0b82d9 assets/createnuclear/models/block/urani
 a4d5ee44c830e329034a46792280edea53343034 assets/createnuclear/models/block/uranium_ore.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/item/autunite.json
 30b11d8da5d02a3e9cebb739b3b9efbee087573c assets/createnuclear/models/item/autunite_pillar.json
-<<<<<<< HEAD
 7465b4a1fcf819fb096551a30f56bc0899f7a40b assets/createnuclear/models/item/biomass.json
-=======
 cf65048724c5a463da2c1b01a575fcc9dc6b51f7 assets/createnuclear/models/item/black_anti_radiation_boots.json
->>>>>>> V2
 f8e44e53a7bc368d4c159769bb071eef6d28d856 assets/createnuclear/models/item/black_anti_radiation_chestplate.json
 82a63e5c93daac9c5430ae77aa8d10b1bddbc2c7 assets/createnuclear/models/item/black_anti_radiation_helmet.json
 2d0a3f0d2dd0fab5b73c7b8291a5eb3a7921157a assets/createnuclear/models/item/black_anti_radiation_leggings.json
@@ -198,14 +186,11 @@ b20e1b4dd0745ead1aa2248a91df5dde465e0938 assets/createnuclear/models/item/lime_c
 e02c005625f9ab199ba04201152973e016b16831 assets/createnuclear/models/item/magenta_anti_radiation_helmet.json
 5e91eecf2e5def0f863b5d7d9b3625a62e4de7af assets/createnuclear/models/item/magenta_anti_radiation_leggings.json
 4799138766c26496b41807407a4b1ce2106cf7b7 assets/createnuclear/models/item/magenta_cloth.json
-<<<<<<< HEAD
 94fbc4170e0aebba53f00f5828089a25bf683c4c assets/createnuclear/models/item/nitrate.json
 9ed9a76ded4e50102175337306def929624d594a assets/createnuclear/models/item/nitrate_sludge.json
 55e956c815f423e5a94d1f113ba7301199f272f5 assets/createnuclear/models/item/nitrogen_bucket.json
 126657f82888c7b7b9e2338dfec05a7f80b1080d assets/createnuclear/models/item/nitrogen_concentrate.json
-=======
 ce5944f3c075d3e2ec4557311d5813a1a985e56f assets/createnuclear/models/item/orange_anti_radiation_boots.json
->>>>>>> V2
 626c65938b0109839ff3f48fecabe659fe38a657 assets/createnuclear/models/item/orange_anti_radiation_chestplate.json
 72af25b71ba1417c58137fce1070c09cc65a61b5 assets/createnuclear/models/item/orange_anti_radiation_helmet.json
 af14c1a038ff14285b1d78dfbcab0a8e44df14e5 assets/createnuclear/models/item/orange_anti_radiation_leggings.json
@@ -671,19 +656,11 @@ e84d8e1fa924bec3e226b8917b4973b9629a5f52 data/minecraft/tags/blocks/campfires.js
 75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/minecraft/tags/blocks/impermeable.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/blocks/lush_ground_replaceable.json
 e84d8e1fa924bec3e226b8917b4973b9629a5f52 data/minecraft/tags/blocks/mineable/axe.json
-<<<<<<< HEAD
-d3e653a0b65fc3edb30f227390b9ba3bbbd53f69 data/minecraft/tags/blocks/mineable/pickaxe.json
+fbbfb3cbedc0c489367fd7ddf69da567dc67d1e0 data/minecraft/tags/blocks/mineable/pickaxe.json
 a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/minecraft/tags/blocks/mineable/shovel.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/blocks/moss_replaceable.json
-ee37198febf019ac6fca8170c940e500b143efa6 data/minecraft/tags/blocks/needs_diamond_tool.json
+f815fd2431b9acf1fdf1f12a1adacaa2d147760f data/minecraft/tags/blocks/needs_diamond_tool.json
 8e904af376273deaa679e5fe3c5f4052bf8222b7 data/minecraft/tags/blocks/needs_iron_tool.json
-=======
-fec304ab25fb92b6a8c60d6527578459c473478e data/minecraft/tags/blocks/mineable/pickaxe.json
-a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/minecraft/tags/blocks/mineable/shovel.json
-8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/blocks/moss_replaceable.json
-60987dec2322da3e5c70b7e7c9bf529d7bf1c806 data/minecraft/tags/blocks/needs_diamond_tool.json
-38aa0fddd24ec7dde10f1e2804328660a2019ac8 data/minecraft/tags/blocks/needs_iron_tool.json
->>>>>>> V2
 9b9e13222cf9d971353888483c5f041cbb664dc3 data/minecraft/tags/blocks/slabs.json
 7e5c701218bfbd3b186b102ff52dc79454a39e8f data/minecraft/tags/blocks/stairs.json
 92fe109294976e85a9b9763124896e012a17c98a data/minecraft/tags/blocks/walls.json

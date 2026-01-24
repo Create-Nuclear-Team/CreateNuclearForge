@@ -130,11 +130,8 @@
   "createnuclear.ponder.reactor.text_9": "Floor 6",
   "createnuclear.ponder.reactor_blueprint.header": "Controller Activation",
   "createnuclear.ponder.reactor_blueprint.text_1": "Reactor Blueprint: the most important element; it allows the reactor to be configured according to specific models.",
-<<<<<<< HEAD
   "createnuclear.snow_powder.fan.recipe": "Cryogenic fan",
-=======
   "createnuclear.tooltip.baseRodHeat": "Base Rod Heat: %d Q",
->>>>>>> V2
   "createnuclear.tooltip.heatLevel": "Heat Level",
   "createnuclear.tooltip.heatLevel.caution": "Caution",
   "createnuclear.tooltip.heatLevel.danger": "Danger",
@@ -148,6 +145,8 @@
   "createnuclear.tooltip.rodTimer": "Rod Duration: %d tick",
   "createnuclear.tooltip.statRod": "Rod Stat Pattern:",
   "createnuclear.tooltip.typeRod": "Rod Type: %s",
+  "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast",
+  "death.attack.createnuclear.radiation": "%1$s died from radiation",
   "effect.createnuclear.radiation": "Radiation",
   "emi.category.createnuclear.fan_enriched": "Bulk Enriching",
   "emi.category.createnuclear.snow_powder": "Cryogenic fan",
@@ -160,12 +159,8 @@
   "fluid.createnuclear.uranium": "Liquid Uranium",
   "gui.createnuclear.reactor_controller.title": "Reactor Controller",
   "gui.createnuclear.reactor_input.title": "Reactor Input Storage",
-<<<<<<< HEAD
-  "item.createnuclear.anti_radiation_boots": "Anti Radiation Boots",
   "item.createnuclear.biomass": "Biomass",
-=======
   "item.createnuclear.black_anti_radiation_boots": "Black Anti Radiation Boots",
->>>>>>> V2
   "item.createnuclear.black_anti_radiation_chestplate": "Black Anti Radiation Chestplate",
   "item.createnuclear.black_anti_radiation_helmet": "Black Anti Radiation Helmet",
   "item.createnuclear.black_anti_radiation_leggings": "Black Anti Radiation Leggings",
@@ -183,11 +178,8 @@
   "item.createnuclear.cat_irradiated_spawn_egg": "Irradiated Cat Spawn Egg",
   "item.createnuclear.chicken_irradiated_spawn_egg": "Irradiated Chicken Spawn Egg",
   "item.createnuclear.coal_dust": "Coal Dust",
-<<<<<<< HEAD
   "item.createnuclear.cooled_nitrogen_concentrate": "Cooled Nitrogen Concentrate",
-=======
   "item.createnuclear.cyan_anti_radiation_boots": "Cyan Anti Radiation Boots",
->>>>>>> V2
   "item.createnuclear.cyan_anti_radiation_chestplate": "Cyan Anti Radiation Chestplate",
   "item.createnuclear.cyan_anti_radiation_helmet": "Cyan Anti Radiation Helmet",
   "item.createnuclear.cyan_anti_radiation_leggings": "Cyan Anti Radiation Leggings",
@@ -228,14 +220,11 @@
   "item.createnuclear.magenta_anti_radiation_helmet": "Magenta Anti Radiation Helmet",
   "item.createnuclear.magenta_anti_radiation_leggings": "Magenta Anti Radiation Leggings",
   "item.createnuclear.magenta_cloth": "Magenta Cloth",
-<<<<<<< HEAD
   "item.createnuclear.nitrate": "Nitrate",
   "item.createnuclear.nitrate_sludge": "Nitrate Sludge",
   "item.createnuclear.nitrogen_bucket": "Nitrogen Bucket",
   "item.createnuclear.nitrogen_concentrate": "Nitrogen Concentrate",
-=======
   "item.createnuclear.orange_anti_radiation_boots": "Orange Anti Radiation Boots",
->>>>>>> V2
   "item.createnuclear.orange_anti_radiation_chestplate": "Orange Anti Radiation Chestplate",
   "item.createnuclear.orange_anti_radiation_helmet": "Orange Anti Radiation Helmet",
   "item.createnuclear.orange_anti_radiation_leggings": "Orange Anti Radiation Leggings",
