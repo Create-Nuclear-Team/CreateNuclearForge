@@ -27,6 +27,7 @@ import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.CNPlacementModifiers;
 import org.slf4j.Logger;
 
 @Mod(CreateNuclear.MOD_ID)
@@ -69,6 +70,7 @@ public class CreateNuclear {
 
         CNConfigs.register(modLoadingContext);
 
+        CNPlacementModifiers.register(modEventBus);
         CNCreativeModeTabs.register(modEventBus);
         CNEffects.register(modEventBus);
         CNPotions.register(modEventBus);
