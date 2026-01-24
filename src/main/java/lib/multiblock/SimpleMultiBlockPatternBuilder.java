@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 public final class SimpleMultiBlockPatternBuilder implements IMultiBlockPatternBuilder {
     private static final Joiner COMA_SEPARATOR = Joiner.on(',');
     public static SimpleMultiBlockPatternBuilder start() {

@@ -26,8 +26,10 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.manager.React
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorOutputManagerI;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,27 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public ReactorControllerBlock controller;
     protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorControllerInventory inventory;
+
+    //public LinkedHashSet<LazyOptional<IItemHandler>> attachedInventory;
+
+    //private boolean powered;
+    public State powered = State.OFF;
+    public float reactorPower;
+    public float lastReactorPower;
+    int overFlowHeatTimer = 0;
+    int overFlowLimiter = 30;
+    double overHeat = 0;
+    public int baseUraniumHeat = 25;
+    public int baseGraphiteHeat = -10;
+    public int proximityUraniumHeat = 5;
+    public int proximityGraphiteHeat = -5;
+    public int maxUraniumPerGraphite = CNConfigs.common().rods.rodFuelMaxForCoolerRod.get();
+    public int graphiteTimer = 3600;
+    public int uraniumTimer = 3600;
+    public int countUraniumRod;
+    public int countGraphiteRod;
+    public int heat;
+
     public double total;
     public CompoundTag screen_pattern = new CompoundTag();
     public ItemStack configuredPattern;

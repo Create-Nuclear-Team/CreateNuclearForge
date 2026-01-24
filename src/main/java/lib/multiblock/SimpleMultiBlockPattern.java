@@ -18,10 +18,12 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+
 public record SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffsetPosList,
                                       Map<Character, Predicate<BlockInWorld>> predicateHashMap,
                                       Map<Character, Supplier<BlockState>> blockProvider) implements IMultiBlockPattern {
-    public SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffsetPosList, Map<Character, Predicate<BlockInWorld>> predicateHashMap, Map<Character, Supplier<BlockState>> blockProvider) {
+    
+  public SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffsetPosList, Map<Character, Predicate<BlockInWorld>> predicateHashMap, Map<Character, Supplier<BlockState>> blockProvider) {
         this.multiBlockOffsetPosList = List.copyOf(multiBlockOffsetPosList);
         this.predicateHashMap = Map.copyOf(predicateHashMap);
         this.blockProvider = Map.copyOf(blockProvider);

@@ -2,6 +2,10 @@ package net.nuclearteam.createnuclear.content.multiblock.output;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
+import com.simibubi.create.content.kinetics.motor.KineticScrollValueBehaviour;
+import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
+import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.utility.CreateLang;
@@ -42,12 +46,15 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     ReactorControllerBlockEntity controllerEntity = null;
     public ReactorControllerBlock controller = null;
 
+
     // protected ScrollValueBehaviour generatedSpeed;
     protected float generatedSpeed;
+
 
     public ReactorOutputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
+
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
@@ -61,6 +68,7 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     }
 
     @Override
+
     public void lazyTick() {
         super.lazyTick();
 
@@ -125,6 +133,7 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
             }
         } else setSpeed(0);
     }
+
 
      @Override
      public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {

@@ -22,6 +22,7 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+
 public class CNCrushingRecipeGen extends CrushingRecipeGen {
 
     GeneratedRecipe
@@ -46,6 +47,17 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
             .output(1, CNItems.URANIUM_POWDER,81)
         ),
 
+        RAW_THORIUM_BLOCK = create(() -> CNBlocks.RAW_THORIUM_BLOCK, b -> b
+            .duration(250)
+            .output(1, CNItems.THORIUM_DUST, 81)
+        ),
+
+        RAW_THORIUM_ITEM = create(() -> CNItems.RAW_THORIUM, b -> b
+                .duration(125)
+                .output(1, CNItems.THORIUM_DUST, 1)
+                .output(0.5f, CNItems.THORIUM_DUST, 1)
+        ),
+
         RAW_ZINC = create(() -> AllItems.RAW_ZINC, b -> b.duration(250)
             .output(1, AllItems.CRUSHED_ZINC, 1)
             .output(.75f, AllItems.EXP_NUGGET, 1)
@@ -63,7 +75,6 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
     public CNCrushingRecipeGen(PackOutput generator) {
         super(generator, CreateNuclear.MOD_ID);
     }
-
 
 
     protected <T extends ProcessingRecipe<?>> GeneratedRecipe createFix(String namespace,

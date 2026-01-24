@@ -16,6 +16,7 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+
 public class CNMixingRecipeGen extends MixingRecipeGen {
 
     GeneratedRecipe
@@ -31,10 +32,7 @@ public class CNMixingRecipeGen extends MixingRecipeGen {
         )
     ;
 
-
-
     public CNMixingRecipeGen(PackOutput generator) {
         super(generator, CreateNuclear.MOD_ID);
     }
-
 }
