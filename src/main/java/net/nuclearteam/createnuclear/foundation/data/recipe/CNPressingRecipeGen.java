@@ -11,10 +11,11 @@ public class CNPressingRecipeGen extends PressingRecipeGen {
 
     GeneratedRecipe
         GRAPHENE = create("graphene", b -> b
-            .require(Ingredient.of(CNTags.forgeItemTag("coal_dusts")))
+            .require(Ingredient.of(CNTags.forgeItemTag("dusts/coal")))
             .output(CNItems.GRAPHENE)
     )
     ;
+
 
     public CNPressingRecipeGen(PackOutput generator) {
         super(generator, CreateNuclear.MOD_ID);

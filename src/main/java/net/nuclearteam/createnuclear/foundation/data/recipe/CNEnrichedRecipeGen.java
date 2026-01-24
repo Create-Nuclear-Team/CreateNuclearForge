@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
+import com.simibubi.create.foundation.recipe.IRecipeTypeInfo;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
@@ -7,6 +8,11 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.CNRecipeTypes;
+import net.nuclearteam.createnuclear.CreateNuclear;
+
+import java.util.function.Supplier;
+
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.data.recipe.EnrichedRecipeGen;
 
