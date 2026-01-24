@@ -3,7 +3,9 @@ package net.nuclearteam.createnuclear.content.equipment.armor;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.tterrag.registrate.util.entry.ItemEntry;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.Util;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.EntityModelSet;
@@ -26,6 +28,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
+@MethodsReturnNonnullByDefault
 public class AntiRadiationArmorItem {
 
     public static final ArmorItem.Type HELMET = ArmorItem.Type.HELMET;
@@ -40,6 +43,12 @@ public class AntiRadiationArmorItem {
         p_266744_.put(ArmorItem.Type.CHESTPLATE, UUID.fromString("9F3D476D-C118-4544-8365-64846904B48E"));
         p_266744_.put(ArmorItem.Type.HELMET, UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150"));
     });
+
+    private static void irradiatedArmorAttribute(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder, ArmorItem.Type type) {
+        UUID uuid = ARMOR_MODIFIER_UUID_PER_TYPE.get(type);
+        builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", 1, AttributeModifier.Operation.MULTIPLY_TOTAL));
+    }
+
 
     public static void attachCustomModel(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
@@ -102,8 +111,7 @@ public class AntiRadiationArmorItem {
     private static String getSingleLayerTexture(DyeColor color) {
         return CreateNuclear.asResource("textures/models/armor/" + color.getName() + "_anti_radiation_suit.png").toString();
     }
-
-
+  
     public static class Helmet extends ArmorItem {
         protected final DyeColor color;
         private final Multimap<Attribute, AttributeModifier> attributeModifiers;
@@ -111,9 +119,10 @@ public class AntiRadiationArmorItem {
         public Helmet(Properties properties, DyeColor color) {
             super(ARMOR_MATERIAL, HELMET, properties);
             this.color = color;
+
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-            UUID uuid = ARMOR_MODIFIER_UUID_PER_TYPE.get(HELMET);
-            builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", 42, AttributeModifier.Operation.ADDITION));
+            builder.putAll(super.getDefaultAttributeModifiers(HELMET.getSlot()));
+            irradiatedArmorAttribute(builder, HELMET);
             this.attributeModifiers = builder.build();
         }
 
@@ -183,9 +192,17 @@ public class AntiRadiationArmorItem {
     public static class Chestplate extends ArmorItem {
         protected final DyeColor color;
 
+        private final Multimap<Attribute, AttributeModifier> attributeModifiers;
+
+
         public Chestplate(Properties properties, DyeColor color) {
             super(ARMOR_MATERIAL, CHESTPLATE, properties);
             this.color = color;
+
+            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+            builder.putAll(super.getDefaultAttributeModifiers(CHESTPLATE.getSlot()));
+            irradiatedArmorAttribute(builder, CHESTPLATE);
+            this.attributeModifiers = builder.build();
         }
 
         @Override
@@ -244,14 +261,26 @@ public class AntiRadiationArmorItem {
                     ? CNItemTags.ANTI_RADIATION_ARMOR.tag
                     : CNItemTags.ANTI_RADIATION_CHESTPLATE_DYE.tag;
         }
+
+        @Override
+        public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot pEquipmentSlot) {
+            return pEquipmentSlot == this.type.getSlot() ? this.attributeModifiers : super.getDefaultAttributeModifiers(pEquipmentSlot);
+        }
     }
 
     public static class Leggings extends ArmorItem {
         protected final DyeColor color;
 
+        private final Multimap<Attribute, AttributeModifier> attributeModifiers;
+
+
         public Leggings(Properties properties, DyeColor color) {
             super(ARMOR_MATERIAL, LEGGINGS, properties);
             this.color = color;
+            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+            builder.putAll(super.getDefaultAttributeModifiers(LEGGINGS.getSlot()));
+            irradiatedArmorAttribute(builder, LEGGINGS);
+            this.attributeModifiers = builder.build();
         }
 
         @Override
@@ -310,19 +339,35 @@ public class AntiRadiationArmorItem {
                     ? CNItemTags.ANTI_RADIATION_ARMOR.tag
                     : CNItemTags.ANTI_RADIATION_LEGGINGS_DYE.tag;
         }
+
+        @Override
+        public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot pEquipmentSlot) {
+            return pEquipmentSlot == this.type.getSlot() ? this.attributeModifiers : super.getDefaultAttributeModifiers(pEquipmentSlot);
+        }
     }
 
     public static class Boot extends ArmorItem {
+        private final Multimap<Attribute, AttributeModifier> attributeModifiers;
         protected final DyeColor color;
-
-        public Boot(Properties properties, DyeColor color) {
+        public Boot(Properties properties) {
             super(ARMOR_MATERIAL, BOOTS, properties);
+
+            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
+            builder.putAll(super.getDefaultAttributeModifiers(BOOTS.getSlot()));
+            irradiatedArmorAttribute(builder, BOOTS);
+            this.attributeModifiers = builder.build();
             this.color = color;
         }
 
         @Override
         public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-            return getSingleLayerTexture(this.color);
+            return String.valueOf(CreateNuclear.asResource("textures/models/armor/white_anti_radiation_suit_layer_1.png"));
+        }
+
+        @Override
+        public Multimap<Attribute, AttributeModifier> getDefaultAttributeModifiers(EquipmentSlot pEquipmentSlot) {
+            return pEquipmentSlot == this.type.getSlot() ? this.attributeModifiers : super.getDefaultAttributeModifiers(pEquipmentSlot);
+            //return getSingleLayerTexture(this.color);
         }
 
         @Override
