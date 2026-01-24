@@ -137,6 +137,7 @@ public class CNTags {
         ANTI_RADIATION_CHESTPLATE_FULL_DYE,
         ANTI_RADIATION_LEGGINGS_FULL_DYE,
         COMPOSTABLE(FORGE),
+        ANTI_RADIATION_BOOTS_FULL_DYE
         ;
 
         public final TagKey<Item> tag;
