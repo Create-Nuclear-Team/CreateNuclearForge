@@ -130,6 +130,8 @@
   "createnuclear.ponder.reactor_blueprint.header": "uoıʇɐʌıʇɔⱯ ɹǝןןoɹʇuoƆ",
   "createnuclear.ponder.reactor_blueprint.text_1": "˙sןǝpoɯ ɔıɟıɔǝds oʇ buıpɹoɔɔɐ pǝɹnbıɟuoɔ ǝq oʇ ɹoʇɔɐǝɹ ǝɥʇ sʍoןןɐ ʇı ؛ʇuǝɯǝןǝ ʇuɐʇɹodɯı ʇsoɯ ǝɥʇ :ʇuıɹdǝnןᗺ ɹoʇɔɐǝᴚ",
   "createnuclear.tooltip.baseRodHeat": "Ὁ %d :ʇɐǝH poᴚ ǝsɐᗺ",
+  "createnuclear.tooltip.fluid": " %s :pınןℲ",
+  "createnuclear.tooltip.fluid.amount": "qɯ %d",
   "createnuclear.tooltip.heatLevel": "ןǝʌǝꞀ ʇɐǝH",
   "createnuclear.tooltip.heatLevel.caution": "uoıʇnɐƆ",
   "createnuclear.tooltip.heatLevel.danger": "ɹǝbuɐᗡ",

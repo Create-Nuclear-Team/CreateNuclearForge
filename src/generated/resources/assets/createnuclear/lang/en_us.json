@@ -130,6 +130,8 @@
   "createnuclear.ponder.reactor_blueprint.header": "Controller Activation",
   "createnuclear.ponder.reactor_blueprint.text_1": "Reactor Blueprint: the most important element; it allows the reactor to be configured according to specific models.",
   "createnuclear.tooltip.baseRodHeat": "Base Rod Heat: %d Q",
+  "createnuclear.tooltip.fluid": "Fluid: %s ",
+  "createnuclear.tooltip.fluid.amount": "%d mb",
   "createnuclear.tooltip.heatLevel": "Heat Level",
   "createnuclear.tooltip.heatLevel.caution": "Caution",
   "createnuclear.tooltip.heatLevel.danger": "Danger",
