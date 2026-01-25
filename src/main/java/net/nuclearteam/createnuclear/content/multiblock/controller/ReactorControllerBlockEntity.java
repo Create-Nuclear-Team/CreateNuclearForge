@@ -12,20 +12,22 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
+import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputFluid;
 import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs;
-import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManager;
-import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputManagerI;
-import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorOutputManager;
-import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorOutputManagerI;
+import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
@@ -33,6 +35,7 @@ import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
@@ -56,6 +59,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     private BigItemStack bigFuelItem;
     private BigItemStack bigCoolerItem;
+    private List<BigFluidStack> bigFluidStack;
 
     public int reactorSize = 0;
     public String reactorFacing = "null";
@@ -65,18 +69,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     private final ReactorInputManagerI inputManager;
     private final ReactorOutputManagerI outputManager;
+    private final ReactorInputFluidManagerI inputFluidManager;
 
     HeatManager heatManager = new HeatManager();
-
-    public double calculateProgress() {
-        countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
-        countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
-
-        double totalGraphiteRodLife = (double) heatManager.graphiteTimer / countGraphiteRod;
-        double totalUraniumRodLife = (double) heatManager.uraniumTimer / countUraniumRod;
-
-        return totalGraphiteRodLife + totalUraniumRodLife;
-    }
 
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -85,24 +80,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
         inputManager = new ReactorInputManager();
         outputManager = new ReactorOutputManager();
+        inputFluidManager = new ReactorInputFluidManager();
 
         bigFuelItem = new BigItemStack(ItemStack.EMPTY);
         bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
-    }
-
-    public boolean isAssembled() {
-        if (level == null) return false;
-        try {
-            return level.getBlockState(worldPosition).getValue(ASSEMBLED);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public void setAssembled(boolean assembled) {
-        if (level == null) return;
-        level.setBlockAndUpdate(worldPosition, getBlockState().setValue(ASSEMBLED, assembled));
-        this.setChanged();
+        bigFluidStack = new ArrayList<>();
     }
 
     @Override
@@ -138,6 +120,17 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             } else {
                 IHeat.HeatLevel.getFormattedItemText(bigCoolerItem, false).forGoggles(tooltip);
             }
+
+            Map<ResourceLocation, Long> m = this.inputFluidManager.getInventory(level).fluids();
+            List<BigFluidStack> stacks = VirtualReactorInputFluid.toBigList(m);
+
+            for (BigFluidStack stack : stacks) {
+                CreateNuclearLang
+                    .translate("tooltip.fluid", stack.stack.getDisplayName())
+                    .translate("tooltip.fluid.amount", stack.amount)
+                    .forGoggles(tooltip);
+            }
+
         }
 
         return true;
@@ -152,6 +145,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         // Lecture des Inputs
         this.inputManager.read(compound);
         this.outputManager.read(compound);
+        this.inputFluidManager.read(compound);
 
         // 1. Tes nouvelles variables simples
         this.reactorSize = compound.getInt("reactorSize");
@@ -176,6 +170,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         super.write(compound, clientPacket);
         this.inputManager.write(compound);
         this.outputManager.write(compound);
+        this.inputFluidManager.write(compound);
 
         // 1. Tes nouvelles variables simples
         compound.putInt("reactorSize", this.reactorSize);
@@ -194,21 +189,59 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
         compound.put("bigFuel", bigFuelItem.write());
         compound.put("bigCooler", bigCoolerItem.write());
+
+    }
+
+
+    public boolean isAssembled() {
+        if (level == null) return false;
+        try {
+            return level.getBlockState(worldPosition).getValue(ASSEMBLED);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void setAssembled(boolean assembled) {
+        if (level == null) return;
+        level.setBlockAndUpdate(worldPosition, getBlockState().setValue(ASSEMBLED, assembled));
+        this.setChanged();
+    }
+
+    public double calculateProgress() {
+        countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
+        countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
+
+        double totalGraphiteRodLife = (double) heatManager.graphiteTimer / countGraphiteRod;
+        double totalUraniumRodLife = (double) heatManager.uraniumTimer / countUraniumRod;
+
+        return totalGraphiteRodLife + totalUraniumRodLife;
     }
 
     public void test() {
         CreateNuclear.LOGGER.warn("List d'input: {}", this.inputManager.size());
+        CreateNuclear.LOGGER.warn("List d'output: {}", this.outputManager.size());
+        CreateNuclear.LOGGER.warn("List d'input fluid: {}", this.inputFluidManager.size());
+
         for (BlockPos p : this.inputManager.getBlocksPosition()) {
                 CreateNuclear.LOGGER.info("ReactorInputEntity BlockPos {}", p);
-        }
-        for (BlockPos p : this.outputManager.getBlocksPosition()) {
-            CreateNuclear.LOGGER.info("ReactorOutputEntity BlockPos {}", p);
         }
         for (BlockPos p : this.inputManager.getBlocksPosition(level)) {
             CreateNuclear.LOGGER.warn("List vrais input: {}", p);
         }
+
+        for (BlockPos p : this.outputManager.getBlocksPosition()) {
+            CreateNuclear.LOGGER.info("ReactorOutputEntity BlockPos {}", p);
+        }
         for (BlockPos p : this.outputManager.getBlocksPosition(level)) {
             CreateNuclear.LOGGER.warn("List vrais output: {}", p);
+        }
+
+        for (BlockPos p : this.inputFluidManager.getBlocksPosition()) {
+            CreateNuclear.LOGGER.info("ReactorFluidInputEntity BlockPos {}", p);
+        }
+        for (BlockPos p : this.inputFluidManager.getBlocksPosition(level)) {
+            CreateNuclear.LOGGER.warn("List vrais input fluid: {}", p);
         }
     }
 
@@ -229,9 +262,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         }
         if (isAssembled()) {
             List<IItemHandler> handlers = inputManager.getItemHandlers(level);
+            List<IFluidHandler> fluidHandlers = inputFluidManager.getFuildHandlers(level);
             VirtualReactorInputs virtualReactorInputs = inputManager.getInventory(level);
+            VirtualReactorInputFluid virtualReactorInputFluid = inputFluidManager.getInventory(level);
             bigFuelItem = virtualReactorInputs.getBigFuelRod();
             bigCoolerItem = virtualReactorInputs.getBigCooledRod();
+            bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
 
             if (!isEmptyConfiguredPattern() && bigFuelItem.count > 0 && bigCoolerItem.count > 0) {
                 if (this.inputManager.size() > 0) {
@@ -417,9 +453,20 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.setChanged();
     }
 
+    public void addInputFluid(BlockPos outputPos) {
+        this.inputFluidManager.addBlock(outputPos);
+        this.setChanged();
+    }
+
+    public void removeInputFluid(BlockPos outputPos) {
+        this.inputFluidManager.removeBlock(outputPos);
+        this.setChanged();
+    }
+
     public void removeIOAll() {
         this.inputManager.clearInvalid(level);
         this.outputManager.clearInvalid(level);
+        this.inputFluidManager.clearInvalid(level);
         this.setChanged();
     }
 }
