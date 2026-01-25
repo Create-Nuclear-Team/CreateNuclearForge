@@ -12,8 +12,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputFluid;
-import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorFluidInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 
 import java.util.ArrayList;
 import java.util.List;
