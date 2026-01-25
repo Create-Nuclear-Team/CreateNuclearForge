@@ -13,8 +13,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
-import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,9 +72,9 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
     }
 
     @Override
-    public VirtualReactorInputs getInventory(Level level) {
+    public VirtualReactorInputsItem getInventory(Level level) {
         List<IItemHandler> handlers = this.getItemHandlers(level);
-        if (handlers.isEmpty()) return new VirtualReactorInputs();
+        if (handlers.isEmpty()) return new VirtualReactorInputsItem();
 
         int totalFuel = 0;
         int totalCooler = 0;
@@ -87,7 +87,7 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
             }
         }
 
-        return new VirtualReactorInputs(totalFuel, totalCooler);
+        return new VirtualReactorInputsItem(totalFuel, totalCooler);
     }
 
     @Override
