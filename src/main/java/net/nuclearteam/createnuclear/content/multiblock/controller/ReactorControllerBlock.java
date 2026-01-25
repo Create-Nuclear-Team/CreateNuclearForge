@@ -28,15 +28,12 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Arrays;
 import java.util.List;
 
 @MethodsReturnNonnullByDefault

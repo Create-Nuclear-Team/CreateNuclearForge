@@ -9,8 +9,6 @@ import com.simibubi.create.foundation.utility.IInteractionChecker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -22,13 +20,12 @@ import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
-import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputFluid;
-import net.nuclearteam.createnuclear.content.multiblock.VirtualReactorInputs;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
-import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
 
@@ -263,10 +260,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (isAssembled()) {
             List<IItemHandler> handlers = inputManager.getItemHandlers(level);
             List<IFluidHandler> fluidHandlers = inputFluidManager.getFuildHandlers(level);
-            VirtualReactorInputs virtualReactorInputs = inputManager.getInventory(level);
+            VirtualReactorInputsItem virtualReactorInputsItem = inputManager.getInventory(level);
             VirtualReactorInputFluid virtualReactorInputFluid = inputFluidManager.getInventory(level);
-            bigFuelItem = virtualReactorInputs.getBigFuelRod();
-            bigCoolerItem = virtualReactorInputs.getBigCooledRod();
+            bigFuelItem = virtualReactorInputsItem.getBigFuelRod();
+            bigCoolerItem = virtualReactorInputsItem.getBigCooledRod();
             bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
 
             if (!isEmptyConfiguredPattern() && bigFuelItem.count > 0 && bigCoolerItem.count > 0) {
