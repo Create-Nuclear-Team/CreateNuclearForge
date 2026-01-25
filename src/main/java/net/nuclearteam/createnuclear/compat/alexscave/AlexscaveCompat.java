@@ -18,16 +18,11 @@ public class AlexscaveCompat {
 
     public AlexscaveCompat() {}
 
-    // J'ai changé void en boolean
     public boolean MobSpawn(BlockState state, Level level, BlockPos.MutableBlockPos carve, float itemDropModifier, Explosion dummyExplosion){
-        // Si c'est un oeuf de Tremorzilla
         if(state.is(ACBlockRegistry.TREMORZILLA_EGG.get()) && state.getBlock() instanceof TremorzillaEggBlock tremorzillaEggBlock){
-            // On fait éclore le dinosaure
             tremorzillaEggBlock.spawnDinosaurs(level, carve, state);
-            // On retourne TRUE pour dire "J'ai géré ce bloc, ne fais rien d'autre"
             return true;
         }
-        // Logique normale pour les autres blocs Alex Caves
         else if (AlexsCaves.COMMON_CONFIG.nukesSpawnItemDrops.get() && random.nextFloat() < itemDropModifier && state.getFluidState().isEmpty()) {
             level.destroyBlock(carve, true);
         } else {
