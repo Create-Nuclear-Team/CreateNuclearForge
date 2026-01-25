@@ -37,4 +37,14 @@ public class MultiblockHelpers {
             }
         }
     }
+
+    public static ReactorControllerBlockEntity getControllerForPart(Level level, BlockPos pos) {
+        List<? extends Player> players = level.players();
+        BlockPos controllerPos = pattern.findControllerPos(pos, level, players, true);
+        if (controllerPos != null) {
+            return  (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
+        }
+
+        return null;
+    }
 }
