@@ -27,6 +27,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.nuclearteam.createnuclear.*;
+import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
@@ -45,7 +46,7 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
         super(properties);
     }
 
-    protected ReactorPattern pattern =  new ReactorPattern();
+    
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
@@ -77,46 +78,20 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-        List<? extends Player> players = level.players();
-        pattern.FindController(pos, level, players, true);
-
-        BlockPos controllerPos = pattern.findControllerPos(pos, level, players, true);
-        if (controllerPos != null) {
-            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
-            if (controllerBlockEntity != null) {
-                controllerBlockEntity.addOutput(pos);
-            }
-        }
+        MultiblockHelpers.handleOnPlace(pos, level, ReactorControllerBlockEntity::addOutput);
     }
 
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
-        List<? extends Player> players = level.players();
-        pattern.FindController(pos, level, players, false);
-
-        BlockPos controllerPos = pattern.findControllerPos(pos, level, players, true);
-        if (controllerPos != null) {
-            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
-            if (controllerBlockEntity != null) {
-                controllerBlockEntity.removeOutput(pos);
-            }
-        }
+        MultiblockHelpers.handleRemoval(pos, level, ReactorControllerBlockEntity::removeOutput);
     }
 
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         List<? extends Player> players = pLevel.players();
-        pattern.FindController(pPos, pLevel, players, false);
-
-        BlockPos controllerPos = pattern.findControllerPos(pPos, pLevel, players, true);
-        if (controllerPos != null) {
-            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) pLevel.getBlockEntity(controllerPos);
-            if (controllerBlockEntity != null) {
-                controllerBlockEntity.removeOutput(pPos);
-            }
-        }
+        MultiblockHelpers.handleRemoval(pPos, pLevel, ReactorControllerBlockEntity::removeOutput);
     }
 
     @Override
