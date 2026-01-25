@@ -131,16 +131,6 @@ public class ReactorLiquidInputEntity extends SmartBlockEntity implements IHaveG
 		}
 	}
 
-
-	public void applyFluidTankSize(int blocks) {
-		tankInventory.setCapacity(CAPACITY);
-		int overflow = tankInventory.getFluidAmount() - tankInventory.getCapacity();
-		if (overflow > 0)
-			tankInventory.drain(overflow, IFluidHandler.FluidAction.EXECUTE);
-		forceFluidLevelUpdate = true;
-	}
-
-
 	public void sendDataImmediately() {
 		syncCooldown = 0;
 		queuedSync = false;
@@ -249,7 +239,6 @@ public class ReactorLiquidInputEntity extends SmartBlockEntity implements IHaveG
 
 	@Override
 	public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
-		registerAwardables(behaviours, AllAdvancements.STEAM_ENGINE_MAXED, AllAdvancements.PIPE_ORGAN);
 	}
 
 	public FluidTank getTankInventory() {

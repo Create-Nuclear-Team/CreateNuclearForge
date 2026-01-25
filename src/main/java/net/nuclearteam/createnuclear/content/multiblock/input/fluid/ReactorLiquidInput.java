@@ -37,10 +37,14 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNShapes;
+import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
+import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.block.MultiDirectionalReactorBlock;
 import org.jetbrains.annotations.NotNull;
 
-public class ReactorLiquidInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorLiquidInputEntity> {
+import javax.annotation.Nullable;
+
+public class ReactorLiquidInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorFluidInputEntity> {
 
 	@Override
 	public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, LivingEntity pPlacer, ItemStack pStack) {
@@ -54,10 +58,8 @@ public class ReactorLiquidInput extends MultiDirectionalReactorBlock implements 
 
 	@Override
 	public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean moved) {
-		if (oldState.getBlock() == state.getBlock())
-			return;
-		if (moved)
-			return;
+		super.onPlace(state, world, pos, oldState, moved);
+		MultiblockHelpers.handleOnPlace(pos, world, ReactorControllerBlockEntity::addInputFluid);
 	}
 
 	@Override
@@ -194,23 +196,24 @@ public class ReactorLiquidInput extends MultiDirectionalReactorBlock implements 
 	}
 
 	@Override
+	public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
+		super.playerDestroy(level, player, pos, state, blockEntity, tool);
+		MultiblockHelpers.handleRemoval(pos, level, ReactorControllerBlockEntity::removeInputFluid);
+	}
+
+	@Override
 	public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
-		if (state.hasBlockEntity() && (state.getBlock() != newState.getBlock() || !newState.hasBlockEntity())) {
-			BlockEntity be = world.getBlockEntity(pos);
-			if (!(be instanceof FluidTankBlockEntity tankBE))
-				return;
-			world.removeBlockEntity(pos);
-			ConnectivityHandler.splitMulti(tankBE);
-		}
+		super.onRemove(state, world, pos, newState, isMoving);
+		MultiblockHelpers.handleRemoval(pos, world, ReactorControllerBlockEntity::removeInputFluid);
 	}
 
 	@Override
-	public Class<ReactorLiquidInputEntity> getBlockEntityClass() {
-		return ReactorLiquidInputEntity.class;
+	public Class<ReactorFluidInputEntity> getBlockEntityClass() {
+		return ReactorFluidInputEntity.class;
 	}
 
 	@Override
-	public BlockEntityType<? extends ReactorLiquidInputEntity> getBlockEntityType() {
+	public BlockEntityType<? extends ReactorFluidInputEntity> getBlockEntityType() {
 		return CNBlockEntityTypes.REACTOR_LIQUID_INPUT.get();
 	}
 
