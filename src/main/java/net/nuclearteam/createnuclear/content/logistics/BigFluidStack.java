@@ -1,0 +1,87 @@
+package net.nuclearteam.createnuclear.content.logistics;
+
+import com.simibubi.create.content.logistics.BigItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fluids.FluidStack;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+
+public class BigFluidStack {
+    public static final int INF = 1_000_000_000;
+
+    public FluidStack stack;
+    public int amount;
+
+    public BigFluidStack(FluidStack stack) {
+        this(stack, 1);
+    }
+
+    public BigFluidStack(FluidStack stack, int amount) {
+        this.stack = stack;
+        this.amount = amount;
+    }
+
+    public CompoundTag write() {
+        CompoundTag tag = new CompoundTag();
+        tag.put("Fluid", stack.writeToNBT(new CompoundTag()));
+        tag.putInt("Amount", amount);
+
+        return tag;
+    }
+
+    public static BigFluidStack read(CompoundTag tag) {
+        return new BigFluidStack(FluidStack.loadFluidStackFromNBT(tag.getCompound("Fluid")), tag.getInt("Amount"));
+    }
+
+    public void send(FriendlyByteBuf buffer) {
+        buffer.writeFluidStack(stack);
+        buffer.writeVarInt(amount);
+    }
+
+    public boolean isInfinite() {
+        return amount >= INF;
+    }
+
+    public static BigFluidStack receive(FriendlyByteBuf buffer) {
+        return new BigFluidStack(buffer.readFluidStack(), buffer.readVarInt());
+    }
+
+    public static Comparator<? super BigFluidStack> comparator() {
+        return (i1, i2) -> Integer.compare(i2.amount, i1.amount);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == this)
+            return true;
+        if (obj instanceof BigFluidStack other)
+            return Objects.equals(stack, other.stack) && amount == other.amount;
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return (nullHash(stack) * 31) ^ Integer.hashCode(amount);
+    }
+
+    int nullHash(Object o) {
+        return o == null ? 0 : o.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "(" + stack.getDisplayName()
+                .getString() + " x" + amount + ")";
+    }
+
+    public static List<BigFluidStack> duplicateWrappers(List<BigFluidStack> list) {
+        List<BigFluidStack> copy = new ArrayList<>();
+        for (BigFluidStack bigFluidStack : list)
+            copy.add(new BigFluidStack(bigFluidStack.stack, bigFluidStack.amount));
+        return copy;
+    }
+}
