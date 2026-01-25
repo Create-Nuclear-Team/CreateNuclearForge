@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.multiblock.input;
+package net.nuclearteam.createnuclear.content.multiblock.input.item;
 
 import com.simibubi.create.foundation.data.SpecialBlockStateGen;
 import com.tterrag.registrate.providers.DataGenContext;
@@ -7,7 +7,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.generators.ModelFile;
-import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 
 public class ReactorInputGenerator extends SpecialBlockStateGen {
     @Override
