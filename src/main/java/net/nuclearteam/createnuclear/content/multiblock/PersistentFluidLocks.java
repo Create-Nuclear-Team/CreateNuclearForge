@@ -15,6 +15,12 @@ public class PersistentFluidLocks extends SavedData {
     private final Map<BlockPos, Fluid> locks = new ConcurrentHashMap<>();
     private static final String DATA_NAME = "createnuclear_fluid_locks";
 
+    /**
+     * Persistent storage for fluid locks associated with multiblock controllers.
+     * Locks are persisted to world saved data so controllers keep their preferred
+     * fluid across server restarts.
+     */
+
     public static PersistentFluidLocks get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(nbt -> {
             PersistentFluidLocks d = new PersistentFluidLocks();
@@ -24,6 +30,12 @@ public class PersistentFluidLocks extends SavedData {
         }, PersistentFluidLocks::new, DATA_NAME);
     }
 
+   /**
+    * Attempt to acquire a persistent lock for the specified controller position.
+    * @param pos controller block position
+    * @param fluid fluid to lock to; if null the call is a no-op and returns true
+    * @return true if the lock was acquired or already held for the same fluid
+    */
    public boolean tryLock(BlockPos pos, Fluid fluid) {
         if (fluid == null) return true;
         boolean ok = locks.compute(pos, (k,v) -> v == null ? fluid : v) == fluid;
@@ -31,12 +43,22 @@ public class PersistentFluidLocks extends SavedData {
         return ok;
    }
 
+    /**
+     * Check whether the given fluid is acceptable for the controller at {@code pos}.
+     * @param pos controller position
+     * @param fluid fluid to check
+     * @return true if no lock is present or the lock matches the provided fluid
+     */
     public boolean canAccept(BlockPos pos, Fluid fluid) {
         if (fluid == null) return true;
         Fluid locked = locks.get(pos);
         return locked == null || locked == fluid;
     }
 
+    /**
+     * Clear any persistent lock for the specified controller position.
+     * Marks the saved data as dirty when a lock was removed.
+     */
     public void clearLock(BlockPos pos) {
         if (locks.remove(pos) != null) setDirty();
     }

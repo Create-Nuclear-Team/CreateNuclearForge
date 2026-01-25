@@ -10,12 +10,25 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.Map.Entry;
 
+/**
+ * A lightweight, in-memory aggregation of fluid quantities keyed by
+ * fluid ResourceLocation. This record is used to represent the combined
+ * input fluids available to a reactor without modifying the real handlers.
+ */
 public record VirtualReactorInputFluid(Map<ResourceLocation, Long> fluids) {
 
+    /**
+     * Create an empty virtual inventory.
+     */
     public VirtualReactorInputFluid() {
         this(new HashMap<>());
     }
 
+    /**
+     * Add the contents of the provided FluidStack to this virtual inventory.
+     * Empty stacks or non-registered fluids are ignored.
+     * @param stack the fluid stack to add
+     */
     public void addFluid(@NotNull FluidStack stack) {
         if (stack.isEmpty() || stack.getAmount() <= 0) return;
         ResourceLocation id = ForgeRegistries.FLUIDS.getKey(stack.getFluid());
@@ -24,7 +37,10 @@ public record VirtualReactorInputFluid(Map<ResourceLocation, Long> fluids) {
     }
 
     /**
-     * Remove up to amount from the given fluid id and return a FluidStack representing what was removed.
+     * Remove up to {@code amount} units of the specified fluid from this virtual inventory.
+     * Returns a FluidStack describing the removed amount (or {@link FluidStack#EMPTY}).
+     * @param fluidId fluid identifier
+     * @param amount maximum amount to remove
      */
     public FluidStack removeFluid(@NotNull ResourceLocation fluidId, long amount) {
         if (amount <= 0 || fluidId == null) return FluidStack.EMPTY;
@@ -39,11 +55,20 @@ public record VirtualReactorInputFluid(Map<ResourceLocation, Long> fluids) {
         return new FluidStack(ForgeRegistries.FLUIDS.getValue(fluidId), removedInt);
     }
 
+    /**
+     * Get the stored amount for the given fluid id.
+     * @param fluidId fluid identifier
+     * @return total amount stored for that fluid
+     */
     public long getAmount(@NotNull ResourceLocation fluidId) {
         if (fluidId == null) return 0L;
         return fluids.getOrDefault(fluidId, 0L);
     }
 
+    /**
+     * Convert a map of ResourceLocation->long into a list of BigFluidStack
+     * suitable for display or consumption elsewhere.
+     */
     public static List<BigFluidStack> toBigList(Map<ResourceLocation, Long> map) {
         List<BigFluidStack> list = new ArrayList<>();
         for (Entry<ResourceLocation, Long> e : map.entrySet()) {

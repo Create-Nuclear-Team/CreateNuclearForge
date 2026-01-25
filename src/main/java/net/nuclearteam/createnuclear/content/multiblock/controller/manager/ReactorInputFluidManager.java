@@ -21,7 +21,17 @@ import java.util.List;
 public class ReactorInputFluidManager extends AbstractReactorIOManager implements ReactorInputFluidManagerI {
     private static final String NBT_KEY = "ReactorInputFluid";
 
+    /**
+     * Manager that tracks fluid input blocks for a reactor.
+     * Responsible for serializing tracked positions, validating
+     * handlers, reporting aggregated inventory and extracting fluids.
+     */
+
     @Override
+    /**
+     * Read tracked positions from NBT data.
+     * Existing positions are cleared before reading.
+     */
     public void read(CompoundTag compound) {
         positions.clear();
         if (!compound.contains(NBT_KEY)) return;
@@ -33,6 +43,9 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
     }
 
     @Override
+    /**
+     * Write tracked positions to the provided NBT compound.
+     */
     public void write(CompoundTag compound) {
         ListTag list = new ListTag();
         for (BlockPos pos : positions) {
@@ -46,6 +59,9 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
     }
 
     @Override
+    /**
+     * Remove any tracked positions that are no longer valid in the given level.
+     */
     public void clearInvalid(Level level) {
         List<BlockPos> toRemove = new ArrayList<>();
         for (BlockPos p: positions) {
@@ -68,6 +84,10 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
     }
 
     @Override
+    /**
+     * Return an immutable list of tracked block positions that correspond
+     * to fluid input entities in the given level.
+     */
     public List<BlockPos> getBlocksPosition(Level level) {
         List<BlockPos> positions = new ArrayList<>();
 
@@ -79,6 +99,9 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
     }
 
     @Override
+    /**
+     * Collect and return fluid handler capabilities for all tracked positions.
+     */
     public List<IFluidHandler> getFuildHandlers(Level level) {
         List<IFluidHandler> handlers = new ArrayList<>();
         for (BlockPos p : new ArrayList<>(positions)) {
@@ -93,6 +116,9 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
     }
 
     @Override
+    /**
+     * Build and return a virtual aggregated inventory of all input fluids.
+     */
     public VirtualReactorInputFluid getInventory(Level level) {
         VirtualReactorInputFluid virtualReactorInputFluid = new VirtualReactorInputFluid();
         List<IFluidHandler> handlers = this.getFuildHandlers(level);
@@ -107,6 +133,10 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
     }
 
     @Override
+    /**
+     * Attempt to extract up to {@code fluidNeeded} units of fluid from tracked handlers.
+     * Returns true if the full amount was extracted.
+     */
     public boolean extractFluids(Level level, int fluidNeeded) {
         if (level == null) return false;
         List<IFluidHandler> handlers = getFuildHandlers(level);

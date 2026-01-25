@@ -505,7 +505,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         setChanged();
         sendData();
     }
-//
 
     public void clearLockIfAllInputsEmpty() {
         if (level == null || level.isClientSide) return;
