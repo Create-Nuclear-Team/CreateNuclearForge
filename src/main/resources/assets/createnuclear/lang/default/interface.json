@@ -21,6 +21,8 @@
   "createnuclear.tooltip.item.graphene.rod": "Graphite Rod: ",
   "createnuclear.tooltip.item.unknown.rod": "Unknown: ",
   "createnuclear.gui.reactor_controller.info_header.title": "Heat value",
+  "createnuclear.tooltip.fluid": "Fluid: %s ",
+  "createnuclear.tooltip.fluid.amount": "%d mb",
 
   "death.attack.createnuclear.radiation": "%1$s died from radiation",
   "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast"
