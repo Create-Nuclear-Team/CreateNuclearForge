@@ -7,6 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -28,6 +29,8 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
+import net.nuclearteam.createnuclear.content.multiblock.FluidLockManager;
+import net.nuclearteam.createnuclear.content.multiblock.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
@@ -123,6 +126,10 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         ReactorControllerBlock controller = (ReactorControllerBlock) state.getBlock();
 
         controller.Rotate(state, pos.below(3), worldIn, 0);
+        if (!worldIn.isClientSide && worldIn instanceof ServerLevel serverLevel) {
+            PersistentFluidLocks.get(serverLevel).clearLock(pos);
+        } else FluidLockManager.clearLock(pos);
+
         List<? extends Player> players = worldIn.players();
         for (Player p : players) {
             p.sendSystemMessage(Component.translatable("reactor.info.assembled.destroyer"));
