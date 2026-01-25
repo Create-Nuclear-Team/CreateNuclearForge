@@ -2,10 +2,6 @@ package net.nuclearteam.createnuclear.content.multiblock.output;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
-import com.simibubi.create.content.kinetics.motor.KineticScrollValueBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.utility.CreateLang;
@@ -28,12 +24,9 @@ import net.nuclearteam.createnuclear.CNBlocks;
 
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
-import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.List;
-import java.util.Objects;
 
 import static net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput.DIR;
 
