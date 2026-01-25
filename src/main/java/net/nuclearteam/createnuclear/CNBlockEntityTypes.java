@@ -7,9 +7,8 @@ import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfir
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCoreEntity;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
-import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorFluidInputEntity;
-import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorLiquidInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputRenderer;
 
