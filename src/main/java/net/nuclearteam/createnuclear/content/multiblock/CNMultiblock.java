@@ -17,6 +17,7 @@ public class CNMultiblock {
             stateIs(CNBlocks.REACTOR_CASING.get()).test(state)
             || stateIs(CNBlocks.REACTOR_OUTPUT.get()).test(state)
             || stateIs(CNBlocks.REACTOR_INPUT.get()).test(state)
+            || stateIs(CNBlocks.REACTOR_LIQUID_INPUT.get()).test(state)
     ;
 
     static {
