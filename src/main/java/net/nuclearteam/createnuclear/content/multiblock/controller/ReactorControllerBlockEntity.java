@@ -11,15 +11,24 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
+import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
+import net.nuclearteam.createnuclear.content.multiblock.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.PersistentFluidLocks;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
@@ -465,5 +474,66 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.outputManager.clearInvalid(level);
         this.inputFluidManager.clearInvalid(level);
         this.setChanged();
+    }
+
+    /** Try to lock this controller to the given Fluid. Returns true if allowed. */
+    public boolean tryLockFluid(Fluid fluid) {
+        // server-persistent approach (preferred): use PersistentFluidLocks when on server
+        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+            return PersistentFluidLocks.get(serverLevel).tryLock(getBlockPos(), fluid);
+        }
+        // fallback to in-memory manager (single-server-run)
+        return FluidLockManager.tryLock(getBlockPos(), fluid);
+    }
+
+    /** Returns whether the given FluidStack is acceptable for this controller. */
+    public boolean canAcceptFluid(FluidStack stack) {
+        if (stack == null || stack.isEmpty()) return true;
+        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+            return PersistentFluidLocks.get(serverLevel).canAccept(getBlockPos(), stack.getFluid());
+        }
+        return FluidLockManager.canAccept(getBlockPos(), stack);
+    }
+
+    /** Force-clear the lock on this controller. */
+    public void clearLock() {
+        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+            PersistentFluidLocks.get(serverLevel).clearLock(getBlockPos());
+        } else {
+            FluidLockManager.clearLock(getBlockPos());
+        }
+        setChanged();
+        sendData();
+    }
+//
+
+    public void clearLockIfAllInputsEmpty() {
+        if (level == null || level.isClientSide) return;
+
+        final int SCAN_RADIUS = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this).data().getSize(); // adapte selon la taille max du multiblock
+        BlockPos center = getBlockPos();
+        boolean anyNonEmpty = false;
+
+        for (int dx = -SCAN_RADIUS; dx <= SCAN_RADIUS && !anyNonEmpty; dx++) {
+            for (int dy = -SCAN_RADIUS; dy <= SCAN_RADIUS && !anyNonEmpty; dy++) {
+                for (int dz = -SCAN_RADIUS; dz <= SCAN_RADIUS && !anyNonEmpty; dz++) {
+                    BlockPos p = center.offset(dx, dy, dz);
+                    BlockEntity be = level.getBlockEntity(p);
+                    if (!(be instanceof ReactorFluidInputEntity)) continue;
+
+                    IFluidHandler handler = be.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
+                    if (handler == null) continue;
+
+                    for (int t = 0; t < handler.getTanks(); t++) {
+                        if (!handler.getFluidInTank(t).isEmpty()) {
+                            anyNonEmpty = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!anyNonEmpty) clearLock();
     }
 }
