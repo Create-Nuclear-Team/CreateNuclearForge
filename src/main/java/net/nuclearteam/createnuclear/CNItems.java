@@ -18,6 +18,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
@@ -290,7 +291,7 @@ public class CNItems {
     public static final DyedItemsList<Boot> ANTI_RADIATION_BOOTS = new DyedItemsList<>(color -> {
         String colorName = color.getSerializedName();
 
-        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_boots", p -> new Boot(p, color))
+        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_boots", p -> new Boot(p, DyeColor.WHITE))
                 .tag(
                         CNTags.forgeItemTag("armors/boots"),
                         getBootTag(colorName),
@@ -300,13 +301,13 @@ public class CNItems {
                 .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                         .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                         .define('X', CNTags.forgeItemTag("ingots/lead"))
-                        .define('Y', ClothItem.Cloths.getByColor(color).get())
+                        .define('Y', ClothItem.Cloths.getByColor(DyeColor.WHITE).get())
                         .pattern("Y Y")
                         .pattern("X X")
                         .showNotification(true)
                         .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
                 .lang(TextUtils.titleCaseConversion(color.getName()) + " Anti Radiation Boots")
-                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/boots/" + colorName + "_anti_radiation_boots")))
+                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/anti_radiation_boots")))
                 .register();
     });
 

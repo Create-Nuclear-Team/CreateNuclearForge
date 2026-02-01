@@ -19,7 +19,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.nuclearteam.createnuclear.CNAttributes;
-import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
@@ -44,9 +43,9 @@ public class AntiRadiationArmorItem {
         p_266744_.put(ArmorItem.Type.HELMET, UUID.fromString("2AD3F246-FEE1-4E67-B886-69FD380BB150"));
     });
 
-    private static void irradiatedArmorAttribute(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder, ArmorItem.Type type) {
+    private static void irradiatedArmorAttribute(ImmutableMultimap.Builder<Attribute, AttributeModifier> builder, ArmorItem.Type type, int defence) {
         UUID uuid = ARMOR_MODIFIER_UUID_PER_TYPE.get(type);
-        builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", 1, AttributeModifier.Operation.MULTIPLY_TOTAL));
+        builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", (double)  defence / 12, AttributeModifier.Operation.MULTIPLY_TOTAL));
     }
 
 
@@ -122,7 +121,7 @@ public class AntiRadiationArmorItem {
 
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
             builder.putAll(super.getDefaultAttributeModifiers(HELMET.getSlot()));
-            irradiatedArmorAttribute(builder, HELMET);
+            irradiatedArmorAttribute(builder, HELMET, this.getDefense());
             this.attributeModifiers = builder.build();
         }
 
@@ -201,7 +200,7 @@ public class AntiRadiationArmorItem {
 
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
             builder.putAll(super.getDefaultAttributeModifiers(CHESTPLATE.getSlot()));
-            irradiatedArmorAttribute(builder, CHESTPLATE);
+            irradiatedArmorAttribute(builder, CHESTPLATE, this.getDefense());
             this.attributeModifiers = builder.build();
         }
 
@@ -279,7 +278,7 @@ public class AntiRadiationArmorItem {
             this.color = color;
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
             builder.putAll(super.getDefaultAttributeModifiers(LEGGINGS.getSlot()));
-            irradiatedArmorAttribute(builder, LEGGINGS);
+            irradiatedArmorAttribute(builder, LEGGINGS, this.getDefense());
             this.attributeModifiers = builder.build();
         }
 
@@ -354,14 +353,15 @@ public class AntiRadiationArmorItem {
 
             ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
             builder.putAll(super.getDefaultAttributeModifiers(BOOTS.getSlot()));
-            irradiatedArmorAttribute(builder, BOOTS);
+            irradiatedArmorAttribute(builder, BOOTS, this.getDefense());
             this.attributeModifiers = builder.build();
             this.color = color;
         }
 
         @Override
         public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-            return String.valueOf(CreateNuclear.asResource("textures/models/armor/white_anti_radiation_suit_layer_1.png"));
+            return getSingleLayerTexture(this.color);
+            // String.valueOf(CreateNuclear.asResource("textures/models/armor/white_anti_radiation_suit.png"));
         }
 
         @Override
