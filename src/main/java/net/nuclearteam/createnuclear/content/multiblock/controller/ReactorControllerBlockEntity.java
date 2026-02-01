@@ -23,6 +23,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
+import net.nuclearteam.createnuclear.api.multiblock.IMultiblockHost;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.FluidLockManager;
@@ -101,49 +102,34 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public BigItemStack getBigCoolerItem() { return this.bigCoolerItem; }
     public void setBigCoolerItem(BigItemStack b) { this.bigCoolerItem = b; }
 
-    public int getReactorSize() { return this.reactorSize; }
-    public void setReactorSize(int s) { this.reactorSize = s; }
+    public int getMultiblockSize() { return this.reactorSize; }
+    public void setMultiblockSize(int s) { this.reactorSize = s; }
 
-    public String getReactorFacing() { return this.reactorFacing; }
-    public void setReactorFacing(String f) { this.reactorFacing = f; }
+    public String getMultiblockFacing() { return this.reactorFacing; }
+    public void setMultiblockFacing(String f) { this.reactorFacing = f; }
 
-    public int[] getReactorPos() { return this.reactorPos; }
-    public void setReactorPos(int[] p) { this.reactorPos = p; }
+    public int[] getMultiblockPos() { return this.reactorPos; }
+    public void setMultiblockStructure(int[] p) { this.reactorPos = p; }
 
     public double getTotal() { return this.total; }
     public void setTotal(double t) { this.total = t; }
 
-    /** Default constructor used by the game; delegates to main constructor with default implementations. */
-    public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        this(type, pos, state,
-            new ReactorInputManager(),
-            new ReactorOutputManager(),
-            new ReactorInputFluidManager(),
-            new DefaultHeatService(new HeatManager()),
-            new DefaultPersistenceService());
-    }
-
     /** Main constructor allowing dependency injection for testability and DIP compliance. */
-    public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,
-                                        ReactorInputManagerI inputManager,
-                                        ReactorOutputManagerI outputManager,
-                                        ReactorInputFluidManagerI inputFluidManager,
-                                        IHeatService heatService,
-                                        IPersistenceService persistenceService) {
+    public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         this.inventory = new ReactorControllerInventory(this);
         this.configuredPattern = ItemStack.EMPTY;
 
-        this.inputManager = inputManager;
-        this.outputManager = outputManager;
-        this.inputFluidManager = inputFluidManager;
+        this.inputManager = new ReactorInputManager();
+        this.outputManager = new ReactorOutputManager();
+        this.inputFluidManager = new ReactorInputFluidManager();
 
         this.bigFuelItem = new BigItemStack(ItemStack.EMPTY);
         this.bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
         this.bigFluidStack = new ArrayList<>();
 
-        this.heatService = heatService;
-        this.persistenceService = persistenceService;
+        this.heatService = new DefaultHeatService(new HeatManager());
+        this.persistenceService = new DefaultPersistenceService();
     }
 
     @Override
@@ -418,6 +404,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         }
     }
 
+    @Deprecated
     public int[] getStructureBounds(BlockPos startPos, int structureSize, String facing) {
         int[] northOffsets5x5 = new int[] {-2, 2, -3, 3, 0, 4};
         int[] northOffsets7x7 = new int[] {-3, 3, -4, 4, 0, 6};
@@ -464,6 +451,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         }
     }
 
+    @Deprecated
     private int[] applyOffset(BlockPos pos, int[] offset) {
         int x = pos.getX();
         int y = pos.getY();

@@ -85,22 +85,22 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         }
         else {
 
-            if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.inventory.getItem(0).isEmpty()){
+            if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()){
                 withBlockEntityDo(worldIn, pos, be -> {
-                    be.inventory.setStackInSlot(0, heldItem);
-                    be.configuredPattern = heldItem;
+                    be.getInventoryObject().setStackInSlot(0, heldItem);
+                    be.setConfiguredPattern(heldItem);
 
                     player.setItemInHand(handIn, ItemStack.EMPTY);
                 });
                 return InteractionResult.SUCCESS;
 
             }
-            else if (heldItem.isEmpty() && !controllerBlockEntity.inventory.getItem(0).isEmpty()) {
+            else if (heldItem.isEmpty() && !controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()) {
                 withBlockEntityDo(worldIn, pos, be -> {
-                    player.setItemInHand(handIn, be.inventory.getItem(0));
-                    be.inventory.setStackInSlot(0, ItemStack.EMPTY);
-                    be.configuredPattern = ItemStack.EMPTY;
-                    be.total = 0.0;
+                    player.setItemInHand(handIn, be.getInventoryObject().getItem(0));
+                    be.getInventoryObject().setStackInSlot(0, ItemStack.EMPTY);
+                    be.setConfiguredPattern(ItemStack.EMPTY);
+                    be.setTotal(0.0);
                     be.rotate(be.getBlockState(), be.getLevel(), 0);
                     be.notifyUpdate();
                 });
@@ -108,7 +108,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                 return InteractionResult.SUCCESS;
 
             }
-            else if (!heldItem.isEmpty() && !controllerBlockEntity.inventory.getItem(0).isEmpty()) {
+            else if (!heldItem.isEmpty() && !controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()) {
                 return InteractionResult.PASS;
             }
         }
@@ -120,7 +120,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         if (!state.hasBlockEntity() || state.getBlock() == newState.getBlock())
             return;
 
-        withBlockEntityDo(worldIn, pos, be -> ItemHelper.dropContents(worldIn, pos, be.inventory));
+        withBlockEntityDo(worldIn, pos, be -> ItemHelper.dropContents(worldIn, pos, be.getInventoryObject()));
         worldIn.removeBlockEntity(pos);
 
         ReactorControllerBlock controller = (ReactorControllerBlock) state.getBlock();
@@ -173,13 +173,13 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                 if (create && !entity.isAssembled()) {
                     player.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
                     level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, true));
-                    entity.reactorSize = result.data().getSize();
+                    entity.setMultiblockSize(result.data().getSize());
                     entity.setAssembled(true);
 
-                    entity.reactorPos = entity.getStructureBounds(pos, entity.reactorSize, entity.reactorFacing);
+                    entity.setMultiblockStructure(entity.getStructureBounds(pos, entity.getMultiblockSize(), entity.getMultiblockFacing()));
                     // Register existing special blocks (inputs/outputs) so the controller
                     // detects ReactorInput/ReactorOutput placed before the controller.
-                    FindSpecialBlocksInReactor(entity.reactorPos, entity, level);
+                    FindSpecialBlocksInReactor(entity.getMultiblockPos(), entity, level);
                 }
             }
             return;
