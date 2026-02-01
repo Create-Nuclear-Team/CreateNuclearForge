@@ -8,9 +8,9 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorContro
 public class DefaultPersistenceService implements IPersistenceService {
     @Override
     public void readBasicState(ReactorControllerBlockEntity owner, CompoundTag compound, boolean clientPacket) {
-        owner.setReactorSize(compound.getInt("reactorSize"));
-        owner.setReactorFacing(compound.getString("reactorFacing"));
-        owner.setReactorPos(compound.getIntArray("reactorPose"));
+        owner.setMultiblockSize(compound.getInt("reactorSize"));
+        owner.setMultiblockFacing(compound.getString("reactorFacing"));
+        owner.setMultiblockStructure(compound.getIntArray("reactorPose"));
         owner.setTotal(compound.getDouble("total"));
 
         if (!clientPacket) {
@@ -24,10 +24,10 @@ public class DefaultPersistenceService implements IPersistenceService {
 
     @Override
     public void writeBasicState(ReactorControllerBlockEntity owner, CompoundTag compound, boolean clientPacket) {
-        compound.putInt("reactorSize", owner.getReactorSize());
-        compound.putString("reactorFacing", owner.getReactorFacing());
-        if (owner.getReactorPos() != null) {
-            compound.putIntArray("reactorPose", owner.getReactorPos());
+        compound.putInt("reactorSize", owner.getMultiblockSize());
+        compound.putString("reactorFacing", owner.getMultiblockFacing());
+        if (owner.getMultiblockPos() != null) {
+            compound.putIntArray("reactorPose", owner.getMultiblockPos());
         }
 
         compound.putDouble("total", owner.calculateProgress());
