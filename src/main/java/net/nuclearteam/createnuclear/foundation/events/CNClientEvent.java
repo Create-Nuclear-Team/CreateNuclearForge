@@ -22,7 +22,6 @@ public class CNClientEvent {
 
     @SubscribeEvent
     public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        // On enregistre le layer avec la méthode createBodyLayer qu'on vient de faire
         event.registerLayerDefinition(AntiRadiationArmorModel.LAYER_LOCATION, AntiRadiationArmorModel::createBodyLayer);
     }
 

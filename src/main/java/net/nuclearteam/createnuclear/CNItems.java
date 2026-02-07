@@ -1,10 +1,9 @@
 package net.nuclearteam.createnuclear;
 
+import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot.getBootsTag;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate.getChestplateTag;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet.getHelmetTag;
-
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings.getLeggingsTag;
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot.getBootTag;
 
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.simibubi.create.AllBlocks;
@@ -291,17 +290,17 @@ public class CNItems {
     public static final DyedItemsList<Boot> ANTI_RADIATION_BOOTS = new DyedItemsList<>(color -> {
         String colorName = color.getSerializedName();
 
-        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_boots", p -> new Boot(p, DyeColor.WHITE))
+        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_boots", p -> new Boot(p, color))
                 .tag(
                         CNTags.forgeItemTag("armors/boots"),
-                        getBootTag(colorName),
+                        getBootsTag(colorName),
                         CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
                         CNItemTags.ANTI_RADIATION_BOOTS_FULL_DYE.tag
                 )
                 .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                         .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                         .define('X', CNTags.forgeItemTag("ingots/lead"))
-                        .define('Y', ClothItem.Cloths.getByColor(DyeColor.WHITE).get())
+                        .define('Y', ClothItem.Cloths.getByColor(color).get())
                         .pattern("Y Y")
                         .pattern("X X")
                         .showNotification(true)
