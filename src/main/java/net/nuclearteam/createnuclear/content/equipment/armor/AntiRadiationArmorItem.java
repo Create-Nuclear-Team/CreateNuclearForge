@@ -8,10 +8,9 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.*;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CNTags;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.CNModelLayers;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -27,8 +26,9 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
     // Cette méthode indique au jeu où trouver la texture PNG de l'armure
     @Override
     public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-        // Cela cherchera: assets/createnuclear/textures/models/armor/blue_anti_radiation_armor.png (exemple)
-        return "createnuclear:textures/models/armor/" + color.getSerializedName() + "_anti_radiation_suit.png";
+        // Cela cherchera: assets/createnuclear/textures/models/armor/default_anti_radiation_suit.png (exemple)
+//        return "createnuclear:textures/models/armor/" + color.getSerializedName() + "_anti_radiation_suit.png";
+        return "createnuclear:textures/models/armor/default_anti_radiation_suit.png";
     }
 
     @Override
@@ -40,7 +40,7 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
             public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
                 if (this.model == null) {
                     var entityModelSet = Minecraft.getInstance().getEntityModels();
-                    var root = entityModelSet.bakeLayer(AntiRadiationArmorModel.LAYER_LOCATION);
+                    var root = entityModelSet.bakeLayer(CNModelLayers.ANTI_IRRADIATION_ARMOR);
                     this.model = new AntiRadiationArmorModel(root);
                 }
 
@@ -49,15 +49,15 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
 
                 // 2. On reset tout
                 this.model.setAllVisible(false);
-                this.model.rightLegArmor.visible = false;
-                this.model.rightBootArmor.visible = false;
-                this.model.leftLegArmor.visible = false;
-                this.model.leftBootArmor.visible = false;
+//                this.model.rightLegArmor.visible = false;
+//                this.model.rightBootArmor.visible = false;
+//                this.model.leftLegArmor.visible = false;
+//                this.model.leftBootArmor.visible = false;
 
                 // 3. Logique d'activation
                 switch (equipmentSlot) {
                     case HEAD -> {
-                        this.model.head.visible = true;
+                        this.model.getHead().visible = true;
                         this.model.hat.visible = true;
                     }
                     case CHEST -> {
@@ -70,16 +70,16 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
                         this.model.leftLeg.visible = true;
 
                         // On active juste la partie "Cuisse"
-                        this.model.rightLegArmor.visible = true;
-                        this.model.leftLegArmor.visible = true;
+//                        this.model.rightLegArmor.visible = true;
+//                        this.model.leftLegArmor.visible = true;
                     }
                     case FEET -> {
                         this.model.rightLeg.visible = true;
                         this.model.leftLeg.visible = true;
 
                         // On active juste la partie "Botte"
-                        this.model.rightBootArmor.visible = true;
-                        this.model.leftBootArmor.visible = true;
+//                        this.model.rightBootArmor.visible = true;
+//                        this.model.leftBootArmor.visible = true;
                     }
                 }
 
