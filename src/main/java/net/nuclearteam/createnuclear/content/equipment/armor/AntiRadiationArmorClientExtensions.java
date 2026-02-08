@@ -31,34 +31,34 @@ public final class AntiRadiationArmorClientExtensions implements IClientItemExte
             case HEAD -> {
                 this.model.getHead().visible = true;
                 this.model.hat.visible = true;
+                this.model.right_boot.visible = false;
+                this.model.left_boot.visible = false;
             }
             case CHEST -> {
                 this.model.body.visible = true;
                 this.model.rightArm.visible = true;
                 this.model.leftArm.visible = true;
             }
-            case LEGS -> {
-                this.model.getHead().visible = false;
-                this.model.body.visible = false;
-                this.model.right_arm.visible = false;
-                this.model.left_arm.visible = false;
+            case FEET -> {
                 this.model.rightLeg.visible = false;
                 this.model.leftLeg.visible = false;
-
                 this.model.right_leg.visible = false;
-                this.model.left_leg.visible = true;
-
-                // On active juste la partie "Cuisse"
-//                this.model.right_leg_armor.visible = true;
-//                this.model.left_leg_armor.visible = true;
-            }
-            case FEET -> {
-                this.model.rightLeg.visible = true;
-                this.model.leftLeg.visible = true;
+                this.model.left_leg.visible = false;
+                this.model.right_boot.visible = true;
+                this.model.left_boot.visible = true;
 
                 // On active juste la partie "Botte"
 //                this.model.right_boot.visible = true;
 //                this.model.left_boot.visible = true;
+            }
+            default -> {
+                this.model.getHead().visible = false;
+                this.model.hat.visible = false;
+                this.model.body.visible = false;
+                this.model.rightArm.visible = false;
+                this.model.leftArm.visible = false;
+                this.model.rightLeg.visible = false;
+                this.model.leftLeg.visible = false;
             }
         }
 
