@@ -59,7 +59,8 @@ public class AntiRadiationArmorModel extends HumanoidModel<LivingEntity> {
 		PartDefinition right_leg = partdefinition.addOrReplaceChild("right_leg", CubeListBuilder.create().texOffs(29, 48).mirror().addBox(-2.0733F, -0.3333F, -1.8667F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)).mirror(false)
 		.texOffs(45, 48).mirror().addBox(-1.9633F, -0.3333F, -2.0667F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)).mirror(false), PartPose.offset(-1.6367F, 19.3333F, 0.7667F));
 
-		PartDefinition right_boot = right_leg.addOrReplaceChild("right_boot", CubeListBuilder.create().texOffs(61, 39).mirror().addBox(-3.6F, -4.0F, -1.3F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)).mirror(false), PartPose.offset(1.6367F, 4.6667F, -0.7667F));
+		PartDefinition right_boot = right_leg.addOrReplaceChild("right_boot", CubeListBuilder.create()
+			.texOffs(61, 39).mirror().addBox(-3.6F, -4.0F, -1.3F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)).mirror(false),PartPose.offset(0F, 17F, -0.5F));
 
 		PartDefinition left_leg = partdefinition.addOrReplaceChild("left_leg", CubeListBuilder.create()
 			.texOffs(29, 48).addBox(-1.9667F, -0.3333F, -1.8667F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
@@ -67,8 +68,7 @@ public class AntiRadiationArmorModel extends HumanoidModel<LivingEntity> {
 			PartPose.offset(2.2167F, 19.3333F, 0.7667F));
 
 		PartDefinition left_boot = left_leg.addOrReplaceChild("left_boot", CubeListBuilder.create()
-			.texOffs(61, 39).addBox(0.2F, 3.0F, -1.3F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)),
-			PartPose.offset(2.2167F, 4.6667F, 0.7667F));
+			.texOffs(61, 39).addBox(0.2F, 3.0F, -1.3F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)),PartPose.offset(0F, 17F, -0.5F));
 
 		return LayerDefinition.create(meshdefinition, 96, 96);
 	}
