@@ -30,9 +30,9 @@ public class AntiRadiationArmorModel extends HumanoidModel<LivingEntity> {
 		this.right_arm = root.getChild("right_arm");
 		this.left_arm = root.getChild("left_arm");
 		this.right_leg = root.getChild("right_leg");
-		this.right_boot = root.getChild("right_boot");
+		this.right_boot = this.right_leg.getChild("right_boot");
 		this.left_leg = root.getChild("left_leg");
-		this.left_boot = root.getChild("left_boot");
+		this.left_boot = this.left_leg.getChild("left_boot");
 	}
 
 	public static LayerDefinition createBodyLayer() {
@@ -59,12 +59,12 @@ public class AntiRadiationArmorModel extends HumanoidModel<LivingEntity> {
 		PartDefinition right_leg = partdefinition.addOrReplaceChild("right_leg", CubeListBuilder.create().texOffs(29, 48).mirror().addBox(-2.0733F, -0.3333F, -1.8667F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)).mirror(false)
 		.texOffs(45, 48).mirror().addBox(-1.9633F, -0.3333F, -2.0667F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)).mirror(false), PartPose.offset(-1.6367F, 19.3333F, 0.7667F));
 
-		partdefinition.addOrReplaceChild("right_boot", CubeListBuilder.create().texOffs(61, 39).mirror().addBox(-1.9633F, 7.6334F, -2.0667F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)).mirror(false), PartPose.offset(-1.6367F, 19.3333F, 0.7667F));
+		right_leg.addOrReplaceChild("right_boot", CubeListBuilder.create().texOffs(61, 39).mirror().addBox(-1.9633F, 7.6334F, -2.0667F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)).mirror(false), PartPose.offset(-1.6367F, 19.3333F, 0.7667F));
 
 		PartDefinition left_leg = partdefinition.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(29, 48).addBox(-1.9667F, -0.3333F, -1.8667F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
 		.texOffs(45, 48).addBox(-2.0167F, -0.3333F, -2.0667F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(2.2167F, 19.3333F, 0.7667F));
 
-		partdefinition.addOrReplaceChild("left_boot", CubeListBuilder.create().texOffs(61, 39).addBox(-2.0167F, 7.6334F, -2.0667F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(2.2167F, 19.3333F, 0.7667F));
+		left_leg.addOrReplaceChild("left_boot", CubeListBuilder.create().texOffs(61, 39).addBox(-2.0167F, 7.6334F, -2.0667F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(2.2167F, 19.3333F, 0.7667F));
 
 		return LayerDefinition.create(meshdefinition, 96, 96);
 	}
