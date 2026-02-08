@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.infrastructure.data;
 
+import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.data.TagGen.CreateTagsProvider;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
@@ -64,6 +65,12 @@ public class CreateNuclearRegistrateTags {
                 .add(Items.BONE_MEAL)
                 .add(Items.ROTTEN_FLESH)
                 .addTag(ItemTags.LEAVES);
+
+        prov.tag(ItemTags.TRIM_MATERIALS)
+                .addTag(CNItemTags.CLOTH.tag);
+
+        prov.tag(ItemTags.TRIM_TEMPLATES)
+                .add(AllItems.PRECISION_MECHANISM.get());
 
         for (CNItemTags tag : CNItemTags.values()) {
             if (tag.alwaysDatagen) {
