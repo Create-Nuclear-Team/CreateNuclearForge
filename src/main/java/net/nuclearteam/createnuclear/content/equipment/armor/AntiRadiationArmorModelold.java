@@ -12,7 +12,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
-public class AntiRadiationArmorModelg extends HumanoidModel<LivingEntity> {
+public class AntiRadiationArmorModelold extends HumanoidModel<LivingEntity> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(
             new ResourceLocation(CreateNuclear.MOD_ID, "anti_radiation_armor"), "main");
 
@@ -25,7 +25,7 @@ public class AntiRadiationArmorModelg extends HumanoidModel<LivingEntity> {
     // NOUVEAU : On stocke quel slot est en train d'être rendu
     public EquipmentSlot currentSlot = EquipmentSlot.HEAD;
 
-    public AntiRadiationArmorModelg(ModelPart root) {
+    public AntiRadiationArmorModelold(ModelPart root) {
         super(root);
         this.rightLegArmor = root.getChild("right_leg").getChild("armor_leg");
         this.rightBootArmor = root.getChild("right_leg").getChild("armor_boot");
