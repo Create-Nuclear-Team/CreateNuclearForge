@@ -1,0 +1,9 @@
+{
+  "asset_name": "anti_radiation_trim_material.yellow",
+  "description": {
+    "color": "#000004",
+    "translate": "trim_pattern.yellow.createnuclear.anti_radiation_trim_material.yellow"
+  },
+  "ingredient": "createnuclear:yellow_cloth",
+  "item_model_index": 0.8
+}

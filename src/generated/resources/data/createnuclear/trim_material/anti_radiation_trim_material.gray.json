@@ -1,0 +1,9 @@
+{
+  "asset_name": "anti_radiation_trim_material.gray",
+  "description": {
+    "color": "#000007",
+    "translate": "trim_pattern.gray.createnuclear.anti_radiation_trim_material.gray"
+  },
+  "ingredient": "createnuclear:gray_cloth",
+  "item_model_index": 0.8
+}

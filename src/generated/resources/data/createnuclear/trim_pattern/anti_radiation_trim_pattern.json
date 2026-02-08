@@ -1,0 +1,7 @@
+{
+  "asset_id": "createnuclear:anti_radiation_trim_pattern",
+  "description": {
+    "translate": "trim_pattern.createnuclear.anti_radiation_trim_pattern"
+  },
+  "template_item": "create:precision_mechanism"
+}
