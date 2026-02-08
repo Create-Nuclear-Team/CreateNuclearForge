@@ -39,18 +39,6 @@ public final class AntiRadiationArmorClientExtensions implements IClientItemExte
                 this.model.rightArm.visible = true;
                 this.model.leftArm.visible = true;
             }
-            case FEET -> {
-                this.model.rightLeg.visible = false;
-                this.model.leftLeg.visible = false;
-                this.model.right_leg.visible = false;
-                this.model.left_leg.visible = false;
-//                this.model.right_boot.visible = true;
-//                this.model.left_boot.visible = true;
-
-                // On active juste la partie "Botte"
-//                this.model.right_boot.visible = true;
-//                this.model.left_boot.visible = true;
-            }
             default -> {
                 this.model.getHead().visible = false;
                 this.model.hat.visible = false;
@@ -59,6 +47,8 @@ public final class AntiRadiationArmorClientExtensions implements IClientItemExte
                 this.model.leftArm.visible = false;
                 this.model.rightLeg.visible = false;
                 this.model.leftLeg.visible = false;
+                this.model.right_leg.visible = false;
+                this.model.left_leg.visible = false;
             }
         }
 
