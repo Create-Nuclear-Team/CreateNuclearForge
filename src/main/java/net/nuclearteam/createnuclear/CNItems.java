@@ -187,27 +187,8 @@ public class CNItems {
             )
             .register(),
 
-        BIOMASS = CreateNuclear.REGISTRATE
-            .item("biomass", Item::new)
-            .tag(CNTags.forgeItemTag("fuels/bio"))
-            .register(),
-
-        NITRATE_SLUDGE = CreateNuclear.REGISTRATE
-            .item("nitrate_sludge", Item::new)
-            .register(),
-
         NITRATE = CreateNuclear.REGISTRATE
             .item("nitrate", Item::new)
-            .register(),
-
-        NITROGEN_CONCENTRATE = CreateNuclear.REGISTRATE
-            .item("nitrogen_concentrate", Item::new)
-            .lang("Nitrogen Concentrate")
-            .register(),
-
-        COOLED_NITROGEN_CONCENTRATE = CreateNuclear.REGISTRATE
-            .item("cooled_nitrogen_concentrate", Item::new)
-            .lang("Cooled Nitrogen Concentrate")
             .register()
     ;
 

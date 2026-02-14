@@ -31,20 +31,14 @@ public class CNMixingRecipeGen extends MixingRecipeGen {
         URANIUM_FLUID = create("uranium_fluid", b -> b
             .require(CNTags.forgeItemTag("dusts/uranium"))
             .output(CNFluids.URANIUM.get(), 25)
-        ),
+        )
 
-        NITRATE_SLUDGE = create("nitrate_sludge", b -> b
-            .require(CNTags.forgeItemTag("fuels/bio"))
-            .require(Fluids.WATER, 1000)
-            .output(CNItems.NITRATE_SLUDGE)
-        ),
-
-        AZOTE = create("liquid_azote", b -> b
-                .require(CNItems.COOLED_NITROGEN_CONCENTRATE)
-                .duration(30)
-                .requiresHeat(HeatCondition.SUPERHEATED)
-                .output(CNFluids.LIQUID_NITROGEN.get(), 1000)
-        );
+//        AZOTE = create("liquid_azote", b -> b
+//                .require(CNItems.COOLED_NITROGEN_CONCENTRATE)
+//                .duration(30)
+//                .requiresHeat(HeatCondition.SUPERHEATED)
+//                .output(CNFluids.LIQUID_NITROGEN.get(), 1000)
+//        );
     ;
 
     public CNMixingRecipeGen(PackOutput generator) {
