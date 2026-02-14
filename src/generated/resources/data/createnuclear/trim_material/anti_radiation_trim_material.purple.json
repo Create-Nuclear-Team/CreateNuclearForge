@@ -1,9 +1,0 @@
-{
-  "asset_name": "anti_radiation_trim_material.purple",
-  "description": {
-    "color": "#00000A",
-    "translate": "trim_pattern.purple.createnuclear.anti_radiation_trim_material.purple"
-  },
-  "ingredient": "createnuclear:purple_cloth",
-  "item_model_index": 0.8
-}

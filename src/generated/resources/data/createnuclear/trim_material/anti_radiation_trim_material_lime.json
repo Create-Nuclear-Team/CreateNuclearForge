@@ -1,0 +1,9 @@
+{
+  "asset_name": "anti_radiation_trim_material_lime",
+  "description": {
+    "color": "#000005",
+    "translate": "trim_pattern.lime.createnuclear.anti_radiation_trim_material_lime"
+  },
+  "ingredient": "createnuclear:lime_cloth",
+  "item_model_index": 0.8
+}
