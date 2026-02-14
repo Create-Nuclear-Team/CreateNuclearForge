@@ -62,7 +62,7 @@ public class ClothItem extends Item {
         }
 
         public ResourceKey<TrimMaterial> getrimMaterialResourceKey() {
-            return ResourceKey.create(Registries.TRIM_MATERIAL, CreateNuclear.asResource(String.join(".", "anti_radiation_trim_material", color.name().toLowerCase(Locale.ROOT))));
+            return ResourceKey.create(Registries.TRIM_MATERIAL, CreateNuclear.asResource(String.join("_", "anti_radiation_trim_material", color.name().toLowerCase(Locale.ROOT))));
         }
 
         public static ItemEntry<ClothItem> getByColor(DyeColor color) {
