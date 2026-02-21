@@ -1,8 +1,9 @@
-// 1.20.1	2026-02-14T15:34:01.5719989	CreateNuclear's Processing Recipes
+// 1.20.1	2026-02-21T13:25:05.6827181	CreateNuclear's Processing Recipes
 c711d032a04e1a9350ad9bc4d9c4d74f54689862 data/createnuclear/recipes/compacting/uranium_fluid_to_yellowcake.json
 33becbc558bd2fbe277be096b292c0093f84e44c data/createnuclear/recipes/crushing/coal.json
 2a8b609dba5bad88511d9c9a80cf6fb582b18c36 data/createnuclear/recipes/crushing/fix/crushed_raw_uranium.json
 57154e35ebb09170bb39f5b3a72ecd49182697f2 data/createnuclear/recipes/crushing/granite.json
+682ceb2386fe56cd47e46d7ebb3d8185ac78515b data/createnuclear/recipes/crushing/nitrate.json
 4feb59d85e86e34ed565c18b6a4df120fe050bc7 data/createnuclear/recipes/crushing/raw_copper.json
 a77015a64560a7a9f2c97b78438598f974dd4c8d data/createnuclear/recipes/crushing/raw_thorium.json
 a6537956fc7c7e00774dca0bc7987fbcc030e1e9 data/createnuclear/recipes/crushing/raw_thorium_block.json
