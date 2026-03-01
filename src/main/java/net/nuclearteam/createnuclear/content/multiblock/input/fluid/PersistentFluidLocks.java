@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.multiblock;
+package net.nuclearteam.createnuclear.content.multiblock.input.fluid;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

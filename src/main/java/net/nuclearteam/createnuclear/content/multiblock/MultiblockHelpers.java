@@ -17,7 +17,6 @@ public class MultiblockHelpers {
      * These helpers locate the controller for a given part position and
      * invoke provided callbacks to register or remove parts.
      */
-
     public static void handleOnPlace(BlockPos pos, Level level, BiConsumer<ReactorControllerBlockEntity, BlockPos> register) {
         /**
          * Called when a multiblock part is placed. Locates the controller and

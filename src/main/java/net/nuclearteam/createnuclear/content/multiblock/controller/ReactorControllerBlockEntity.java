@@ -25,9 +25,9 @@ import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
-import net.nuclearteam.createnuclear.content.multiblock.FluidLockManager;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
-import net.nuclearteam.createnuclear.content.multiblock.PersistentFluidLocks;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
@@ -352,6 +352,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     public void rotate(BlockState state, Level level, int rotation) {
+        if (this.outputManager.getBlocksPosition().isEmpty()) return;
         int remainingRotation = rotation % this.outputManager.getBlocksPosition().size();
         for (int i = 0; i < this.outputManager.getBlocksPosition().size(); i++) {
             int dividedRotation = rotation / this.outputManager.getBlocksPosition().size() + remainingRotation;
