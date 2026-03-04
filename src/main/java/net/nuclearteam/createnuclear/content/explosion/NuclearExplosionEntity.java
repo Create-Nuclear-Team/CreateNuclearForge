@@ -210,15 +210,22 @@ public class NuclearExplosionEntity extends Entity {
                             carveBelow.set(carve.getX(), carve.getY() - 1, carve.getZ());
                             canSetToFire = true;
 
-                            // GESTION SPAWN MOBS
+                            // GESTION SPAWN MOBS / compat Alex's Caves
                             boolean handledByAlex = false;
                             if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null){
-                                // MobSpawn doit retourner TRUE si un oeuf a éclos
                                 handledByAlex = ((AlexscaveCompat) alexscaveHandler).MobSpawn(state, level(), carve, itemDropModifier, dummyExplosion);
                             }
 
-                            // Si c'était un oeuf, on CONTINUE la boucle pour ne pas mettre de feu ni détruire le bloc (c'est déjà fait)
+                            // Si Alex a géré (oeuf éclot), on skip
                             if (handledByAlex) continue;
+
+                            // Nouveau : destruction standard quand Alex's Caves n'est pas présent
+                            // On essaye d'abord d'appeler le comportement d'explosion du block, sinon fallback sur destroyBlock
+                            try {
+                                state.onBlockExploded(level(), carve, dummyExplosion);
+                            } catch (Exception e) {
+                                level().destroyBlock(carve, true);
+                            }
                         }
                     }
                     if (canSetToFire && random.nextFloat() < 0.15 && !level().getBlockState(carveBelow).isAir()) {
