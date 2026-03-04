@@ -4,7 +4,7 @@
   "cookingtime": 200,
   "experience": 0.1,
   "ingredient": {
-    "item": "createnuclear:nitrate_sludge"
+    "tag": "createnuclear:nitrate"
   },
-  "result": "createnuclear:nitrate"
+  "result": "createnuclear:nitrogen_concentrate"
 }

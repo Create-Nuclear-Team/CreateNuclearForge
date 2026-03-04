@@ -33,13 +33,7 @@ public class CNMixingRecipeGen extends MixingRecipeGen {
             .output(CNFluids.URANIUM.get(), 25)
         ),
 
-        NITRATE_SLUDGE = create("nitrate_sludge", b -> b
-            .require(CNTags.forgeItemTag("fuels/bio"))
-            .require(Fluids.WATER, 1000)
-            .output(CNItems.NITRATE_SLUDGE)
-        ),
-
-        AZOTE = create("liquid_azote", b -> b
+        NITROGEN = create("liquid_nitrogen", b -> b
                 .require(CNItems.COOLED_NITROGEN_CONCENTRATE)
                 .duration(30)
                 .requiresHeat(HeatCondition.SUPERHEATED)
