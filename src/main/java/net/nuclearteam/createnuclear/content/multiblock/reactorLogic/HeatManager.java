@@ -6,18 +6,21 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 public class HeatManager {
     public int heat;
     int overFlowHeatTimer = 0;
     int overFlowLimiter = 30;
     double overHeat = 0;
-    public int baseUraniumHeat = 25;
-    public int baseGraphiteHeat = -10;
-    public int proximityUraniumHeat = 5;
-    public int proximityGraphiteHeat = -5;
-    public int maxUraniumPerGraphite = 3;
+    public int baseUraniumHeat = CNConfigs.server().rods.baseValueUranium.get();
+    public int baseGraphiteHeat = CNConfigs.server().rods.baseValueGraphite.get();
+    public int proximityUraniumHeat = CNConfigs.server().rods.uraniumProxyBonus.get();
+    public int proximityGraphiteHeat = CNConfigs.server().rods.graphiteProxyMalus.get();
+    public int maxUraniumPerGraphite = CNConfigs.server().rods.rodFuelMaxForCoolerRod.get();
     public int graphiteTimer = 3600;
     public int uraniumTimer = 3600;
 
@@ -47,10 +50,12 @@ public class HeatManager {
         String currentRod = "";
         ListTag list = inventory.getStackInSlot(0).getOrCreateTag().getCompound("pattern").getList("Items", Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
-            if (ItemStack.of(list.getCompound(i)).is(CNTags.CNItemTags.FUEL.tag)) {
+            ItemStack stackCar = ItemStack.of(list.getCompound(i));
+            RodType rod = ItemRodTypesValue.getRodType(stackCar.getItem());
+            if (stackCar.is(CNTags.CNItemTags.FUEL.tag) || (rod.items().size() > 0 && rod.type() == RodType.TypeRod.FUEL)) {
                 heat += baseUraniumHeat;
                 currentRod = "u";
-            } else if (ItemStack.of(list.getCompound(i)).is(CNTags.CNItemTags.COOLER.tag)) {
+            } else if (stackCar.is(CNTags.CNItemTags.COOLER.tag)) {
                 heat += baseGraphiteHeat;
                 currentRod = "g";
             }
