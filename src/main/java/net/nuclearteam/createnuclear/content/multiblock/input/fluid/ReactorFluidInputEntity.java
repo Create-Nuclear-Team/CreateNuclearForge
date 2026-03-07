@@ -17,6 +17,8 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +27,7 @@ import java.util.List;
 
 public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGoggleInformation {
 
-    private final SmartFluidTank internalTank;
+    private final FluidTank internalTank;
     private LazyOptional<IFluidHandler> capability;
     private LerpedFloat fluidLevel;
 
@@ -44,14 +46,15 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
 
     @Override
     protected void write(CompoundTag tag, boolean clientPacket) {
-        tag.put("tank", internalTank.writeToNBT(new CompoundTag()));
         super.write(tag, clientPacket);
+        CompoundTag tankTag = internalTank.writeToNBT(new CompoundTag());
+        tag.put("tank", tankTag);
     }
 
     @Override
     protected void read(CompoundTag tag, boolean clientPacket) {
-        internalTank.readFromNBT(tag.getCompound("tank"));
         super.read(tag, clientPacket);
+        internalTank.readFromNBT(tag.getCompound("tank"));
 
         if (tag.contains("ForceFluidLevel") || fluidLevel == null)
             fluidLevel = LerpedFloat.linear()
