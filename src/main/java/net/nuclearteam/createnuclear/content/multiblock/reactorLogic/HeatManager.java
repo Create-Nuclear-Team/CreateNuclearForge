@@ -7,7 +7,9 @@ import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
@@ -37,7 +39,7 @@ public class HeatManager {
     };
     private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
-    public double calculateHeat(BigItemStack bigFuelItem, BigItemStack bigCoolerItem, int countGraphiteRod, int countUraniumRod, ReactorControllerInventory inventory) {
+    public double calculateHeat(BigItemStack bigFuelItem, BigItemStack bigCoolerItem, BigFluidStack bigFluidStack, ReactorFluidType type, int countGraphiteRod, int countUraniumRod, ReactorControllerInventory inventory) {
         heat = 0;
 
         if (bigFuelItem.count <= 0 || bigCoolerItem.count <= 0) {
@@ -96,7 +98,13 @@ public class HeatManager {
                 }
             }
         }
-        return heat + overHeat;
+        double heatCaculed = heat + overHeat;
+
+        if (heatCaculed > type.maxHeat() && bigFluidStack.amount > type.efficiency()) {
+            heat = 9_999_999;
+        }
+
+        return heat;
     }
 
     private void updateOverheatState(int countGraphiteRod, int countUraniumRod) {
