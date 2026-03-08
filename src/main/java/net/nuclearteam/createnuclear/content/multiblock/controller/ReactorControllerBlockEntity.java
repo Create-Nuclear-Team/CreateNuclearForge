@@ -24,8 +24,11 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
+import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
+import net.nuclearteam.createnuclear.content.multiblock.fluid.CNReactorFluidTypes;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
@@ -158,6 +161,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.reactorSize = compound.getInt("reactorSize");
         this.reactorFacing = compound.getString("reactorFacing");
         this.reactorPos = compound.getIntArray("reactorPose");
+        if (this.reactorPos != null && this.reactorPos.length == 0) this.reactorPos = null;
         this.total = compound.getDouble("total");
 
         // 2. Gestion des items
@@ -275,12 +279,15 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             bigFuelItem = virtualReactorInputsItem.getBigFuelRod();
             bigCoolerItem = virtualReactorInputsItem.getBigCooledRod();
             bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
+            ReactorFluidType typeFluid = bigFluidStack.get(0).getFluidtype(level);
 
-            if (!isEmptyConfiguredPattern() && bigFuelItem.count > 0 && bigCoolerItem.count > 0) {
-                if (this.inputManager.size() > 0) {
+            // CreateNuclear.LOGGER.warn("BigFluid: {}x{} -> type: {}", bigFluidStack, bigFluidStack.get(0).amount, typeFluid);
+
+            if (!isEmptyConfiguredPattern() && bigFuelItem.count > 0 && bigCoolerItem.count > 0 && !bigFluidStack.isEmpty() && bigFluidStack.get(0).amount > 0) {
+                if (this.inputManager.size() > 0 && this.inputFluidManager.size() > 0) {
                     this.setChanged();
                     this.notifyUpdate();
-                        configuredPattern.getOrCreateTag().putDouble("heat", heatManager.calculateHeat(bigFuelItem, bigCoolerItem, countGraphiteRod, countUraniumRod, inventory));
+                        configuredPattern.getOrCreateTag().putDouble("heat", heatManager.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.get(0), typeFluid, countGraphiteRod, countUraniumRod, inventory));
                         if (!this.outputManager.getBlocksPosition().isEmpty()) {
                             rotate(getBlockState(), getLevel(), heat);
                         }
@@ -307,7 +314,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                     this.notifyUpdate();
                 }
             } else {
-                configuredPattern.getOrCreateTag().putDouble("heat", heatManager.calculateHeat(bigFuelItem, bigCoolerItem, countGraphiteRod, countUraniumRod, inventory));
+                configuredPattern.getOrCreateTag().putDouble("heat", heatManager.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.get(0), typeFluid, countGraphiteRod, countUraniumRod, inventory));
                 if (!this.outputManager.getBlocksPosition().isEmpty()) {
                     rotate(getBlockState(), getLevel(), 0);
                 }
