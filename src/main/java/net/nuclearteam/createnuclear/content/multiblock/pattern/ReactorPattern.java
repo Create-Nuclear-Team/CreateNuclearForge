@@ -133,6 +133,9 @@ public class ReactorPattern {
 
     public boolean isInReactorRange(int []reactorPos, BlockPos blockPos) {
         //[xMin, xMax, yMin, yMax, zMin, zMax]
-        return blockPos.getX() >= reactorPos[0] && blockPos.getX() <= reactorPos[1] && blockPos.getY() >= reactorPos[2] && blockPos.getY() <= reactorPos[3] && blockPos.getZ() >= reactorPos[4] && blockPos.getZ() <= reactorPos[5];
+        if (reactorPos == null || reactorPos.length < 6) return false;
+        return blockPos.getX() >= reactorPos[0] && blockPos.getX() <= reactorPos[1]
+                && blockPos.getY() >= reactorPos[2] && blockPos.getY() <= reactorPos[3]
+                && blockPos.getZ() >= reactorPos[4] && blockPos.getZ() <= reactorPos[5];
     }
 }
