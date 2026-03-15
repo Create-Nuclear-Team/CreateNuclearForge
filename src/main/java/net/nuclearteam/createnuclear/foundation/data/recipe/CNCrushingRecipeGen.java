@@ -49,13 +49,14 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
 
         RAW_THORIUM_BLOCK = create(() -> CNBlocks.RAW_THORIUM_BLOCK, b -> b
             .duration(250)
-            .output(1, CNItems.THORIUM_DUST, 81)
+            .output(1, CNItems.THORIUM_DUST, 9)
+            .output(0.5f, CNItems.THORIUM_DUST, 72)
         ),
 
         RAW_THORIUM_ITEM = create(() -> CNItems.RAW_THORIUM, b -> b
                 .duration(125)
                 .output(1, CNItems.THORIUM_DUST, 1)
-                .output(0.5f, CNItems.THORIUM_DUST, 1)
+                .output(0.5f, CNItems.THORIUM_DUST, 8)
         ),
 
         RAW_ZINC = create(() -> AllItems.RAW_ZINC, b -> b.duration(250)

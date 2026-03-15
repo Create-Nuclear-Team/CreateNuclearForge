@@ -33,6 +33,16 @@ public class CNMechanicalCraftingRecipeGen extends MechanicalCraftingRecipeGen {
                 .patternLine("U    ")
         ),
 
+        THORIUM_ROD = create(CNItems.THORIUM_ROD::get)
+            .recipe(b -> b
+                    .key('U', Ingredient.of(CNItems.THORIUM_INGOT))
+                    .patternLine("U    ")
+                    .patternLine(" U   ")
+                    .patternLine("  U  ")
+                    .patternLine("   U ")
+                    .patternLine("    U")
+            ),
+
         REACTOR_MAIN_FRAME = create(CNBlocks.REACTOR_FRAME::get)
             .recipe(b -> b
                 .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
