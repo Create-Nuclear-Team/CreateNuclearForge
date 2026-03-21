@@ -208,6 +208,16 @@ public class CNItems {
         COOLED_NITROGEN_CONCENTRATE = CreateNuclear.REGISTRATE
             .item("cooled_nitrogen_concentrate", Item::new)
             .lang("Cooled Nitrogen Concentrate")
+            .register(),
+
+        THORIUM_ROD = CreateNuclear.REGISTRATE
+            .item("thorium_rod", Item::new)
+            .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
+                .rodTimer(4500)
+                .baseRodHeat(200)
+                .proximityRodHeat(2)
+                .mixteRodType()))
+            .tag(CNTags.forgeItemTag("rods"))
             .register()
     ;
 

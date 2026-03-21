@@ -157,12 +157,14 @@ public class CNFluids {
     private static class SolidRenderedPlaceableFluidtype extends AllFluids.TintedFluidType {
 
         private Vector3f fogColor;
+        private int fogIntColor;
         private Supplier<Float> fogDistance;
 
         public static FluidTypeFactory create(int fogColor, Supplier<Float> fogDistance) {
             return (p, s, f) -> {
                 SolidRenderedPlaceableFluidtype fluidtype = new SolidRenderedPlaceableFluidtype(p,s,f);
                 fluidtype.fogColor = new Color(fogColor, false).asVectorF();
+                fluidtype.fogIntColor = fogColor;
                 fluidtype.fogDistance = fogDistance;
                 return fluidtype;
             };
@@ -180,7 +182,7 @@ public class CNFluids {
 
         @Override
         protected int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-            return 0x38FF08;
+            return fogIntColor;
         }
 
         @Override
