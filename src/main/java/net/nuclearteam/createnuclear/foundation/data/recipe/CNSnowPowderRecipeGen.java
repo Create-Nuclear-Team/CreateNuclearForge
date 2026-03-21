@@ -13,9 +13,9 @@ import java.util.function.Supplier;
 
 public class CNSnowPowderRecipeGen extends SnowPowderRecipeGen {
 
-    GeneratedRecipe
-            COOLED_NITROGEN_CONCENTRATE = convert(CNItems.NITROGEN_CONCENTRATE, CNItems.COOLED_NITROGEN_CONCENTRATE)
-    ;
+//    GeneratedRecipe
+//            COOLED_NITROGEN_CONCENTRATE = convert(CNItems.NITROGEN_CONCENTRATE, CNItems.COOLED_NITROGEN_CONCENTRATE)
+//    ;
 
     public GeneratedRecipe convert(ItemLike input, ItemLike result) {
         return convert(() -> Ingredient.of(input), () -> result);

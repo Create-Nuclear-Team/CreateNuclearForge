@@ -23,6 +23,7 @@ public class CNMixingRecipeGen extends MixingRecipeGen {
         URANIUM_FLUID = create("uranium_fluid", b -> b
             .require(CNTags.forgeItemTag("dusts/uranium"))
             .output(CNFluids.URANIUM.get(), 25)
+
         ),
 
         THORIUM_FLUID = create("thorium_fluid", b -> b

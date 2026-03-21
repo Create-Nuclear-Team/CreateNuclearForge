@@ -59,12 +59,6 @@ public class CreateNuclearRegistrateTags {
     private static void genItemTags(RegistrateTagsProvider<Item> provIn) {
         CreateTagsProvider<Item> prov = new CreateTagsProvider<>(provIn, Item::builtInRegistryHolder);
 
-        prov.tag(CNItemTags.COMPOSTABLE.tag)
-                .add(Items.KELP)
-                .add(Items.BONE_MEAL)
-                .add(Items.ROTTEN_FLESH)
-                .addTag(ItemTags.LEAVES);
-
         for (CNItemTags tag : CNItemTags.values()) {
             if (tag.alwaysDatagen) {
                 prov.getOrCreateRawBuilder(tag.tag);
