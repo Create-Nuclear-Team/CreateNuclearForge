@@ -39,7 +39,7 @@ public class CreateNuclearDatagen {
         lookupProvider = generatedEntriesProvider.getRegistryProvider();
         generator.addProvider(event.includeClient(), generatedEntriesProvider);
         generator.addProvider(event.includeClient(), new CNStandardRecipeGen(output));
-//        generator.addProvider(event.includeClient(), new CNShapelessRecipeGen(output));
+    //        generator.addProvider(event.includeClient(), new CNShapelessRecipeGen(output));
         generator.addProvider(event.includeClient(), new CNMechanicalCraftingRecipeGen(output));
         generator.addProvider(event.includeClient(), new CNAdvancement(output));
 

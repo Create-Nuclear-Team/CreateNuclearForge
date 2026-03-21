@@ -24,8 +24,10 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
+import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.CNPlacementModifiers;
 import org.slf4j.Logger;
 
 @Mod(CreateNuclear.MOD_ID)
@@ -36,9 +38,8 @@ public class CreateNuclear {
             .defaultCreativeTab((ResourceKey<CreativeModeTab>) null);
 
     static {
-        REGISTRATE.setTooltipModifierFactory(
-            item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
-                .andThen(TooltipModifier.mapNull(KineticStats.create(item))));
+        REGISTRATE.setTooltipModifierFactory(item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
+                .andThen(TooltipModifier.mapNull(KineticStats.create(item))).andThen(RodsStats.create(item)));
     }
 
     public CreateNuclear() {
@@ -69,6 +70,7 @@ public class CreateNuclear {
 
         CNConfigs.register(modLoadingContext);
 
+        CNPlacementModifiers.register(modEventBus);
         CNCreativeModeTabs.register(modEventBus);
         CNEffects.register(modEventBus);
         CNPotions.register(modEventBus);
@@ -93,7 +95,6 @@ public class CreateNuclear {
 
     public static void onRegister(final RegisterEvent event) {
         CNFanProcessingTypes.register();
-
     }
 
     public static ResourceLocation asResource(String path) {
