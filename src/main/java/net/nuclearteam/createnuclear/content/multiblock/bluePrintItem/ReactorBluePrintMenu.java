@@ -13,6 +13,11 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.nuclearteam.createnuclear.CNMenus;
 import net.nuclearteam.createnuclear.CNTags;
+import net.nuclearteam.createnuclear.CNTags.CNItemTags;
+import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRod;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import static net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem.getItemStorage;
 
@@ -21,8 +26,8 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
     public float heat = 0F;
     public int graphiteTime = 5000;
     public int uraniumTime = 3600;
-    public int countGraphiteRod = 0;
-    public int countUraniumRod = 0;
+    public int countCooledRod = 0;
+    public int countFuelRod = 0;
     public double progress = 0;
 
     public boolean sendUpdate = false;
@@ -57,8 +62,8 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
             }
         }
 
-        contentHolder.getOrCreateTag().putInt("uraniumTime", 3600);
-        contentHolder.getOrCreateTag().putInt("graphiteTime", 5000);
+        contentHolder.getOrCreateTag().putInt("uraniumTime", CNConfigs.server().rods.uraniumRodLifetime.get());
+        contentHolder.getOrCreateTag().putInt("graphiteTime", CNConfigs.server().rods.graphiteRodLifetime.get());
         contentHolder.getOrCreateTag().putInt("countGraphiteRod", 0);
         contentHolder.getOrCreateTag().putInt("countUraniumRod", 0);
 
@@ -107,16 +112,66 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
     @Override
     protected void saveData(ItemStack contentHolder) {
+        countFuelRod = 0;
+        countCooledRod = 0;
+
         for (int i = 0; i < ghostInventory.getSlots(); i++) {
-            if (ghostInventory.getStackInSlot(i).isEmpty() || ghostInventory.getStackInSlot(i) == null) ghostInventory.setStackInSlot(i, ItemStack.EMPTY);
-            if (!(ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.FUEL.tag) || ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.COOLER.tag))&& !ghostInventory.getStackInSlot(i).isEmpty()) ghostInventory.setStackInSlot(i, ItemStack.EMPTY);
-            if (ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.COOLER.tag)) countGraphiteRod += 1;
-            if (ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.FUEL.tag)) countUraniumRod += 1;
+            ItemStack stack = ghostInventory.getStackInSlot(i);
+            if (stack == null || stack.isEmpty()) {
+                ghostInventory.setStackInSlot(i, ItemStack.EMPTY);
+                continue;
+            }
+
+            RodType typeRod = ItemRodTypesValue.getRodType(stack.getItem());
+
+            boolean isFuel = stack.is(CNItemTags.FUEL.tag) || typeRod.type() == TypeRod.FUEL;
+            boolean isCooler = stack.is(CNItemTags.COOLER.tag) || typeRod.type() == TypeRod.COOLER;
+            boolean isMixte = typeRod.type() == TypeRod.MIXTE;
+
+            if (isCooler) countCooledRod++;
+            if (isFuel) countFuelRod++;
+            if (isMixte) {
+                countFuelRod++;
+                countCooledRod++;
+            }
         }
 
         contentHolder.getOrCreateTag().put("pattern", ghostInventory.serializeNBT());
-        contentHolder.getOrCreateTag().putInt("countGraphiteRod", countGraphiteRod);
-        contentHolder.getOrCreateTag().putInt("countUraniumRod", countUraniumRod);
+        contentHolder.getOrCreateTag().putInt("countGraphiteRod", countCooledRod);
+        contentHolder.getOrCreateTag().putInt("countUraniumRod", countFuelRod);
+
+        for (int i = 0; i < ghostInventory.getSlots(); i++) {
+            ItemStack stack = ghostInventory.getStackInSlot(i);
+            if (stack == null || stack.isEmpty()) {
+                ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));
+                continue;
+            }
+
+            RodType typeRod = ItemRodTypesValue.getRodType(stack.getItem());
+
+            boolean isFuel = stack.is(CNItemTags.FUEL.tag) || typeRod.type() == TypeRod.FUEL;
+            boolean isCooler = stack.is(CNItemTags.COOLER.tag) || typeRod.type() == TypeRod.COOLER;
+            boolean isMixte = typeRod.type() == TypeRod.MIXTE;
+
+            if (!(isFuel || isCooler || isMixte)) {
+                ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));
+            }
+        }
+
+        contentHolder.getOrCreateTag().put("patternAll", ghostInventory.serializeNBT());
+    }
+
+    protected void saveData2(ItemStack contentHolder) {
+        for (int i = 0; i < ghostInventory.getSlots(); i++) {
+            if (ghostInventory.getStackInSlot(i).isEmpty() || ghostInventory.getStackInSlot(i) == null) ghostInventory.setStackInSlot(i, ItemStack.EMPTY);
+            if (!(ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.FUEL.tag) || ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.COOLER.tag))&& !ghostInventory.getStackInSlot(i).isEmpty()) ghostInventory.setStackInSlot(i, ItemStack.EMPTY);
+            if (ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.COOLER.tag)) countCooledRod += 1;
+            if (ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.FUEL.tag)) countFuelRod += 1;
+        }
+
+        contentHolder.getOrCreateTag().put("pattern", ghostInventory.serializeNBT());
+        contentHolder.getOrCreateTag().putInt("countGraphiteRod", countCooledRod);
+        contentHolder.getOrCreateTag().putInt("countUraniumRod", countFuelRod);
 
         for (int i = 0; i < ghostInventory.getSlots(); i++) {
             if (ghostInventory.getStackInSlot(i).isEmpty() || ghostInventory.getStackInSlot(i) == null) ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));

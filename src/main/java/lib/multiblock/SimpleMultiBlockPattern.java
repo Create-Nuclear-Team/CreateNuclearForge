@@ -18,16 +18,15 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-@SuppressWarnings("null")
-public final class SimpleMultiBlockPattern implements IMultiBlockPattern {
-    private final List<MultiBlockOffsetPos> multiBlockOffsetPosList;
-    private final Map<Character, Predicate<BlockInWorld>> predicateHashMap;
-    private final Map<Character, Supplier<BlockState>> blockProvider;
 
-    public SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffsetPosList, Map<Character, Predicate<BlockInWorld>> predicateMap, Map<Character, Supplier<BlockState>> blockSuppliers) {
+public record SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffsetPosList,
+                                      Map<Character, Predicate<BlockInWorld>> predicateHashMap,
+                                      Map<Character, Supplier<BlockState>> blockProvider) implements IMultiBlockPattern {
+    
+  public SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffsetPosList, Map<Character, Predicate<BlockInWorld>> predicateHashMap, Map<Character, Supplier<BlockState>> blockProvider) {
         this.multiBlockOffsetPosList = List.copyOf(multiBlockOffsetPosList);
-        this.predicateHashMap = Map.copyOf(predicateMap);
-        this.blockProvider = Map.copyOf(blockSuppliers);
+        this.predicateHashMap = Map.copyOf(predicateHashMap);
+        this.blockProvider = Map.copyOf(blockProvider);
     }
 
     public boolean matches(Level level, BlockPos blockPos, Rotation rotation) {
@@ -64,7 +63,8 @@ public final class SimpleMultiBlockPattern implements IMultiBlockPattern {
             if (stateSupplier != null) {
                 var pos = blockPos.offset(multiBlockOffsetPos.pos().rotate(Rotation.NONE));
                 var state = stateSupplier.get();
-                if (stateBiPredicate.test(character, state)) level.getServer().tell(new TickTask(3, () -> level.setBlock(pos, state, Block.UPDATE_ALL)));
+                if (stateBiPredicate.test(character, state))
+                    level.getServer().tell(new TickTask(3, () -> level.setBlock(pos, state, Block.UPDATE_ALL)));
             }
         }
     }

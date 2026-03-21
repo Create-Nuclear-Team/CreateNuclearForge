@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.multiblock.impl.IMultiBlockPatternBuilder;
 import lib.multiblock.impl.IMultiBlockPattern;
-import lib.multiblock.impl.IMultiBlockPatternBuilder;
 import lib.multiblock.impl.IPatternBuilder;
 import lib.multiblock.misc.MultiBlockOffsetPos;
 import lib.multiblock.misc.Util;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class SimpleMultiBlockAislePatternBuilder implements IMultiBlockPatternBuilder {
     public static SimpleMultiBlockAislePatternBuilder start() {
@@ -72,6 +72,7 @@ public class SimpleMultiBlockAislePatternBuilder implements IMultiBlockPatternBu
     public <T extends IMultiBlockPattern> T build(IPatternBuilder<T> builder){
         var data = Util.parseBlockPattern(pattern, lookup.keySet());
         var coreList = data.get('*');
+        CreateNuclear.LOGGER.info("1: {}", coreList.toString());
         if (coreList == null || coreList.size() != 1) {
             throw new IllegalArgumentException("Failed to build pattern due to having more or less than one \"*\" defined! Have: %s Expected: 1".formatted(coreList != null ? coreList.size() : 0));
         }
@@ -84,5 +85,11 @@ public class SimpleMultiBlockAislePatternBuilder implements IMultiBlockPatternBu
         var data = Util.parseBlockPattern(pattern, lookup.keySet());
         var coreList = data.get(character);
         return coreList.get(0).pos();
+    }
+
+    public Stream<MultiBlockOffsetPos> getDistanceControllerTest(char character) {
+        Map<Character, List<MultiBlockOffsetPos>> data = Util.parseBlockPattern(pattern, lookup.keySet());
+        List<MultiBlockOffsetPos> coreList = data.get(character);
+        return coreList.stream();
     }
 }

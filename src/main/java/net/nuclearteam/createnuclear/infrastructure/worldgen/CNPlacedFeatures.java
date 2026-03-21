@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.infrastructure.worldgen;
 
-import com.simibubi.create.infrastructure.worldgen.ConfigPlacementFilter;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;

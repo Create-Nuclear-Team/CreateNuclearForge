@@ -43,5 +43,4 @@ run/emi.json
 run/.mixin.out
 run/gametest
 run/logs
-run/schematics
 run/server

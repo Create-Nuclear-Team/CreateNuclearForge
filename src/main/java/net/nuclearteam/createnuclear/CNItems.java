@@ -4,6 +4,7 @@ import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiatio
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet.getHelmetTag;
 
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings.getLeggingsTag;
+import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot.getBootTag;
 
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.simibubi.create.AllBlocks;
@@ -19,13 +20,15 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
 import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
 import java.util.function.Supplier;
 import net.minecraft.world.item.Items;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
+import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet;
@@ -46,7 +49,7 @@ public class CNItems {
                 .nutrition(20)
                 .saturationMod(0.3F)
                 .alwaysEat()
-                .effect((new MobEffectInstance(CNEffects.RADIATION.get(),600,2)) , 1.0F)
+                .effect(new MobEffectInstance(CNEffects.RADIATION.get(),600,2), 1.0F)
                 .build())
             )
             .register(),
@@ -115,6 +118,14 @@ public class CNItems {
             )
             .register(),
 
+        GRAPHITE_ROD = CreateNuclear.REGISTRATE
+            .item("graphite_rod", Item::new)
+            .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
+                .setRodConfig()
+                .coolerRodType()))
+            .tag(CNTags.forgeItemTag("rods"), CNItemTags.COOLER.tag)
+            .register(),
+
         LEAD_INGOT = CreateNuclear.REGISTRATE
             .item("lead_ingot", Item::new)
             .tag(CNTags.forgeItemTag("ingots"), CNTags.forgeItemTag("ingots/lead"))
@@ -147,6 +158,14 @@ public class CNItems {
             )
             .register(),
 
+        URANIUM_ROD = CreateNuclear.REGISTRATE
+            .item("uranium_rod", Item::new)
+            .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
+                .setRodConfig()
+                .fuelRodType()))
+            .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
+            .register(),
+
         LEAD_NUGGET = CreateNuclear.REGISTRATE
             .item("lead_nugget", Item::new)
             .tag(CNTags.forgeItemTag("nuggets"), CNTags.forgeItemTag("nuggets/lead"))
@@ -166,16 +185,6 @@ public class CNItems {
                 .requires(CNTags.forgeItemTag("ingots/thorium"))
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName() + "_from_decompacting"))
             )
-            .register(),
-
-        GRAPHITE_ROD = CreateNuclear.REGISTRATE
-            .item("graphite_rod", Item::new)
-            .tag(CNTags.forgeItemTag("rods"), CNItemTags.COOLER.tag)
-            .register(),
-
-        URANIUM_ROD = CreateNuclear.REGISTRATE
-            .item("uranium_rod", Item::new)
-            .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register()
     ;
 
@@ -255,26 +264,28 @@ public class CNItems {
                 .register();
     });
 
+    public static final DyedItemsList<Boot> ANTI_RADIATION_BOOTS = new DyedItemsList<>(color -> {
+        String colorName = color.getSerializedName();
 
-    public static final ItemEntry<? extends AntiRadiationArmorItem.Boot>
-        ANTI_RADIATION_BOOTS = CreateNuclear.REGISTRATE.item("anti_radiation_boots", Boot::new)
-            .tag(
-                CNTags.forgeItemTag("armors/boots"),
-                CNItemTags.ANTI_RADIATION_BOOTS_DYE.tag,
-                CNItemTags.ANTI_RADIATION_ARMOR.tag,
-                CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag
-            )
-            .lang("Anti Radiation Boots")
-            .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
-                    .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                    .define('X', CNTags.forgeItemTag("ingots/lead"))
-                    .define('Y', ClothItem.Cloths.WHITE_CLOTH.getItem())
-                    .pattern("Y Y")
-                    .pattern("X X")
-                    .showNotification(true)
-                    .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
-            .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/anti_radiation_boots")))
-            .register();
+        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_boots", p -> new Boot(p, color))
+                .tag(
+                        CNTags.forgeItemTag("armors/boots"),
+                        getBootTag(colorName),
+                        CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
+                        CNItemTags.ANTI_RADIATION_BOOTS_FULL_DYE.tag
+                )
+                .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
+                        .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
+                        .define('X', CNTags.forgeItemTag("ingots/lead"))
+                        .define('Y', ClothItem.Cloths.getByColor(color).get())
+                        .pattern("Y Y")
+                        .pattern("X X")
+                        .showNotification(true)
+                        .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
+                .lang(TextUtils.titleCaseConversion(color.getName()) + " Anti Radiation Boots")
+                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/boots/" + colorName + "_anti_radiation_boots")))
+                .register();
+    });
 
     public static final DyedItemsList<ClothItem> CLOTHS = new DyedItemsList<>(color -> {
         String colorName = color.getSerializedName();

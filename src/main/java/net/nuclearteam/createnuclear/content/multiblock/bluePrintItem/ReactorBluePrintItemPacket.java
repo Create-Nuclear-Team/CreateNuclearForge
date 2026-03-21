@@ -66,8 +66,8 @@ public class ReactorBluePrintItemPacket extends SimplePacketBase {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player == null || !(player.containerMenu instanceof ReactorBluePrintMenu c)) return;
-            c.countUraniumRod = this.countUraniumRod;
-            c.countGraphiteRod = this.countGraphiteRod;
+            c.countFuelRod = this.countUraniumRod;
+            c.countCooledRod = this.countGraphiteRod;
             c.graphiteTime = this.graphiteTime;
             c.uraniumTime = this.uraniumTime;
             c.progress = this.progress;
