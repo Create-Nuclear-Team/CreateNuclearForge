@@ -239,6 +239,7 @@ b636be722a513137e6ca68bdc6510c4a56a2296d assets/createnuclear/models/item/thoriu
 6c63ff92f764da7ce92a99149bf2bf43c23e3727 assets/createnuclear/models/item/thorium_ingot.json
 fe44d1ed2b4100ec32dda43274a085166706485d assets/createnuclear/models/item/thorium_nugget.json
 954086bd19e91b833a263d3da33bb59903ce153f assets/createnuclear/models/item/thorium_ore.json
+420836e3d9085a4ace8a147c25c7bd5fb28b58a1 assets/createnuclear/models/item/thorium_rod.json
 2b6958059c3a4c8aee7fb4c003feba12dd0ab252 assets/createnuclear/models/item/uranium_bucket.json
 7b15a9300d0f6d106e589db3dcd3294781d0bdca assets/createnuclear/models/item/uranium_ore.json
 3b03793c0f5786f258c593e0b140cd6bd10c3b7b assets/createnuclear/models/item/uranium_powder.json
@@ -634,7 +635,7 @@ fd86e3b3265d7069f3cfff0cfb5d086eea5a813a data/forge/tags/items/raw_materials.jso
 61f6f1f4b16790c36a45f769141900772ce4529a data/forge/tags/items/raw_materials/thorium.json
 03a88f0d9f44d3c338b82bf92b22a14dec490bef data/forge/tags/items/raw_materials/uranium.json
 fd86e3b3265d7069f3cfff0cfb5d086eea5a813a data/forge/tags/items/raw_ores.json
-c1ad472460350e6abd024de7785cd870dad05cd9 data/forge/tags/items/rods.json
+4a76a7534e658f2f41e33e3eb5fc2cc55f5e58a8 data/forge/tags/items/rods.json
 a7258ae3454252e874b324fbd81b880ce52759c4 data/forge/tags/items/storage_blocks/lead.json
 2b32fe875f887d4a406700d35e0fe5a93548ebb7 data/forge/tags/items/storage_blocks/raw_lead.json
 725644962932169e20d6f2726e69af199ce3800c data/forge/tags/items/storage_blocks/raw_thorium.json
