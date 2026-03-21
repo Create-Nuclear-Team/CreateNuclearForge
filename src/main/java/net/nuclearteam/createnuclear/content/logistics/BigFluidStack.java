@@ -1,10 +1,14 @@
 package net.nuclearteam.createnuclear.content.logistics;
 
 import com.simibubi.create.content.logistics.BigItemStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
+import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -83,5 +87,10 @@ public class BigFluidStack {
         for (BigFluidStack bigFluidStack : list)
             copy.add(new BigFluidStack(bigFluidStack.stack, bigFluidStack.amount));
         return copy;
+    }
+
+    public ReactorFluidType getFluidtype(@Nullable Level level) {
+        if (level == null) level = Minecraft.getInstance().level;
+        return ReactorFluidType.resolveReactorFluidType(this.stack.getFluid(), level);
     }
 }

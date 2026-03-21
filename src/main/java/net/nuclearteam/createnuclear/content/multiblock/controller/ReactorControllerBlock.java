@@ -5,7 +5,9 @@ import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.item.ItemHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -16,21 +18,19 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.nuclearteam.createnuclear.CNBlockEntityTypes;
-import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
-import net.nuclearteam.createnuclear.content.multiblock.FluidLockManager;
-import net.nuclearteam.createnuclear.content.multiblock.PersistentFluidLocks;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
@@ -192,7 +192,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             }
             level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false));
             entity.setAssembled(false);
-//                entity.removeIOAll();
+            entity.removeIOAll();
             Rotate(state, pos.below(3), level, 0);
         }
     }
@@ -227,38 +227,42 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     }
 
     public void FindSpecialBlocksInReactor(int[] reactorPos, ReactorControllerBlockEntity controllerBlockEntity, Level level){
-        int xMin = reactorPos[0];
-        int xMax = reactorPos[1];
-        int yMin = reactorPos[2];
-        int yMax = reactorPos[3];
-        int zMin = reactorPos[4];
-        int zMax = reactorPos[5];
+        int xMin = reactorPos[0], xMax = reactorPos[1];
+        int yMin = reactorPos[2], yMax = reactorPos[3];
+        int zMin = reactorPos[4], zMax = reactorPos[5];
+
+        final Block reactorOutputBlock = CNBlocks.REACTOR_OUTPUT.get();
+        final Block reactorInputBlock = CNBlocks.REACTOR_INPUT.get();
+        final Block reactorInputFluidBlock = CNBlocks.REACTOR_LIQUID_INPUT.get();
+
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
         for (int y = yMin; y <= yMax; y++) {
             boolean isYBoundary = (y == yMin || y == yMax);
-
             for (int x = xMin; x <= xMax; x++) {
+                boolean isXBoundary = (x == xMin || x == xMax);
                 for (int z = zMin; z <= zMax; z++) {
-                    boolean isXBoundary = (x == xMin || x == xMax);
                     boolean isZBoundary = (z == zMin || z == zMax);
 
-                    // On n'exécute la logique que si on est sur une des faces de la boîte
-                    if (isYBoundary || isXBoundary || isZBoundary) {
-                        mutablePos.set(x, y, z);
-                        //isSpecialBlock(level, mutablePos, controllerBlockEntity);
+                    if (!(isYBoundary || isXBoundary || isZBoundary)) {
+                        continue;
+                    }
+
+                    mutablePos.set(x, y, z);
+
+                    BlockState state = level.getBlockState(mutablePos);
+
+                    if (state.is(reactorOutputBlock)) {
+                        controllerBlockEntity.addOutput(mutablePos.immutable());
+                    }
+                    else if (state.is(reactorInputBlock)) {
+                        controllerBlockEntity.addInput(mutablePos.immutable());
+                    }
+                    else if (state.is(reactorInputFluidBlock)) {
+                        controllerBlockEntity.addInputFluid(mutablePos.immutable());
                     }
                 }
             }
-        }
-    }
-
-    public void isSpecialBlock(Level level, BlockPos blockPos, ReactorControllerBlockEntity controllerBlockEntity) {
-        if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_OUTPUT.get())) {
-            controllerBlockEntity.addOutput(blockPos);
-        }
-        else if (level.getBlockState(blockPos).is(CNBlocks.REACTOR_INPUT.get())) {
-            controllerBlockEntity.addInput(blockPos);
         }
     }
 }

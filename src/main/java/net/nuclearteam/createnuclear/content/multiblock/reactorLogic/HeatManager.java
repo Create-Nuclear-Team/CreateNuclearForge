@@ -1,7 +1,12 @@
 package net.nuclearteam.createnuclear.content.multiblock.reactorLogic;
 
 import com.simibubi.create.content.logistics.BigItemStack;
+import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 /**
  * HeatManager facade delegating to extracted components (in separate files).
@@ -19,7 +24,7 @@ public class HeatManager {
         this(new DefaultHeatCalculator(), new DefaultOverheatController());
     }
 
-    public double calculateHeat(BigItemStack bigFuelItem, BigItemStack bigCoolerItem, int countGraphiteRod, int countUraniumRod, ReactorControllerInventory inventory) {
+    public double calculateHeat(BigItemStack bigFuelItem, BigItemStack bigCoolerItem, BigFluidStack bigFluidStack, ReactorFluidType type, int countGraphiteRod, int countUraniumRod, ReactorControllerInventory inventory) {
         if (bigFuelItem == null || bigCoolerItem == null) return 0;
         if (bigFuelItem.count <= 0 || bigCoolerItem.count <= 0) return 0;
 

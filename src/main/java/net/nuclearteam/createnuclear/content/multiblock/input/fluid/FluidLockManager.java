@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.multiblock;
+package net.nuclearteam.createnuclear.content.multiblock.input.fluid;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.material.Fluid;
@@ -6,7 +6,6 @@ import net.minecraftforge.fluids.FluidStack;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * In-memory manager for ephemeral fluid locks on multiblock controllers.
