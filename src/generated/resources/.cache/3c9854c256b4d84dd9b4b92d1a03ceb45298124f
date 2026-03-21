@@ -1,4 +1,4 @@
-
+// 1.20.1	2026-03-21T16:31:58.2982208	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -46,10 +46,8 @@ a2fc21fa320e677fe7690b260ee3f57ebdbd50b6 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-6f4eaf53d3135b4b5de6590685cc6ed5d6de1cad assets/createnuclear/lang/en_ud.json
-39444f5b88c3a0477718b4d6028524a8aa6d32ba assets/createnuclear/lang/en_us.json
-d4fbf41236516e205e658399f4cc20031c268c94 assets/createnuclear/lang/en_ud.json
-25b2774f0c3dc081d96eea99f6e72a551c7aa658 assets/createnuclear/lang/en_us.json
+2c4dedf3964fc18e95eb4c8e023ce29989021e09 assets/createnuclear/lang/en_ud.json
+41730245df875a6c726df7ea0b7ed48e8a161460 assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -663,6 +661,8 @@ e84d8e1fa924bec3e226b8917b4973b9629a5f52 data/minecraft/tags/blocks/mineable/axe
 455a1766653afcb1a6b5d8715464765e7a975988 data/minecraft/tags/blocks/mineable/pickaxe.json
 a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/minecraft/tags/blocks/mineable/shovel.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/blocks/moss_replaceable.json
+a3f4e5e22848384f6463ad5eba3ce6bf07e211c9 data/minecraft/tags/blocks/needs_diamond_tool.json
+40431d8a2935103c33a58d348816a946e10e540a data/minecraft/tags/blocks/needs_iron_tool.json
 9b9e13222cf9d971353888483c5f041cbb664dc3 data/minecraft/tags/blocks/slabs.json
 7e5c701218bfbd3b186b102ff52dc79454a39e8f data/minecraft/tags/blocks/stairs.json
 92fe109294976e85a9b9763124896e012a17c98a data/minecraft/tags/blocks/walls.json
