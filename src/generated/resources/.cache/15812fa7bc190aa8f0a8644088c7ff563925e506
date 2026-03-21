@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-// 1.20.1	2025-12-30T16:40:56.4654188	CreateNuclear's Processing Recipes
-=======
-// 1.20.1	2025-12-30T17:59:09.0562378	CreateNuclear's Processing Recipes
->>>>>>> V2-Reactor
+// 1.20.1	2026-03-21T16:18:51.9448332	CreateNuclear's Processing Recipes
 c711d032a04e1a9350ad9bc4d9c4d74f54689862 data/createnuclear/recipes/compacting/uranium_fluid_to_yellowcake.json
 33becbc558bd2fbe277be096b292c0093f84e44c data/createnuclear/recipes/crushing/coal.json
 2a8b609dba5bad88511d9c9a80cf6fb582b18c36 data/createnuclear/recipes/crushing/fix/crushed_raw_uranium.json
