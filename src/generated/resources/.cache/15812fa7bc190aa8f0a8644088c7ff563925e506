@@ -1,4 +1,5 @@
-// 1.20.1	2026-02-21T13:25:05.6827181	CreateNuclear's Processing Recipes
+// 1.20.1	2026-03-21T14:52:54.7527806	CreateNuclear's Processing Recipes
+bccfe326d6c91bd2df207a38225fbca413e1013f data/createnuclear/recipes/compacting/thorium_fluid_to_thorium_ingot.json
 c711d032a04e1a9350ad9bc4d9c4d74f54689862 data/createnuclear/recipes/compacting/uranium_fluid_to_yellowcake.json
 33becbc558bd2fbe277be096b292c0093f84e44c data/createnuclear/recipes/crushing/coal.json
 2a8b609dba5bad88511d9c9a80cf6fb582b18c36 data/createnuclear/recipes/crushing/fix/crushed_raw_uranium.json
@@ -14,6 +15,7 @@ e42be7d17c5e057e62c4b1176cbf43319a157f51 data/createnuclear/recipes/enriched/enr
 d0a30a8942f3e81d11afa21a93037916601c38cb data/createnuclear/recipes/item_application/reactor_casing_from_steel_and_brass_casing.json
 f2d3a2dbcb9135e31261cc8408f11cd07038a826 data/createnuclear/recipes/item_application/reactor_input_from_hopper_and_reactor_casing.json
 91c07d7804d0960aaa17a6258f00f1731ca458f5 data/createnuclear/recipes/item_application/reactor_output_from_shaft_and_reactor_casing.json
+f2aea217b202529660a0fff70a4bf681d3d69f12 data/createnuclear/recipes/mixing/liquid_azote.json
 7fc7695cd03577131096e9695170193044f8bc1a data/createnuclear/recipes/mixing/steel.json
 4bc858c73385e4309ef250b163cc696244a64767 data/createnuclear/recipes/mixing/thorium_fluid.json
 23e57de458330d04dfebff8070b44b3b1b2718eb data/createnuclear/recipes/mixing/uranium_fluid.json
