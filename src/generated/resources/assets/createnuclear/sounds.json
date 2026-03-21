@@ -1,0 +1,56 @@
+{
+  "reactor_alarm": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor_alarm"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor_alarm"
+  },
+  "reactor_casing_break": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor_casing_break"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor_casing_break"
+  },
+  "reactor_casing_fall": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor_casing_fall"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor_casing_fall"
+  },
+  "reactor_casing_hit": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor_casing_hit"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor_casing_hit"
+  },
+  "reactor_casing_place": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor_casing_place"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor_casing_place"
+  },
+  "reactor_casing_step": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor_casing_step"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor_casing_step"
+  }
+}
