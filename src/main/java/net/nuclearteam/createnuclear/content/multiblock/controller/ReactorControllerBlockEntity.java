@@ -8,7 +8,6 @@ import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -24,12 +23,9 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
-import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
-import net.nuclearteam.createnuclear.api.multiblock.IMultiblockHost;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
-import net.nuclearteam.createnuclear.content.multiblock.fluid.CNReactorFluidTypes;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
@@ -70,7 +66,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private int heat;
 
     private double total;
-    private CompoundTag screen_pattern = new CompoundTag();
     private ItemStack configuredPattern;
 
     private BigItemStack bigFuelItem;
@@ -268,6 +263,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         super.tick();
         if (level.isClientSide)
             return;
+
         int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
         countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
         countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
@@ -308,7 +304,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.setChanged();
         this.notifyUpdate();
 
-        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, countGraphiteRod, countUraniumRod, inventory));
+        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.get(0), countGraphiteRod, countUraniumRod, inventory, level));
         if (!this.outputManager.getBlocksPosition().isEmpty()) {
             rotate(getBlockState(), getLevel(), heat);
         }
@@ -332,11 +328,23 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     private boolean isReadyToRun() {
-        return !isEmptyConfiguredPattern() && bigFuelItem.count > 0 && bigCoolerItem.count > 0 && this.inputManager.size() > 0;
+        return !isEmptyConfiguredPattern()
+                && bigFuelItem.count > 0
+                && bigCoolerItem.count > 0
+                && !bigFluidStack.isEmpty()
+                && bigFluidStack.get(0).amount > 0
+                && this.inputManager.size() > 0
+                && this.inputFluidManager.size() > 0;
     }
 
     private void updateHeatOnly() {
-        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, countGraphiteRod, countUraniumRod, inventory));
+        // Guard against empty fluid list — HeatManager accepts null for empty/no-fluid case
+        BigItemStack fuel = bigFuelItem;
+        BigItemStack cooler = bigCoolerItem;
+        BigFluidStack fluid = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
+
+        configuredPattern.getOrCreateTag().putDouble("heat",
+                heatService.calculateHeat(fuel, cooler, fluid, countGraphiteRod, countUraniumRod, inventory, level));
     }
 
     private boolean isEmptyConfiguredPattern() {
