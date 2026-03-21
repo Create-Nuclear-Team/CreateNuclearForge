@@ -63,19 +63,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     //public LinkedHashSet<LazyOptional<IItemHandler>> attachedInventory;
 
     //private boolean powered;
-    public State powered = State.OFF;
-    public float reactorPower;
-    public float lastReactorPower;
-    int overFlowHeatTimer = 0;
-    int overFlowLimiter = 30;
-    double overHeat = 0;
-    public int baseUraniumHeat = 25;
-    public int baseGraphiteHeat = -10;
-    public int proximityUraniumHeat = 5;
-    public int proximityGraphiteHeat = -5;
-    public int maxUraniumPerGraphite = CNConfigs.server().rods.rodFuelMaxForCoolerRod.get();
-    public int graphiteTimer = 3600;
-    public int uraniumTimer = 3600;
     public int countUraniumRod;
     public int countGraphiteRod;
     public int heat;
