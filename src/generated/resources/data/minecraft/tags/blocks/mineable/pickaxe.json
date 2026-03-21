@@ -21,6 +21,7 @@
     "createnuclear:lead_block",
     "createnuclear:thorium_block",
     "createnuclear:steel_block",
+    "createnuclear:reactor_alarm",
     "createnuclear:autunite",
     "createnuclear:cut_autunite",
     "createnuclear:cut_autunite_stairs",
