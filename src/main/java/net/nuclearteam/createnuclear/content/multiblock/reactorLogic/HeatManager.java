@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.content.multiblock.reactorLogic;
 
 import com.simibubi.create.content.logistics.BigItemStack;
+import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
@@ -24,13 +25,14 @@ public class HeatManager {
         this(new DefaultHeatCalculator(), new DefaultOverheatController());
     }
 
-    public double calculateHeat(BigItemStack bigFuelItem, BigItemStack bigCoolerItem, BigFluidStack bigFluidStack, ReactorFluidType type, int countGraphiteRod, int countUraniumRod, ReactorControllerInventory inventory) {
-        if (bigFuelItem == null || bigCoolerItem == null) return 0;
-        if (bigFuelItem.count <= 0 || bigCoolerItem.count <= 0) return 0;
+    public double calculateHeat(BigItemStack fuel, BigItemStack cooler, BigFluidStack bigFluidStack, int graphiteCount, int uraniumCount, ReactorControllerInventory inventory, Level level) {
+        if (fuel == null || cooler == null || bigFluidStack == null) return 0;
+        if (fuel.count <= 0 || cooler.count <= 0 || bigFluidStack.amount <= 0) return 0;
 
-        overheatController.updateState(countGraphiteRod, countUraniumRod);
+        overheatController.updateState(graphiteCount, uraniumCount);
+        ReactorFluidType type = bigFluidStack.getFluidtype(level);
 
-        return calculator.computeHeat(bigFuelItem, bigCoolerItem, countGraphiteRod, countUraniumRod, inventory, overheatController.getOverHeat());
+        return calculator.computeHeat(fuel, cooler, bigFluidStack, type, graphiteCount, uraniumCount, inventory, overheatController.getOverHeat());
     }
 
     public int getGraphiteTimer() { return overheatController.getGraphiteTimer(); }

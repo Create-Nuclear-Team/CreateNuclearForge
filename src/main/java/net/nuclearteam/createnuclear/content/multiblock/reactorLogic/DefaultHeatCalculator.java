@@ -5,6 +5,10 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNTags;
+import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
 
 public class DefaultHeatCalculator implements IHeatCalculator {
@@ -28,18 +32,19 @@ public class DefaultHeatCalculator implements IHeatCalculator {
     private final int proximityGraphiteHeat = -5;
 
     @Override
-    public double computeHeat(BigItemStack bigFuelItem, BigItemStack bigCoolerItem, int countGraphiteRod, int countUraniumRod, ReactorControllerInventory inventory, double overHeat) {
+    public double computeHeat(BigItemStack bigFuelItem, BigItemStack bigCoolerItem, BigFluidStack bigFluidStack, ReactorFluidType type, int countGraphiteRod, int countUraniumRod, ReactorControllerInventory inventory, double overHeat) {
         int heat = 0;
 
         ListTag list = inventory.getStackInSlot(0).getOrCreateTag().getCompound("pattern").getList("Items", Tag.TAG_COMPOUND);
 
         for (int i = 0; i < list.size(); i++) {
             ItemStack currentStack = ItemStack.of(list.getCompound(i));
+            RodType rod = ItemRodTypesValue.getRodType(currentStack.getItem());
             String currentRod = "";
-            if (currentStack.is(CNTags.CNItemTags.FUEL.tag)) {
+            if (currentStack.is(CNTags.CNItemTags.FUEL.tag) || (rod.items().size() > 0 && rod.type() == RodType.TypeRod.FUEL)) {
                 heat += baseUraniumHeat;
                 currentRod = "u";
-            } else if (currentStack.is(CNTags.CNItemTags.COOLER.tag)) {
+            } else if (currentStack.is(CNTags.CNItemTags.COOLER.tag) || (rod.items().size() > 0 && rod.type() == RodType.TypeRod.COOLER)) {
                 heat += baseGraphiteHeat;
                 currentRod = "g";
             }
@@ -73,6 +78,12 @@ public class DefaultHeatCalculator implements IHeatCalculator {
             }
         }
 
-        return heat + overHeat;
+        double heatCaculed = heat + overHeat;
+
+        if (heatCaculed > type.maxHeat() && bigFluidStack.amount > type.efficiency()) {
+            heat = 9_999_999;
+        }
+
+        return heat;
     }
 }
