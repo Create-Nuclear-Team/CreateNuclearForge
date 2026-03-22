@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class RadiationProvider implements ICapabilitySerializable<CompoundTag> {
-    public static final Capability<IRadiation> CAP = CapabilityManager.get(new CapabilityToken<>() {});
-    private final IRadiation instance = new RadiationCapability();
-    private final LazyOptional<IRadiation> optional = LazyOptional.of(() -> instance);
+    public static final Capability<IRadiationCapability> CAP = CapabilityManager.get(new CapabilityToken<>() {});
+    private final IRadiationCapability instance = new RadiationCapability();
+    private final LazyOptional<IRadiationCapability> optional = LazyOptional.of(() -> instance);
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {

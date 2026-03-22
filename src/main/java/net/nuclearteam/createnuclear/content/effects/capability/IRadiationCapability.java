@@ -1,6 +1,6 @@
 package net.nuclearteam.createnuclear.content.effects.capability;
 
-public interface IRadiation {
+public interface IRadiationCapability {
     double getRadiation();
     void setRadiation(double value);
 

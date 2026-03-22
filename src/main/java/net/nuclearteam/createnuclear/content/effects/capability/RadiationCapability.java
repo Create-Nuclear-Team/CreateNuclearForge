@@ -16,12 +16,12 @@ import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CNPackets;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.effects.IRadiationSource;
-import net.nuclearteam.createnuclear.content.effects.packet.RadiationSyncPacket;
+import net.nuclearteam.createnuclear.api.radiation.IRadiationSource;
+import net.nuclearteam.createnuclear.foundation.networking.radiation.RadiationSyncPacket;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.foundation.utility.InventoryHashUtil;
 
-public class RadiationCapability implements IRadiation{
+public class RadiationCapability implements IRadiationCapability {
     private double radiation;
     private long inventoryHash;
 

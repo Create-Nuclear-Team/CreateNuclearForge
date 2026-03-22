@@ -14,7 +14,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.network.NetworkEvent.Context;
-import net.nuclearteam.createnuclear.content.effects.packet.RadiationSyncPacket;
+import net.nuclearteam.createnuclear.foundation.networking.radiation.RadiationSyncPacket;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItemPacket;
 import net.nuclearteam.createnuclear.content.multiblock.controller.EventTriggerPacket;
 

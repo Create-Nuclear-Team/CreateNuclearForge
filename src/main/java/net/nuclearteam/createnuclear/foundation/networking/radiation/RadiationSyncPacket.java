@@ -1,9 +1,9 @@
-package net.nuclearteam.createnuclear.content.effects.packet;
+package net.nuclearteam.createnuclear.foundation.networking.radiation;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import net.nuclearteam.createnuclear.content.effects.ClientRadiationData;
+import net.nuclearteam.createnuclear.foundation.data.radiation.ClientRadiationData;
 
 public class RadiationSyncPacket extends SimplePacketBase {
     private final double radiation;

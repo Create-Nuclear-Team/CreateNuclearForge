@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.effects;
+package net.nuclearteam.createnuclear.foundation.data.radiation;
 
 public record ClientRadiationData(double radiation) {
     public ClientRadiationData() {
