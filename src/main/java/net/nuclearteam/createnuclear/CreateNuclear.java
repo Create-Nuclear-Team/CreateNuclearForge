@@ -89,8 +89,11 @@ public class CreateNuclear {
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
-        event.enqueueWork(CNPotions::registerPotionsRecipes);
         event.enqueueWork(() -> IrradiatedAnimal.VANILLA_TO_IRRADIATED.put(EntityType.CHICKEN, CNEntityType.IRRADIATED_CHICKEN.get()));
+        event.enqueueWork(() -> {
+            CNPotions.registerPotionsRecipes();
+            CNOpenPipeEffectHandlers.registerDefaults();
+        });
     }
 
     public static void onRegister(final RegisterEvent event) {
