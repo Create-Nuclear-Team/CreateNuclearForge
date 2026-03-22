@@ -1,16 +1,13 @@
 package net.nuclearteam.createnuclear.content.effects.capability;
 
-import com.simibubi.create.AllPackets;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
@@ -21,6 +18,7 @@ import net.nuclearteam.createnuclear.CNPackets;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.effects.IRadiationSource;
 import net.nuclearteam.createnuclear.content.effects.packet.RadiationSyncPacket;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.foundation.utility.InventoryHashUtil;
 
 public class RadiationCapability implements IRadiation{
@@ -64,35 +62,49 @@ public class RadiationCapability implements IRadiation{
         player.getCapability(RadiationProvider.CAP).ifPresent(cap -> {
             long newHash = InventoryHashUtil.compute(player);
 
-            if (newHash == cap.getInventoryHash()) return;
+            if (newHash != cap.getInventoryHash()) {
+                cap.setInventoryHash(newHash);
 
-            cap.setInventoryHash(newHash);
+                double radiation = 0;
 
-            double radiation = 0;
-
-            for (ItemStack stack : player.getInventory().items) {
-                if (stack.getItem() instanceof IRadiationSource source) {
-                    radiation += source.getRadiation(stack, player);
+                for (ItemStack stack : player.getInventory().items) {
+                    if (stack.getItem() instanceof IRadiationSource source) {
+                        radiation += source.getRadiation(stack, player);
+                    }
                 }
+
+                for (ItemStack stack : player.getInventory().offhand) {
+                    if (stack.getItem() instanceof IRadiationSource source) {
+                        radiation += source.getRadiation(stack, player);
+                    }
+                }
+
+                double resistance = player.getAttributeValue(CNAttributes.IRRADIATED_RESISTANCE.get());
+
+                for (ItemStack stack : player.getArmorSlots()) {
+                    if (stack.getItem() instanceof ArmorItem armorItem && armorItem instanceof AntiRadiationArmorItem.Helmet) {
+                        float ratio = 1.0f;
+                        if (stack.isDamageableItem()) {
+                            ratio = 1f - ((float) stack.getDamageValue() / (float) stack.getMaxDamage());
+                            ratio = Math.max(0f, ratio);
+                        }
+                        resistance *= ratio;
+                    }
+                }
+
+                CreateNuclear.LOGGER.warn("onPlayerTick::resistance: {}, radiation: {}, newHash: {}", resistance, radiation, newHash);
+                resistance = Mth.clamp(resistance, 0.0, 1.0);
+                radiation *= (1.0 - resistance);
+
+                CreateNuclear.LOGGER.warn("onPlayerTick::radiation2: {}", radiation);
+
+
+                cap.setRadiation(radiation);
+
+                CNPackets.getChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new RadiationSyncPacket(radiation));
             }
 
-            for (ItemStack stack : player.getInventory().offhand) {
-                if (stack.getItem() instanceof IRadiationSource source) {
-                    radiation += source.getRadiation(stack, player);
-                }
-            }
-
-            double resistance = player.getAttributeValue(CNAttributes.IRRADIATED_RESISTANCE.get());
-            CreateNuclear.LOGGER.warn("onPlayerTick::resistance: {}, radiation: {}, newHash: {}", resistance, radiation, newHash);
-            resistance = Mth.clamp(resistance, 0.0, 1.0);
-            radiation *= (1.0 - resistance);
-
-            cap.setRadiation(radiation);
-
-            applyEffects(player, radiation);
-
-
-            CNPackets.getChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new RadiationSyncPacket(radiation));
+            applyEffects(player, cap.getRadiation());
         });
     }
 
