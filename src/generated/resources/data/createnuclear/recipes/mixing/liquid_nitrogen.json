@@ -1,12 +1,14 @@
 {
   "type": "create:mixing",
-  "heatRequirement": "superheated",
   "ingredients": [
     {
       "item": "createnuclear:cooled_nitrogen_concentrate"
+    },
+    {
+      "item": "minecraft:ice"
     }
   ],
-  "processingTime": 30,
+  "processingTime": 20,
   "results": [
     {
       "amount": 1000,
