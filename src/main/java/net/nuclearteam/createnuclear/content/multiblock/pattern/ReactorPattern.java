@@ -120,7 +120,7 @@ public class ReactorPattern {
                         ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(newBlock).getBlock();
                         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, newBlock);
                         if  (entity != null) {
-                            if (isInReactorRange(entity.reactorPos, blockPos)) {
+                            if (isInReactorRange(entity.getMultiblockPos(), blockPos)) {
                                 return newBlock;
                             }
                         }
