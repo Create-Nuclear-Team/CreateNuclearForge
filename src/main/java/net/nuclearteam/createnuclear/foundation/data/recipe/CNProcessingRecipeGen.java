@@ -36,6 +36,7 @@ public abstract class CNProcessingRecipeGen extends RecipeProvider {
         GENERATORS.add(new CNMixingRecipeGen(output));
         GENERATORS.add(new CNPressingRecipeGen(output));
         GENERATORS.add(new CNEnrichedRecipeGen(output));
+        GENERATORS.add(new CNSnowPowderRecipeGen(output));
         GENERATORS.add(new CNWashingRecipeGen(output));
 
 
