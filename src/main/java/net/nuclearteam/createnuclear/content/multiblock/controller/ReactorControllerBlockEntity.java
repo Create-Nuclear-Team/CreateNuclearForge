@@ -324,13 +324,18 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (!this.outputManager.getBlocksPosition().isEmpty()) {
             rotate(getBlockState(), getLevel(), heat);
         }
-        if (updateLiquidTimers()) {
-            boolean extracted = inputFluidManager.extractFluids(level, 1000);
-            if (extracted) {
-                liquidLife = calculateLiquidProgress();
+        CreateNuclear.LOGGER.info("" + bigFluidStack.stream().mapToLong(fluid -> fluid.amount).sum());
+        if (bigFluidStack.stream()
+                .mapToLong(fluid -> fluid.amount)
+                .sum()>1000) {
+            if (updateLiquidTimers()) {
+                CreateNuclear.LOGGER.warn("Liquids have been updated");
+                boolean extracted = inputFluidManager.extractFluids(level, 1000);
+                if (extracted) {
+                    liquidLife = calculateLiquidProgress();
+                }
             }
         }
-
         if (updateTimers()) {
             boolean extracted = inputManager.extractItems(level, 1, 1);
             if (extracted) {
@@ -380,8 +385,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     private boolean updateLiquidTimers()  {
-        liquidLife = Math.max(0, liquidLife - 1);
-        return liquidLife == 0;
+        liquidLife -= 1;
+        return liquidLife <= 0;
     }
 
 
