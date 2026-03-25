@@ -5,4 +5,5 @@ public interface IOverheatController {
     double getOverHeat();
     int getGraphiteTimer();
     int getUraniumTimer();
+    int getLiquidTimer();
 }

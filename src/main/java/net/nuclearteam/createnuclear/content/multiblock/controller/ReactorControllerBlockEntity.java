@@ -66,6 +66,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private int heat;
 
     private double total;
+    private double liquidLife;
     private ItemStack configuredPattern;
 
     private BigItemStack bigFuelItem;
@@ -112,6 +113,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     public double getTotal() { return this.total; }
     public void setTotal(double t) { this.total = t; }
+
+    public double getLiquidLife() { return this.liquidLife; }
+    public void setLiquidLife(double l) { this.liquidLife = l; }
 
     /** Main constructor allowing dependency injection for testability and DIP compliance. */
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -231,6 +235,18 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return totalGraphiteRodLife + totalUraniumRodLife;
     }
 
+    public double calculateLiquidProgress() {
+        return switch (reactorSize) {
+            case 5 -> (double) heatService.getLiquidTimer() / 40;
+            case 7 -> (double) heatService.getLiquidTimer() / 147;
+            case 9 -> (double) heatService.getLiquidTimer() / 360;
+            default -> {
+                CreateNuclear.LOGGER.error("Invalid reactor size value: " + reactorSize);
+                yield 1;
+            }
+        };
+    }
+
     public void test() {
         CreateNuclear.LOGGER.warn("List d'input: {}", this.inputManager.size());
         CreateNuclear.LOGGER.warn("List d'output: {}", this.outputManager.size());
@@ -308,6 +324,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (!this.outputManager.getBlocksPosition().isEmpty()) {
             rotate(getBlockState(), getLevel(), heat);
         }
+        if (updateLiquidTimers()) {
+            boolean extracted = inputFluidManager.extractFluids(level, 1000);
+            if (extracted) {
+                liquidLife = calculateLiquidProgress();
+            }
+        }
 
         if (updateTimers()) {
             boolean extracted = inputManager.extractItems(level, 1, 1);
@@ -355,6 +377,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
         total -= 1;
         return total <= 0;//(total/constTotal) <= 0;
+    }
+
+    private boolean updateLiquidTimers()  {
+        liquidLife = Math.max(0, liquidLife - 1);
+        return liquidLife == 0;
     }
 
 

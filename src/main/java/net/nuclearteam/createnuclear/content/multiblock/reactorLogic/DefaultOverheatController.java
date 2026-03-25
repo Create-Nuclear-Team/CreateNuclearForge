@@ -8,6 +8,7 @@ class DefaultOverheatController implements IOverheatController {
     private final int maxUraniumPerGraphite = 3;
     private final int graphiteTimer = 3600;
     private final int uraniumTimer = 3600;
+    private final int liquidTimer = 3600;
 
     @Override
     public void updateState(int countGraphiteRod, int countUraniumRod) {
@@ -36,4 +37,7 @@ class DefaultOverheatController implements IOverheatController {
 
     @Override
     public int getUraniumTimer() { return uraniumTimer; }
+
+    @Override
+    public int getLiquidTimer()  { return liquidTimer; }
 }

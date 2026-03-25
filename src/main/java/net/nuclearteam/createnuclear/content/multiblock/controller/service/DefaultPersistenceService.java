@@ -12,6 +12,7 @@ public class DefaultPersistenceService implements IPersistenceService {
         owner.setMultiblockFacing(compound.getString("reactorFacing"));
         owner.setMultiblockStructure(compound.getIntArray("reactorPose"));
         owner.setTotal(compound.getDouble("total"));
+        owner.setLiquidLife(compound.getDouble("liquidLife"));
 
         if (!clientPacket) {
             owner.deserializeInventory(compound.getCompound("pattern"));
@@ -31,6 +32,7 @@ public class DefaultPersistenceService implements IPersistenceService {
         }
 
         compound.putDouble("total", owner.calculateProgress());
+        compound.putDouble("liquidProgress", owner.calculateLiquidProgress());
 
         if (!clientPacket) {
             compound.put("pattern", owner.serializeInventory());

@@ -25,6 +25,11 @@ public class DefaultHeatService implements IHeatService {
     }
 
     @Override
+    public  int getLiquidTimer() {
+        return impl.getLiquidTimer();
+    }
+
+    @Override
     public double calculateHeat(BigItemStack fuel, BigItemStack cooler, BigFluidStack bigFluidStack, int graphiteCount, int uraniumCount, ReactorControllerInventory inventory, Level level) {
         return impl.calculateHeat(fuel, cooler, bigFluidStack, graphiteCount, uraniumCount, inventory, level);
     }
