@@ -386,8 +386,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (this.outputManager.getBlocksPosition().isEmpty()) return;
         int remainingRotation = rotation % this.outputManager.getBlocksPosition().size();
         for (int i = 0; i < this.outputManager.getBlocksPosition().size(); i++) {
-            int dividedRotation = rotation / this.outputManager.getBlocksPosition().size() + remainingRotation;
-            remainingRotation = 0;
+            int dividedRotation = (rotation / this.outputManager.getBlocksPosition().size()) + (i < remainingRotation ? 1 : 0);
             BlockPos pos =  this.outputManager.getBlocksPosition().get(i);
 
             if (dividedRotation > 0) {
