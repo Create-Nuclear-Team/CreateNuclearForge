@@ -1,7 +1,6 @@
 {
 	"format_version": "1.21.11",
 	"credit": "Made with Blockbench",
-	"texture_size": [96, 96],
 	"textures": {
 		"14": "createnuclear:item/default_anti_radiation_suit"
 	},
@@ -63,18 +62,59 @@
 			}
 		}
 	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [1.5, 0, 0],
+			"translation": [0.25, -0.5, -1],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [1.5, 0, 0],
+			"translation": [0.25, -0.5, -1],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"firstperson_righthand": {
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"firstperson_lefthand": {
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"ground": {
+			"rotation": [90, 0, 0]
+		},
+		"gui": {
+			"rotation": [-151.96, 54.21, 174.44],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"head": {
+			"translation": [0, -29.5, -2.5]
+		},
+		"fixed": {
+			"scale": [0.5, 0.5, 0.5]
+		}
+	},
 	"groups": [
 		{
-			"name": "right_leg",
-			"origin": [9.67, -2.43333, 8.76667],
+			"name": "black_anti_radiation_leggings",
+			"origin": [8, 8, 8],
+			"scope": 0,
 			"color": 0,
-			"children": [0, 1]
-		},
-		{
-			"name": "left_leg",
-			"origin": [5.78333, -2.43333, 8.76667],
-			"color": 0,
-			"children": [2, 3]
+			"children": [
+				{
+					"name": "right_leg",
+					"origin": [9.67, -2.43333, 8.76667],
+					"scope": 0,
+					"color": 0,
+					"children": [0, 1]
+				},
+				{
+					"name": "left_leg",
+					"origin": [5.78333, -2.43333, 8.76667],
+					"scope": 0,
+					"color": 0,
+					"children": [2, 3]
+				}
+			]
 		}
 	]
 }
