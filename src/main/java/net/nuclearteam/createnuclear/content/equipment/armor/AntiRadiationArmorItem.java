@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.equipment.armor; // Mets ton package
+package net.nuclearteam.createnuclear.content.equipment.armor;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
