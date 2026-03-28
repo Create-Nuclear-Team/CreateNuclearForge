@@ -1,4 +1,4 @@
-// 1.20.1	2026-03-28T17:00:33.791521	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-03-28T17:25:44.1375456	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -605,6 +605,4 @@ a63487094743744be756ad497f483fcd4d11e9bc data/minecraft/tags/fluids/lava.json
 9b1c04e4516407eb6df9f1262fd73a71605f3bb1 data/minecraft/tags/fluids/water.json
 9b9e13222cf9d971353888483c5f041cbb664dc3 data/minecraft/tags/items/slabs.json
 7e5c701218bfbd3b186b102ff52dc79454a39e8f data/minecraft/tags/items/stairs.json
-6825946ed077fccc589ef544a2c4383349cf3954 data/minecraft/tags/items/trim_materials.json
-f4ce817cb1c25b5c196f742ca0cb44f39d2cc286 data/minecraft/tags/items/trim_templates.json
 92fe109294976e85a9b9763124896e012a17c98a data/minecraft/tags/items/walls.json

@@ -66,12 +66,6 @@ public class CreateNuclearRegistrateTags {
                 .add(Items.ROTTEN_FLESH)
                 .addTag(ItemTags.LEAVES);
 
-        prov.tag(ItemTags.TRIM_MATERIALS)
-                .addTag(CNItemTags.CLOTH.tag);
-
-        prov.tag(ItemTags.TRIM_TEMPLATES)
-                .add(AllItems.PRECISION_MECHANISM.get());
-
         for (CNItemTags tag : CNItemTags.values()) {
             if (tag.alwaysDatagen) {
                 prov.getOrCreateRawBuilder(tag.tag);
