@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear;
 
+import static com.simibubi.create.foundation.data.AssetLookup.itemModel;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot.getBootsTag;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate.getChestplateTag;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet.getHelmetTag;
@@ -233,7 +234,7 @@ public class CNItems {
                             .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
                 })
                 .lang(TextUtils.titleCaseConversion(color.getName()) + " Anti Radiation Helmet")
-                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/helmets/" + colorName + "_anti_radiation_helmet")))
+                .model(itemModel("black_anti_radiation_helmet"))
             .register();
     });
 
@@ -258,8 +259,8 @@ public class CNItems {
                         .showNotification(true)
                         .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
                 .lang(TextUtils.titleCaseConversion(color.getName()) +" Anti Radiation Chestplate")
-                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/chestplates/" + colorName + "_anti_radiation_chestplate")))
-            .register();
+                .model(itemModel("black_anti_radiation_chestplate"))
+                .register();
 
     });
 
@@ -283,7 +284,7 @@ public class CNItems {
                         .showNotification(true)
                         .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
                 .lang(TextUtils.titleCaseConversion(color.getName()) +" Anti Radiation Leggings")
-                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/leggings/" + colorName + "_anti_radiation_leggings")))
+                .model(itemModel("black_anti_radiation_leggings"))
                 .register();
     });
 
@@ -306,7 +307,7 @@ public class CNItems {
                         .showNotification(true)
                         .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
                 .lang(TextUtils.titleCaseConversion(color.getName()) + " Anti Radiation Boots")
-                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/anti_radiation_boots")))
+                .model(itemModel("black_anti_radiation_boots"))
                 .register();
     });
 
