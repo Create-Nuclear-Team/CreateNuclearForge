@@ -1,9 +1,0 @@
-{
-  "asset_name": "anti_radiation_trim_material_white",
-  "description": {
-    "color": "#000000",
-    "translate": "trim_pattern.white.createnuclear.anti_radiation_trim_material_white"
-  },
-  "ingredient": "createnuclear:white_cloth",
-  "item_model_index": 0.8
-}

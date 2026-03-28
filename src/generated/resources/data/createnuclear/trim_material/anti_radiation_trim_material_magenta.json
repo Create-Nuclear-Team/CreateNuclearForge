@@ -1,9 +1,0 @@
-{
-  "asset_name": "anti_radiation_trim_material_magenta",
-  "description": {
-    "color": "#000002",
-    "translate": "trim_pattern.magenta.createnuclear.anti_radiation_trim_material_magenta"
-  },
-  "ingredient": "createnuclear:magenta_cloth",
-  "item_model_index": 0.8
-}
