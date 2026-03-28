@@ -125,13 +125,13 @@ public class CNAdvancement implements DataProvider {
             .after(LEAD_INGOT)
             .whenIconCollected()),
 
-    ANTI_RADIATION_ARMOR = create("anti_radiation_armor", b -> b.icon(CNItems.ANTI_RADIATION_HELMETS.get(DyeColor.WHITE))
+    ANTI_RADIATION_ARMOR = create("anti_radiation_armor", b -> b.icon(CNItems.ANTI_RADIATION_HELMETS)
             .title("Anti radiation Armor")
             .description("Craft your first anti-radiation armor piece to protect yourself from radiation")
             .after(LEAD_INGOT)
             .whenItemCollected(CNTags.CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag)),
 
-    FULL_ANTI_RADIATION_ARMOR = create("full_anti_radiation_armor", b -> b.icon(CNItems.ANTI_RADIATION_CHESTPLATES.get(DyeColor.WHITE))
+    FULL_ANTI_RADIATION_ARMOR = create("full_anti_radiation_armor", b -> b.icon(CNItems.ANTI_RADIATION_CHESTPLATES)
             .title("Fully Protected")
             .description("Wear a full set of anti-radiation armor to fully protect yourself from radiation")
             .externalTrigger(
@@ -143,7 +143,7 @@ public class CNAdvancement implements DataProvider {
                     ))
             .after(ANTI_RADIATION_ARMOR)),
 
-    DYE_ANTI_RADIATION_ARMOR = create("dye_anti_radiation_armor", b -> b.icon(CNItems.ANTI_RADIATION_HELMETS.get(DyeColor.RED))
+    DYE_ANTI_RADIATION_ARMOR = create("dye_anti_radiation_armor", b -> b.icon(CNItems.ANTI_RADIATION_HELMETS)
             .title("Pimp My Armor")
             .description("Dye your anti radiation armor to any color")
             .whenItemCollected(CNTags.CNItemTags.ANTI_RADIATION_HELMET_DYE.tag)
