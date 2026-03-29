@@ -1,6 +1,6 @@
 package net.nuclearteam.createnuclear.content.equipment.armor;
 
-import net.minecraft.tags.TagKey;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
@@ -22,7 +22,10 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
     // Cette méthode indique au jeu où trouver la texture PNG de l'armure
     @Override
     public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-        return String.valueOf(CreateNuclear.asResource("textures/models/armor/default_anti_radiation_suit.png"));
+        CompoundTag tag = stack.getTag();
+        String cloth = (tag != null && tag.contains("Cloth")) ? tag.getString("Cloth") : "default";
+        String textureFile = cloth + "_anti_radiation_suit.png";
+        return CreateNuclear.asResource("textures/models/armor/" + textureFile).toString();
     }
 
     @Override
@@ -34,23 +37,11 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
         public Helmet(Properties p, DyeColor color) {
             super(ArmorMaterials.ANTI_RADIATION_SUIT, Type.HELMET, p, color);
         }
-
-        public static TagKey<Item> getHelmetTag(String key) {
-            return key.equals("white")
-                    ? CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
-                    : CNTags.CNItemTags.ANTI_RADIATION_HELMET_DYE.tag;
-        }
     }
 
     public static class Chestplate extends AntiRadiationArmorItem {
         public Chestplate(Properties p, DyeColor color) {
             super(ArmorMaterials.ANTI_RADIATION_SUIT, Type.CHESTPLATE, p, color);
-        }
-
-        public static TagKey<Item> getChestplateTag(String key) {
-            return key.equals("white")
-                    ? CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
-                    : CNTags.CNItemTags.ANTI_RADIATION_CHESTPLATE_DYE.tag;
         }
     }
 
@@ -58,23 +49,11 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
         public Leggings(Properties p, DyeColor color) {
             super(ArmorMaterials.ANTI_RADIATION_SUIT, Type.LEGGINGS, p, color);
         }
-
-        public static TagKey<Item> getLeggingsTag(String key) {
-            return key.equals("white")
-                    ? CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
-                    : CNTags.CNItemTags.ANTI_RADIATION_LEGGINGS_DYE.tag;
-        }
     }
 
     public static class Boot extends AntiRadiationArmorItem {
         public Boot(Properties p, DyeColor color) {
             super(ArmorMaterials.ANTI_RADIATION_SUIT, Type.BOOTS, p, color);
-        }
-
-        public static TagKey<Item> getBootsTag(String key) {
-            return key.equals("white")
-                    ? CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
-                    : CNTags.CNItemTags.ANTI_RADIATION_BOOTS_DYE.tag;
         }
     }
 }
