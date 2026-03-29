@@ -1,3 +1,8 @@
 {
-  "values": []
+  "values": [
+    "createnuclear:default_anti_radiation_helmet",
+    "createnuclear:default_anti_radiation_chestplate",
+    "createnuclear:default_anti_radiation_leggings",
+    "createnuclear:default_anti_radiation_boots"
+  ]
 }
