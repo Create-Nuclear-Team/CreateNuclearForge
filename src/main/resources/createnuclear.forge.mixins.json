@@ -4,7 +4,8 @@
   "package": "net.nuclearteam.createnuclear.foundation.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "BaseFireBlockMixin"
+    "BaseFireBlockMixin",
+    "SmithingTransformRecipeMixin"
   ],
   "client": [
   ],
