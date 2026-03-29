@@ -9,6 +9,7 @@ import net.minecraft.world.item.crafting.SmithingTransformRecipe;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
+import net.nuclearteam.createnuclear.foundation.util.ClothTagHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,18 +31,7 @@ public class SmithingTransformRecipeMixin {
             ItemStack baseItem = pContainer.getItem(1);
             ItemStack additionItem = pContainer.getItem(2);
 
-            CompoundTag baseTag = baseItem.getOrCreateTag();
-            CompoundTag resultTag = resultItem.getOrCreateTag();
-
-            if (!resultTag.contains("Cloth")) {
-                resultTag.putString("Cloth", baseTag.getString("Cloth"));
-            }
-
-            resultTag.putString("Cloth", ((ClothItem) additionItem.getItem()).getColor().getSerializedName());
-
-//            CreateNuclear.LOGGER.warn("CN$assemble::result -> {}, component: {}", this.result, this.result.getOrCreateTag());
-//            CreateNuclear.LOGGER.warn("CN$assemble::itemstack -> {}, component: {}", resultItem, resultItem.getOrCreateTag());
-//            CreateNuclear.LOGGER.warn("CN$assemble::itemstack -> {}, tag: {}", resultItem, resultItem.getOrCreateTag());
+            ClothTagHelper.initClothTagsForResult(resultItem, baseItem, additionItem);
 
             cir.setReturnValue(resultItem);
         }
