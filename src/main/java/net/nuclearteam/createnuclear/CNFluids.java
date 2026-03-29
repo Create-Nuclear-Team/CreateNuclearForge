@@ -88,7 +88,7 @@ public class CNFluids {
                     .register();
 
     public static final FluidEntry<ForgeFlowingFluid.Flowing> LIQUID_NITROGEN =
-        CreateNuclear.REGISTRATE.standardFluid("nitrogen", SolidRenderedPlaceableFluidtype.create(0x121212, () -> 1f / 16f))
+        CreateNuclear.REGISTRATE.standardFluid("nitrogen", SolidRenderedPlaceableFluidtype.create(0x23ECD5, () -> 1f / 16f))
             .lang("Liquid Nitrogen")
             .tag(CNFluidTags.NITROGEN.tag)
             .properties(p -> p.viscosity(1000)
