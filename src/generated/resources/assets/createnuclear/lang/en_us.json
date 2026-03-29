@@ -132,6 +132,7 @@
   "createnuclear.ponder.reactor_blueprint.text_1": "Reactor Blueprint: the most important element; it allows the reactor to be configured according to specific models.",
   "createnuclear.snow_powder.fan.recipe": "Cryogenic fan",
   "createnuclear.tooltip.baseRodHeat": "Base Rod Heat: %d Q",
+  "createnuclear.tooltip.cloth.color": "Color of armor piece: %s",
   "createnuclear.tooltip.heatLevel": "Heat Level",
   "createnuclear.tooltip.heatLevel.caution": "Caution",
   "createnuclear.tooltip.heatLevel.danger": "Danger",
