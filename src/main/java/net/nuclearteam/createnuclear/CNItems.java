@@ -20,7 +20,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.nuclearteam.createnuclear.content.effects.RadiationItem;
+import net.nuclearteam.createnuclear.foundation.item.radiation.RadiationItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
 import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
@@ -29,7 +29,6 @@ import net.minecraft.world.item.Items;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
-import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet;
@@ -45,7 +44,7 @@ public class CNItems {
 
     public static final ItemEntry<? extends Item>
         YELLOWCAKE = CreateNuclear.REGISTRATE
-            .item("yellowcake", RadiationItem::new)
+            .item("yellowcake", p -> new RadiationItem(p, 4))
             .properties(p -> p.food(new FoodProperties.Builder()
                 .nutrition(20)
                 .saturationMod(0.3F)
@@ -60,7 +59,7 @@ public class CNItems {
             .register(),
 
         ENRICHED_YELLOWCAKE = CreateNuclear.REGISTRATE
-            .item("enriched_yellowcake", RadiationItem::new)
+            .item("enriched_yellowcake", p -> new RadiationItem(p, 2))
             .register(),
 
         RAW_LEAD = CreateNuclear.REGISTRATE
@@ -74,7 +73,7 @@ public class CNItems {
             .register(),
 
         RAW_URANIUM = CreateNuclear.REGISTRATE
-            .item("raw_uranium", RadiationItem::new)
+            .item("raw_uranium", p -> new RadiationItem(p, 3))
             .tag(CNTags.forgeItemTag("raw_ores"), CNTags.forgeItemTag("raw_materials"), CNTags.forgeItemTag("raw_materials/uranium"))
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
                     .unlockedBy("has_storage_blocks_raw_uranium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("storage_blocks/raw_uranium")))
@@ -99,7 +98,7 @@ public class CNItems {
             .register(),
 
         URANIUM_POWDER = CreateNuclear.REGISTRATE
-            .item("uranium_powder", RadiationItem::new)
+            .item("uranium_powder", p -> new RadiationItem(p, 2))
             .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("dusts/uranium"))
             .register(),
 
@@ -160,7 +159,7 @@ public class CNItems {
             .register(),
 
         URANIUM_ROD = CreateNuclear.REGISTRATE
-            .item("uranium_rod", RadiationItem::new)
+            .item("uranium_rod", p -> new RadiationItem(p, 100))
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
                 .setRodConfig()
                 .fuelRodType()))

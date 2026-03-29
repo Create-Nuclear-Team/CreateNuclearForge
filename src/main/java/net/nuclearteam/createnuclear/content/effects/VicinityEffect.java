@@ -44,7 +44,7 @@ public class VicinityEffect extends MobEffect {
                     cooldownTicks = 500;
                 } else {
                     cooldownTicks--;
-                    CreateNuclear.LOGGER.warn("Test Duree: {}, entity: {}", cooldownTicks, nearby.getUUID());
+                    //CreateNuclear.LOGGER.warn("Test Duree: {}, entity: {}", cooldownTicks, nearby.getUUID());
                 }
             }
         }
