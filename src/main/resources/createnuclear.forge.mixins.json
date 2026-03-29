@@ -6,7 +6,7 @@
   "refmap": "createnuclear.refmap.json",
   "mixins": [
     "BaseFireBlockMixin",
-    "SmithingTransformRecipeMixin"
+    "SmithingTransformRecipeMixin",
     "RadiationHeartMixin"
   ],
   "client": [

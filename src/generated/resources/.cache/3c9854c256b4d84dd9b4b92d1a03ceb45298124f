@@ -1,5 +1,4 @@
-// 1.20.1	2026-03-29T19:21:15.4224741	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
-
+// 1.20.1	2026-03-29T19:46:27.7911371	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -47,7 +46,8 @@ a2fc21fa320e677fe7690b260ee3f57ebdbd50b6 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-
+ed5d69da9f817640d2b982d1d1fa6fc20ac61da3 assets/createnuclear/lang/en_ud.json
+05ef8f4bee51a9ffcdfaa274bf99cff2312e42ee assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -112,7 +112,6 @@ d234edb3b6bc81b7300ee65722973b66db0b82d9 assets/createnuclear/models/block/urani
 a4d5ee44c830e329034a46792280edea53343034 assets/createnuclear/models/block/uranium_ore.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/item/autunite.json
 30b11d8da5d02a3e9cebb739b3b9efbee087573c assets/createnuclear/models/item/autunite_pillar.json
-
 3036f3b383b40ca2021856366cd0f01cb279285b assets/createnuclear/models/item/black_cloth.json
 3a5955f81eeed80e907bf8e2ee4df14fe42843f0 assets/createnuclear/models/item/blue_cloth.json
 8cdcca32a87171e2c709e762165330b2f0389f90 assets/createnuclear/models/item/brown_cloth.json
@@ -532,6 +531,7 @@ ccbc67cba973a8e1e43d0166ddfa5645f6a82aea data/createnuclear/tags/entity_types/ir
 410aa6d101788f25baa176741887c6f314006f29 data/createnuclear/tags/fluids/nitrogen.json
 dd07a117bf2a657aba3d776ee718829150a1c0af data/createnuclear/tags/fluids/thorium.json
 bfd5a561b60a7d59d7f7c248ec75e3571a0f2fed data/createnuclear/tags/fluids/uranium.json
+35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/createnuclear/tags/items/all_anti_radiation_armors.json
 bce34f53cb2d00f7dee84683e8fdd429dabbcc1d data/createnuclear/tags/items/anti_radiation_armor.json
 2e4d08932c4a84863f0198eb2845f80d8fda1221 data/createnuclear/tags/items/cloth.json
 8e6598f14a72a61cbe1e5ed2aaea229fb2dd74e6 data/createnuclear/tags/items/cooler.json
