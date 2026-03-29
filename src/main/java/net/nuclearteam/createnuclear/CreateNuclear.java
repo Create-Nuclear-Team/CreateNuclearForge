@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear;
 
-
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.CreateBuildInfo;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -36,7 +35,7 @@ public class CreateNuclear {
     public static final String MOD_ID = "createnuclear";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID)
-           .defaultCreativeTab((ResourceKey<CreativeModeTab>) null);
+            .defaultCreativeTab((ResourceKey<CreativeModeTab>) null);
 
     static {
         REGISTRATE.setTooltipModifierFactory(item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
@@ -58,7 +57,7 @@ public class CreateNuclear {
 
         REGISTRATE.registerEventListeners(modEventBus);
 
-
+        CNSoundEvents.prepare();
         CNTags.init();
         CNBlocks.register();
         CNBlockEntityTypes.register();
@@ -76,21 +75,25 @@ public class CreateNuclear {
         CNEffects.register(modEventBus);
         CNPotions.register(modEventBus);
         CNRecipeTypes.register(modEventBus);
+//        CNSounds.register(modEventBus);
         CNAttributes.register(modEventBus);
 
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);
         modEventBus.addListener(EventPriority.LOWEST, CreateNuclearDatagen::gatherData);
+        modEventBus.addListener(CNSoundEvents::register);
         forgeEventBus.addListener(CNFluids::handleFluidEffect);
-
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CreateNuclearClient.onCtorClient(modEventBus, forgeEventBus));
     }
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
-        event.enqueueWork(CNPotions::registerPotionsRecipes);
         event.enqueueWork(() -> IrradiatedAnimal.VANILLA_TO_IRRADIATED.put(EntityType.CHICKEN, CNEntityType.IRRADIATED_CHICKEN.get()));
+        event.enqueueWork(() -> {
+            CNPotions.registerPotionsRecipes();
+            CNOpenPipeEffectHandlers.registerDefaults();
+        });
     }
 
     public static void onRegister(final RegisterEvent event) {

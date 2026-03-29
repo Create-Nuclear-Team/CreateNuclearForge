@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.infrastructure.worldgen;
 
-import com.simibubi.create.infrastructure.worldgen.AllPlacedFeatures;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
@@ -20,6 +19,7 @@ public class CNBiomeModifiers {
     public static final ResourceKey<BiomeModifier>
         URANIUM_ORE = key("uranium_ore"),
         LEAD_ORE = key("lead_ore"),
+        THORIUM_ORE = key("thorium_ore"),
         STRIATED_ORES_OVERWORLD = key("striated_ores_overworld")
     ;
 
@@ -34,10 +34,12 @@ public class CNBiomeModifiers {
         HolderGetter<PlacedFeature> featureLookup = ctx.lookup(Registries.PLACED_FEATURE);
         Holder<PlacedFeature> uraniumOre = featureLookup.getOrThrow(CNPlacedFeatures.URANIUM_ORE);
         Holder<PlacedFeature> leadOre = featureLookup.getOrThrow(CNPlacedFeatures.LEAD_ORE);
+        Holder<PlacedFeature> thoriumOre = featureLookup.getOrThrow(CNPlacedFeatures.THORIUM_ORE);
         Holder<PlacedFeature> striatedOresOverworld = featureLookup.getOrThrow(CNPlacedFeatures.STRIATED_ORES_OVERWORLD);
 
         ctx.register(URANIUM_ORE, addOre(isOverworld, uraniumOre));
         ctx.register(LEAD_ORE, addOre(isOverworld, leadOre));
+        ctx.register(THORIUM_ORE, addOre(isOverworld, thoriumOre));
         ctx.register(STRIATED_ORES_OVERWORLD, addOre(isOverworld, striatedOresOverworld));
     }
 

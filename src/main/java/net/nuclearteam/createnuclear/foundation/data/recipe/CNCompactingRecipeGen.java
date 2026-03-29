@@ -12,7 +12,13 @@ public class CNCompactingRecipeGen extends CompactingRecipeGen {
         YELLOWCAKE = create(CreateNuclear.asResource("uranium_fluid_to_yellowcake"), b -> b
             .require(CNTags.CNFluidTags.URANIUM.tag, 100)
             .output(CNItems.YELLOWCAKE, 1)
-        );
+        ),
+
+        THORIUM = create(CreateNuclear.asResource("thorium_fluid_to_thorium_ingot"), b -> b
+            .require(CNTags.CNFluidTags.THORIUM.tag, 200)
+            .output(CNItems.THORIUM_INGOT, 1)
+        )
+    ;
 
 
     public CNCompactingRecipeGen(PackOutput output) {

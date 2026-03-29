@@ -21,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
+import net.nuclearteam.createnuclear.content.effects.RadiationItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
@@ -43,9 +44,9 @@ import java.util.List;
 @SuppressWarnings({"unused", "deprecation"})
 public class CNItems {
 
-    public static final ItemEntry<Item>
+    public static final ItemEntry<? extends Item>
         YELLOWCAKE = CreateNuclear.REGISTRATE
-            .item("yellowcake", Item::new)
+            .item("yellowcake", RadiationItem::new)
             .properties(p -> p.food(new FoodProperties.Builder()
                 .nutrition(20)
                 .saturationMod(0.3F)
@@ -60,7 +61,7 @@ public class CNItems {
             .register(),
 
         ENRICHED_YELLOWCAKE = CreateNuclear.REGISTRATE
-            .item("enriched_yellowcake", Item::new)
+            .item("enriched_yellowcake", RadiationItem::new)
             .register(),
 
         RAW_LEAD = CreateNuclear.REGISTRATE
@@ -74,7 +75,7 @@ public class CNItems {
             .register(),
 
         RAW_URANIUM = CreateNuclear.REGISTRATE
-            .item("raw_uranium", Item::new)
+            .item("raw_uranium", RadiationItem::new)
             .tag(CNTags.forgeItemTag("raw_ores"), CNTags.forgeItemTag("raw_materials"), CNTags.forgeItemTag("raw_materials/uranium"))
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, c.get(), 9)
                     .unlockedBy("has_storage_blocks_raw_uranium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("storage_blocks/raw_uranium")))
@@ -99,7 +100,7 @@ public class CNItems {
             .register(),
 
         URANIUM_POWDER = CreateNuclear.REGISTRATE
-            .item("uranium_powder", Item::new)
+            .item("uranium_powder", RadiationItem::new)
             .tag(CNTags.forgeItemTag("dusts"), CNTags.forgeItemTag("dusts/uranium"))
             .register(),
 
@@ -160,7 +161,7 @@ public class CNItems {
             .register(),
 
         URANIUM_ROD = CreateNuclear.REGISTRATE
-            .item("uranium_rod", Item::new)
+            .item("uranium_rod", RadiationItem::new)
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
                 .setRodConfig()
                 .fuelRodType()))
@@ -188,15 +189,6 @@ public class CNItems {
             )
             .register(),
 
-        BIOMASS = CreateNuclear.REGISTRATE
-            .item("biomass", Item::new)
-            .tag(CNTags.forgeItemTag("fuels/bio"))
-            .register(),
-
-        NITRATE_SLUDGE = CreateNuclear.REGISTRATE
-            .item("nitrate_sludge", Item::new)
-            .register(),
-
         NITRATE = CreateNuclear.REGISTRATE
             .item("nitrate", Item::new)
             .register(),
@@ -209,6 +201,16 @@ public class CNItems {
         COOLED_NITROGEN_CONCENTRATE = CreateNuclear.REGISTRATE
             .item("cooled_nitrogen_concentrate", Item::new)
             .lang("Cooled Nitrogen Concentrate")
+            .register(),
+
+        THORIUM_ROD = CreateNuclear.REGISTRATE
+            .item("thorium_rod", Item::new)
+            .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
+                .rodTimer(4500)
+                .baseRodHeat(200)
+                .proximityRodHeat(2)
+                .mixteRodType()))
+            .tag(CNTags.forgeItemTag("rods"))
             .register()
     ;
 

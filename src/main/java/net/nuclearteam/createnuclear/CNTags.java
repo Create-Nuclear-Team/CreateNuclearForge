@@ -74,7 +74,8 @@ public class CNTags {
         ENRICHING_FIRE_BASE_BLOCKS,
         ALL_CAMPFIRES(MINECRAFT, "all/campfires"),
         URANIUM_ORES,
-        LEAD_ORES
+        LEAD_ORES,
+        THORIUM_ORES
         ;
 
         public final TagKey<Block> tag;
@@ -129,6 +130,8 @@ public class CNTags {
         LEAD_ORES,
         ANTI_RADIATION_ARMOR,
         COMPOSTABLE(FORGE),
+        THORIUM_ORES,
+        ALL_ANTI_RADIATION_ARMORS,
         ;
 
         public final TagKey<Item> tag;

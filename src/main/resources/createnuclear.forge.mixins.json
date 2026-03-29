@@ -3,9 +3,11 @@
   "priority": 1100,
   "package": "net.nuclearteam.createnuclear.foundation.mixin",
   "compatibilityLevel": "JAVA_17",
+  "refmap": "createnuclear.refmap.json",
   "mixins": [
     "BaseFireBlockMixin",
     "SmithingTransformRecipeMixin"
+    "RadiationHeartMixin"
   ],
   "client": [
   ],
