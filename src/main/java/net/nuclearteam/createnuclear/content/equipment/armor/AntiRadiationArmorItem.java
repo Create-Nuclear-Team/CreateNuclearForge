@@ -82,7 +82,6 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
         return list;
     }
 
-
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new AntiRadiationArmorClientExtensions());
