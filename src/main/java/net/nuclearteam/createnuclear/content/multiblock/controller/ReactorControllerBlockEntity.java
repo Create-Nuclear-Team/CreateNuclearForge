@@ -8,7 +8,6 @@ import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -24,11 +23,9 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
-import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
-import net.nuclearteam.createnuclear.content.multiblock.fluid.CNReactorFluidTypes;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
@@ -41,6 +38,10 @@ import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEnti
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
+import net.nuclearteam.createnuclear.content.multiblock.controller.service.IHeatService;
+import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultHeatService;
+import net.nuclearteam.createnuclear.content.multiblock.controller.service.IPersistenceService;
+import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultPersistenceService;
 
 
 import java.util.ArrayList;
@@ -54,59 +55,80 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     /** The assembled state is stored in the block state (`ReactorControllerBlock.ASSEMBLED`).
      *  Use the helper accessors below to query or toggle it to keep entity/blockstate consistent.
      */
-    public int speed = 16; // This is the result speed of the reactor, change this to change the total capacity
-    public boolean destroyed = false;
-    public boolean created = false;
+    // configurable public surface reduced; fields are private and accessible via getters/setters
+    private int speed = 16; // This is the result speed of the reactor, change this to change the total capacity
 
-    public ReactorControllerBlock controller;
-    protected ReactorPattern pattern =  new ReactorPattern();
-    public ReactorControllerInventory inventory;
+    private ReactorControllerBlock controller;
+    private final ReactorPattern pattern = new ReactorPattern();
+    private final ReactorControllerInventory inventory;
+    private int countUraniumRod;
+    private int countGraphiteRod;
+    private int heat;
 
-    int overFlowHeatTimer = 0;
-    int overFlowLimiter = 30;
-    double overHeat = 0;
-    public int baseUraniumHeat = 25;
-    public int baseGraphiteHeat = -10;
-    public int proximityUraniumHeat = 5;
-    public int proximityGraphiteHeat = -5;
-    public int maxUraniumPerGraphite = 3;
-    public int graphiteTimer = 3600;
-    public int uraniumTimer = 3600;
-    public int countUraniumRod;
-    public int countGraphiteRod;
-    public int heat;
-
-    public double total;
-    public ItemStack configuredPattern;
+    private double total;
+    private ItemStack configuredPattern;
 
     private BigItemStack bigFuelItem;
     private BigItemStack bigCoolerItem;
     private List<BigFluidStack> bigFluidStack;
 
-    public int reactorSize = 0;
-    public String reactorFacing = "null";
+    private int reactorSize = 0;
+    private String reactorFacing = "null";
     // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
-    public int[] reactorPos;
+    private int[] reactorPos;
     private boolean needsToResolveEntities = false;
 
     private final ReactorInputManagerI inputManager;
     private final ReactorOutputManagerI outputManager;
     private final ReactorInputFluidManagerI inputFluidManager;
 
-    HeatManager heatManager = new HeatManager();
+    // services (dependencies) - abstracted behind interfaces to follow DIP
+    private final IHeatService heatService;
+    private final IPersistenceService persistenceService;
 
+    // service fields are injected; implementations live in separate classes
+
+    // --- Accessors used by external services (persistence) ---
+    public ReactorControllerInventory getInventoryObject() { return this.inventory; }
+    public void deserializeInventory(CompoundTag tag) { this.inventory.deserializeNBT(tag); }
+    public CompoundTag serializeInventory() { return this.inventory.serializeNBT(); }
+
+    public ItemStack getConfiguredPattern() { return this.configuredPattern; }
+    public void setConfiguredPattern(ItemStack stack) { this.configuredPattern = stack; }
+
+    public BigItemStack getBigFuelItem() { return this.bigFuelItem; }
+    public void setBigFuelItem(BigItemStack b) { this.bigFuelItem = b; }
+    public BigItemStack getBigCoolerItem() { return this.bigCoolerItem; }
+    public void setBigCoolerItem(BigItemStack b) { this.bigCoolerItem = b; }
+
+    public int getMultiblockSize() { return this.reactorSize; }
+    public void setMultiblockSize(int s) { this.reactorSize = s; }
+
+    public String getMultiblockFacing() { return this.reactorFacing; }
+    public void setMultiblockFacing(String f) { this.reactorFacing = f; }
+
+    public int[] getMultiblockPos() { return this.reactorPos; }
+    public void setMultiblockStructure(int[] p) { this.reactorPos = p; }
+
+    public double getTotal() { return this.total; }
+    public void setTotal(double t) { this.total = t; }
+
+    /** Main constructor allowing dependency injection for testability and DIP compliance. */
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        inventory = new ReactorControllerInventory(this);
-        configuredPattern = ItemStack.EMPTY;
+        this.inventory = new ReactorControllerInventory(this);
+        this.configuredPattern = ItemStack.EMPTY;
 
-        inputManager = new ReactorInputManager();
-        outputManager = new ReactorOutputManager();
-        inputFluidManager = new ReactorInputFluidManager();
+        this.inputManager = new ReactorInputManager();
+        this.outputManager = new ReactorOutputManager();
+        this.inputFluidManager = new ReactorInputFluidManager();
 
-        bigFuelItem = new BigItemStack(ItemStack.EMPTY);
-        bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
-        bigFluidStack = new ArrayList<>();
+        this.bigFuelItem = new BigItemStack(ItemStack.EMPTY);
+        this.bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
+        this.bigFluidStack = new ArrayList<>();
+
+        this.heatService = new DefaultHeatService(new HeatManager());
+        this.persistenceService = new DefaultPersistenceService();
     }
 
     @Override
@@ -163,28 +185,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket); // Toujours en premier pour les coordonnées de base
-
-        // Lecture des Inputs
+        // delegate managers and persistence
         this.inputManager.read(compound);
         this.outputManager.read(compound);
         this.inputFluidManager.read(compound);
 
-        // 1. Tes nouvelles variables simples
-        this.reactorSize = compound.getInt("reactorSize");
-        this.reactorFacing = compound.getString("reactorFacing");
-        this.reactorPos = compound.getIntArray("reactorPose");
-        if (this.reactorPos != null && this.reactorPos.length == 0) this.reactorPos = null;
-        this.total = compound.getDouble("total");
-
-        // 2. Gestion des items
-        if (!clientPacket) {
-            inventory.deserializeNBT(compound.getCompound("pattern"));
-        }
-        configuredPattern = ItemStack.of(compound.getCompound("items"));
-
-        bigFuelItem = BigItemStack.read(compound.getCompound("bigFuel"));
-        bigCoolerItem = BigItemStack.read(compound.getCompound("bigCooler"));
-
+        this.persistenceService.readBasicState(this, compound, clientPacket);
         this.needsToResolveEntities = true;
     }
 
@@ -195,23 +201,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.outputManager.write(compound);
         this.inputFluidManager.write(compound);
 
-        // 1. Tes nouvelles variables simples
-        compound.putInt("reactorSize", this.reactorSize);
-        compound.putString("reactorFacing", this.reactorFacing);
-        if (this.reactorPos != null) {
-            compound.putIntArray("reactorPose", this.reactorPos);
-        }
-
-        compound.putDouble("total", calculateProgress());
-
-        // 2. Gestion des items (Ton code existant)
-        if (!clientPacket) {
-            compound.put("pattern", inventory.serializeNBT());
-        }
-        compound.put("items", configuredPattern.serializeNBT());
-
-        compound.put("bigFuel", bigFuelItem.write());
-        compound.put("bigCooler", bigCoolerItem.write());
+        this.persistenceService.writeBasicState(this, compound, clientPacket);
 
     }
 
@@ -235,8 +225,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
         countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
 
-        double totalGraphiteRodLife = (double) heatManager.graphiteTimer / countGraphiteRod;
-        double totalUraniumRodLife = (double) heatManager.uraniumTimer / countUraniumRod;
+        double totalGraphiteRodLife = (double) heatService.getGraphiteTimer() / Math.max(1, countGraphiteRod);
+        double totalUraniumRodLife = (double) heatService.getUraniumTimer() / Math.max(1, countUraniumRod);
 
         return totalGraphiteRodLife + totalUraniumRodLife;
     }
@@ -277,63 +267,84 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
         countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
         countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
-        if (needsToResolveEntities) {
-            List<IItemHandler> handlers = inputManager.getItemHandlers(level);
-            CreateNuclear.LOGGER.warn("Resolving inputs after load, handlers found: {}", handlers.size());
-            needsToResolveEntities = false;
+
+        resolveEntitiesIfNeeded();
+
+        if (!isAssembled()) return;
+
+        // gather IO snapshot
+        VirtualReactorInputsItem virtualReactorInputsItem = inputManager.getInventory(level);
+        VirtualReactorInputFluid virtualReactorInputFluid = inputFluidManager.getInventory(level);
+        this.bigFuelItem = virtualReactorInputsItem.getBigFuelRod();
+        this.bigCoolerItem = virtualReactorInputsItem.getBigCooledRod();
+        this.bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
+
+        handleAssembledState(heat);
+    }
+
+    // --- extracted sub-steps to keep single responsibility per method ---
+    private void resolveEntitiesIfNeeded() {
+        if (!needsToResolveEntities) return;
+        List<IItemHandler> handlers = inputManager.getItemHandlers(level);
+        CreateNuclear.LOGGER.warn("Resolving inputs after load, handlers found: {}", handlers.size());
+        needsToResolveEntities = false;
+        this.setChanged();
+    }
+
+    private void handleAssembledState(int heat) {
+        if (!isReadyToRun()) {
+            updateHeatOnly();
+            if (!this.outputManager.getBlocksPosition().isEmpty()) rotate(getBlockState(), getLevel(), 0);
             this.setChanged();
+            this.notifyUpdate();
+            return;
         }
-        if (isAssembled()) {
-            List<IItemHandler> handlers = inputManager.getItemHandlers(level);
-            List<IFluidHandler> fluidHandlers = inputFluidManager.getFuildHandlers(level);
-            VirtualReactorInputsItem virtualReactorInputsItem = inputManager.getInventory(level);
-            VirtualReactorInputFluid virtualReactorInputFluid = inputFluidManager.getInventory(level);
-            bigFuelItem = virtualReactorInputsItem.getBigFuelRod();
-            bigCoolerItem = virtualReactorInputsItem.getBigCooledRod();
-            bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
-            ReactorFluidType typeFluid = bigFluidStack.get(0).getFluidtype(level);
 
-            // CreateNuclear.LOGGER.warn("BigFluid: {}x{} -> type: {}", bigFluidStack, bigFluidStack.get(0).amount, typeFluid);
+        // ready to run
+        this.setChanged();
+        this.notifyUpdate();
 
-            if (!isEmptyConfiguredPattern() && bigFuelItem.count > 0 && bigCoolerItem.count > 0 && !bigFluidStack.isEmpty() && bigFluidStack.get(0).amount > 0) {
-                if (this.inputManager.size() > 0 && this.inputFluidManager.size() > 0) {
-                    this.setChanged();
-                    this.notifyUpdate();
-                        configuredPattern.getOrCreateTag().putDouble("heat", heatManager.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.get(0), typeFluid, countGraphiteRod, countUraniumRod, inventory));
-                        if (!this.outputManager.getBlocksPosition().isEmpty()) {
-                            rotate(getBlockState(), getLevel(), heat);
-                        }
+        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.get(0), countGraphiteRod, countUraniumRod, inventory, level));
+        if (!this.outputManager.getBlocksPosition().isEmpty()) {
+            rotate(getBlockState(), getLevel(), heat);
+        }
 
-                        if (updateTimers()) {
-                            boolean extracted = inputManager.extractItems(level, 1, 1);
-                            if (extracted) {
-                                this.setChanged();
-                                this.notifyUpdate();
-                                total = calculateProgress();
-
-                                if (IHeat.HeatLevel.isNotDanger(heat)) {
-                                    //...
-                                } else {
-                                    EventTriggerPacket packet = new EventTriggerPacket(600);
-                                    CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
-                                    CNPackets.sendToNear(level, getBlockPos(), 32, packet);
-                                }
-                                return;
-                            }
-                        }
-
-                    this.setChanged();
-                    this.notifyUpdate();
-                }
-            } else {
-                configuredPattern.getOrCreateTag().putDouble("heat", heatManager.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.get(0), typeFluid, countGraphiteRod, countUraniumRod, inventory));
-                if (!this.outputManager.getBlocksPosition().isEmpty()) {
-                    rotate(getBlockState(), getLevel(), 0);
-                }
+        if (updateTimers()) {
+            boolean extracted = inputManager.extractItems(level, 1, 1);
+            if (extracted) {
                 this.setChanged();
                 this.notifyUpdate();
+                total = calculateProgress();
+
+                if (IHeat.HeatLevel.isNotDanger(heat)) {
+                    // normal
+                } else {
+                    EventTriggerPacket packet = new EventTriggerPacket(600);
+                    CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
+                    CNPackets.sendToNear(level, getBlockPos(), 32, packet);
+                }
             }
         }
+    }
+
+    private boolean isReadyToRun() {
+        return !isEmptyConfiguredPattern()
+                && bigFuelItem.count > 0
+                && bigCoolerItem.count > 0
+                && !bigFluidStack.isEmpty()
+                && bigFluidStack.get(0).amount > 0
+                && this.inputManager.size() > 0
+                && this.inputFluidManager.size() > 0;
+    }
+
+    private void updateHeatOnly() {
+        // Guard against empty fluid list — HeatManager accepts null for empty/no-fluid case
+        BigItemStack fuel = bigFuelItem;
+        BigItemStack cooler = bigCoolerItem;
+        BigFluidStack fluid = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
+
+        configuredPattern.getOrCreateTag().putDouble("heat",
+                heatService.calculateHeat(fuel, cooler, fluid, countGraphiteRod, countUraniumRod, inventory, level));
     }
 
     private boolean isEmptyConfiguredPattern() {
@@ -374,8 +385,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (this.outputManager.getBlocksPosition().isEmpty()) return;
         int remainingRotation = rotation % this.outputManager.getBlocksPosition().size();
         for (int i = 0; i < this.outputManager.getBlocksPosition().size(); i++) {
-            int dividedRotation = rotation / this.outputManager.getBlocksPosition().size() + remainingRotation;
-            remainingRotation = 0;
+            int dividedRotation = (rotation / this.outputManager.getBlocksPosition().size()) + (i < remainingRotation ? 1 : 0);
             BlockPos pos =  this.outputManager.getBlocksPosition().get(i);
 
             if (dividedRotation > 0) {
@@ -405,6 +415,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         }
     }
 
+    @Deprecated
     public int[] getStructureBounds(BlockPos startPos, int structureSize, String facing) {
         int[] northOffsets5x5 = new int[] {-2, 2, -3, 3, 0, 4};
         int[] northOffsets7x7 = new int[] {-3, 3, -4, 4, 0, 6};
@@ -451,6 +462,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         }
     }
 
+    @Deprecated
     private int[] applyOffset(BlockPos pos, int[] offset) {
         int x = pos.getX();
         int y = pos.getY();
