@@ -20,20 +20,22 @@ public class HeatDisplaySource extends NumericSingleLineDisplaySource {
         boolean heatValue = context.sourceConfig().getInt("heat") == 1;
         boolean heatType = context.sourceConfig().getInt("heat") == 2;
 
+        int heat = (int) controller.getConfiguredPattern().getTag().getDouble("heat");
+
         if (heatOriginal) {
-            return CreateNuclearLang.number(controller.heat)
+            return CreateNuclearLang.number(heat)
                 .space()
                 .translate("generic.unit.heat.value")
                 .component();
         } else if (heatValue) {
-            return CreateNuclearLang.number(Math.abs(controller.heat /4))
+            return CreateNuclearLang.number(Math.abs(heat /4))
                 .space()
                 .translate("generic.unit.heat.rotation")
                 .component();
         } else if (heatType) {
             return CreateNuclearLang
-                .translateDirect("generic.unit.heat.type", IHeat.HeatLevel.of(controller.heat))
-                .withStyle(IHeat.HeatLevel.of(controller.heat).getTextColor());
+                .translateDirect("generic.unit.heat.type", IHeat.HeatLevel.of(heat))
+                .withStyle(IHeat.HeatLevel.of(heat).getTextColor());
         } else {
             return null;
         }

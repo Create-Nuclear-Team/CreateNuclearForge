@@ -114,7 +114,7 @@
   "block.createnuclear.uranium": "Uranium",
   "block.createnuclear.uranium_ore": "Uranium Ore",
   "create.recipe.fan_enriched.fan": "Fan behind Enriched Fire",
-<<<<<<< HEAD
+  "create.recipe.fan_snow_powder.fan": "Fan behind Powder Snow",
   "createnuclear.display_source.heat": "Heat",
   "createnuclear.display_source.heat.rotation": "RPM",
   "createnuclear.display_source.heat.type": "Heat level",
@@ -123,9 +123,6 @@
   "createnuclear.display_source.reactor_controller_count_rod.cooled": "Cooled",
   "createnuclear.display_source.reactor_controller_count_rod.fuel": "Fuel",
   "createnuclear.display_source.reactor_count_rod": "Count Rod in Pattern",
-=======
-  "create.recipe.fan_snow_powder.fan": "Fan behind Powder Snow",
->>>>>>> V2-Reactor
   "createnuclear.enriched.fan.recipe": "Bulk Enriching",
   "createnuclear.generic.unit.count.rod": "Counts %s Rod",
   "createnuclear.generic.unit.countCooled.rod": "Count Cooled Rod: %d",

@@ -113,6 +113,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public double getTotal() { return this.total; }
     public void setTotal(double t) { this.total = t; }
 
+    public int getCountUraniumRod() {
+        return this.countUraniumRod;
+    }
+
+    public int getCountGraphiteRod() {
+        return this.countGraphiteRod;
+    }
+
     /** Main constructor allowing dependency injection for testability and DIP compliance. */
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
