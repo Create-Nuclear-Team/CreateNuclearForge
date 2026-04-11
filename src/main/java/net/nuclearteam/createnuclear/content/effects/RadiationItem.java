@@ -7,6 +7,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.nuclearteam.createnuclear.CNEffects;
+import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 public class RadiationItem extends Item {
 
@@ -17,6 +19,8 @@ public class RadiationItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         if (world.isClientSide) return;
+
+        if (!CNConfigs.server().radiation.enabledItemRadiation.get()) return;
 
         if (entity instanceof Player player) {
             int total = 0;
