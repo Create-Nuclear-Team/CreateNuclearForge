@@ -100,6 +100,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public void setBigFuelItem(BigItemStack b) { this.bigFuelItem = b; }
     public BigItemStack getBigCoolerItem() { return this.bigCoolerItem; }
     public void setBigCoolerItem(BigItemStack b) { this.bigCoolerItem = b; }
+    public List<BigFluidStack> getBigFluidStack() { return this.bigFluidStack; }
+    public void setBigFluidStack(List<BigFluidStack> b) { this.bigFluidStack = b; }
 
     public int getMultiblockSize() { return this.reactorSize; }
     public void setMultiblockSize(int s) { this.reactorSize = s; }
@@ -158,6 +160,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             IHeat.HeatLevel.getName("reactor_controller").style(ChatFormatting.GRAY).forGoggles(tooltip);
 
             IHeat.HeatLevel.getFormattedHeatText(configuredPattern.getOrCreateTag().getInt("heat")).forGoggles(tooltip);
+
+            CreateNuclear.LOGGER.warn("fuel: {}, cooled: {}", bigFuelItem, bigCoolerItem);
 
             if (bigFuelItem.stack.isEmpty()) {
                 // if rod empty we initialize it at 1 (and display it as 0) to avoid having air item displayed instead of the rod

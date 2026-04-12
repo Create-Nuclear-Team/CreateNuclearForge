@@ -13,6 +13,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
 
@@ -44,7 +45,6 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
     @Override
     public void read(CompoundTag compound) {
         positions.clear();
-//        CreateNuclear.LOGGER.warn("ReactorInputManager::read start: {} {}", compound.contains(NBT_KEY), compound.getList(NBT_KEY, Tag.TAG_COMPOUND));
         if (!compound.contains(NBT_KEY)) return;
         ListTag list = compound.getList(NBT_KEY, Tag.TAG_COMPOUND);
         for (int i = 0; i < list.size(); ++i) {
@@ -82,8 +82,12 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
             int slots = h.getSlots();
             for (int s = 0; s < slots; s++) {
                 ItemStack st = h.getStackInSlot(s);
-                if (st.is(CNTags.CNItemTags.FUEL.tag)) totalFuel += st.getCount();
-                else if (st.is(CNTags.CNItemTags.COOLER.tag)) totalCooler += st.getCount();
+
+                if (TypeRodPredicate.IS_FUEL.test(st)) totalFuel += st.getCount();
+                else if (TypeRodPredicate.IS_COOLED.test(st)) totalCooler += st.getCount();
+
+                if (s == 0 && TypeRodPredicate.IS_MIXTE.test(st)) totalFuel += st.getCount();
+                else if (s == 1 && TypeRodPredicate.IS_MIXTE.test(st)) totalCooler += st.getCount();
             }
         }
 
@@ -104,11 +108,24 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
             for (int s = 0; s < slots && (fuelRemaining > 0 || coolerRemaining > 0); s++) {
                 ItemStack stack = handler.getStackInSlot(s);
                 if (stack.isEmpty()) continue;
-                if (fuelRemaining > 0 && stack.is(CNItemTags.FUEL.tag)) {
+
+
+                if (fuelRemaining > 0 && TypeRodPredicate.IS_FUEL.test(stack)) {
                     int toExtract = Math.min(fuelRemaining, stack.getCount());
                     handler.extractItem(s, toExtract, false);
                     fuelRemaining -= toExtract;
-                } else if (coolerRemaining > 0 && stack.is(CNItemTags.COOLER.tag)) {
+                } else if (coolerRemaining > 0 && TypeRodPredicate.IS_COOLED.test(stack)) {
+                    int toExtract = Math.min(coolerRemaining, stack.getCount());
+                    handler.extractItem(s, toExtract, false);
+                    coolerRemaining -= toExtract;
+                }
+
+                if (fuelRemaining > 0 && s == 0 && TypeRodPredicate.IS_MIXTE.test(stack)) {
+                    int toExtract = Math.min(fuelRemaining, stack.getCount());
+                    handler.extractItem(s, toExtract, false);
+                    fuelRemaining -= toExtract;
+                }
+                else if (coolerRemaining > 0 && s == 1 && TypeRodPredicate.IS_MIXTE.test(stack)) {
                     int toExtract = Math.min(coolerRemaining, stack.getCount());
                     handler.extractItem(s, toExtract, false);
                     coolerRemaining -= toExtract;
