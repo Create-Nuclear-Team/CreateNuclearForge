@@ -17,7 +17,7 @@ public class PatternCountRodsDisplaySource extends NumericSingleLineDisplaySourc
 
         boolean typeRod = context.sourceConfig().getInt("typeRod") == 0;
 
-        int countRod = typeRod ? controller.getCountUraniumRod() : controller.getCountGraphiteRod();
+        int countRod = typeRod ? controller.getBigFuelItem().count : controller.getBigCoolerItem().count;
 
         return CreateNuclearLang
                 .number(countRod)
