@@ -1,9 +1,7 @@
 package net.nuclearteam.createnuclear.content.particles;
 
-import com.github.alexmodguy.alexscaves.AlexsCaves;
-import com.github.alexmodguy.alexscaves.client.ClientProxy;
-import com.github.alexmodguy.alexscaves.client.sound.NuclearExplosionSound;
-import com.github.alexmodguy.alexscaves.server.misc.ACSoundRegistry;
+import net.nuclearteam.createnuclear.CNSounds;
+import net.nuclearteam.createnuclear.compat.alexscave.AlexscaveCompat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Camera;
@@ -20,10 +18,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import net.nuclearteam.createnuclear.CNClientProxy;
 import net.nuclearteam.createnuclear.CNParticleRegistry;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.compat.Mods;
+import net.nuclearteam.createnuclear.content.explosion.CNNuclearExplosionSound;
 import net.nuclearteam.createnuclear.foundation.utility.Maths;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 public class NuclearMushroomCloudParticle extends Particle {
 
@@ -43,6 +44,8 @@ public class NuclearMushroomCloudParticle extends Particle {
 
     private final boolean pink;
 
+    private Object alexscaveHandler;
+
     protected NuclearMushroomCloudParticle(ClientLevel level, double x, double y, double z, float scale, boolean pink) {
         super(level, x, y, z);
         this.gravity = 0.0F;
@@ -50,6 +53,10 @@ public class NuclearMushroomCloudParticle extends Particle {
         this.scale = scale + 0.2F;
         this.setSize(3.0F, 3.0F);
         this.pink = pink;
+
+        if (Mods.ALEXS_CAVE.isLoaded()) {
+            this.alexscaveHandler = new AlexscaveCompat();
+        }
     }
 
     public boolean shouldCull() {
@@ -57,26 +64,38 @@ public class NuclearMushroomCloudParticle extends Particle {
     }
 
     public void tick() {
-        if (Mods.ALEXS_CAVE.isLoaded()) {
-            ((ClientProxy) AlexsCaves.PROXY).renderNukeSkyDarkFor = 70;
-            ((ClientProxy) AlexsCaves.PROXY).muteNonNukeSoundsFor = 50;
+        if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null) {
+            ((AlexscaveCompat)alexscaveHandler).NukeParam();
+        }
+        else {
+            ((CNClientProxy) CreateNuclear.PROXY).renderNukeSkyDarkFor = 70;
+            ((CNClientProxy) CreateNuclear.PROXY).muteNonNukeSoundsFor = 50;
         }
         boolean large = this.scale > 2.0F;
         if(age > BALL_FOR / 2 + 5){
             if(!playedExplosion){
                 playedExplosion = true;
-                if (Mods.ALEXS_CAVE.isLoaded()) {
-                    playSound(large ? ACSoundRegistry.LARGE_NUCLEAR_EXPLOSION.get() : ACSoundRegistry.NUCLEAR_EXPLOSION.get(), lifetime - 20, lifetime, 0.2F, false);
+                if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null) {
+                    SoundEvent[] nuclear_explosions = ((AlexscaveCompat)alexscaveHandler).GetACSounds();
+                    playSound(large ? nuclear_explosions[0] : nuclear_explosions[1], lifetime - 20, lifetime, 0.2F, false);
+                } else {
+                    playSound(large ? CNSounds.LARGE_NUCLEAR_EXPLOSION.get() : CNSounds.NUCLEAR_EXPLOSION.get(), lifetime - 20, lifetime, 0.2F, false);
                 }
             }
         }
         if (age < BALL_FOR) {
-            if (Mods.ALEXS_CAVE.isLoaded()) {
-                if (!playedRinging && AlexsCaves.CLIENT_CONFIG.nuclearBombFlash.get()) {
+            if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null) {
+                if (!playedRinging && ((AlexscaveCompat)alexscaveHandler).GetACConfig()) {
                     playedRinging = true;
-                    playSound(ACSoundRegistry.NUCLEAR_EXPLOSION_RINGING.get(), 100, 50, 0.05F, true);
+                    playSound(((AlexscaveCompat)alexscaveHandler).GetACSounds()[2], 100, 50, 0.05F, true);
                 }
-                ((ClientProxy) AlexsCaves.PROXY).renderNukeFlashFor = 16;
+                ((AlexscaveCompat)alexscaveHandler).UpdateACProxy();
+            } else {
+                if (!playedRinging && CNConfigs.client().nuclearBombFlash.get()) {
+                    playedRinging = true;
+                    playSound(CNSounds.NUCLEAR_EXPLOSION_RINGING.get(), 100, 50, 0.05F, true);
+                }
+                ((CNClientProxy) CreateNuclear.PROXY).renderNukeFlashFor = 16;
             }
         } else if (age < lifetime - FADE_SPEED) {
             float life = (float) (Math.log(1 + (age - BALL_FOR) / (float) (lifetime - BALL_FOR))) * 2F;
@@ -94,8 +113,11 @@ public class NuclearMushroomCloudParticle extends Particle {
                 if(!playedRumble){
                     playedRumble = true;
 
-                    if (Mods.ALEXS_CAVE.isLoaded()) {
-                        playSound(ACSoundRegistry.NUCLEAR_EXPLOSION_RUMBLE.get(), lifetime + 100, lifetime, 0.1F, true);
+                    if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null) {
+                        playSound(((AlexscaveCompat)alexscaveHandler).GetACSounds()[3], lifetime + 100, lifetime, 0.1F, true);
+                    } else {
+                        playSound(CNSounds.NUCLEAR_EXPLOSION_RUMBLE.get(), lifetime + 100, lifetime, 0.1F, true);
+
                     }
                 }
             }
@@ -104,7 +126,7 @@ public class NuclearMushroomCloudParticle extends Particle {
     }
 
     private void playSound(SoundEvent soundEvent, int duration, int fadesAt, float fadeInBy, boolean looping){
-        Minecraft.getInstance().getSoundManager().queueTickingSound(new NuclearExplosionSound(soundEvent, this.x, this.y, this.z, duration, fadesAt, fadeInBy, looping));
+        Minecraft.getInstance().getSoundManager().queueTickingSound(new CNNuclearExplosionSound(soundEvent, this.x, this.y, this.z, duration, fadesAt, fadeInBy, looping));
     }
 
     public void render(VertexConsumer vertexConsumer, Camera camera, float partialTick) {

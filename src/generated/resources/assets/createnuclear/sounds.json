@@ -1,4 +1,22 @@
 {
+  "large_nuclear_explosion": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:large_nuclear_explosion"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.large_nuclear_explosion"
+  },
+  "nuclear_explosion": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:nuclear_explosion"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.nuclear_explosion"
+  },
   "reactor_alarm": {
     "sounds": [
       {

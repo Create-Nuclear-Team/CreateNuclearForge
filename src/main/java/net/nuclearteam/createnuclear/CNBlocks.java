@@ -47,6 +47,7 @@ import net.nuclearteam.createnuclear.CNTags.CNBlockTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.cooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCore;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrame;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorframeItem;
@@ -56,7 +57,6 @@ import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorLiqui
 import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorLiquidInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
-import net.nuclearteam.createnuclear.content.multiblock.reactorCooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
 import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
 
