@@ -15,10 +15,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.LevelEvent;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
+import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -28,14 +31,12 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.nuclearteam.createnuclear.CNEffects;
-import net.nuclearteam.createnuclear.CNEntityType;
-import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.CNTags;
+import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.chicken.IrradiatedChicken;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 import org.spongepowered.asm.mixin.MixinEnvironment;
+import net.nuclearteam.createnuclear.content.effects.capability.RadiationCapability;
 
 @Mod.EventBusSubscriber
 public class CommentEvents {
@@ -93,13 +94,6 @@ public class CommentEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        Player player = event.getEntity();
-
-//        if (player.getItemInHand(event.getHand()).is(Items.LEAD))
-//            SuspiciousRitual.maybeSendInfoMessages(null, event.getLevel(), event.getPos(), player);
-    }
 
     @SubscribeEvent
     public static void onEntityConvert(LivingConversionEvent.Pre event) {
@@ -165,4 +159,24 @@ public class CommentEvents {
             event.getEntity().playSound(SoundEvents.SLIME_SQUISH, 1.0F, 1.5F);
         }
     }
+
+    @SubscribeEvent
+    public static void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
+        RadiationCapability.attach(event);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent event) {
+        RadiationCapability.onPlayerTick(event);
+    }
+
+    @Mod.EventBusSubscriber(modid = CreateNuclear.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+    public static class RadiationEvent {
+        @SubscribeEvent
+        public static void onEntityAttribute(EntityAttributeModificationEvent event) {
+            event.add(EntityType.PLAYER, CNAttributes.IRRADIATED_RESISTANCE.get());
+        }
+    }
+
+
 }

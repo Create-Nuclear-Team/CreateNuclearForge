@@ -37,27 +37,16 @@ public class VicinityEffect extends MobEffect {
         for (Entity nearbyEntity : nearbyEntities) {
             LivingEntity nearby = (LivingEntity) nearbyEntity;
 
-            int couldown = getCooldown(nearby);
-            if (couldown <= 0) {
-                for (Supplier<MobEffectInstance> effect : effects) {
-                    nearby.addEffect(effect.get());
+            for (Supplier<MobEffectInstance> effect : effects) {
+                int cooldownTicks = 0;
+                if (cooldownTicks == 0) {
+                        nearby.addEffect(effect.get());
+                    cooldownTicks = 500;
+                } else {
+                    cooldownTicks--;
+                    //CreateNuclear.LOGGER.warn("Test Duree: {}, entity: {}", cooldownTicks, nearby.getUUID());
                 }
-
-                setCooldown(nearby, 500);
-
-            } else {
-                setCooldown(nearby, couldown - 1);
-                CreateNuclear.LOGGER.warn("Test Duree: {}, entity: {}", couldown, nearby.getUUID());
             }
-        }
-
-
-        // Clean up cooldowns only on the server: remove entries whose entity is gone or marked removed.
-        if (entity.level() instanceof ServerLevel serverLevel) {
-            cooldowns.entrySet().removeIf(entry -> {
-                Entity e = serverLevel.getEntity(entry.getKey());
-                return e == null || e.isRemoved();
-            });
         }
     }
 

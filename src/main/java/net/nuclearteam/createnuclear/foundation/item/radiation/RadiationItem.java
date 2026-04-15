@@ -1,0 +1,21 @@
+package net.nuclearteam.createnuclear.foundation.item.radiation;
+
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.nuclearteam.createnuclear.api.radiation.IRadiationSource;
+
+public class RadiationItem extends Item implements IRadiationSource {
+
+    private final double radiation;
+
+    public RadiationItem(Item.Properties settings, double radiation) {
+        super(settings);
+        this.radiation = radiation;
+    }
+
+    @Override
+    public double getRadiation(ItemStack stack, Player player) {
+        return this.radiation * stack.getCount();
+    }
+}

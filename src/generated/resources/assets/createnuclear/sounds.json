@@ -18,13 +18,14 @@
     "subtitle": "createnuclear.subtitle.nuclear_explosion"
   },
   "reactor_alarm": {
+    "category": "block",
+    "subtitle": "createnuclear.subtitle.reactor_alarm",
     "sounds": [
       {
-        "type": "file",
-        "name": "createnuclear:reactor_alarm"
+        "name": "createnuclear:reactor_alarm",
+        "stream": true
       }
-    ],
-    "subtitle": "createnuclear.subtitle.reactor_alarm"
+    ]
   },
   "reactor_casing_break": {
     "sounds": [
