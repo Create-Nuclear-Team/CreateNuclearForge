@@ -149,7 +149,7 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
             if (stack.isEmpty()) continue;
             int toExtract = Math.min(fluidNeeded, stack.getAmount());
             if (toExtract > 1) {
-                handler.drain(toExtract-1, FluidAction.EXECUTE);
+                handler.drain(toExtract, FluidAction.EXECUTE);
                 isExtracted = true;
             }
             if (fluidNeeded <= 0) break;
