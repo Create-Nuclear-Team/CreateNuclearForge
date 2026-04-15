@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "X": {
+      "tag": "forge:ingots/lead"
+    },
+    "Y": {
+      "item": "createnuclear:red_cloth"
+    }
+  },
+  "pattern": [
+    "Y Y",
+    "X X"
+  ],
+  "result": {
+    "item": "createnuclear:red_anti_radiation_boots"
+  },
+  "show_notification": true
+}

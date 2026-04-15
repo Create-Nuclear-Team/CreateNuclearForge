@@ -1,6 +1,8 @@
 {
   "values": [
+    "createnuclear:uranium_ore",
     "createnuclear:lead_ore",
-    "createnuclear:uranium_ore"
+    "createnuclear:thorium_ore",
+    "createnuclear:thorium_block"
   ]
 }

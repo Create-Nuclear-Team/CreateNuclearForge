@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear;
 
-
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.CreateBuildInfo;
 import com.simibubi.create.foundation.data.CreateRegistrate;
@@ -25,8 +24,10 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
+import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.CNPlacementModifiers;
 import org.slf4j.Logger;
 
 @Mod(CreateNuclear.MOD_ID)
@@ -37,11 +38,11 @@ public class CreateNuclear {
     public static CNCommonProxy PROXY = DistExecutor.runForDist(() -> CreateNuclearClient::new, () -> CNCommonProxy::new);
 
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID)
-           .defaultCreativeTab((ResourceKey<CreativeModeTab>) null);
+            .defaultCreativeTab((ResourceKey<CreativeModeTab>) null);
 
     static {
         REGISTRATE.setTooltipModifierFactory(item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
-                .andThen(TooltipModifier.mapNull(KineticStats.create(item))));
+                .andThen(TooltipModifier.mapNull(KineticStats.create(item))).andThen(RodsStats.create(item)));
     }
 
     public CreateNuclear() {
@@ -59,7 +60,7 @@ public class CreateNuclear {
 
         REGISTRATE.registerEventListeners(modEventBus);
 
-
+        CNSoundEvents.prepare();
         CNTags.init();
         CNBlocks.register();
         CNBlockEntityTypes.register();
@@ -72,12 +73,14 @@ public class CreateNuclear {
 
         CNConfigs.register(modLoadingContext);
 
+        CNPlacementModifiers.register(modEventBus);
         CNCreativeModeTabs.register(modEventBus);
         CNEffects.register(modEventBus);
         CNPotions.register(modEventBus);
         CNParticleTypes.register(modEventBus);
         CNParticleRegistry.DEF_REG.register(modEventBus);
         CNRecipeTypes.register(modEventBus);
+//        CNSounds.register(modEventBus);
         CNAttributes.register(modEventBus);
 
         PROXY.commonInit();
@@ -85,23 +88,24 @@ public class CreateNuclear {
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);
         modEventBus.addListener(EventPriority.LOWEST, CreateNuclearDatagen::gatherData);
+        modEventBus.addListener(CNSoundEvents::register);
         forgeEventBus.addListener(CNFluids::handleFluidEffect);
-
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> CreateNuclearClient.onCtorClient(modEventBus, forgeEventBus));
     }
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
-        event.enqueueWork(CNPotions::registerPotionsRecipes);
         event.enqueueWork(() -> IrradiatedAnimal.VANILLA_TO_IRRADIATED.put(EntityType.CHICKEN, CNEntityType.IRRADIATED_CHICKEN.get()));
+        event.enqueueWork(() -> {
+            CNPotions.registerPotionsRecipes();
+            CNOpenPipeEffectHandlers.registerDefaults();
+        });
     }
 
     public static void onRegister(final RegisterEvent event) {
         CNFanProcessingTypes.register();
-
     }
-
 
     public static ResourceLocation asResource(String path) {
         return new ResourceLocation(MOD_ID, path);

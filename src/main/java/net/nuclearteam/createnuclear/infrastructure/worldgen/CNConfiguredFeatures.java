@@ -23,6 +23,7 @@ public class CNConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>>
         URANIUM_ORE = key("uranium_ore"),
         LEAD_ORE = key("lead_ore"),
+        THORIUM_ORE = key("thorium_ore"),
         STRIATED_ORES_OVERWORLD = key("striated_ores_overworld")
     ;
 
@@ -38,15 +39,19 @@ public class CNConfiguredFeatures {
                 OreConfiguration.target(stoneOreReplaceable, CNBlocks.URANIUM_ORE.getDefaultState()),
                 OreConfiguration.target(deepslateOreReplaceables, CNBlocks.DEEPSLATE_URANIUM_ORE.getDefaultState())
         );
-
         register(ctx, URANIUM_ORE, Feature.ORE, new OreConfiguration(uraniumTargetStates, 7));
 
         List<TargetBlockState> leadTargetStates = List.of(
                 OreConfiguration.target(stoneOreReplaceable, CNBlocks.LEAD_ORE.getDefaultState()),
                 OreConfiguration.target(deepslateOreReplaceables, CNBlocks.DEEPSLATE_LEAD_ORE.getDefaultState())
         );
-
         register(ctx, LEAD_ORE, Feature.ORE, new OreConfiguration(leadTargetStates, 7));
+
+        List<TargetBlockState> thoriumTargetStates = List.of(
+                OreConfiguration.target(stoneOreReplaceable, CNBlocks.THORIUM_ORE.getDefaultState()),
+                OreConfiguration.target(deepslateOreReplaceables, CNBlocks.DEEPSLATE_THORIUM_ORE.getDefaultState())
+        );
+        register(ctx, THORIUM_ORE, Feature.ORE, new OreConfiguration(thoriumTargetStates, 7));
 
         List<LayerPattern> overworldLayerPatterns = List.of(
                 CNLayerPatterns.AUTUNITE.get()

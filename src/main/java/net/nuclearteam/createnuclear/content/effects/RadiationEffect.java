@@ -4,15 +4,16 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
+import net.nuclearteam.createnuclear.foundation.damageTypes.CreateNuclearDamageSources;
 
 public class RadiationEffect extends VicinityEffect {
 
@@ -23,16 +24,18 @@ public class RadiationEffect extends VicinityEffect {
     public RadiationEffect() {
         super(MobEffectCategory.HARMFUL, 15453236,
                 amplifier -> 10,
-                (e) -> {
+                e -> {
+//                    CreateNuclear.LOGGER.warn("attribute: {}", e.getAttributes().save());
+//                    CreateNuclear.LOGGER.warn("attribute irradiated: {}", e.getAttributeValue(CNAttributes.IRRADIATED_RESISTANCE.get()));
 
-                    boolean isWearingAntiRadiationArmor = AntiRadiationArmorItem.Armor.isFullSet(e.getArmorSlots());
-//                        for (ItemStack armor : e.getArmorSlots()) {
-//                            CreateNuclear.LOGGER.warn("AntiRadiationArmorItem.Armor.isFullSet(armor) {}", AntiRadiationArmorItem.Armor.isFullSet(armor));
-//                            if (AntiRadiationArmorItem.Armor.isFullSet(armor)) {
-//                                isWearingAntiRadiationArmor = true;
-//                                break;
-//                            }
-//                        }
+                    boolean isWearingAntiRadiationArmor = false;
+                    for (ItemStack armor : e.getArmorSlots()) {
+//                        CreateNuclear.LOGGER.warn("attribute irradiated: {}", armor.getAttributeModifiers(ArmorItem.Type.HELMET.getSlot()));
+                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
+                            isWearingAntiRadiationArmor = true;
+                            break;
+                        }
+                    }
 
                     return !e.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)
                                 && !e.hasEffect(CNEffects.RADIATION.get())
@@ -72,14 +75,8 @@ public class RadiationEffect extends VicinityEffect {
     public void applyEffectTick(LivingEntity entity, int amplifier) {
         super.applyEffectTick(entity, amplifier);
 
-        // Do not apply damage if the entity is wearing anti-radiation armor
-        boolean wearingAntiRad = AntiRadiationArmorItem.Armor.isFullSet(entity.getArmorSlots());
-        if (wearingAntiRad) {
-            return;
-        }
-
         // Apply radiation damage (magic type), scaled by amplifier
         int damage = 1 << amplifier;
-        entity.hurt(CNDamageSources.radiation(entity.level()), damage);
+        entity.hurt(CreateNuclearDamageSources.radiation(entity.level()), damage);
     }
 }

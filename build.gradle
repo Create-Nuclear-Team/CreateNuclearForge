@@ -24,6 +24,7 @@ println "Java: ${System.getProperty 'java.version'}, " +
 
 
 mixin {
+    add sourceSets.main, "createnuclear.refmap.json"
     // add sourceSets.main, 'createnuclear.forge.refmap.json'
     config 'createnuclear.forge.mixins.json'
 
@@ -112,10 +113,8 @@ minecraft {
         client {
             workingDirectory project.file('run')
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            //property 'mixin.env.remapRefMap', 'true'
-            //property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-            property("mixin.env.remapRefMap", "true")
-            property("mixin.env.refMapRemappingFile", "${projectDir}/build/createSrgToMcp/output.srg")
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
         }
 
         server {

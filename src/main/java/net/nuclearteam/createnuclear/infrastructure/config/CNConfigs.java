@@ -30,6 +30,10 @@ public class CNConfigs {
         return server;
     }
 
+    public static CNCServer server() {
+        return server;
+    }
+
     public static ConfigBase byType(ModConfig.Type type) {
         return CONFIGS.get(type);
     }

@@ -9,6 +9,7 @@ import net.nuclearteam.createnuclear.content.particles.NuclearMushroomCloudParti
 import net.nuclearteam.createnuclear.content.particles.SmallNuclearExplosionParticle;
 import net.nuclearteam.createnuclear.foundation.ponder.CreateNuclearPonderPlugin;
 
+
 @SuppressWarnings("unused")
 public class CreateNuclearClient extends CNCommonProxy {
 

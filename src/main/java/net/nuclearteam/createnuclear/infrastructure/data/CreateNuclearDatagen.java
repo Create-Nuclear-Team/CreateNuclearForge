@@ -10,6 +10,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.nuclearteam.createnuclear.CNSoundEvents;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.data.recipe.CNMechanicalCraftingRecipeGen;
@@ -31,12 +32,14 @@ public class CreateNuclearDatagen {
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
+        generator.addProvider(event.includeClient(), CNSoundEvents.provider(generator));
+
 
         GeneratedEntriesProvider generatedEntriesProvider = new GeneratedEntriesProvider(output, lookupProvider);
         lookupProvider = generatedEntriesProvider.getRegistryProvider();
         generator.addProvider(event.includeClient(), generatedEntriesProvider);
         generator.addProvider(event.includeClient(), new CNStandardRecipeGen(output));
-//        generator.addProvider(event.includeClient(), new CNShapelessRecipeGen(output));
+    //        generator.addProvider(event.includeClient(), new CNShapelessRecipeGen(output));
         generator.addProvider(event.includeClient(), new CNMechanicalCraftingRecipeGen(output));
         generator.addProvider(event.includeClient(), new CNAdvancement(output));
 
@@ -60,6 +63,7 @@ public class CreateNuclearDatagen {
             provideDefaultLang("tooltips", langConsumer);
             provideDefaultLang("reactor", langConsumer);
             CNAdvancement.provideLang(langConsumer);
+            CNSoundEvents.provideLang(langConsumer);
             providePonderLang(langConsumer);
         });
     }

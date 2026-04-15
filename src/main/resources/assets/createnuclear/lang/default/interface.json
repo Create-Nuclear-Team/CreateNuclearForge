@@ -6,6 +6,10 @@
   "emi.category.createnuclear.fan_enriched": "Bulk Enriching",
   "create.recipe.fan_enriched.fan": "Fan behind Enriched Fire",
 
+  "createnuclear.snow_powder.fan.recipe": "Cryogenic fan",
+  "emi.category.createnuclear.snow_powder": "Cryogenic fan",
+  "create.recipe.fan_snow_powder.fan": "Fan behind Powder Snow",
+
   "gui.createnuclear.reactor_controller.title": "Reactor Controller",
   "gui.createnuclear.reactor_input.title": "Reactor Input Storage",
 
@@ -24,5 +28,4 @@
 
   "death.attack.createnuclear.radiation": "%1$s died from radiation",
   "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast"
-
 }

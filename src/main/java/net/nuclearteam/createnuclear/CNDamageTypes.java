@@ -18,7 +18,6 @@ public class CNDamageTypes {
     }
 
     public static void bootstrap(BootstapContext<DamageType> ctx) {
-
         new DamageTypeBuilder(RADIATION).register(ctx);
         new DamageTypeBuilder(FAN_RADIATION).register(ctx);
     }
