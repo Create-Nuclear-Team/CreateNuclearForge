@@ -14,6 +14,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.network.NetworkEvent.Context;
+import net.nuclearteam.createnuclear.foundation.networking.radiation.RadiationSyncPacket;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItemPacket;
 import net.nuclearteam.createnuclear.content.multiblock.controller.EventTriggerPacket;
 
@@ -26,6 +27,7 @@ public enum CNPackets {
 
     // To client
     TRIGGER_EVENT_TEXT_OVERLAY(EventTriggerPacket.class, EventTriggerPacket::new, PLAY_TO_CLIENT),
+    RADIATION_SYNC(RadiationSyncPacket.class, RadiationSyncPacket::new, PLAY_TO_CLIENT)
     ;
     public static final ResourceLocation CHANNEL_NAME = CreateNuclear.asResource("main");
     public static final int NETWORK_VERSION = 0;
