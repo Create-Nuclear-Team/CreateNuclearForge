@@ -134,6 +134,8 @@
   "createnuclear.snow_powder.fan.recipe": "Cryogenic fan",
   "createnuclear.subtitle.large_nuclear_explosion": "Large Nuclear Explosion",
   "createnuclear.subtitle.nuclear_explosion": "Nuclear Explosion",
+  "createnuclear.subtitle.nuclear_explosion_ringing": "Nuclear Explosion Ringing",
+  "createnuclear.subtitle.nuclear_explosion_rumble": "Nuclear Explosion Rumble",
   "createnuclear.subtitle.reactor_alarm": "Reactor Alarm",
   "createnuclear.subtitle.reactor_casing_break": "Break Reactor Casing",
   "createnuclear.subtitle.reactor_casing_fall": "Reactor Casing Fall",

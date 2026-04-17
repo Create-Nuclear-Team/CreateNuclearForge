@@ -23,7 +23,7 @@ public class CNNuclearExplosionSound extends AbstractTickableSoundInstance {
         this.fadesAt = fadesAt;
         this.fadeInBy = fadeInBy;
         this.delay = 0;
-        this.volume = 0;
+        this.volume = 20;
     }
 
     public void tick() {

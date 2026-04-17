@@ -6,7 +6,9 @@
   "refmap": "createnuclear.refmap.json",
   "mixins": [
     "BaseFireBlockMixin",
-    "RadiationHeartMixin"
+    "RadiationHeartMixin",
+    "GameRendererMixin",
+    "CameraAccessor"
   ],
   "accessWidener": "createnuclear.accesswidener",
   "client": [

@@ -17,15 +17,32 @@
     ],
     "subtitle": "createnuclear.subtitle.nuclear_explosion"
   },
-  "reactor_alarm": {
-    "category": "block",
-    "subtitle": "createnuclear.subtitle.reactor_alarm",
+  "nuclear_explosion_ringing": {
     "sounds": [
       {
-        "name": "createnuclear:reactor_alarm",
-        "stream": true
+        "type": "file",
+        "name": "createnuclear:nuclear_explosion_ringing"
       }
-    ]
+    ],
+    "subtitle": "createnuclear.subtitle.nuclear_explosion_ringing"
+  },
+  "nuclear_explosion_rumble": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:nuclear_explosion_rumble"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.nuclear_explosion_rumble"
+  },
+  "reactor_alarm": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reactor_alarm"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reactor_alarm"
   },
   "reactor_casing_break": {
     "sounds": [

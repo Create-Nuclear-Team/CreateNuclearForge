@@ -1,6 +1,6 @@
 package net.nuclearteam.createnuclear.content.particles;
 
-import net.nuclearteam.createnuclear.CNSounds;
+import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.compat.alexscave.AlexscaveCompat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -18,9 +18,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.nuclearteam.createnuclear.CNClientProxy;
-import net.nuclearteam.createnuclear.CNParticleRegistry;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.compat.Mods;
 import net.nuclearteam.createnuclear.content.explosion.CNNuclearExplosionSound;
 import net.nuclearteam.createnuclear.foundation.utility.Maths;
@@ -76,10 +73,12 @@ public class NuclearMushroomCloudParticle extends Particle {
             if(!playedExplosion){
                 playedExplosion = true;
                 if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null) {
+                    CreateNuclear.LOGGER.info("EXPLOSIOOOOOON, (With Alex's Cave)");
                     SoundEvent[] nuclear_explosions = ((AlexscaveCompat)alexscaveHandler).GetACSounds();
                     playSound(large ? nuclear_explosions[0] : nuclear_explosions[1], lifetime - 20, lifetime, 0.2F, false);
                 } else {
-                    playSound(large ? CNSounds.LARGE_NUCLEAR_EXPLOSION.get() : CNSounds.NUCLEAR_EXPLOSION.get(), lifetime - 20, lifetime, 0.2F, false);
+                    CreateNuclear.LOGGER.info("EXPLOSIOOOOOON, (WITHOUT Alex's Cave)");
+                    playSound(large ? CNSoundEvents.LARGE_NUCLEAR_EXPLOSION.getMainEvent() : CNSoundEvents.NUCLEAR_EXPLOSION.getMainEvent(), lifetime - 20, lifetime, 0.2F, false);
                 }
             }
         }
@@ -93,7 +92,7 @@ public class NuclearMushroomCloudParticle extends Particle {
             } else {
                 if (!playedRinging && CNConfigs.client().nuclearBombFlash.get()) {
                     playedRinging = true;
-                    playSound(CNSounds.NUCLEAR_EXPLOSION_RINGING.get(), 100, 50, 0.05F, true);
+                    playSound(CNSoundEvents.NUCLEAR_EXPLOSION_RINGING.getMainEvent(), 100, 50, 0.05F, true);
                 }
                 ((CNClientProxy) CreateNuclear.PROXY).renderNukeFlashFor = 16;
             }
@@ -116,7 +115,7 @@ public class NuclearMushroomCloudParticle extends Particle {
                     if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null) {
                         playSound(((AlexscaveCompat)alexscaveHandler).GetACSounds()[3], lifetime + 100, lifetime, 0.1F, true);
                     } else {
-                        playSound(CNSounds.NUCLEAR_EXPLOSION_RUMBLE.get(), lifetime + 100, lifetime, 0.1F, true);
+                        playSound(CNSoundEvents.NUCLEAR_EXPLOSION_RUMBLE.getMainEvent(), lifetime + 100, lifetime, 0.1F, true);
 
                     }
                 }
