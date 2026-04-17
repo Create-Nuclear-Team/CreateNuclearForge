@@ -12,7 +12,7 @@ import net.nuclearteam.createnuclear.foundation.ponder.CreateNuclearPonderPlugin
 
 
 @SuppressWarnings("unused")
-public class CreateNuclearClient extends CNCommonProxy {
+public class CreateNuclearClient extends CNClientProxy {
 
     public static void onCtorClient(IEventBus modEventBus, IEventBus forgeEventBus) {
         modEventBus.addListener(CreateNuclearClient::clientInit);

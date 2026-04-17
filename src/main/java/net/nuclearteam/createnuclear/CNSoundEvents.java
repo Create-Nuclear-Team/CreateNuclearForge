@@ -73,6 +73,16 @@ public class CNSoundEvents {
         LARGE_NUCLEAR_EXPLOSION = create("large_nuclear_explosion")
                 .subtitle("Large Nuclear Explosion")
                 .category(SoundSource.AMBIENT)
+                .build(),
+
+        NUCLEAR_EXPLOSION_RINGING = create("nuclear_explosion_ringing")
+                .subtitle("Nuclear Explosion Ringing")
+                .category(SoundSource.AMBIENT)
+                .build(),
+
+        NUCLEAR_EXPLOSION_RUMBLE = create("nuclear_explosion_rumble")
+                .subtitle("Nuclear Explosion Rumble")
+                .category(SoundSource.AMBIENT)
                 .build()
     ;
 

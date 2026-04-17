@@ -185,8 +185,8 @@ dependencies {
     // at runtime, use the full JEI jar for Forge
 
     //Alex's cave
-    implementation fg.deobf("curse.maven:alexs-caves-924854:5848216")
-    implementation fg.deobf("curse.maven:citadel-331936:6002521")
+    compileOnly fg.deobf("curse.maven:alexs-caves-924854:5848216")
+    compileOnly fg.deobf("curse.maven:citadel-331936:6002521")
 
     implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
     implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))

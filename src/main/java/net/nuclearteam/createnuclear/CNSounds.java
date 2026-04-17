@@ -20,7 +20,7 @@ public class CNSounds {
     public static final RegistryObject<SoundEvent> REACTOR_CASING_FALL = registerSoundEvent("reactor_casing_fall");
     public static  final RegistryObject<SoundEvent> LARGE_NUCLEAR_EXPLOSION = registerSoundEvent("large_nuclear_explosion");
     public static  final RegistryObject<SoundEvent> NUCLEAR_EXPLOSION = registerSoundEvent("nuclear_explosion");
-    public static  final RegistryObject<SoundEvent> NUCLEAR_EXPLOSION_RINGING = registerSoundEvent("nuclear_explosion_ringin");
+    public static  final RegistryObject<SoundEvent> NUCLEAR_EXPLOSION_RINGING = registerSoundEvent("nuclear_explosion_ringing");
     public static  final RegistryObject<SoundEvent> NUCLEAR_EXPLOSION_RUMBLE = registerSoundEvent("nuclear_explosion_rumble");
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
