@@ -320,7 +320,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.setChanged();
         this.notifyUpdate();
 
-        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.get(0), countGraphiteRod, countUraniumRod, inventory, level));
+        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.isEmpty() ? null : bigFluidStack.get(0), countGraphiteRod, countUraniumRod, inventory, level));
         if (!this.outputManager.getBlocksPosition().isEmpty()) {
             rotate(getBlockState(), getLevel(), heat);
         }
@@ -356,10 +356,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return !isEmptyConfiguredPattern()
                 && bigFuelItem.count > 0
                 && bigCoolerItem.count > 0
-                && !bigFluidStack.isEmpty()
-                && bigFluidStack.get(0).amount > 0
-                && this.inputManager.size() > 0
-                && this.inputFluidManager.size() > 0;
+                && this.inputManager.size() > 0;
     }
 
     private void updateHeatOnly() {
