@@ -15,8 +15,6 @@ class DefaultOverheatController implements IOverheatController {
 
     @Override
     public void updateState(int countGraphiteRod, int countUraniumRod, BigFluidStack bigFluidStack) {
-        if (countGraphiteRod <= 0) return;
-
         if (countUraniumRod > countGraphiteRod * maxUraniumPerGraphite || bigFluidStack.amount < 1000) {
             overFlowHeatTimer++;
             if (overFlowHeatTimer >= overFlowLimiter) {
