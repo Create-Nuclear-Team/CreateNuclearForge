@@ -218,36 +218,53 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER) {
             explosionCountdown++;
 
-            // --- AFFICHAGE DU COMPTE À REBOURS ---
-            // Toutes les secondes (20 ticks)
-            if (explosionCountdown % 20 == 0) {
-                int secondsLeft = (300 - explosionCountdown) / 20;
+            int secondsLeft = (300 - explosionCountdown) / 20;
 
-                if (secondsLeft > 0) {
-                    NotifyUtil.sendTitle(
+            // --- PHASE CRITIQUE : 10 dernières secondes (Action Bar clignotante) ---
+            if (secondsLeft <= 10 && secondsLeft > 0) {
+                // Clignotement : change de couleur tous les 5 ticks (0.25s)
+                boolean isWhite = (level.getGameTime() / 5) % 2 == 0;
+                ChatFormatting flashColor = isWhite ? ChatFormatting.WHITE : ChatFormatting.RED;
+
+                NotifyUtil.sendActionBar(
                         level, getBlockPos(),
-                        "ALERTE : FUSION DU CŒUR",
-                        "Explosion dans " + secondsLeft + "s",
-                        ChatFormatting.RED,
-                        configRadius, configWarnAll,
-                        0, 25, 5 // Apparition instantanée pour le timer
-                    );
-                }
+                        "CORE MELTDOWN IN " + secondsLeft + "s",
+                        flashColor,
+                        configRadius, configWarnAll
+                );
+            }
+            // --- PHASE D'ALERTE : Entre 15s et 11s (Action Bar fixe) ---
+            else if (secondsLeft > 10 && explosionCountdown % 20 == 0) {
+                NotifyUtil.sendActionBar(
+                        level, getBlockPos(),
+                        "WARNING: CORE OVERHEATING",
+                        ChatFormatting.DARK_RED,
+                        configRadius, configWarnAll
+                );
             }
 
+            // --- MOMENT DE L'EXPLOSION ---
             if (explosionCountdown >= 300) {
+                // Affichage d'un titre final géant avant de tout faire sauter
+                NotifyUtil.sendTitle(
+                        level, getBlockPos(),
+                        "CRITICAL FAILURE",
+                        "IMMINENT EXPLOSION",
+                        ChatFormatting.DARK_RED,
+                        configRadius, configWarnAll,
+                        0, 40, 10
+                );
+
                 triggerNuclearExplosion();
             }
         } else {
-            // --- MESSAGE SI L'EXPLOSION EST ANNULÉE ---
+            // --- CŒUR STABILISÉ ---
             if (explosionCountdown > 0) {
-                NotifyUtil.sendTitle(
-                    level, getBlockPos(),
-                    "CŒUR STABILISÉ",
-                    "Le réacteur refroidit...",
-                    ChatFormatting.GREEN,
-                    configRadius, configWarnAll,
-                    10, 40, 10
+                NotifyUtil.sendActionBar(
+                        level, getBlockPos(),
+                        "CORE STABILIZED",
+                        ChatFormatting.GREEN,
+                        configRadius, configWarnAll
                 );
             }
             explosionCountdown = 0;
