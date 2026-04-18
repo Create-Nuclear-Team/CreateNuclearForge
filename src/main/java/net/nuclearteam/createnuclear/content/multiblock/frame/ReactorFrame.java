@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.content.multiblock.frame;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -14,10 +15,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
@@ -27,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ReactorFrame extends Block implements IWrenchable {
+public class ReactorFrame extends Block implements IWrenchable, IBE<ReactorFrameEntity> {
     public static final Property<Part> PART = EnumProperty.create("part", Part.class);
     protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorFrame(Properties properties) {
@@ -112,11 +115,22 @@ public class ReactorFrame extends Block implements IWrenchable {
         List<? extends Player> players = level.players();
         pattern.FindController(pos, level, players, true);
     }
+
     @Override // called when the player destroys the block, with or without a tool
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         List<? extends Player> players = level.players();
         pattern.FindController(pos, level, players, false);
+    }
+
+    @Override
+    public Class<ReactorFrameEntity> getBlockEntityClass() {
+        return ReactorFrameEntity.class;
+    }
+
+    @Override
+    public BlockEntityType<? extends ReactorFrameEntity> getBlockEntityType() {
+        return CNBlockEntityTypes.REACTOR_FRAME.get();
     }
 
 }

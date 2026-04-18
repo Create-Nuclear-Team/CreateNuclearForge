@@ -7,6 +7,8 @@ import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfir
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCoreEntity;
+import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrameEntity;
+import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrameRenderer;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
@@ -21,6 +23,12 @@ public class CNBlockEntityTypes {
     public static final BlockEntityEntry<ReactorCasingEntity> REACTOR_CASING =
             CreateNuclear.REGISTRATE.blockEntity("reactor_casing", ReactorCasingEntity::new)
                     .validBlocks(CNBlocks.REACTOR_CASING)
+                    .register();
+
+    public static final BlockEntityEntry<ReactorFrameEntity> REACTOR_FRAME =
+            CreateNuclear.REGISTRATE.blockEntity("reactor_frame", ReactorFrameEntity::new)
+                    .validBlocks(CNBlocks.REACTOR_FRAME)
+                    .renderer(() -> ReactorFrameRenderer::new)
                     .register();
 
     public static final BlockEntityEntry<ReactorCoreEntity> REACTOR_CORE =
