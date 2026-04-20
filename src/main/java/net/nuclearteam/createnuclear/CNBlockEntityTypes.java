@@ -25,12 +25,6 @@ public class CNBlockEntityTypes {
                     .validBlocks(CNBlocks.REACTOR_CASING)
                     .register();
 
-    public static final BlockEntityEntry<ReactorFrameEntity> REACTOR_FRAME =
-            CreateNuclear.REGISTRATE.blockEntity("reactor_frame", ReactorFrameEntity::new)
-                    .validBlocks(CNBlocks.REACTOR_FRAME)
-                    .renderer(() -> ReactorFrameRenderer::new)
-                    .register();
-
     public static final BlockEntityEntry<ReactorCoreEntity> REACTOR_CORE =
             CreateNuclear.REGISTRATE.blockEntity("reactor_core", ReactorCoreEntity::new)
                     .validBlocks(CNBlocks.REACTOR_CORE)

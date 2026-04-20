@@ -1,7 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.frame;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
-import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -20,7 +19,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
@@ -30,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class ReactorFrame extends Block implements IWrenchable, IBE<ReactorFrameEntity> {
+public class ReactorFrame extends Block implements IWrenchable {
     public static final Property<Part> PART = EnumProperty.create("part", Part.class);
     protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorFrame(Properties properties) {
@@ -122,15 +120,4 @@ public class ReactorFrame extends Block implements IWrenchable, IBE<ReactorFrame
         List<? extends Player> players = level.players();
         pattern.FindController(pos, level, players, false);
     }
-
-    @Override
-    public Class<ReactorFrameEntity> getBlockEntityClass() {
-        return ReactorFrameEntity.class;
-    }
-
-    @Override
-    public BlockEntityType<? extends ReactorFrameEntity> getBlockEntityType() {
-        return CNBlockEntityTypes.REACTOR_FRAME.get();
-    }
-
 }
