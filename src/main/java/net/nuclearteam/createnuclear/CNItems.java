@@ -189,6 +189,7 @@ public class CNItems {
 
         NITRATE = CreateNuclear.REGISTRATE
             .item("nitrate", Item::new)
+            .lang("Nitrate")
             .register(),
 
         NITROGEN_CONCENTRATE = CreateNuclear.REGISTRATE
