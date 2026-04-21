@@ -4,6 +4,7 @@ import com.simibubi.create.AllPartialModels;
 import com.simibubi.create.content.kinetics.base.OrientedRotatingVisual;
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarmEntity;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCoreEntity;
@@ -50,6 +51,11 @@ public class CNBlockEntityTypes {
     public static final BlockEntityEntry<ReactorControllerBlockEntity> REACTOR_CONTROLLER =
             CreateNuclear.REGISTRATE.blockEntity("reactor_controller", ReactorControllerBlockEntity::new)
                     .validBlocks(CNBlocks.REACTOR_CONTROLLER)
+                    .register();
+
+    public static final BlockEntityEntry<ReactorAlarmEntity> REACTOR_ALARM =
+            CreateNuclear.REGISTRATE.blockEntity("reactor_alarm", ReactorAlarmEntity::new)
+                    .validBlocks(CNBlocks.REACTOR_ALARM)
                     .register();
 
     public static void register() {}

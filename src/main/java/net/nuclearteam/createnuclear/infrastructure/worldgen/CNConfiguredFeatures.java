@@ -24,6 +24,7 @@ public class CNConfiguredFeatures {
         URANIUM_ORE = key("uranium_ore"),
         LEAD_ORE = key("lead_ore"),
         THORIUM_ORE = key("thorium_ore"),
+        NITRATE_ORE = key("nitrate_ore"),
         STRIATED_ORES_OVERWORLD = key("striated_ores_overworld")
     ;
 
@@ -52,6 +53,12 @@ public class CNConfiguredFeatures {
                 OreConfiguration.target(deepslateOreReplaceables, CNBlocks.DEEPSLATE_THORIUM_ORE.getDefaultState())
         );
         register(ctx, THORIUM_ORE, Feature.ORE, new OreConfiguration(thoriumTargetStates, 7));
+
+        List<TargetBlockState> nitrateTargetStates = List.of(
+                OreConfiguration.target(stoneOreReplaceable, CNBlocks.NITRATE_ORE.getDefaultState()),
+                OreConfiguration.target(deepslateOreReplaceables, CNBlocks.DEEPSLATE_NITRATE_ORE.getDefaultState())
+        );
+        register(ctx, NITRATE_ORE, Feature.ORE, new OreConfiguration(nitrateTargetStates, 7));
 
         List<LayerPattern> overworldLayerPatterns = List.of(
                 CNLayerPatterns.AUTUNITE.get()
