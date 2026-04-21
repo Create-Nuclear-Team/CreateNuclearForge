@@ -134,12 +134,6 @@ public class AntiRadiationArmorItem {
         public Helmet(Properties properties, DyeColor color) {
             super(ARMOR_MATERIAL, HELMET, properties);
             this.color = color;
-            ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
-            builder.putAll(super.getDefaultAttributeModifiers(HELMET.getSlot()));
-            irradiatedArmorAttribute(builder, HELMET);
-            UUID uuid = ARMOR_MODIFIER_UUID_PER_TYPE.get(HELMET);
-            builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", 42, AttributeModifier.Operation.ADDITION));
-            this.attributeModifiers = builder.build();
         }
 
         @Override
