@@ -2,13 +2,13 @@
 	"credit": "Made with Blockbench",
 	"parent": "block/block",
 	"textures": {
-		"0": "createnuclear:block/reactor/casing/casing_inner",
-		"1": "createnuclear:block/reactor/casing/casing_top",
+		"0": "createnuclear:block/reactor/casing/reactor_casing",
+		"1": "createnuclear:block/reactor/casing/reactor_casing",
 		"2": "createnuclear:block/reactor/frame/window",
 		"3": "createnuclear:block/reactor/casing/reactor_casing",
 		"4": "createnuclear:fluid/uranium_flow",
 		"5": "createnuclear:fluid/uranium_still",
-		"particle": "createnuclear:block/reactor/casing/casing_inner"
+		"particle": "createnuclear:block/reactor/casing/reactor_casing"
 	},
 	"elements": [
 		{

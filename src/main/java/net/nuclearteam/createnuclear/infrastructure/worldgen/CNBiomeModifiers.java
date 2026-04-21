@@ -20,6 +20,7 @@ public class CNBiomeModifiers {
         URANIUM_ORE = key("uranium_ore"),
         LEAD_ORE = key("lead_ore"),
         THORIUM_ORE = key("thorium_ore"),
+        NITRATE_ORE = key("nitrate_ore"),
         STRIATED_ORES_OVERWORLD = key("striated_ores_overworld")
     ;
 
@@ -35,11 +36,13 @@ public class CNBiomeModifiers {
         Holder<PlacedFeature> uraniumOre = featureLookup.getOrThrow(CNPlacedFeatures.URANIUM_ORE);
         Holder<PlacedFeature> leadOre = featureLookup.getOrThrow(CNPlacedFeatures.LEAD_ORE);
         Holder<PlacedFeature> thoriumOre = featureLookup.getOrThrow(CNPlacedFeatures.THORIUM_ORE);
+        Holder<PlacedFeature> nitrateOre = featureLookup.getOrThrow(CNPlacedFeatures.NITRATE_ORE);
         Holder<PlacedFeature> striatedOresOverworld = featureLookup.getOrThrow(CNPlacedFeatures.STRIATED_ORES_OVERWORLD);
 
         ctx.register(URANIUM_ORE, addOre(isOverworld, uraniumOre));
         ctx.register(LEAD_ORE, addOre(isOverworld, leadOre));
         ctx.register(THORIUM_ORE, addOre(isOverworld, thoriumOre));
+        ctx.register(NITRATE_ORE, addOre(isOverworld, nitrateOre));
         ctx.register(STRIATED_ORES_OVERWORLD, addOre(isOverworld, striatedOresOverworld));
     }
 
