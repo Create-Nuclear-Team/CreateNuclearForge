@@ -8,8 +8,6 @@ import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarmEntity
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCoreEntity;
-import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrameEntity;
-import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrameRenderer;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;

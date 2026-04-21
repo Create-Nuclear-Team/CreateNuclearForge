@@ -476,24 +476,23 @@ public class CNBlocks {
             .register();
 
     public static final BlockEntry<Block> NITRATE_ORE =
-            CreateNuclear.REGISTRATE.block("nitrate_ore", Block::new)
-                    .initialProperties(SharedProperties::stone)
-                    .simpleItem()
-                    .transform(pickaxeOnly())
-                    .loot((lt, b) -> lt.add(b,
-                            RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.NITRATE)
-                                            .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
-                                    ))))
-                    .tag(BlockTags.NEEDS_IRON_TOOL,
-                            CNTags.forgeBlockTag("ores"),
-                            CNTags.forgeBlockTag("ores_in_ground/stone"),
-                            CNTags.forgeBlockTag("ores/nitrate")
-                    )
-                    .item()
-                    .tag(CNTags.forgeItemTag("ores/nitrate"))
-                    .build()
-                    .register();
+        CreateNuclear.REGISTRATE.block("nitrate_ore", Block::new)
+            .initialProperties(SharedProperties::stone)
+            .transform(pickaxeOnly())
+            .loot((lt, b) -> lt.add(b,
+                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.NITRATE)
+                        .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                ))))
+            .tag(BlockTags.NEEDS_IRON_TOOL,
+                    CNTags.forgeBlockTag("ores"),
+                    CNTags.forgeBlockTag("ores_in_ground/stone"),
+                    CNTags.forgeBlockTag("ores/nitrate")
+            )
+            .item()
+            .tag(CNTags.forgeItemTag("ores/nitrate"))
+            .build()
+            .register();
 
     public static final BlockEntry<Block> DEEPSLATE_NITRATE_ORE =
             CreateNuclear.REGISTRATE.block("deepslate_nitrate_ore", Block::new)
