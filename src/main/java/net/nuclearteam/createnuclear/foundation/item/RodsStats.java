@@ -20,7 +20,6 @@ public record RodsStats(Item item) implements TooltipModifier {
         return new RodsStats(item);
     }
 
-
     @Override
     public void modify(ItemTooltipEvent context) {
         List<Component> rodTypesStat = getRodTypeStats(item, context.getEntity());
@@ -31,7 +30,7 @@ public record RodsStats(Item item) implements TooltipModifier {
         }
     }
 
-    public static List<Component> getRodTypeStats(Item item, Player player) {
+    private static List<Component> getRodTypeStats(Item item, Player player) {
         Level world = player.level();
         List<Component> components = new ArrayList<>();
 
