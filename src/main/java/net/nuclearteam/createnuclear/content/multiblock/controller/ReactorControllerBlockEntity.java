@@ -91,6 +91,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private int countUraniumRod;
     private int countGraphiteRod;
     private int heat;
+    private int explosionCountdown = 0;
+    private boolean isExploding = false;
 
     private double total;
     private ItemStack configuredPattern;
@@ -352,12 +354,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             }
             explosionCountdown = 0;
         }
-
-        if (isEmptyConfiguredPattern()) {
-
-            BlockEntity blockEntity = level.getBlockEntity(getBlockPosForReactor('I'));
-        }
-
 
 
             /*if (blockEntity instanceof ReactorInputEntity be) {

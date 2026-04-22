@@ -34,7 +34,6 @@ import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInput;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;

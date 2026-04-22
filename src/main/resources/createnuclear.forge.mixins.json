@@ -8,8 +8,8 @@
     "BaseFireBlockMixin",
     "RadiationHeartMixin",
     "GameRendererMixin",
-    "CameraAccessor"
-    "SmithingTransformRecipeMixin",
+    "CameraAccessor",
+    "SmithingTransformRecipeMixin"
   ],
   "accessWidener": "createnuclear.accesswidener",
   "client": [

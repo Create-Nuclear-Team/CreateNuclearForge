@@ -38,7 +38,7 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
             return;
         }
 
-        int heat = (int) reactorController.configuredPattern
+        int heat = (int) reactorController.getConfiguredPattern()
                 .getOrCreateTag()
                 .getDouble("heat");
 
@@ -53,7 +53,7 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
                 triggerNuclearExplosion(
                         (ServerLevel) level,
                         getBlockPos(),
-                        reactorController.countUraniumRod
+                        reactorController.getBigFuelItem().count
                 );
 
                 // Supprime le cœur (optionnel mais logique)
