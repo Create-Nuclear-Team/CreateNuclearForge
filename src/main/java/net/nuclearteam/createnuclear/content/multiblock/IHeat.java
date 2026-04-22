@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.content.multiblock;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.foundation.item.TooltipHelper;
 import com.simibubi.create.foundation.utility.CreateLang;
 import net.createmod.catnip.lang.Lang;
@@ -66,6 +67,10 @@ public interface IHeat extends IWrenchable {
             return NONE;
         }
 
+        public static boolean isNotDanger(int heat) {
+            return of(heat) != DANGER || of(heat) != NONE;
+        }
+
         public static LangBuilder getFormattedHeatText(int heat) {
             HeatLevel heatLevel = of(heat);
             LangBuilder builder = CreateLang.builder(CreateNuclear.MOD_ID).text(TooltipHelper.makeProgressBar(5, heatLevel.ordinal()+1));
@@ -105,6 +110,10 @@ public interface IHeat extends IWrenchable {
             ;
 
             return builder;
+        }
+
+        public static LangBuilder getFormattedItemText(BigItemStack itemRod, Boolean IsEmpty) {
+            return getFormattedItemText(new ItemStack(itemRod.stack.getItem(), itemRod.count), IsEmpty);
         }
 
         public static LangBuilder getName(String name) {

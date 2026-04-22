@@ -1,19 +1,13 @@
-package net.nuclearteam.createnuclear.content.multiblock.input;
+package net.nuclearteam.createnuclear.content.multiblock.input.item;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.foundation.block.IBE;
 import com.simibubi.create.foundation.item.ItemHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.LivingEntity;
+
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -29,29 +23,22 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.property.Properties;
+
 import net.minecraftforge.network.NetworkHooks;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
-import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNShapes;
-import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
-import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
+import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.foundation.block.MultiDirectionalReactorBlock;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.List;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+
+@ParametersAreNonnullByDefault
 public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorInputEntity> {
-
-
+    
     public ReactorInput(Properties properties) {
         super(properties);
     }
@@ -80,8 +67,7 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
-        List<? extends Player> players = level.players();
-        FindController(pos, level, players, true);
+        MultiblockHelpers.handleOnPlace(pos, level, ReactorControllerBlockEntity::addInput);
     }
 
     // @Override // ! may be useless
@@ -101,8 +87,7 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
-        List<? extends Player> players = level.players();
-        FindController(pos, level, players, false);
+        MultiblockHelpers.handleRemoval(pos, level, ReactorControllerBlockEntity::removeInput);
     }
 
     @Override
@@ -111,28 +96,7 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
 
         withBlockEntityDo(pLevel, pPos, be -> ItemHelper.dropContents(pLevel, pPos, be.inventory));
         pLevel.removeBlockEntity(pPos);
-
-        List<? extends Player> players = pLevel.players();
-        FindController(pPos, pLevel, players, false);
-    }
-
-    public ReactorControllerBlock FindController(BlockPos blockPos, Level level, List<? extends Player> players, boolean first){ // Function that checks the surrounding blocks in order
-        BlockPos newBlock;                                                   // to find the controller and verify the pattern
-        Vec3i pos = new Vec3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        for (int x = pos.getX()-5; x != pos.getX()+5; x+=1) {
-            for (int z = pos.getZ()-5; z != pos.getZ()+5; z+=1) {
-                newBlock = new BlockPos(x, pos.getY(), z);
-                if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) { // verifying the pattern
-                    ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(newBlock).getBlock();
-                    controller.Verify(level.getBlockState(newBlock), newBlock, level, players, first);
-                    ReactorControllerBlockEntity entity = controller.getBlockEntity(level, newBlock);
-                    if (entity.created) {
-                        return controller;
-                    }
-                }
-            }
-        }
-        return null;
+        MultiblockHelpers.handleRemoval(pPos, pLevel, ReactorControllerBlockEntity::removeInput);
     }
 
     @Override

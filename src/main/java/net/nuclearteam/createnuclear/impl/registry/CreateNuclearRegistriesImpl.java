@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
+import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import org.jetbrains.annotations.ApiStatus.Internal;
 
@@ -17,6 +18,12 @@ public class CreateNuclearRegistriesImpl {
                 CreateNuclearRegistries.ROD_TYPE,
                 RodType.CODEC,
                 RodType.CODEC
+        );
+
+        event.dataPackRegistry(
+                CreateNuclearRegistries.FLUID_TYPE,
+                ReactorFluidType.CODEC,
+                ReactorFluidType.CODEC
         );
     }
 }

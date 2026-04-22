@@ -141,7 +141,6 @@
   "createnuclear.subtitle.reactor_casing_place": "Place Reactor Casing",
   "createnuclear.subtitle.reactor_casing_step": "Step on Reactor Casing",
   "createnuclear.tooltip.baseRodHeat": "Base Rod Heat: %d Q",
-  "createnuclear.tooltip.cloth.color": "Color of armor piece: %s",
   "createnuclear.tooltip.heatLevel": "Heat Level",
   "createnuclear.tooltip.heatLevel.caution": "Caution",
   "createnuclear.tooltip.heatLevel.danger": "Danger",

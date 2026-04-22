@@ -15,6 +15,15 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.*;
 import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.foundation.util.ClothTagHelper;
@@ -66,6 +75,10 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
         tooltip.addAll(makeSummary);
     }
 
+
+                    // Copie des états (accroupi, bébé, chevauchement...)
+                    castedOriginal.copyPropertiesTo(this.model);
+
     public List<Component> makeSummary(ItemStack item) {
         if (!item.hasTag()) return Collections.emptyList();
 
@@ -86,6 +99,30 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new AntiRadiationArmorClientExtensions());
     }
+  
+   /* public static class Helmet extends ArmorItem {
+        protected final DyeColor color;
+
+
+        public Helmet(Properties properties, DyeColor color) {
+            super(ARMOR_MATERIAL, HELMET, properties);
+            this.color = color;
+        }
+
+        @Override
+        public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
+            return getSingleLayerTexture(this.color);
+        }
+
+        @Override
+        public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+            AntiRadiationArmorItem.attachCustomModel(consumer);
+        }
+
+        public static class DyeItemHelmetList<T extends Helmet> implements Iterable<ItemEntry<T>> {
+            private static final int COLOR_AMOUNT = DyeColor.values().length;
+            private final ItemEntry<?>[] entry = new ItemEntry<?>[COLOR_AMOUNT];
+*/
 
     public static class Helmet extends AntiRadiationArmorItem {
         public Helmet(Properties p, DyeColor color) {

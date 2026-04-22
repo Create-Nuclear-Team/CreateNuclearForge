@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.multiblock.input;
+package net.nuclearteam.createnuclear.content.multiblock.input.fluid;
 
 import com.simibubi.create.foundation.data.SpecialBlockStateGen;
 import com.tterrag.registrate.providers.DataGenContext;
@@ -7,19 +7,18 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.generators.ModelFile;
-import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 
-public class ReactorInputGenerator extends SpecialBlockStateGen {
+public class ReactorLiquidInputGenerator extends SpecialBlockStateGen {
     @Override
     protected int getXRotation(BlockState state) {
-        return state.getValue(ReactorInput.FACING) == Direction.DOWN ? 180 : 0;
+        return state.getValue(ReactorLiquidInput.FACING) == Direction.DOWN ? 180 : 0;
     }
 
     @Override
     protected int getYRotation(BlockState state) {
-        return state.getValue(ReactorInput.FACING).getAxis().isVertical()
+        return state.getValue(ReactorLiquidInput.FACING).getAxis().isVertical()
                 ? 0
-                : horizontalAngle(state.getValue(ReactorInput.FACING));
+                : horizontalAngle(state.getValue(ReactorLiquidInput.FACING));
     }
 
     @Override
@@ -27,7 +26,7 @@ public class ReactorInputGenerator extends SpecialBlockStateGen {
         return prov
                 .models()
                 .getExistingFile(prov
-                        .modLoc("block/reactor/input/input" + (state.getValue(ReactorInput.FACING).getAxis().isVertical()
+                        .modLoc("block/reactor/liquid_input/liquid_input" + (state.getValue(ReactorLiquidInput.FACING).getAxis().isVertical()
                                 ? "_vertical"
                                 : ""
                         )));

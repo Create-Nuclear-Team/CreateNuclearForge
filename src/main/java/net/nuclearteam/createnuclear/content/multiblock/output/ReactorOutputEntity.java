@@ -2,10 +2,6 @@ package net.nuclearteam.createnuclear.content.multiblock.output;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
-import com.simibubi.create.content.kinetics.motor.KineticScrollValueBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
-import com.simibubi.create.foundation.blockEntity.behaviour.scrollValue.ScrollValueBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.utility.CreateLang;
@@ -28,10 +24,9 @@ import net.nuclearteam.createnuclear.CNBlocks;
 
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
-import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import java.util.List;
-import java.util.Objects;
 
 import static net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput.DIR;
 
@@ -40,8 +35,9 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     public int speed = 1;
     public float heat = 0;
 
-    ReactorControllerBlock controller = null;
+    protected ReactorPattern pattern =  new ReactorPattern();
     ReactorControllerBlockEntity controllerEntity = null;
+    public ReactorControllerBlock controller = null;
 
 
     // protected ScrollValueBehaviour generatedSpeed;
@@ -86,24 +82,38 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 		setChanged();
     }
 
-    @Override
-	protected void read(CompoundTag compound, boolean clientPacket) {
-		super.read(compound, clientPacket);
-		generatedSpeed = compound.getFloat("generatedSpeed");
-	}
+    // Assure-toi d'avoir cette variable définie dans ta classe
+    private BlockPos outputPos;
 
-	
-	
-	@Override
-	public void write(CompoundTag compound, boolean clientPacket) {
-		super.write(compound, clientPacket);
-		compound.putFloat("generatedSpeed", generatedSpeed);
-	}
+    @Override
+    protected void read(CompoundTag compound, boolean clientPacket) {
+        super.read(compound, clientPacket);
+
+        // On récupère la vitesse
+        generatedSpeed = compound.getFloat("generatedSpeed");
+
+        // On récupère la position (seulement si elle existe dans le tag)
+        if (compound.contains("outputPos")) {
+            this.outputPos = BlockPos.of(compound.getLong("outputPos"));
+        }
+    }
+
+    @Override
+    public void write(CompoundTag compound, boolean clientPacket) {
+        super.write(compound, clientPacket);
+
+        // On enregistre la vitesse
+        compound.putFloat("generatedSpeed", generatedSpeed);
+
+        // On enregistre la position si elle n'est pas nulle
+        if (this.outputPos != null) {
+            compound.putLong("outputPos", this.outputPos.asLong());
+        }
+    }
 
     @Override
     public void tick() {
         super.tick();
-
         BlockGetter level = getLevel();
 
         if (level.getBlockState(getBlockPos().above(3)).getBlock() == CNBlocks.REACTOR_CONTROLLER.get()) {
@@ -150,14 +160,8 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
         if (!hasSource() || getGeneratedSpeed() > getTheoreticalSpeed())
         {
-            FindController(getBlockPos(), Objects.requireNonNull(getLevel()));
-        }
-    }
-
-    public void FindController(BlockPos pos, Level level){
-        if (level.getBlockState(pos.above(3)).getBlock() == CNBlocks.REACTOR_CONTROLLER.get()){
-            ReactorControllerBlock controller = (ReactorControllerBlock)level.getBlockState(pos.above(3)).getBlock();
-            controller.Verify(controller.defaultBlockState(), pos.above(3), level, level.players(), false);
+            assert level != null;
+            pattern.FindController(getBlockPos(), level, level.players(), true);
         }
     }
 
@@ -222,5 +226,9 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
             return direction.getAxis() != facing.getAxis();
         }
 
+    }
+
+    public void setController(ReactorControllerBlock controller) {
+        this.controller = controller;
     }
 }
