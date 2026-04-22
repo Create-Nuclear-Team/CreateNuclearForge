@@ -9,8 +9,8 @@ import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItemScreen;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintMenu;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputMenu;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputScreen;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputMenu;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputScreen;
 
 public class CNMenus {
     public static final MenuEntry<ReactorBluePrintMenu> REACTOR_BLUEPRINT_MENU = menu("reactor_blueprint_menu", ReactorBluePrintMenu::new, () -> ReactorBluePrintItemScreen::new);

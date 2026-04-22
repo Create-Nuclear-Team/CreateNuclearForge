@@ -10,6 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.nuclearteam.createnuclear.CNDamageTypes;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
+import net.nuclearteam.createnuclear.content.multiblock.fluid.CNReactorFluidTypes;
 import net.nuclearteam.createnuclear.content.multiblock.rod.CNRodTypes;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.CNBiomeModifiers;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.CNConfiguredFeatures;
@@ -26,6 +27,7 @@ public class GeneratedEntriesProvider extends DatapackBuiltinEntriesProvider {
         .add(Registries.PLACED_FEATURE, CNPlacedFeatures::bootstrap)
         .add(ForgeRegistries.Keys.BIOME_MODIFIERS, CNBiomeModifiers::bootstrap)
         .add(CreateNuclearRegistries.ROD_TYPE, CNRodTypes::bootstrap)
+        .add(CreateNuclearRegistries.FLUID_TYPE, CNReactorFluidTypes::bootstrap)
     ;
 
     public GeneratedEntriesProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {

@@ -58,7 +58,7 @@ public class ReactorBluePrintItemScreen extends AbstractSimiContainerScreen<Reac
                 tag.getInt("graphiteTime"),
                 tag.getInt("uraniumTime"),
                 tag.getInt("countUraniumRod"),
-                tag.getInt("countGraphiteRod")+3
+                tag.getInt("countGraphiteRod")
         );
 
 

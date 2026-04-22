@@ -6,6 +6,7 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorModel;
 import net.nuclearteam.createnuclear.foundation.events.overlay.IrradiatedOverlayRendererVision;
@@ -21,10 +22,7 @@ public class CNClientEvent {
     }
 
     @SubscribeEvent
-    public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        // On enregistre le layer avec la méthode createBodyLayer qu'on vient de faire
-        event.registerLayerDefinition(AntiRadiationArmorModel.LAYER_LOCATION, AntiRadiationArmorModel::createBodyLayer);
+    public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        CNEntityType.registerModelLayer(event);
     }
-
-
 }

@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
+import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.foundation.utility.RenderHelper;
@@ -42,7 +43,7 @@ public class HelmetOverlay  implements HudOverlay {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return false;
         ItemStack helmet = player.getInventory().getArmor(EquipmentSlot.HEAD.getIndex());
-        return !helmet.isEmpty() && helmet.is(CNItemTags.ANTI_RADIATION_HELMET_FULL_DYE.tag);
+        return !helmet.isEmpty() && helmet.is(CNItemTags.ANTI_RADIATION_ARMOR.tag) && helmet.is(CNTags.forgeItemTag("armors/helmets"));
     }
 
     @Override
