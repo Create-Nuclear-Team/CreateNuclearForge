@@ -34,6 +34,9 @@ import org.slf4j.Logger;
 public class CreateNuclear {
     public static final String MOD_ID = "createnuclear";
     public static final Logger LOGGER = LogUtils.getLogger();
+
+    public static CNCommonProxy PROXY = DistExecutor.runForDist(() -> CreateNuclearClient::new, () -> CNCommonProxy::new);
+
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID)
             .defaultCreativeTab((ResourceKey<CreativeModeTab>) null);
 
@@ -74,9 +77,13 @@ public class CreateNuclear {
         CNCreativeModeTabs.register(modEventBus);
         CNEffects.register(modEventBus);
         CNPotions.register(modEventBus);
+        CNParticleTypes.register(modEventBus);
+        CNParticleRegistry.DEF_REG.register(modEventBus);
         CNRecipeTypes.register(modEventBus);
 //        CNSounds.register(modEventBus);
         CNAttributes.register(modEventBus);
+
+        PROXY.commonInit();
 
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);

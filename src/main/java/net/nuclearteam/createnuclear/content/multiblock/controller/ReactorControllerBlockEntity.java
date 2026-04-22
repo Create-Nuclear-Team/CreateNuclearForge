@@ -8,15 +8,31 @@ import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
@@ -28,6 +44,17 @@ import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
+import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
@@ -221,6 +248,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.setChanged();
     }
 
+
     public double calculateProgress() {
         countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
         countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
@@ -261,9 +289,103 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     @Override
     public void tick() {
         super.tick();
-        if (level.isClientSide)
+        if (level.isClientSide || isExploding)
             return;
 
+        int currentHeat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+
+        // Récupération des configs pour l'utilitaire
+        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+
+        if (IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER) {
+            explosionCountdown++;
+
+            int secondsLeft = (300 - explosionCountdown) / 20;
+
+            // --- PHASE CRITIQUE : 10 dernières secondes (Action Bar clignotante) ---
+            if (secondsLeft <= 10 && secondsLeft > 0) {
+                // Clignotement : change de couleur tous les 5 ticks (0.25s)
+                boolean isWhite = (level.getGameTime() / 5) % 2 == 0;
+                ChatFormatting flashColor = isWhite ? ChatFormatting.WHITE : ChatFormatting.RED;
+
+                NotifyUtil.sendActionBar(
+                        level, getBlockPos(),
+                        "CORE MELTDOWN IN " + secondsLeft + "s",
+                        flashColor,
+                        configRadius, configWarnAll
+                );
+            }
+            // --- PHASE D'ALERTE : Entre 15s et 11s (Action Bar fixe) ---
+            else if (secondsLeft > 10 && explosionCountdown % 20 == 0) {
+                NotifyUtil.sendActionBar(
+                        level, getBlockPos(),
+                        "WARNING: CORE OVERHEATING",
+                        ChatFormatting.DARK_RED,
+                        configRadius, configWarnAll
+                );
+            }
+
+            // --- MOMENT DE L'EXPLOSION ---
+            if (explosionCountdown >= 300) {
+                // Affichage d'un titre final géant avant de tout faire sauter
+                NotifyUtil.sendTitle(
+                        level, getBlockPos(),
+                        "CRITICAL FAILURE",
+                        "IMMINENT EXPLOSION",
+                        ChatFormatting.DARK_RED,
+                        configRadius, configWarnAll,
+                        0, 40, 10
+                );
+
+                triggerNuclearExplosion();
+            }
+        } else {
+            // --- CŒUR STABILISÉ ---
+            if (explosionCountdown > 0) {
+                NotifyUtil.sendActionBar(
+                        level, getBlockPos(),
+                        "CORE STABILIZED",
+                        ChatFormatting.GREEN,
+                        configRadius, configWarnAll
+                );
+            }
+            explosionCountdown = 0;
+        }
+
+        if (isEmptyConfiguredPattern()) {
+
+            BlockEntity blockEntity = level.getBlockEntity(getBlockPosForReactor('I'));
+
+
+
+            /*if (blockEntity instanceof ReactorInputEntity be) {
+                CompoundTag tag = be.serializeNBT();
+                ListTag inventoryTag = tag.getCompound("Inventory").getList("Items", Tag.TAG_COMPOUND);
+                fuelItem = ItemStack.of(inventoryTag.getCompound(0));
+                coolerItem = ItemStack.of(inventoryTag.getCompound(1));
+                if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
+                    configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat(tag));
+                    if (updateTimers()) {
+                        be.inventory.extractItem(0, 1, false);
+                        be.inventory.extractItem(1, 1, false);
+                        total = calculateProgress();
+                        int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+
+                        if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
+                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4);
+                        } else {
+                            // Send a packet to all clients around this block within 16 blocks
+                            EventTriggerPacket packet = new EventTriggerPacket(600); // display for 100 ticks
+                            CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
+                            CNPackets.sendToNear(level, getBlockPos(), 32, packet);
+                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
+                        }
+                        return;
+                    }
+                } else {
+                    this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
+                }*/
         int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
         countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
         countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
@@ -326,6 +448,111 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             }
         }
     }
+
+    private void triggerNuclearExplosion() {
+        if (isExploding) return;
+        isExploding = true;
+
+        BlockPos explosionPos = getBlockPos().above(5);
+        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+
+        if (level instanceof ServerLevel serverLevel) {
+            // --- MESSAGE D'EXPLOSION FINALE ---
+            NotifyUtil.sendTitle(
+                level, getBlockPos(),
+                "RÉACTEUR DÉTRUIT",
+                "Fusion critique terminée",
+                ChatFormatting.DARK_RED,
+                configRadius, configWarnAll,
+                10, 60, 20
+            );
+
+            NuclearExplosionEntity explosion = new NuclearExplosionEntity(
+                    CNEntityType.NUCLEAR_EXPLOSION.get(),
+                    serverLevel
+            );
+
+            explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() - 2.0D);
+
+            float size = Mth.clamp(countUraniumRod * 0.075F, 1.0F, 4.0F);
+            explosion.setSize(size);
+
+            boolean griefing = serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+            explosion.setNoGriefing(!griefing);
+
+            serverLevel.addFreshEntity(explosion);
+
+            // On détruit le bloc après avoir envoyé les messages
+            level.destroyBlock(getBlockPos(), false);
+
+            changeBiome(CNBiomes.Irradiated.PLAIN, (int)size*30, explosionPos, serverLevel);
+        }
+    }
+
+    public void changeBiome(ResourceKey<Biome> biomeResourceKey, int radius, BlockPos center, ServerLevel serverLevel) {
+    Registry<Biome> biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME);
+    Holder<Biome> targetBiomeHolder = biomeRegistry.getHolderOrThrow(biomeResourceKey);
+
+    // Vérification rapide du centre
+    Holder<Biome> current = serverLevel.getBiome(center);
+    if (current.is(biomeResourceKey)) {
+        return;
+    }
+
+    // Définition de la zone de recherche (Bounding Box carrée qui contient le cercle)
+    int minX = center.getX() - radius;
+    int maxX = center.getX() + radius;
+    int minZ = center.getZ() - radius;
+    int maxZ = center.getZ() + radius;
+
+    double radiusSq = (double) radius * radius;
+    ArrayList<ChunkAccess> chunks = new ArrayList<>();
+
+    // On parcourt les chunks impactés
+    for (int cz = SectionPos.blockToSectionCoord(minZ); cz <= SectionPos.blockToSectionCoord(maxZ); ++cz) {
+        for (int cx = SectionPos.blockToSectionCoord(minX); cx <= SectionPos.blockToSectionCoord(maxX); ++cx) {
+            ChunkAccess chunkAccess = serverLevel.getChunk(cx, cz, ChunkStatus.FULL, false);
+            if (chunkAccess != null) {
+                // On utilise un resolver personnalisé qui vérifie la distance
+                chunkAccess.fillBiomesFromNoise(
+                    createCircularResolver(targetBiomeHolder, center, radiusSq, serverLevel),
+                    serverLevel.getChunkSource().randomState().sampler()
+                );
+                chunkAccess.setUnsaved(true);
+                chunks.add(chunkAccess);
+            }
+        }
+    }
+
+    // Notification aux clients
+    serverLevel.getChunkSource().chunkMap.resendBiomesForChunks(chunks);
+}
+
+    // Le resolver magique pour la forme circulaire
+    private BiomeResolver createCircularResolver(Holder<Biome> targetBiome, BlockPos center, double radiusSq, ServerLevel level) {
+        return (x, y, z, noise) -> {
+            // x, y, z ici sont en "biome coordinates" (1 unité = 4 blocs)
+            // On les multiplie par 4 pour revenir à une échelle de blocs
+            int blockX = x << 2;
+            int blockZ = z << 2;
+
+            double distX = blockX - center.getX();
+            double distZ = blockZ - center.getZ();
+
+            // Equation du cercle : x² + z² <= r²
+            if ((distX * distX) + (distZ * distZ) <= radiusSq) {
+                return targetBiome;
+            }
+
+            // Si hors du cercle, on garde le biome d'origine (ou on laisse le bruit faire)
+            // Note : Ici on demande au niveau le biome actuel à cette position
+            return level.getBiome(new BlockPos(blockX, y << 2, blockZ));
+        };
+    }
+
+    private boolean isEmptyConfiguredPattern() {
+        return !configuredPattern.isEmpty() || !configuredPattern.getOrCreateTag().isEmpty();
 
     private boolean isReadyToRun() {
         return !isEmptyConfiguredPattern()

@@ -11,6 +11,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.SlotItemHandler;
 import net.nuclearteam.createnuclear.CNMenus;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
@@ -71,7 +73,7 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
     }
 
     @Override
-    protected net.minecraftforge.items.ItemStackHandler createGhostInventory() {
+    protected ItemStackHandler createGhostInventory() {
         return getItemStorage(contentHolder);
     }
 
@@ -105,7 +107,7 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
         };
 
         for (int[] pos : positions) {// up and down not middle
-            this.addSlot(new net.minecraftforge.items.SlotItemHandler(ghostInventory,i, startWidth + incr * pos[0], startHeight + incr * pos[1]));
+            this.addSlot(new SlotItemHandler(ghostInventory,i, startWidth + incr * pos[0], startHeight + incr * pos[1]));
             i++;
         }
     }

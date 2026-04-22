@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.foundation.events;
 
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.TimeUtil;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -24,12 +26,16 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.chicken.IrradiatedChicken;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
+import org.spongepowered.asm.mixin.MixinEnvironment;
 import net.nuclearteam.createnuclear.content.effects.capability.RadiationCapability;
 
 @Mod.EventBusSubscriber
@@ -48,6 +54,23 @@ public class CommentEvents {
 
             if (type == EntityType.CHICKEN)
                 mob.goalSelector.addGoal(0, new AvoidEntityGoal<>(mob, IrradiatedChicken.class, 4.0F, 1.0F, 1.2F));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServerWorldTick(LivingEvent.LivingTickEvent event) {
+        LivingEntity entityLiving = event.getEntity();
+        Level world = entityLiving.level();
+        if (world == null)
+            return;
+
+        if (world.isClientSide)
+            return;
+        if (entityLiving.tickCount % 20 == 0) return;
+        if (entityLiving instanceof Player p && p.isSpectator()) return;
+        Holder<Biome> biome = world.getBiome(entityLiving.getOnPos());
+        if (biome.is(CNBiomes.Irradiated.PLAIN)){
+            entityLiving.addEffect(new MobEffectInstance(CNEffects.RADIATION.get(),600,0, false, true, true));
         }
     }
 

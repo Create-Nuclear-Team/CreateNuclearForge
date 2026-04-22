@@ -6,9 +6,12 @@
   "refmap": "createnuclear.refmap.json",
   "mixins": [
     "BaseFireBlockMixin",
+    "RadiationHeartMixin",
+    "GameRendererMixin",
+    "CameraAccessor"
     "SmithingTransformRecipeMixin",
-    "RadiationHeartMixin"
   ],
+  "accessWidener": "createnuclear.accesswidener",
   "client": [
   ],
   "injectors": {
