@@ -7,7 +7,15 @@ import net.minecraft.world.item.Item;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
+import com.tterrag.registrate.providers.RegistrateRecipeProvider;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
+import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 
 public class DyedItemsList<T extends Item> implements Iterable<ItemEntry<T>> {
 

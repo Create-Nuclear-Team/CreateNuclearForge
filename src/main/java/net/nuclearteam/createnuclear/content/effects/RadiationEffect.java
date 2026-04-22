@@ -26,16 +26,21 @@ public class RadiationEffect extends VicinityEffect {
         super(MobEffectCategory.HARMFUL, 15453236,
                 amplifier -> 10,
                 e -> {
-//                    CreateNuclear.LOGGER.warn("attribute: {}", e.getAttributes().save());
-//                    CreateNuclear.LOGGER.warn("attribute irradiated: {}", e.getAttributeValue(CNAttributes.IRRADIATED_RESISTANCE.get()));
-
                     boolean isWearingAntiRadiationArmor = false;
+                  
                     for (ItemStack armor : e.getArmorSlots()) {
                         if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
                             isWearingAntiRadiationArmor = true;
                             break;
                         }
                     }
+//                    for (ItemStack armor : e.getArmorSlots()) {
+//                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
+//                            isWearingAntiRadiationArmor = true;
+//                            break;
+//                        }
+//                    }
+
 
                     return !e.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)
                                 && !e.hasEffect(CNEffects.RADIATION.get())
