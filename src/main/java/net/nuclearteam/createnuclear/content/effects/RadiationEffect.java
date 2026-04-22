@@ -28,12 +28,12 @@ public class RadiationEffect extends VicinityEffect {
                 e -> {
                     boolean isWearingAntiRadiationArmor = false;
                   
-                    for (ItemStack armor : e.getArmorSlots()) {
-                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
-                            isWearingAntiRadiationArmor = true;
-                            break;
-                        }
-                    }
+//                    for (ItemStack armor : e.getArmorSlots()) {
+//                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
+//                            isWearingAntiRadiationArmor = true;
+//                            break;
+//                        }
+//                    }
 //                    for (ItemStack armor : e.getArmorSlots()) {
 //                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
 //                            isWearingAntiRadiationArmor = true;
