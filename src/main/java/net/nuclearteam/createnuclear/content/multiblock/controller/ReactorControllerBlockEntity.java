@@ -45,7 +45,7 @@ import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
@@ -356,6 +356,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (isEmptyConfiguredPattern()) {
 
             BlockEntity blockEntity = level.getBlockEntity(getBlockPosForReactor('I'));
+        }
 
 
 
@@ -550,9 +551,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             return level.getBiome(new BlockPos(blockX, y << 2, blockZ));
         };
     }
-
-    private boolean isEmptyConfiguredPattern() {
-        return !configuredPattern.isEmpty() || !configuredPattern.getOrCreateTag().isEmpty();
 
     private boolean isReadyToRun() {
         return !isEmptyConfiguredPattern()
