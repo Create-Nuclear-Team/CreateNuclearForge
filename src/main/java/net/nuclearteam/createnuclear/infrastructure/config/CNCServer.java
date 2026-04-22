@@ -6,6 +6,7 @@ public class CNCServer extends ConfigBase {
     public final CRods rods = nested(0, CRods::new, Comments.rods);
     public final CExplode explode = nested(0, CExplode::new, Comments.explode);
     public CNotify notify = nested(50, CNotify::new,"ratio");
+    public final CRadiation radiation = nested(0, CRadiation::new, Comments.radiation);
 
     @Override
     public String getName() {
@@ -15,5 +16,6 @@ public class CNCServer extends ConfigBase {
     private static class Comments {
         static String rods = "Modify the duration and configuration of rods.";
         static String explode = "Explosion settings.";
+        static String radiation = "Enable or disable radiation effects emitted by mod items. ";
     }
 }

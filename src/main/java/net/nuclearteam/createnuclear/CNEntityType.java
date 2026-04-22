@@ -21,6 +21,7 @@ import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.Irradi
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfModel;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.wolf.IrradiatedWolfRenderer;
 import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorModel;
 
 public class CNEntityType {
 
@@ -86,6 +87,8 @@ public class CNEntityType {
         event.registerLayerDefinition(CNModelLayers.IRRADIATED_CHICKEN, IrradiatedChickenModel::createBodyLayer);
         event.registerLayerDefinition(CNModelLayers.IRRADIATED_WOLF, IrradiatedWolfModel::createBodyLayer);
         event.registerLayerDefinition(CNModelLayers.IRRADIATED_COW, IrradiatedCowModel::createBodyLayer);
+
+        event.registerLayerDefinition(CNModelLayers.ANTI_IRRADIATION_ARMOR, AntiRadiationArmorModel::createBodyLayer);
 
    }
 

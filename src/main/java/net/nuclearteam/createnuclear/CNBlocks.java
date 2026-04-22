@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
@@ -37,6 +38,7 @@ import net.minecraftforge.client.model.generators.ModelFile;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
 import net.minecraftforge.common.Tags;
+
 import net.minecraftforge.common.util.ForgeSoundType;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
@@ -51,10 +53,10 @@ import net.nuclearteam.createnuclear.content.multiblock.cooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCore;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrame;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorframeItem;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputGenerator;
-import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorLiquidInput;
-import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorLiquidInputGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorLiquidInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorLiquidInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
@@ -156,7 +158,7 @@ public class CNBlocks {
 
 
     public static final BlockEntry<ReactorLiquidInput> REACTOR_LIQUID_INPUT =
-        CreateNuclear.REGISTRATE.block("reactor_liquid_input", ReactorLiquidInput::regular)
+        CreateNuclear.REGISTRATE.block("reactor_liquid_input", ReactorLiquidInput::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(2F))
@@ -473,6 +475,45 @@ public class CNBlocks {
             .build()
             .register();
 
+    public static final BlockEntry<Block> NITRATE_ORE =
+        CreateNuclear.REGISTRATE.block("nitrate_ore", Block::new)
+            .initialProperties(SharedProperties::stone)
+            .transform(pickaxeOnly())
+            .loot((lt, b) -> lt.add(b,
+                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.NITRATE)
+                        .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                ))))
+            .tag(BlockTags.NEEDS_IRON_TOOL,
+                    CNTags.forgeBlockTag("ores"),
+                    CNTags.forgeBlockTag("ores_in_ground/stone"),
+                    CNTags.forgeBlockTag("ores/nitrate")
+            )
+            .item()
+            .tag(CNTags.forgeItemTag("ores/nitrate"))
+            .build()
+            .register();
+
+    public static final BlockEntry<Block> DEEPSLATE_NITRATE_ORE =
+            CreateNuclear.REGISTRATE.block("deepslate_nitrate_ore", Block::new)
+                    .initialProperties(SharedProperties::stone)
+                    .simpleItem()
+                    .transform(pickaxeOnly())
+                    .loot((lt, b) -> lt.add(b,
+                            RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.NITRATE)
+                                            .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                                    ))))
+                    .tag(BlockTags.NEEDS_IRON_TOOL,
+                            CNTags.forgeBlockTag("ores"),
+                            CNTags.forgeBlockTag("ores_in_ground/deepslate"),
+                            CNTags.forgeBlockTag("ores/nitrate")
+                    )
+                    .item()
+                    .tag(CNTags.forgeItemTag("ores/nitrate"))
+                    .build()
+                    .register();
+
     public static final BlockEntry<Block> RAW_URANIUM_BLOCK =
         CreateNuclear.REGISTRATE.block("raw_uranium_block", Block::new)
             .initialProperties(SharedProperties::stone)
@@ -565,13 +606,22 @@ public class CNBlocks {
             .build()
             .register();
 
-    public static final BlockEntry<ReactorAlarm> REACTOR_ALARM =
-            CreateNuclear.REGISTRATE.block("reactor_alarm", ReactorAlarm::new)
-                    .initialProperties(SharedProperties::stone)
-                    .transform(pickaxeOnly())
-                    .item()
-                    .build()
-                    .register();
+    public static final BlockEntry<Block> REACTOR_ALARM =
+        CreateNuclear.REGISTRATE.block("reactor_alarm", Block::new)
+            .initialProperties(SharedProperties::stone)
+            .transform(pickaxeOnly())
+            .item()
+            .build()
+            .register();
+
+    /*public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK = CreateNuclear.REGISTRATE.block("test_event_trigger_block", EventTriggerBlock::new)
+            .defaultBlockstate()
+            .defaultLang()
+            .simpleItem()
+            .register();*/
+
+
+
 
 
 

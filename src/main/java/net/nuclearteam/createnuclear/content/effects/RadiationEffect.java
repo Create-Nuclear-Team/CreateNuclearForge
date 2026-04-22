@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNAttributes;
+
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
@@ -25,17 +26,21 @@ public class RadiationEffect extends VicinityEffect {
         super(MobEffectCategory.HARMFUL, 15453236,
                 amplifier -> 10,
                 e -> {
-//                    CreateNuclear.LOGGER.warn("attribute: {}", e.getAttributes().save());
-//                    CreateNuclear.LOGGER.warn("attribute irradiated: {}", e.getAttributeValue(CNAttributes.IRRADIATED_RESISTANCE.get()));
-
                     boolean isWearingAntiRadiationArmor = false;
-                    for (ItemStack armor : e.getArmorSlots()) {
-//                        CreateNuclear.LOGGER.warn("attribute irradiated: {}", armor.getAttributeModifiers(ArmorItem.Type.HELMET.getSlot()));
-                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
-                            isWearingAntiRadiationArmor = true;
-                            break;
-                        }
-                    }
+                  
+//                    for (ItemStack armor : e.getArmorSlots()) {
+//                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
+//                            isWearingAntiRadiationArmor = true;
+//                            break;
+//                        }
+//                    }
+//                    for (ItemStack armor : e.getArmorSlots()) {
+//                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
+//                            isWearingAntiRadiationArmor = true;
+//                            break;
+//                        }
+//                    }
+
 
                     return !e.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)
                                 && !e.hasEffect(CNEffects.RADIATION.get())
@@ -78,5 +83,6 @@ public class RadiationEffect extends VicinityEffect {
         // Apply radiation damage (magic type), scaled by amplifier
         int damage = 1 << amplifier;
         entity.hurt(CreateNuclearDamageSources.radiation(entity.level()), damage);
+
     }
 }

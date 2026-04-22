@@ -42,7 +42,7 @@ public class CreateNuclear {
 
     static {
         REGISTRATE.setTooltipModifierFactory(item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
-                .andThen(TooltipModifier.mapNull(KineticStats.create(item))).andThen(RodsStats.create(item)));
+            .andThen(TooltipModifier.mapNull(KineticStats.create(item))).andThen(RodsStats.create(item)));
     }
 
     public CreateNuclear() {

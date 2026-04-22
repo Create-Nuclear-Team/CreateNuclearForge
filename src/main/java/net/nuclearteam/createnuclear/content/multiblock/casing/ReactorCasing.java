@@ -5,6 +5,7 @@ import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -34,6 +35,8 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInput;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 
@@ -48,6 +51,7 @@ import java.util.Optional;
 @SuppressWarnings({"deprecation", "unused"})
 public class ReactorCasing extends Block implements IWrenchable, IBE<ReactorCasingEntity> {
     private final TypeBlock typeBlock;
+    protected ReactorPattern pattern =  new ReactorPattern();
 
     public ReactorCasing(Properties properties, TypeBlock tBlock) {
         super(properties);
@@ -60,21 +64,21 @@ public class ReactorCasing extends Block implements IWrenchable, IBE<ReactorCasi
         super.onPlace(state, level, pos, oldState, movedByPiston);
         // change nearby chunks' biomes to the mod biome (radius in blocks)
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, true);
+        pattern.FindController(pos, level, players, true);
     }
 
     @Override // called when the player destroys the block, with or without a tool
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, false);
+        pattern.FindController(pos, level, players, false);
     }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         super.onRemove(state, level, pos, newState, movedByPiston);
         List<? extends Player> players = level.players();
-        FindController(pos, level, players, false);
+        pattern.FindController(pos, level, players, false);
     }
 
     @Override
@@ -88,28 +92,6 @@ public class ReactorCasing extends Block implements IWrenchable, IBE<ReactorCasi
             player.sendSystemMessage(Component.translatable("reactor.update.casing.input"));
         }
         return InteractionResult.SUCCESS;
-    }
-
-    // En attendant le controller pour verifier le pattern
-    public ReactorControllerBlock FindController(BlockPos blockPos, Level level, List<? extends Player> players, boolean first){ // Function that checks the surrounding blocks in order
-        BlockPos newBlock; // to find the controller and verify the pattern
-        Vec3i pos = new Vec3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
-        for (int y = pos.getY()-3; y != pos.getY()+4; y+=1) {
-            for (int x = pos.getX()-5; x != pos.getX()+5; x+=1) {
-                for (int z = pos.getZ()-5; z != pos.getZ()+5; z+=1) {
-                    newBlock = new BlockPos(x, y, z);
-                    if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) { // verifying the pattern
-                        ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(newBlock).getBlock();
-                        controller.Verify(level.getBlockState(newBlock), newBlock, level, players, first);
-                        ReactorControllerBlockEntity entity = controller.getBlockEntity(level, newBlock);
-                        if (entity.created) {
-                            return controller;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     @Override

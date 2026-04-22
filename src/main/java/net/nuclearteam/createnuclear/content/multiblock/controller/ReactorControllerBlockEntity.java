@@ -1,11 +1,11 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller;
 
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
+import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
-import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -13,8 +13,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -24,6 +22,9 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
@@ -32,7 +33,16 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.*;
+import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
+import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
+import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
@@ -45,72 +55,107 @@ import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
+import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
+import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
+import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
+import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
+import net.nuclearteam.createnuclear.content.multiblock.controller.service.IHeatService;
+import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultHeatService;
+import net.nuclearteam.createnuclear.content.multiblock.controller.service.IPersistenceService;
+import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultPersistenceService;
 
-import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
 @SuppressWarnings({"unused"})
 public class ReactorControllerBlockEntity extends SmartBlockEntity implements IInteractionChecker, IHaveGoggleInformation {
-    public int explosionCountdown = 0;
-    private boolean isExploding = false;
+    /** The assembled state is stored in the block state (`ReactorControllerBlock.ASSEMBLED`).
+     *  Use the helper accessors below to query or toggle it to keep entity/blockstate consistent.
+     */
+    // configurable public surface reduced; fields are private and accessible via getters/setters
+    private int speed = 16; // This is the result speed of the reactor, change this to change the total capacity
 
-    public boolean destroyed = false;
-    public boolean created = false;
-    public boolean test = true;
-    public int speed = 16; // This is the result speed of the reactor, change this to change the total capacity
+    private ReactorControllerBlock controller;
+    private final ReactorPattern pattern = new ReactorPattern();
+    private final ReactorControllerInventory inventory;
+    private int countUraniumRod;
+    private int countGraphiteRod;
+    private int heat;
 
-    public boolean sendUpdate;
+    private double total;
+    private ItemStack configuredPattern;
 
-    public ReactorControllerBlock controller;
+    private BigItemStack bigFuelItem;
+    private BigItemStack bigCoolerItem;
+    private List<BigFluidStack> bigFluidStack;
 
-    public ReactorControllerInventory inventory;
+    private int reactorSize = 0;
+    private String reactorFacing = "null";
+    // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
+    private int[] reactorPos;
+    private boolean needsToResolveEntities = false;
 
-    //public LinkedHashSet<LazyOptional<IItemHandler>> attachedInventory;
+    private final ReactorInputManagerI inputManager;
+    private final ReactorOutputManagerI outputManager;
+    private final ReactorInputFluidManagerI inputFluidManager;
 
-    //private boolean powered;
-    public State powered = State.OFF;
-    public float reactorPower;
-    public float lastReactorPower;
-    int overFlowHeatTimer = 0;
-    int overFlowLimiter = 30;
-    double overHeat = 0;
-    public int baseUraniumHeat = 25;
-    public int baseGraphiteHeat = -10;
-    public int proximityUraniumHeat = 5;
-    public int proximityGraphiteHeat = -5;
-    public int maxUraniumPerGraphite = CNConfigs.server().rods.rodFuelMaxForCoolerRod.get();
-    public int graphiteTimer = 3600;
-    public int uraniumTimer = 3600;
-    public int countUraniumRod;
-    public int countGraphiteRod;
-    public int heat;
-    public double total;
-    public CompoundTag screen_pattern = new CompoundTag();
-    public ItemStack configuredPattern;
+    // services (dependencies) - abstracted behind interfaces to follow DIP
+    private final IHeatService heatService;
+    private final IPersistenceService persistenceService;
 
-    private ItemStack fuelItem;
-    private ItemStack coolerItem;
+    // service fields are injected; implementations live in separate classes
 
-    private final int[][] formattedPattern = new int[][]{
-            {99,99,99,0,1,2,99,99,99},
-            {99,99,3,4,5,6,7,99,99},
-            {99,8,9,10,11,12,13,14,99},
-            {15,16,17,18,19,20,21,22,23},
-            {24,25,26,27,28,29,30,31,32},
-            {33,34,35,36,37,38,39,40,41},
-            {99,42,43,44,45,46,47,48,99},
-            {99,99,49,50,51,52,53,99,99},
-            {99,99,99,54,55,56,99,99,99}
-    };
-    private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
+    // --- Accessors used by external services (persistence) ---
+    public ReactorControllerInventory getInventoryObject() { return this.inventory; }
+    public void deserializeInventory(CompoundTag tag) { this.inventory.deserializeNBT(tag); }
+    public CompoundTag serializeInventory() { return this.inventory.serializeNBT(); }
 
+    public ItemStack getConfiguredPattern() { return this.configuredPattern; }
+    public void setConfiguredPattern(ItemStack stack) { this.configuredPattern = stack; }
 
+    public BigItemStack getBigFuelItem() { return this.bigFuelItem; }
+    public void setBigFuelItem(BigItemStack b) { this.bigFuelItem = b; }
+    public BigItemStack getBigCoolerItem() { return this.bigCoolerItem; }
+    public void setBigCoolerItem(BigItemStack b) { this.bigCoolerItem = b; }
 
+    public int getMultiblockSize() { return this.reactorSize; }
+    public void setMultiblockSize(int s) { this.reactorSize = s; }
+
+    public String getMultiblockFacing() { return this.reactorFacing; }
+    public void setMultiblockFacing(String f) { this.reactorFacing = f; }
+
+    public int[] getMultiblockPos() { return this.reactorPos; }
+    public void setMultiblockStructure(int[] p) { this.reactorPos = p; }
+
+    public double getTotal() { return this.total; }
+    public void setTotal(double t) { this.total = t; }
+
+    /** Main constructor allowing dependency injection for testability and DIP compliance. */
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        inventory = new ReactorControllerInventory(this);
-        configuredPattern = ItemStack.EMPTY;
-        //attachedInventory = new LinkedHashSet<>();
+        this.inventory = new ReactorControllerInventory(this);
+        this.configuredPattern = ItemStack.EMPTY;
+
+        this.inputManager = new ReactorInputManager();
+        this.outputManager = new ReactorOutputManager();
+        this.inputFluidManager = new ReactorInputFluidManager();
+
+        this.bigFuelItem = new BigItemStack(ItemStack.EMPTY);
+        this.bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
+        this.bigFluidStack = new ArrayList<>();
+
+        this.heatService = new DefaultHeatService(new HeatManager());
+        this.persistenceService = new DefaultPersistenceService();
     }
 
     @Override
@@ -133,19 +178,30 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
             IHeat.HeatLevel.getFormattedHeatText(configuredPattern.getOrCreateTag().getInt("heat")).forGoggles(tooltip);
 
-            if (fuelItem.isEmpty()) {
+            if (bigFuelItem.stack.isEmpty()) {
                 // if rod empty we initialize it at 1 (and display it as 0) to avoid having air item displayed instead of the rod
                 IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.URANIUM_ROD.asItem(), 1), true).forGoggles(tooltip);
             } else {
-                IHeat.HeatLevel.getFormattedItemText(fuelItem, false).forGoggles(tooltip);
+                IHeat.HeatLevel.getFormattedItemText(bigFuelItem, false).forGoggles(tooltip);
             }
 
-            if (fuelItem.isEmpty()) {
+            if (bigCoolerItem.stack.isEmpty()) {
                 // if rod empty we initialize it at 1 (and display it as 0) to avoid having air item displayed instead of the rod
                 IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.GRAPHITE_ROD.asItem(), 1), true).forGoggles(tooltip);
             } else {
-                IHeat.HeatLevel.getFormattedItemText(coolerItem, false).forGoggles(tooltip);
+                IHeat.HeatLevel.getFormattedItemText(bigCoolerItem, false).forGoggles(tooltip);
             }
+
+            Map<ResourceLocation, Long> m = this.inputFluidManager.getInventory(level).fluids();
+            List<BigFluidStack> stacks = VirtualReactorInputFluid.toBigList(m);
+
+            for (BigFluidStack stack : stacks) {
+                CreateNuclearLang
+                    .translate("tooltip.fluid", stack.stack.getDisplayName())
+                    .translate("tooltip.fluid.amount", stack.amount)
+                    .forGoggles(tooltip);
+            }
+
         }
 
         return true;
@@ -154,53 +210,80 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     //(Si les methode read et write ne sont pas implémenté alors lorsque l'on relance le monde minecraft les items dans le composant auront disparu !)
     @Override
-    protected void read(CompoundTag compound, boolean clientPacket) { //Permet de stocker les item 1/2
-        if (!clientPacket) {
-            inventory.deserializeNBT(compound.getCompound("pattern"));
-        }
-        configuredPattern = ItemStack.of(compound.getCompound("items"));
-        if (ItemStack.of(compound.getCompound("cooler")) != null || ItemStack.of(compound.getCompound("fuel")) != null) {
-            coolerItem = ItemStack.of(compound.getCompound("cooler"));
-            fuelItem = ItemStack.of(compound.getCompound("fuel"));
+    protected void read(CompoundTag compound, boolean clientPacket) {
+        super.read(compound, clientPacket); // Toujours en premier pour les coordonnées de base
+        // delegate managers and persistence
+        this.inputManager.read(compound);
+        this.outputManager.read(compound);
+        this.inputFluidManager.read(compound);
 
-        }
-        /*
-        countGraphiteRod = compound.getInt("countGraphiteRod");
-        countUraniumRod = compound.getInt("countUraniumRod");
-        graphiteTimer = compound.getInt("graphiteTimer");
-        uraniumTimer = compound.getInt("uraniumTimer");
-        heat = compound.getInt("heat");
-*/
-        total = compound.getDouble("total");
-        super.read(compound, clientPacket);
+        this.persistenceService.readBasicState(this, compound, clientPacket);
+        this.needsToResolveEntities = true;
     }
 
     @Override
-    protected void write(CompoundTag compound, boolean clientPacket) { //Permet de stocker les item 2/2
-        if (!clientPacket) {
-            compound.put("pattern", inventory.serializeNBT());
-            //compound.putBoolean("powered", isPowered());
-        }
-        compound.put("items", configuredPattern.serializeNBT());
-
-        if (coolerItem != null || fuelItem != null) {
-            compound.put("cooler", coolerItem.serializeNBT());
-            compound.put("fuel", fuelItem.serializeNBT());
-        }
-        /*compound.putInt("countGraphiteRod", countGraphiteRod);
-        compound.putInt("countUraniumRod", countUraniumRod);
-        compound.putInt("graphiteTimer", graphiteTimer);
-        compound.putInt("uraniumTimer", uraniumTimer);
-        compound.putInt("heat", heat);
-        compound.putString("state", powered.name());
-        compound.put("screen_pattern", screen_pattern);
-*/
-        compound.putDouble("total", calculateProgress());
+    protected void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
+        this.inputManager.write(compound);
+        this.outputManager.write(compound);
+        this.inputFluidManager.write(compound);
+
+        this.persistenceService.writeBasicState(this, compound, clientPacket);
+
     }
 
-    public enum State {
-        ON, OFF
+
+    public boolean isAssembled() {
+        if (level == null) return false;
+        try {
+            return level.getBlockState(worldPosition).getValue(ASSEMBLED);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void setAssembled(boolean assembled) {
+        if (level == null) return;
+        level.setBlockAndUpdate(worldPosition, getBlockState().setValue(ASSEMBLED, assembled));
+        this.setChanged();
+    }
+
+
+    public double calculateProgress() {
+        countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
+        countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
+
+        double totalGraphiteRodLife = (double) heatService.getGraphiteTimer() / Math.max(1, countGraphiteRod);
+        double totalUraniumRodLife = (double) heatService.getUraniumTimer() / Math.max(1, countUraniumRod);
+
+        return totalGraphiteRodLife + totalUraniumRodLife;
+    }
+
+    public void test() {
+        CreateNuclear.LOGGER.warn("List d'input: {}", this.inputManager.size());
+        CreateNuclear.LOGGER.warn("List d'output: {}", this.outputManager.size());
+        CreateNuclear.LOGGER.warn("List d'input fluid: {}", this.inputFluidManager.size());
+
+        for (BlockPos p : this.inputManager.getBlocksPosition()) {
+                CreateNuclear.LOGGER.info("ReactorInputEntity BlockPos {}", p);
+        }
+        for (BlockPos p : this.inputManager.getBlocksPosition(level)) {
+            CreateNuclear.LOGGER.warn("List vrais input: {}", p);
+        }
+
+        for (BlockPos p : this.outputManager.getBlocksPosition()) {
+            CreateNuclear.LOGGER.info("ReactorOutputEntity BlockPos {}", p);
+        }
+        for (BlockPos p : this.outputManager.getBlocksPosition(level)) {
+            CreateNuclear.LOGGER.warn("List vrais output: {}", p);
+        }
+
+        for (BlockPos p : this.inputFluidManager.getBlocksPosition()) {
+            CreateNuclear.LOGGER.info("ReactorFluidInputEntity BlockPos {}", p);
+        }
+        for (BlockPos p : this.inputFluidManager.getBlocksPosition(level)) {
+            CreateNuclear.LOGGER.warn("List vrais input fluid: {}", p);
+        }
     }
 
     @Override
@@ -276,7 +359,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
 
 
-            if (blockEntity instanceof ReactorInputEntity be) {
+            /*if (blockEntity instanceof ReactorInputEntity be) {
                 CompoundTag tag = be.serializeNBT();
                 ListTag inventoryTag = tag.getCompound("Inventory").getList("Items", Tag.TAG_COMPOUND);
                 fuelItem = ItemStack.of(inventoryTag.getCompound(0));
@@ -302,30 +385,66 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                     }
                 } else {
                     this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
-                }
+                }*/
+        int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+        countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
+        countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
 
-                /*if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
-                    configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat(tag));
-                    if (updateTimers()) {
-                        TransferUtil.extract(be.inventory, ItemVariant.of(fuelItem), 1);
-                        TransferUtil.extract(be.inventory, ItemVariant.of(coolerItem), 1);
-                        total = calculateProgress();
-                        int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+        resolveEntitiesIfNeeded();
 
-                        if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
-                            //j'ai divisé la chaleur par 4, car maintenant on a mis la chaleur sur 1000 et non plus sur 200 en ayant rajouté 1/5 de bonus
-                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4);
-                        } else {
-                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
-                        }
-                        return;
-                    }
-                } else {
-                    this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
-                }
-                */
+        if (!isAssembled()) return;
 
+        // gather IO snapshot
+        VirtualReactorInputsItem virtualReactorInputsItem = inputManager.getInventory(level);
+        VirtualReactorInputFluid virtualReactorInputFluid = inputFluidManager.getInventory(level);
+        this.bigFuelItem = virtualReactorInputsItem.getBigFuelRod();
+        this.bigCoolerItem = virtualReactorInputsItem.getBigCooledRod();
+        this.bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
+
+        handleAssembledState(heat);
+    }
+
+    // --- extracted sub-steps to keep single responsibility per method ---
+    private void resolveEntitiesIfNeeded() {
+        if (!needsToResolveEntities) return;
+        List<IItemHandler> handlers = inputManager.getItemHandlers(level);
+        CreateNuclear.LOGGER.warn("Resolving inputs after load, handlers found: {}", handlers.size());
+        needsToResolveEntities = false;
+        this.setChanged();
+    }
+
+    private void handleAssembledState(int heat) {
+        if (!isReadyToRun()) {
+            updateHeatOnly();
+            if (!this.outputManager.getBlocksPosition().isEmpty()) rotate(getBlockState(), getLevel(), 0);
+            this.setChanged();
+            this.notifyUpdate();
+            return;
+        }
+
+        // ready to run
+        this.setChanged();
+        this.notifyUpdate();
+
+        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.get(0), countGraphiteRod, countUraniumRod, inventory, level));
+        if (!this.outputManager.getBlocksPosition().isEmpty()) {
+            rotate(getBlockState(), getLevel(), heat);
+        }
+
+        if (updateTimers()) {
+            boolean extracted = inputManager.extractItems(level, 1, 1);
+            if (extracted) {
+                this.setChanged();
                 this.notifyUpdate();
+                total = calculateProgress();
+
+                if (IHeat.HeatLevel.isNotDanger(heat)) {
+                    // normal
+                } else {
+                    EventTriggerPacket packet = new EventTriggerPacket(600);
+                    CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
+                    CNPackets.sendToNear(level, getBlockPos(), 32, packet);
+                }
             }
         }
     }
@@ -434,6 +553,29 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     private boolean isEmptyConfiguredPattern() {
         return !configuredPattern.isEmpty() || !configuredPattern.getOrCreateTag().isEmpty();
+
+    private boolean isReadyToRun() {
+        return !isEmptyConfiguredPattern()
+                && bigFuelItem.count > 0
+                && bigCoolerItem.count > 0
+                && !bigFluidStack.isEmpty()
+                && bigFluidStack.get(0).amount > 0
+                && this.inputManager.size() > 0
+                && this.inputFluidManager.size() > 0;
+    }
+
+    private void updateHeatOnly() {
+        // Guard against empty fluid list — HeatManager accepts null for empty/no-fluid case
+        BigItemStack fuel = bigFuelItem;
+        BigItemStack cooler = bigCoolerItem;
+        BigFluidStack fluid = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
+
+        configuredPattern.getOrCreateTag().putDouble("heat",
+                heatService.calculateHeat(fuel, cooler, fluid, countGraphiteRod, countUraniumRod, inventory, level));
+    }
+
+    private boolean isEmptyConfiguredPattern() {
+        return configuredPattern.isEmpty() || configuredPattern.getOrCreateTag().isEmpty();
     }
 
     private boolean updateTimers() {
@@ -442,95 +584,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return total <= 0;//(total/constTotal) <= 0;
     }
 
-    private double calculateProgress() {
-        countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
-        countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
-        // graphiteTimer = configuredPattern.getOrCreateTag().getInt("graphiteTime");
-        // uraniumTimer = configuredPattern.getOrCreateTag().getInt("uraniumTime");
-
-        double totalGraphiteRodLife = (double) graphiteTimer / countGraphiteRod;
-        double totalUraniumRodLife = (double) uraniumTimer / countUraniumRod;
-
-        return totalGraphiteRodLife + totalUraniumRodLife;
-    }
-
-    private double calculateHeat(CompoundTag tag) {
-        countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
-        countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
-        heat = 0;
-
-        // if more than maxUraniumPerGraphite of the rods are uranium, the reactor will overheat
-        if (countUraniumRod > countGraphiteRod * maxUraniumPerGraphite) {
-            overFlowHeatTimer++;
-            if (overFlowHeatTimer >= overFlowLimiter) {
-                overHeat+=1;
-                overFlowHeatTimer= 0;
-                if (overFlowLimiter > 2) {
-                    overFlowLimiter -= 1;
-                }
-            }
-        } else {
-            overFlowHeatTimer = 0;
-            overFlowLimiter = 30;
-            if (overHeat > 0) {
-                overHeat -= 2;
-            } else {
-                overHeat = 0;
-            }
-        }
-        // the offsets for the four directions (down, up, right, left) is int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} }; (defined at the top of the class)
-        String currentRod = "";
-        ListTag list = inventory.getStackInSlot(0).getOrCreateTag().getCompound("pattern").getList("Items", Tag.TAG_COMPOUND);
-        for (int i = 0; i < list.size(); i++) {
-            if (ItemStack.of(list.getCompound(i)).is(CNTags.CNItemTags.FUEL.tag)) {
-                heat += baseUraniumHeat;
-                currentRod = "u";
-            } else if (ItemStack.of(list.getCompound(i)).is(CNTags.CNItemTags.COOLER.tag)) {
-                heat += baseGraphiteHeat;
-                currentRod = "g";
-            }
-            for (int j = 0; j < formattedPattern.length; j++) {
-                for (int k = 0; k < formattedPattern[j].length; k++) {
-                    // Skip if the current pattern value is 99
-                    if (formattedPattern[j][k] == 99) continue;
-
-                    // Check if the current slot matches the pattern
-                    if (list.getCompound(i).getInt("Slot") != formattedPattern[j][k]) continue;
-
-                    // For each neighbor (up, down, right, left)
-                    for (int[] offset : offsets) {
-                        int nj = j + offset[0];
-                        int nk = k + offset[1];
-
-                        // Check if the indices are within the array boundaries
-                        if (nj < 0 || nj >= formattedPattern.length || nk < 0 || nk >= formattedPattern[j].length)
-                            continue;
-
-                        int neighborSlot = formattedPattern[nj][nk];
-
-                        // Loop through the list to find the neighbor slot
-                        for (int l = 0; l < list.size(); l++) {
-                            if (list.getCompound(l).getInt("Slot") == neighborSlot) {
-                                // If the currentRod equals "u", apply the corresponding heat
-                                if (currentRod.equals("u")) {
-                                    ItemStack stack = ItemStack.of(list.getCompound(i));
-                                    if (stack.is(CNTags.CNItemTags.FUEL.tag)) {
-                                        heat += proximityUraniumHeat;
-                                    } else if (stack.is(CNTags.CNItemTags.COOLER.tag)) {
-                                        heat += proximityGraphiteHeat;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return heat + overHeat;
-    }
 
     private BlockPos getBlockPosForReactor(char character) {
-        BlockPos pos = FindController(character);
+        BlockPos pos = pattern.VerifyPattern5x5(character);
         BlockPos posController = getBlockPos();
         BlockPos posInput = new BlockPos(posController.getX(), posController.getY(), posController.getZ());
 
@@ -553,100 +609,190 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return posInput;
     }
 
-    private CompoundTag convertePattern(CompoundTag compoundTag) {
-        ListTag pattern = compoundTag.getList("Items", Tag.TAG_COMPOUND);
+    public void rotate(BlockState state, Level level, int rotation) {
+        if (this.outputManager.getBlocksPosition().isEmpty()) return;
+        int remainingRotation = rotation % this.outputManager.getBlocksPosition().size();
+        for (int i = 0; i < this.outputManager.getBlocksPosition().size(); i++) {
+            int dividedRotation = (rotation / this.outputManager.getBlocksPosition().size()) + (i < remainingRotation ? 1 : 0);
+            BlockPos pos =  this.outputManager.getBlocksPosition().get(i);
 
-        int[][] list = new int[][]{
-                {99,99,99,0,1,2,99,99,99},
-                {99,99,3,4,5,6,7,99,99},
-                {99,8,9,10,11,12,13,14,99},
-                {15,16,17,18,19,20,21,22,23},
-                {24,25,26,27,28,29,30,31,32},
-                {33,34,35,36,37,38,39,40,41},
-                {99,42,43,44,45,46,47,48,99},
-                {99,99,49,50,51,52,53,99,99},
-                {99,99,99,54,55,56,99,99,99}
-        };
+            if (dividedRotation > 0) {
+                if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
+                    ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
+                    if (state.getValue(ASSEMBLED)) { // Starting the energy
+                        entity.speed = dividedRotation;
+                        entity.heat = dividedRotation;
+                    } else { // stopping the energy
+                        entity.speed = 0;
+                        entity.heat = 0;
+                    }
+                    entity.updateSpeed = true;
+                    entity.updateGeneratedRotation();
+                    entity.setSpeed(dividedRotation);
 
-
-        return null;
-    }
-
-    private static BlockPos FindController(char character) {
-        return SimpleMultiBlockAislePatternBuilder.start()
-                .aisle(AAAAA, AAAAA, AAAAA, AAAAA, AAAAA)
-                .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
-                .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
-                .aisle(AAIAA, ADADA, BACAB, ADADA, AAAA)
-                .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
-                .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
-                .aisle(AAAAA, AAAAA, AAAAA, AAAAA, AAOAA)
-                .where('A', a -> a.getState().is(CNBlocks.REACTOR_CASING.get()))
-                .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
-                .where('C', a -> a.getState().is(CNBlocks.REACTOR_CORE.get()))
-                .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
-                .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
-                .where('O', a -> a.getState().is(CNBlocks.REACTOR_OUTPUT.get()))
-                .where('I', a -> a.getState().is(CNBlocks.REACTOR_INPUT.get()))
-                .getDistanceController(character);
-    }
-
-    public void rotate(BlockState state, BlockPos pos, Level level, int rotation) {
-        if (level.getBlockState(pos).is(CNBlocks.REACTOR_OUTPUT.get()) && rotation > 0) {
-            if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
-                ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
-                if (state.getValue(ASSEMBLED)) { // Starting the energy
-                    entity.speed = rotation;
-                    entity.heat = rotation;
-                } else { // stopping the energy
-                    entity.speed = 0;
+                }
+            } else {
+                if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
+                    ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
+                    entity.setSpeed(0);
                     entity.heat = 0;
+                    entity.updateSpeed = true;
+                    entity.updateGeneratedRotation();
                 }
-                entity.updateSpeed = true;
-                entity.updateGeneratedRotation();
-                entity.setSpeed(rotation);
-
-            }
-        }
-        else {
-            if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
-                ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
-                entity.setSpeed(0);
-                entity.heat = 0;
-                entity.updateSpeed = true;
-                entity.updateGeneratedRotation();
             }
         }
     }
 
-    public InteractionResult onClick(Player player, InteractionHand hand) {
-        ItemStack heldItem = player.getItemInHand(hand);
-        if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && !heldItem.isEmpty()) {
-            if (configuredPattern.isEmpty()) {
-                inventory.setStackInSlot(0, heldItem);
-                configuredPattern = heldItem;
-                //player.setItemInHand(hand, ItemStack.EMPTY);
-            }
-            notifyUpdate();
-            return InteractionResult.SUCCESS;
-        }
-        else if (heldItem.isEmpty()) {
-            if (configuredPattern.isEmpty()) {
-                if (!level.isClientSide) {
-                    if (player.addItem(configuredPattern)){
-                        configuredPattern = ItemStack.EMPTY;
-                    }
-                    else {
-                        player.setItemInHand(hand, configuredPattern);
-                        inventory.setStackInSlot(0, ItemStack.EMPTY);
-                    }
-                    notifyUpdate();
-                    return InteractionResult.CONSUME;
-                    //return InteractionResult.FAIL;
+    @Deprecated
+    public int[] getStructureBounds(BlockPos startPos, int structureSize, String facing) {
+        int[] northOffsets5x5 = new int[] {-2, 2, -3, 3, 0, 4};
+        int[] northOffsets7x7 = new int[] {-3, 3, -4, 4, 0, 6};
+        int[] northOffsets9x9 = new int[] {-4, 4, -5, 5, 0, 8};
+
+        int[] eastOffsets5x5 = new int[] {-4, 0, -3, 3, -2, 2};
+        int[] eastOffsets7x7 = new int[] {-6, 0, -4, 4, -3, 3};
+        int[] eastOffsets9x9 = new int[] {-8, 0, -5, 5, -4, 4};
+
+        int[] southOffsets5x5 = new int[] {-2, 2, -3, 3, -4, 0};
+        int[] southOffsets7x7 = new int[] {-3, 3, -4, 4, -6, 0};
+        int[] southOffsets9x9 = new int[] {-4, 4, -5, 5, -8, 0};
+
+        int[] westOffsets5x5 = new int[] {0, 4, -3, 3, -2, 2};
+        int[] westOffsets7x7 = new int[] {0, 6, -4, 4, -3, 3};
+        int[] westOffsets9x9 = new int[] {0, 8, -5, 5, -4, 4};
+
+        switch (facing) {
+            case "north":
+                switch (structureSize) {
+                    case 5: return applyOffset(startPos, northOffsets5x5);
+                    case 7: return applyOffset(startPos, northOffsets7x7);
+                    case 9: return applyOffset(startPos, northOffsets9x9);
                 }
-                else return InteractionResult.SUCCESS;
+            case "east":
+                switch (structureSize) {
+                    case 5: return applyOffset(startPos, eastOffsets5x5);
+                    case 7: return applyOffset(startPos, eastOffsets7x7);
+                    case 9: return applyOffset(startPos, eastOffsets9x9);
+                }
+            case "south":
+                switch (structureSize) {
+                    case 5: return applyOffset(startPos, southOffsets5x5);
+                    case 7: return applyOffset(startPos, southOffsets7x7);
+                    case 9: return applyOffset(startPos, southOffsets9x9);
+                }
+            case "west":
+                switch (structureSize) {
+                    case 5: return applyOffset(startPos, westOffsets5x5);
+                    case 7: return applyOffset(startPos, westOffsets7x7);
+                    case 9: return applyOffset(startPos, westOffsets9x9);
+                }
+            default: return new int[] {0, 0, 0, 0, 0, 0};
+        }
+    }
+
+    @Deprecated
+    private int[] applyOffset(BlockPos pos, int[] offset) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
+        return new int[] {x + offset[0], x + offset[1], y + offset[2], y + offset[3], z + offset[4], z + offset[5]};
+    }
+
+    public void addInput(BlockPos inputPos) {
+        this.inputManager.addBlock(inputPos);
+        this.setChanged();
+    }
+
+    public void removeInput(BlockPos inputPos) {
+        this.inputManager.removeBlock(inputPos);
+        this.setChanged();
+    }
+
+    public void addOutput(BlockPos outputPos) {
+        this.outputManager.addBlock(outputPos);
+        this.setChanged();
+    }
+
+    public void removeOutput(BlockPos outputPos) {
+        this.outputManager.removeBlock(outputPos);
+        this.setChanged();
+    }
+
+    public void addInputFluid(BlockPos outputPos) {
+        this.inputFluidManager.addBlock(outputPos);
+        this.setChanged();
+    }
+
+    public void removeInputFluid(BlockPos outputPos) {
+        this.inputFluidManager.removeBlock(outputPos);
+        this.setChanged();
+    }
+
+    public void removeIOAll() {
+        this.inputManager.clearInvalid(level);
+        this.outputManager.clearInvalid(level);
+        this.inputFluidManager.clearInvalid(level);
+        this.setChanged();
+    }
+
+    /** Try to lock this controller to the given Fluid. Returns true if allowed. */
+    public boolean tryLockFluid(Fluid fluid) {
+        // server-persistent approach (preferred): use PersistentFluidLocks when on server
+        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+            return PersistentFluidLocks.get(serverLevel).tryLock(getBlockPos(), fluid);
+        }
+        // fallback to in-memory manager (single-server-run)
+        return FluidLockManager.tryLock(getBlockPos(), fluid);
+    }
+
+    /** Returns whether the given FluidStack is acceptable for this controller. */
+    public boolean canAcceptFluid(FluidStack stack) {
+        if (stack == null || stack.isEmpty()) return true;
+        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+            return PersistentFluidLocks.get(serverLevel).canAccept(getBlockPos(), stack.getFluid());
+        }
+        return FluidLockManager.canAccept(getBlockPos(), stack);
+    }
+
+    /** Force-clear the lock on this controller. */
+    public void clearLock() {
+        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+            PersistentFluidLocks.get(serverLevel).clearLock(getBlockPos());
+        } else {
+            FluidLockManager.clearLock(getBlockPos());
+        }
+        setChanged();
+        sendData();
+    }
+
+    public void clearLockIfAllInputsEmpty() {
+        if (level == null || level.isClientSide) return;
+
+        final int SCAN_RADIUS = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this).data().getSize(); // adapte selon la taille max du multiblock
+        BlockPos center = getBlockPos();
+        boolean anyNonEmpty = false;
+
+        for (int dx = -SCAN_RADIUS; dx <= SCAN_RADIUS && !anyNonEmpty; dx++) {
+            for (int dy = -SCAN_RADIUS; dy <= SCAN_RADIUS && !anyNonEmpty; dy++) {
+                for (int dz = -SCAN_RADIUS; dz <= SCAN_RADIUS && !anyNonEmpty; dz++) {
+                    BlockPos p = center.offset(dx, dy, dz);
+                    BlockEntity be = level.getBlockEntity(p);
+                    if (!(be instanceof ReactorFluidInputEntity)) continue;
+
+                    IFluidHandler handler = be.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
+                    if (handler == null) continue;
+
+                    for (int t = 0; t < handler.getTanks(); t++) {
+                        if (!handler.getFluidInTank(t).isEmpty()) {
+                            anyNonEmpty = true;
+                            break;
+                        }
+                    }
+                }
             }
         }
-        return InteractionResult.PASS;
+
+        if (!anyNonEmpty) clearLock();
     }
 }

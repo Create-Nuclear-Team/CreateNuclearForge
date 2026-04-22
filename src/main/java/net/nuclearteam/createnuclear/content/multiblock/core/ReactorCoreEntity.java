@@ -12,6 +12,7 @@ import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 
@@ -57,6 +58,17 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
 
                 // Supprime le cœur (optionnel mais logique)
                 level.removeBlock(getBlockPos(), false);
+
+        /*if (level.getBlockEntity(controllerPos) instanceof ReactorControllerBlockEntity reactorController) {
+            int heat = (int) reactorController.getConfiguredPattern().getOrCreateTag().getDouble("heat");
+            if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.DANGER) {
+                if (countdownTicks >= CNConfigs.server().explode.time.get()) { // 300 ticks = 15 secondes
+                    explodeReactorCore(level, getBlockPos());
+                } else {
+                    countdownTicks++;
+                }
+            } else {
+                countdownTicks = 0; // Reset the countdown if the heat level is not in danger*/
             }
 
         } else {
@@ -99,7 +111,7 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
 
     /* ===================== MULTIBLOCK ===================== */
 
-    private static BlockPos FindController(char character) {
+   /* private static BlockPos FindController(char character) {
         return SimpleMultiBlockAislePatternBuilder.start()
                 .aisle(AAAAA, AAAAA, AAAAA, AAAAA, AAAAA)
                 .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
@@ -116,7 +128,7 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
                 .where('O', a -> a.getState().is(CNBlocks.REACTOR_OUTPUT.get()))
                 .where('I', a -> a.getState().is(CNBlocks.REACTOR_INPUT.get()))
                 .getDistanceController(character);
-    }
+    }*/
 
     private BlockPos getBlockPosForReactor() {
         BlockPos origin = getBlockPos();

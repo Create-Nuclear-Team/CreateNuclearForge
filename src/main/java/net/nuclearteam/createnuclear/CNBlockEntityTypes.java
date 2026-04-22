@@ -8,8 +8,8 @@ import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarmEntity
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCoreEntity;
-import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputEntity;
-import net.nuclearteam.createnuclear.content.multiblock.liquidInput.ReactorLiquidInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputRenderer;
 
@@ -34,13 +34,8 @@ public class CNBlockEntityTypes {
                     .validBlocks(CNBlocks.REACTOR_INPUT)
                     .register();
 
-    public static final BlockEntityEntry<ReactorLiquidInputEntity> REACTOR_LIQUID_INPUT =
-            CreateNuclear.REGISTRATE.blockEntity("reactor_liquid_input", ReactorLiquidInputEntity::new)
-                    .validBlocks(CNBlocks.REACTOR_LIQUID_INPUT)
-                    .register();
-
-    public static final BlockEntityEntry<ReactorLiquidInputEntity> CREATIVE_REACTOR_LIQUID_INPUT =
-            CreateNuclear.REGISTRATE.blockEntity("reactor_liquid_input", ReactorLiquidInputEntity::new)
+    public static final BlockEntityEntry<ReactorFluidInputEntity> REACTOR_LIQUID_INPUT =
+            CreateNuclear.REGISTRATE.blockEntity("reactor_liquid_input", ReactorFluidInputEntity::new)
                     .validBlocks(CNBlocks.REACTOR_LIQUID_INPUT)
                     .register();
 

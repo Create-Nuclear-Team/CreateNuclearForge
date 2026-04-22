@@ -5,8 +5,8 @@
 		"4": "minecraft:block/water_still",
 		"5": "minecraft:block/water_flow",
 		"6": "createnuclear:block/reactor/casing/reactor_casing",
-		"8": "createnuclear:block/reactor/casing/casing_inner",
-		"9": "createnuclear:block/reactor/casing/casing_top",
+		"8": "createnuclear:block/reactor/casing/reactor_casing",
+		"9": "createnuclear:block/reactor/casing/reactor_casing",
 		"10": "createnuclear:block/reactor/frame/window_single",
 		"particle": "minecraft:block/water_still"
 	},

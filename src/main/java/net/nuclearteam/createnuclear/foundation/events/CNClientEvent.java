@@ -24,6 +24,5 @@ public class CNClientEvent {
     @SubscribeEvent
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         CNEntityType.registerModelLayer(event);
-        event.registerLayerDefinition(AntiRadiationArmorModel.LAYER_LOCATION, AntiRadiationArmorModel::createBodyLayer);
     }
 }

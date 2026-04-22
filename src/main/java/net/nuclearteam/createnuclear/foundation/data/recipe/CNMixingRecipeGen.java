@@ -3,6 +3,7 @@ package net.nuclearteam.createnuclear.foundation.data.recipe;
 import com.simibubi.create.api.data.recipe.MixingRecipeGen;
 import com.simibubi.create.content.processing.recipe.HeatCondition;
 import net.minecraft.data.PackOutput;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.Tags;
 import net.nuclearteam.createnuclear.CNFluids;
@@ -38,10 +39,10 @@ public class CNMixingRecipeGen extends MixingRecipeGen {
 //            .output(CNItems.NITRATE_SLUDGE)
 //        ),
 
-        AZOTE = create("liquid_azote", b -> b
+        NITROGEN = create("liquid_nitrogen", b -> b
                 .require(CNItems.COOLED_NITROGEN_CONCENTRATE)
-                .duration(30)
-                .requiresHeat(HeatCondition.SUPERHEATED)
+                .duration(20)
+                .require(Items.ICE)
                 .output(CNFluids.LIQUID_NITROGEN.get(), 1000)
         );
     ;

@@ -15,6 +15,8 @@
     "createnuclear:uranium_ore",
     "createnuclear:lead_ore",
     "createnuclear:thorium_ore",
+    "createnuclear:nitrate_ore",
+    "createnuclear:deepslate_nitrate_ore",
     "createnuclear:raw_uranium_block",
     "createnuclear:raw_lead_block",
     "createnuclear:raw_thorium_block",

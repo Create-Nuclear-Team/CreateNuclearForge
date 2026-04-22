@@ -1,11 +1,6 @@
 package net.nuclearteam.createnuclear;
 
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Chestplate.getChestplateTag;
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Helmet.getHelmetTag;
-
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Leggings.getLeggingsTag;
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.Boot.getBootTag;
-
+import com.simibubi.create.foundation.data.AssetLookup;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
@@ -13,15 +8,22 @@ import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.SmithingTransformRecipeBuilder;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
 import net.nuclearteam.createnuclear.foundation.item.radiation.RadiationItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
+import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
 import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
 import java.util.function.Supplier;
@@ -189,6 +191,7 @@ public class CNItems {
 
         NITRATE = CreateNuclear.REGISTRATE
             .item("nitrate", Item::new)
+            .lang("Nitrate")
             .register(),
 
         NITROGEN_CONCENTRATE = CreateNuclear.REGISTRATE
@@ -212,104 +215,140 @@ public class CNItems {
             .register()
     ;
 
-    public static final DyedItemsList<Helmet> ANTI_RADIATION_HELMETS = new DyedItemsList<>(color -> {
-        String colorName = color.getSerializedName();
+    public static final ItemEntry<Helmet> ANTI_RADIATION_HELMETS = CreateNuclear.REGISTRATE
+        .item("default_anti_radiation_helmet", p -> new Helmet(p, DyeColor.BLACK))
+        .tag(
+            CNTags.forgeItemTag("armors/helmets"),
+            CNItemTags.ANTI_RADIATION_ARMOR.tag
+        )
+        .recipe((c, p) -> {
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
+                .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
+                .define('X', CNTags.forgeItemTag("ingots/lead"))
+                .define('Y', ClothItem.Cloths.getByColor(DyeColor.BLACK).get())
+                .define('Z', CNBlocks.REINFORCED_GLASS.asItem())
+                .pattern("YXY")
+                .pattern("XZX")
+                .showNotification(true)
+                .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
 
-        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_helmet", p -> new Helmet(p, color))
-                .tag(
-                    CNTags.forgeItemTag("armors/helmets"),
-                    getHelmetTag(colorName),
-                    CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
-                    CNItemTags.ANTI_RADIATION_HELMET_FULL_DYE.tag
-                )
-                .recipe((c, p) -> {
-                    ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
-                            .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                            .define('X', CNTags.forgeItemTag("ingots/lead"))
-                            .define('Y', ClothItem.Cloths.getByColor(color).get())
-                            .define('Z', CNBlocks.REINFORCED_GLASS.asItem())
-                            .pattern("YXY")
-                            .pattern("XZX")
-                            .showNotification(true)
-                            .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
-                })
-                .lang(TextUtils.titleCaseConversion(color.getName()) + " Anti Radiation Helmet")
-                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/helmets/" + colorName + "_anti_radiation_helmet")))
-            .register();
-    });
+            for (Cloths cloth : Cloths.values()) {
+                SmithingClothRecipeBuilder
+                    .smithingCloth(
+                        Ingredient.EMPTY,
+                        Ingredient.of(c.get()),
+                        Ingredient.of(cloth.getItem()),
+                        RecipeCategory.COMBAT,
+                        new ItemStack(c.get())
+                    )
+                    .unlocks("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
+                    .save(p, CreateNuclear.asResource("smithing/" + c.getName() + "_" + cloth.getColor().getSerializedName()));
+            }
+        })
+        .lang("Anti Radiation Helmet")
+        .model(AssetLookup.itemModelWithPartials())
+        .register();
 
-    public static final DyedItemsList<Chestplate> ANTI_RADIATION_CHESTPLATES = new DyedItemsList<>(color -> {
-        String colorName = color.getSerializedName();
+    public static final ItemEntry<Chestplate> ANTI_RADIATION_CHESTPLATES = CreateNuclear.REGISTRATE
+        .item("default_anti_radiation_chestplate",  p -> new Chestplate(p, DyeColor.BLACK))
+        .tag(
+            CNTags.forgeItemTag("armors/chestplates"),
+            CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
+        )
+        .recipe((c, p) -> {
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
+                    .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
+                    .define('X', CNTags.forgeItemTag("ingots/lead"))
+                    .define('Y', ClothItem.Cloths.getByColor(DyeColor.BLACK).get())
+                    .define('Z', CNItems.GRAPHITE_ROD)
+                    .pattern("Y Y")
+                    .pattern("XXX")
+                    .pattern("ZXZ")
+                    .showNotification(true)
+                    .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
+            for (Cloths cloth : Cloths.values()) {
+                SmithingClothRecipeBuilder
+                    .smithingCloth(
+                        Ingredient.EMPTY,
+                        Ingredient.of(c.get()),
+                        Ingredient.of(cloth.getItem()),
+                        RecipeCategory.COMBAT,
+                        new ItemStack(c.get())
+                    )
+                    .unlocks("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
+                    .save(p, CreateNuclear.asResource("smithing/" + c.getName() + "_" + cloth.getColor().getSerializedName()));
+            }
+        })
+        .lang("Anti Radiation Chestplate")
+        .model(AssetLookup.itemModelWithPartials())
+        .register();
 
-        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_chestplate",  p -> new Chestplate(p, color))
-            .tag(
-                CNTags.forgeItemTag("armors/chestplates"),
-                getChestplateTag(colorName),
-                CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
-                CNItemTags.ANTI_RADIATION_CHESTPLATE_FULL_DYE.tag
-            )
-                .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
-                        .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                        .define('X', CNTags.forgeItemTag("ingots/lead"))
-                        .define('Y', ClothItem.Cloths.getByColor(color).get())
-                        .define('Z', CNItems.GRAPHITE_ROD)
-                        .pattern("Y Y")
-                        .pattern("XXX")
-                        .pattern("ZXZ")
-                        .showNotification(true)
-                        .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
-                .lang(TextUtils.titleCaseConversion(color.getName()) +" Anti Radiation Chestplate")
-                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/chestplates/" + colorName + "_anti_radiation_chestplate")))
-            .register();
+    public static final ItemEntry<Leggings> ANTI_RADIATION_LEGGINGS = CreateNuclear.REGISTRATE
+        .item("default_anti_radiation_leggings",  p -> new Leggings(p, DyeColor.BLACK))
+        .tag(
+            CNTags.forgeItemTag("armors/leggings"),
+                CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
+        )
+        .recipe((c, p) -> {
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
+                .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
+                .define('X', CNTags.forgeItemTag("ingots/lead"))
+                .define('Y', ClothItem.Cloths.getByColor(DyeColor.BLACK).get())
+                .pattern("YXY")
+                .pattern("X X")
+                .pattern("Y Y")
+                .showNotification(true)
+                .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
 
-    });
+            for (Cloths cloth : Cloths.values()) {
+                SmithingClothRecipeBuilder
+                    .smithingCloth(
+                        Ingredient.EMPTY,
+                        Ingredient.of(c.get()),
+                        Ingredient.of(cloth.getItem()),
+                        RecipeCategory.COMBAT,
+                        new ItemStack(c.get())
+                    )
+                    .unlocks("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
+                    .save(p, CreateNuclear.asResource("smithing/" + c.getName() + "_" + cloth.getColor().getSerializedName()));
+            }
+        })
+        .lang("Anti Radiation Leggings")
+        .model(AssetLookup.itemModelWithPartials())
+        .register();
 
-    public static final DyedItemsList<Leggings> ANTI_RADIATION_LEGGINGS = new DyedItemsList<>(color -> {
-        String colorName = color.getSerializedName();
+    public static final ItemEntry<Boot> ANTI_RADIATION_BOOTS = CreateNuclear.REGISTRATE
+        .item("default_anti_radiation_boots", p -> new Boot(p, DyeColor.BLACK))
+        .tag(
+            CNTags.forgeItemTag("armors/boots"),
+            CNTags.CNItemTags.ANTI_RADIATION_ARMOR.tag
+        )
+        .recipe((c, p) -> {
+            ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
+                .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
+                .define('X', CNTags.forgeItemTag("ingots/lead"))
+                .define('Y', ClothItem.Cloths.getByColor(DyeColor.BLACK).get())
+                .pattern("Y Y")
+                .pattern("X X")
+                .showNotification(true)
+                .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName()));
 
-        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_leggings",  p -> new Leggings(p, color))
-                .tag(
-                    CNTags.forgeItemTag("armors/leggings"),
-                    getLeggingsTag(colorName),
-                    CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
-                    CNItemTags.ANTI_RADIATION_LEGGINGS_FULL_DYE.tag
-                )
-                .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
-                        .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                        .define('X', CNTags.forgeItemTag("ingots/lead"))
-                        .define('Y', ClothItem.Cloths.getByColor(color).get())
-                        .pattern("YXY")
-                        .pattern("X X")
-                        .pattern("Y Y")
-                        .showNotification(true)
-                        .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
-                .lang(TextUtils.titleCaseConversion(color.getName()) +" Anti Radiation Leggings")
-                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/leggings/" + colorName + "_anti_radiation_leggings")))
-                .register();
-    });
-
-    public static final DyedItemsList<Boot> ANTI_RADIATION_BOOTS = new DyedItemsList<>(color -> {
-        String colorName = color.getSerializedName();
-
-        return CreateNuclear.REGISTRATE.item(colorName + "_anti_radiation_boots", p -> new Boot(p, color))
-                .tag(
-                        CNTags.forgeItemTag("armors/boots"),
-                        getBootTag(colorName),
-                        CNItemTags.ALL_ANTI_RADIATION_ARMORS.tag,
-                        CNItemTags.ANTI_RADIATION_BOOTS_FULL_DYE.tag
-                )
-                .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
-                        .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
-                        .define('X', CNTags.forgeItemTag("ingots/lead"))
-                        .define('Y', ClothItem.Cloths.getByColor(color).get())
-                        .pattern("Y Y")
-                        .pattern("X X")
-                        .showNotification(true)
-                        .save(p, CreateNuclear.asResource("crafting/items/armors/" + c.getName())))
-                .lang(TextUtils.titleCaseConversion(color.getName()) + " Anti Radiation Boots")
-                .model((c, p) -> p.generated(c, CreateNuclear.asResource("item/armors/boots/" + colorName + "_anti_radiation_boots")))
-                .register();
-    });
+            for (Cloths cloth : Cloths.values()) {
+                SmithingClothRecipeBuilder
+                    .smithingCloth(
+                        Ingredient.EMPTY,
+                        Ingredient.of(c.get()),
+                        Ingredient.of(cloth.getItem()),
+                        RecipeCategory.COMBAT,
+                        new ItemStack(c.get())
+                    )
+                    .unlocks("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
+                    .save(p, CreateNuclear.asResource("smithing/" + c.getName() + "_" + cloth.getColor().getSerializedName()));
+            }
+        })
+        .lang("Anti Radiation Boots")
+        .model(AssetLookup.itemModelWithPartials())
+        .register();
 
     public static final DyedItemsList<ClothItem> CLOTHS = new DyedItemsList<>(color -> {
         String colorName = color.getSerializedName();

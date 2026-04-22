@@ -3,6 +3,10 @@ package net.nuclearteam.createnuclear;
 import net.createmod.ponder.foundation.PonderIndex;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.DyeColor;
+
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -36,5 +40,19 @@ public class CreateNuclearClient extends CNClientProxy {
         registry.registerSpecial(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD.get(), new NuclearMushroomCloudParticle.Factory());
         registry.registerSpriteSet(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD_SMOKE.get(), SmallNuclearExplosionParticle.NukeFactory::new);
         registry.registerSpriteSet(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD_EXPLOSION.get(), SmallNuclearExplosionParticle.NukeFactory::new);
+        ItemProperties.register(CNItems.ANTI_RADIATION_HELMETS.asItem(), CreateNuclear.asResource("cloth"),
+            (itemStack, clientLevel, livingEntity, i) -> {
+                CompoundTag tag = itemStack.getOrCreateTag();
+                CreateNuclear.LOGGER.warn("ItemProperties::register tag: {}, {}", tag.toString(), itemStack);
+                if (!tag.contains("Cloth")) return 0f;
+
+                return switch (tag.getString("Cloth")){
+                    case "black" -> 1f;
+                    case "blue" -> 2f;
+                    default -> 0f;
+                };
+
+            }
+        );
     }
 }
