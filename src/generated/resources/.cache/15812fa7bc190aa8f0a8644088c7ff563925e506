@@ -1,4 +1,4 @@
-
+// 1.20.1	2026-04-22T20:27:45.8969098	CreateNuclear's Processing Recipes
 bccfe326d6c91bd2df207a38225fbca413e1013f data/createnuclear/recipes/compacting/thorium_fluid_to_thorium_ingot.json
 c711d032a04e1a9350ad9bc4d9c4d74f54689862 data/createnuclear/recipes/compacting/uranium_fluid_to_yellowcake.json
 33becbc558bd2fbe277be096b292c0093f84e44c data/createnuclear/recipes/crushing/coal.json
