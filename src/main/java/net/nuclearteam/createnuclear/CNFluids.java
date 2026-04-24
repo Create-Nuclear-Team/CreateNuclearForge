@@ -31,6 +31,7 @@ import net.minecraftforge.fluids.FluidInteractionRegistry.InteractionInformation
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
+import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteStoneTypes;
 import org.joml.Vector3f;
 import net.nuclearteam.createnuclear.CNTags.CNFluidTags;
@@ -104,6 +105,7 @@ public class CNFluids {
                 .explosionResistance(100f)
             )
             .source(ForgeFlowingFluid.Source::new)
+            .onRegister(ReactorFluidTypesValue.setReactorFluidTypeInfos(8196, 100))
             .bucket()
             .onRegister(CNFluids::registerFluidDispenseBehavior)
             .lang("Nitrogen Bucket")
