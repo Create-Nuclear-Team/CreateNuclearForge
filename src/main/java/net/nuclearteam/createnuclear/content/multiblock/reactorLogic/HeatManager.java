@@ -29,8 +29,8 @@ public class HeatManager {
         if (fuel == null || cooler == null) return 0;
         if (fuel.count <= 0 || cooler.count <= 0) return 0;
 
-        overheatController.updateState(graphiteCount, uraniumCount, bigFluidStack);
         ReactorFluidType type = bigFluidStack == null ? null : bigFluidStack.getFluidtype(level);
+        overheatController.updateState(graphiteCount, uraniumCount, bigFluidStack, type);
 
         return calculator.computeHeat(fuel, cooler, bigFluidStack, type, graphiteCount, uraniumCount, inventory, overheatController.getOverHeat());
     }

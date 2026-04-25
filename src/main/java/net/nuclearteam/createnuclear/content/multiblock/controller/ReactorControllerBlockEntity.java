@@ -147,7 +147,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        if(!configuredPattern.getOrCreateTag().isEmpty()) {
+        if(!configuredPattern.getTag().isEmpty()) {
             CreateLang.translate("gui.gauge.info_header")
                 .style(ChatFormatting.GRAY)
                 .forGoggles(tooltip);
@@ -319,18 +319,19 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         // ready to run
         this.setChanged();
         this.notifyUpdate();
-
-        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.isEmpty() ? null : bigFluidStack.get(0), countGraphiteRod, countUraniumRod, inventory, level));
+        BigFluidStack fluidStack = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
+        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, fluidStack, countGraphiteRod, countUraniumRod, inventory, level));
         if (!this.outputManager.getBlocksPosition().isEmpty()) {
             rotate(getBlockState(), getLevel(), heat);
         }
-        if (bigFluidStack.stream()
-                .mapToLong(fluid -> fluid.amount)
-                .sum()>1) {
-            if (updateLiquidTimers()) {
-                boolean extracted = inputFluidManager.extractFluids(level, 1000);
-                if (extracted) {
-                    liquidLife = calculateLiquidProgress();
+
+        if (fluidStack != null) {
+            if (fluidStack.amount > 1) {
+                if (updateLiquidTimers()) {
+                    boolean extracted = inputFluidManager.extractFluids(level, fluidStack.getFluidtype(level).efficiency());
+                    if (extracted) {
+                        liquidLife = calculateLiquidProgress();
+                    }
                 }
             }
         }
@@ -356,7 +357,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return !isEmptyConfiguredPattern()
                 && bigFuelItem.count > 0
                 && bigCoolerItem.count > 0
-                && this.inputManager.size() > 0;
+                && this.inputManager.size() > 0
+                && this.inputFluidManager.size() > 0;
     }
 
     private void updateHeatOnly() {
