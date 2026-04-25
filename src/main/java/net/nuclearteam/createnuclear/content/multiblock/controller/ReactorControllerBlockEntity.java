@@ -42,6 +42,7 @@ import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
+import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
@@ -110,6 +111,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private final ReactorInputManagerI inputManager;
     private final ReactorOutputManagerI outputManager;
     private final ReactorInputFluidManagerI inputFluidManager;
+    private final ReactorAlarmManagerI alarmManager;
 
     // services (dependencies) - abstracted behind interfaces to follow DIP
     private final IHeatService heatService;
@@ -151,6 +153,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.inputManager = new ReactorInputManager();
         this.outputManager = new ReactorOutputManager();
         this.inputFluidManager = new ReactorInputFluidManager();
+        this.alarmManager = new ReactorAlarmManager();
 
         this.bigFuelItem = new BigItemStack(ItemStack.EMPTY);
         this.bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
@@ -218,6 +221,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.inputManager.read(compound);
         this.outputManager.read(compound);
         this.inputFluidManager.read(compound);
+        this.alarmManager.read(compound);
 
         this.persistenceService.readBasicState(this, compound, clientPacket);
         this.needsToResolveEntities = true;
@@ -229,6 +233,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.inputManager.write(compound);
         this.outputManager.write(compound);
         this.inputFluidManager.write(compound);
+        this.alarmManager.write(compound);
 
         this.persistenceService.writeBasicState(this, compound, clientPacket);
 
@@ -295,103 +300,74 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             return;
 
         int currentHeat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+        boolean isDanger = IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER;
 
-        // Récupération des configs pour l'utilitaire
-        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
-        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+        // --- GESTION DES ALARMES (SORTIE DU IF DANGER) ---
+        // On récupère la liste des alarmes à CHAQUE tick, même sans danger
+        List<BlockPos> alarms = new ArrayList<>(this.alarmManager.getBlocksPosition());
 
-        if (IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER) {
+        if (!alarms.isEmpty()) {
+            // TRI DE LA LISTE : Crucial pour que l'index 0 soit TOUJOURS le même bloc
+            alarms.sort((p1, p2) -> {
+                if (p1.getX() != p2.getX()) return p1.getX() - p2.getX();
+                if (p1.getY() != p2.getY()) return p1.getY() - p2.getY();
+                return p1.getZ() - p2.getZ();
+            });
+
+            BlockPos primaryAlarm = alarms.get(0);
+
+            for (BlockPos p : alarms) {
+                if (!level.isLoaded(p)) continue;
+                BlockState state = level.getBlockState(p);
+
+                if (state.getBlock() instanceof ReactorAlarm) {
+                    // Allumé seulement si Danger ET que c'est l'alarme "élue" (la plus petite coordonnée)
+                    boolean shouldBePowered = isDanger && p.equals(primaryAlarm);
+
+                    if (state.getValue(ReactorAlarm.POWERED) != shouldBePowered) {
+                        level.setBlock(p, state.setValue(ReactorAlarm.POWERED, shouldBePowered), 3);
+                    }
+                }
+            }
+        }
+
+        if (isDanger) {
             explosionCountdown++;
-
             int secondsLeft = (300 - explosionCountdown) / 20;
 
-            // --- PHASE CRITIQUE : 10 dernières secondes (Action Bar clignotante) ---
+            // Configs pour les notifications
+            int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+            boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+
+            // --- AFFICHAGE ALERTES (ActionBar / Title) ---
             if (secondsLeft <= 10 && secondsLeft > 0) {
-                // Clignotement : change de couleur tous les 5 ticks (0.25s)
                 boolean isWhite = (level.getGameTime() / 5) % 2 == 0;
                 ChatFormatting flashColor = isWhite ? ChatFormatting.WHITE : ChatFormatting.RED;
-
-                NotifyUtil.sendActionBar(
-                        level, getBlockPos(),
-                        "CORE MELTDOWN IN " + secondsLeft + "s",
-                        flashColor,
-                        configRadius, configWarnAll
-                );
-            }
-            // --- PHASE D'ALERTE : Entre 15s et 11s (Action Bar fixe) ---
-            else if (secondsLeft > 10 && explosionCountdown % 20 == 0) {
-                NotifyUtil.sendActionBar(
-                        level, getBlockPos(),
-                        "WARNING: CORE OVERHEATING",
-                        ChatFormatting.DARK_RED,
-                        configRadius, configWarnAll
-                );
+                NotifyUtil.sendActionBar(level, getBlockPos(), "CORE MELTDOWN IN " + secondsLeft + "s", flashColor, configRadius, configWarnAll);
+            } else if (secondsLeft > 10 && explosionCountdown % 20 == 0) {
+                NotifyUtil.sendActionBar(level, getBlockPos(), "WARNING: CORE OVERHEATING", ChatFormatting.DARK_RED, configRadius, configWarnAll);
             }
 
-            // --- MOMENT DE L'EXPLOSION ---
             if (explosionCountdown >= 300) {
-                // Affichage d'un titre final géant avant de tout faire sauter
-                NotifyUtil.sendTitle(
-                        level, getBlockPos(),
-                        "CRITICAL FAILURE",
-                        "IMMINENT EXPLOSION",
-                        ChatFormatting.DARK_RED,
-                        configRadius, configWarnAll,
-                        0, 40, 10
-                );
-
+                NotifyUtil.sendTitle(level, getBlockPos(), "CRITICAL FAILURE", "IMMINENT EXPLOSION", ChatFormatting.DARK_RED, configRadius, configWarnAll, 0, 40, 10);
                 triggerNuclearExplosion();
+                return;
             }
         } else {
-            // --- CŒUR STABILISÉ ---
+            // --- STABILISATION ---
             if (explosionCountdown > 0) {
-                NotifyUtil.sendActionBar(
-                        level, getBlockPos(),
-                        "CORE STABILIZED",
-                        ChatFormatting.GREEN,
-                        configRadius, configWarnAll
-                );
+                int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+                boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+                NotifyUtil.sendActionBar(level, getBlockPos(), "CORE STABILIZED", ChatFormatting.GREEN, configRadius, configWarnAll);
             }
             explosionCountdown = 0;
         }
 
-
-            /*if (blockEntity instanceof ReactorInputEntity be) {
-                CompoundTag tag = be.serializeNBT();
-                ListTag inventoryTag = tag.getCompound("Inventory").getList("Items", Tag.TAG_COMPOUND);
-                fuelItem = ItemStack.of(inventoryTag.getCompound(0));
-                coolerItem = ItemStack.of(inventoryTag.getCompound(1));
-                if (fuelItem.getCount() > 0 && coolerItem.getCount() > 0) {
-                    configuredPattern.getOrCreateTag().putDouble("heat", calculateHeat(tag));
-                    if (updateTimers()) {
-                        be.inventory.extractItem(0, 1, false);
-                        be.inventory.extractItem(1, 1, false);
-                        total = calculateProgress();
-                        int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-
-                        if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.SAFETY || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.CAUTION || IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.WARNING) {
-                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), heat/4);
-                        } else {
-                            // Send a packet to all clients around this block within 16 blocks
-                            EventTriggerPacket packet = new EventTriggerPacket(600); // display for 100 ticks
-                            CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
-                            CNPackets.sendToNear(level, getBlockPos(), 32, packet);
-                            this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
-                        }
-                        return;
-                    }
-                } else {
-                    this.rotate(getBlockState(), new BlockPos(getBlockPos().getX(), getBlockPos().getY() + FindController('O').getY(), getBlockPos().getZ()), getLevel(), 0);
-                }*/
+        // --- LOGIQUE TECHNIQUE (Items, Rotation, etc.) ---
         int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-        countGraphiteRod = configuredPattern.getOrCreateTag().getInt("countGraphiteRod");
-        countUraniumRod = configuredPattern.getOrCreateTag().getInt("countUraniumRod");
-
         resolveEntitiesIfNeeded();
-
         if (!isAssembled()) return;
 
-        // gather IO snapshot
         VirtualReactorInputsItem virtualReactorInputsItem = inputManager.getInventory(level);
         VirtualReactorInputFluid virtualReactorInputFluid = inputFluidManager.getInventory(level);
         this.bigFuelItem = virtualReactorInputsItem.getBigFuelRod();
@@ -723,10 +699,21 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.setChanged();
     }
 
+    public void addAlarm(BlockPos alarmPos) {
+        this.alarmManager.addBlock(alarmPos);
+        this.setChanged();
+    }
+
+    public void removeAlarm(BlockPos alarmPos) {
+        this.alarmManager.removeBlock(alarmPos);
+        this.setChanged();
+    }
+
     public void removeIOAll() {
         this.inputManager.clearInvalid(level);
         this.outputManager.clearInvalid(level);
         this.inputFluidManager.clearInvalid(level);
+        this.alarmManager.clearInvalid(level);
         this.setChanged();
     }
 
