@@ -88,6 +88,7 @@ public class CNBlocks {
         .tag(BlockTags.NEEDS_DIAMOND_TOOL)
         .simpleItem()
         .transform(pickaxeOnly())
+        .transform(displaySource(CNDisplaySources.REACTOR_SUMMARY))
         .register();
 
     public static final BlockEntry<ReactorCore> REACTOR_CORE = CreateNuclear.REGISTRATE
@@ -196,6 +197,7 @@ public class CNBlocks {
             .transform(displaySource(CNDisplaySources.PATTERN_COUNT_RODS))
             .transform(displaySource(CNDisplaySources.HEAT))
             .transform(displaySource(CNDisplaySources.LIQUID_LEVEL))
+            .transform(displaySource(CNDisplaySources.REACTOR_SUMMARY))
             .item()
             .transform(customItemModel("reactor", "controller", "item"))
             .register();
