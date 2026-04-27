@@ -302,12 +302,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         int currentHeat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
         boolean isDanger = IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER;
 
-        // --- GESTION DES ALARMES (SORTIE DU IF DANGER) ---
-        // On récupère la liste des alarmes à CHAQUE tick, même sans danger
+        // --- GESTION DES ALARMES (TRIÉE POUR STABILITÉ) ---
         List<BlockPos> alarms = new ArrayList<>(this.alarmManager.getBlocksPosition());
-
         if (!alarms.isEmpty()) {
-            // TRI DE LA LISTE : Crucial pour que l'index 0 soit TOUJOURS le même bloc
             alarms.sort((p1, p2) -> {
                 if (p1.getX() != p2.getX()) return p1.getX() - p2.getX();
                 if (p1.getY() != p2.getY()) return p1.getY() - p2.getY();
@@ -315,15 +312,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             });
 
             BlockPos primaryAlarm = alarms.get(0);
-
             for (BlockPos p : alarms) {
                 if (!level.isLoaded(p)) continue;
                 BlockState state = level.getBlockState(p);
-
                 if (state.getBlock() instanceof ReactorAlarm) {
-                    // Allumé seulement si Danger ET que c'est l'alarme "élue" (la plus petite coordonnée)
                     boolean shouldBePowered = isDanger && p.equals(primaryAlarm);
-
                     if (state.getValue(ReactorAlarm.POWERED) != shouldBePowered) {
                         level.setBlock(p, state.setValue(ReactorAlarm.POWERED, shouldBePowered), 3);
                     }
@@ -331,39 +324,53 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             }
         }
 
+        // Récupération des configs pour les notifications
+        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+
         if (isDanger) {
             explosionCountdown++;
             int secondsLeft = (300 - explosionCountdown) / 20;
 
-            // Configs pour les notifications
-            int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
-            boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
-
-            // --- AFFICHAGE ALERTES (ActionBar / Title) ---
+            // --- AFFICHAGE ALERTES ACTION BAR (TRADUITES) ---
             if (secondsLeft <= 10 && secondsLeft > 0) {
                 boolean isWhite = (level.getGameTime() / 5) % 2 == 0;
                 ChatFormatting flashColor = isWhite ? ChatFormatting.WHITE : ChatFormatting.RED;
-                NotifyUtil.sendActionBar(level, getBlockPos(), "CORE MELTDOWN IN " + secondsLeft + "s", flashColor, configRadius, configWarnAll);
+
+                NotifyUtil.sendActionBar(level, getBlockPos(),
+                        CreateNuclearLang.translate("notification.reactor.meltdown_in")
+                                .add(CreateNuclearLang.number(secondsLeft))
+                                .add(CreateNuclearLang.translate("generic.unit.seconds"))
+                                .string(),
+                        flashColor, configRadius, configWarnAll);
+
             } else if (secondsLeft > 10 && explosionCountdown % 20 == 0) {
-                NotifyUtil.sendActionBar(level, getBlockPos(), "WARNING: CORE OVERHEATING", ChatFormatting.DARK_RED, configRadius, configWarnAll);
+                NotifyUtil.sendActionBar(level, getBlockPos(),
+                        CreateNuclearLang.translate("notification.reactor.overheating").string(),
+                        ChatFormatting.DARK_RED, configRadius, configWarnAll);
             }
 
+            // --- MOMENT DE L'EXPLOSION ---
             if (explosionCountdown >= 300) {
-                NotifyUtil.sendTitle(level, getBlockPos(), "CRITICAL FAILURE", "IMMINENT EXPLOSION", ChatFormatting.DARK_RED, configRadius, configWarnAll, 0, 40, 10);
+                NotifyUtil.sendTitle(level, getBlockPos(),
+                        CreateNuclearLang.translate("notification.reactor.critical_failure").string(),
+                        CreateNuclearLang.translate("notification.reactor.imminent_explosion").string(),
+                        ChatFormatting.DARK_RED, configRadius, configWarnAll, 0, 40, 10);
+
                 triggerNuclearExplosion();
                 return;
             }
         } else {
-            // --- STABILISATION ---
+            // --- CŒUR STABILISÉ ---
             if (explosionCountdown > 0) {
-                int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
-                boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
-                NotifyUtil.sendActionBar(level, getBlockPos(), "CORE STABILIZED", ChatFormatting.GREEN, configRadius, configWarnAll);
+                NotifyUtil.sendActionBar(level, getBlockPos(),
+                        CreateNuclearLang.translate("notification.reactor.stabilized").string(),
+                        ChatFormatting.GREEN, configRadius, configWarnAll);
             }
             explosionCountdown = 0;
         }
 
-        // --- LOGIQUE TECHNIQUE (Items, Rotation, etc.) ---
+        // --- LOGIQUE TECHNIQUE ---
         int heat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
         resolveEntitiesIfNeeded();
         if (!isAssembled()) return;
@@ -431,26 +438,38 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
         if (level instanceof ServerLevel serverLevel) {
-            // --- MESSAGE D'EXPLOSION FINALE ---
-            NotifyUtil.sendTitle(
-                level, getBlockPos(),
-                "RÉACTEUR DÉTRUIT",
-                "Fusion critique terminée",
-                ChatFormatting.DARK_RED,
-                configRadius, configWarnAll,
-                10, 60, 20
-            );
+            // --- MESSAGE D'EXPLOSION FINALE (TRADUIT) ---
+            NotifyUtil.sendTitle(level, getBlockPos(),
+                    CreateNuclearLang.translate("notification.reactor.destroyed").string(),
+                    CreateNuclearLang.translate("notification.reactor.meltdown_finished").string(),
+                    ChatFormatting.DARK_RED, configRadius, configWarnAll, 10, 60, 20);
 
             NuclearExplosionEntity explosion = new NuclearExplosionEntity(
                     CNEntityType.NUCLEAR_EXPLOSION.get(),
                     serverLevel
             );
 
-            explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() - 2.0D);
+            // --- CALCUL D'EXPLOSION ÉQUILIBRÉ ---
 
-            float size = Mth.clamp(countUraniumRod * 0.075F, 1.0F, 4.0F);
+            // 1. On définit un modificateur de structure plus progressif
+            // Au lieu de 1, 2, 3, on utilise un ratio basé sur la taille réelle
+            float structureFactor = reactorSize / 5.0F; // 5x5 -> 1.0 | 7x7 -> 1.4 | 9x9 -> 1.8
+
+            /* 2. Utilisation de la racine carrée (Mth.sqrt)
+               L'uranium augmente la puissance, mais avec des rendements décroissants.
+               Plus on ajoute d'uranium, plus chaque barre supplémentaire ajoute "moins" au rayon.
+            */
+            float fuelImpact = Mth.sqrt(countUraniumRod) * 0.3F;
+
+            // 3. Taille finale : Base constante + (Impact Fuel * Facteur Structure)
+            float size = 1.5F + (fuelImpact * structureFactor);
+
+            size = Mth.clamp(size, 1.0F, 10.0F);
+
+            explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() - 2.0D);
             explosion.setSize(size);
 
+            // Griefing selon les gamerules
             boolean griefing = serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
             explosion.setNoGriefing(!griefing);
 
@@ -459,7 +478,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             // On détruit le bloc après avoir envoyé les messages
             level.destroyBlock(getBlockPos(), false);
 
-            changeBiome(CNBiomes.Irradiated.PLAIN, (int)size*30, explosionPos, serverLevel);
+            // Changement de biome vers Irradiated Plain
+            changeBiome(CNBiomes.Irradiated.PLAIN, (int)size * 30, explosionPos, serverLevel);
         }
     }
 
