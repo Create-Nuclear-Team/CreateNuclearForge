@@ -2,8 +2,12 @@ package net.nuclearteam.createnuclear.content.effects.capability;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
@@ -79,27 +83,10 @@ public class RadiationCapability implements IRadiationCapability {
                     }
                 }
 
-                double resistance = player.getAttributeValue(CNAttributes.IRRADIATED_RESISTANCE.get());
-
-                for (ItemStack stack : player.getArmorSlots()) {
-                    if (stack.getItem() instanceof ArmorItem armorItem && armorItem instanceof AntiRadiationArmorItem.Helmet) {
-                        float ratio = 1.0f;
-                        if (stack.isDamageableItem()) {
-                            ratio = 1f - ((float) stack.getDamageValue() / (float) stack.getMaxDamage());
-                            ratio = Math.max(0f, ratio);
-                        }
-                        resistance *= ratio;
-                    }
-                }
-
-                CreateNuclear.LOGGER.warn("onPlayerTick::resistance: {}, radiation: {}, newHash: {}", resistance, radiation, newHash);
-                resistance = Mth.clamp(resistance, 0.0, 1.0);
+                double resistance = getRadiationResistance(player);
                 radiation *= (1.0 - resistance);
 
-                CreateNuclear.LOGGER.warn("onPlayerTick::radiation2: {}", radiation);
-
-
-                cap.setRadiation(radiation);
+                cap.setRadiation(Math.max(0, radiation));
 
                 CNPackets.getChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new RadiationSyncPacket(radiation));
             }
@@ -108,14 +95,43 @@ public class RadiationCapability implements IRadiationCapability {
         });
     }
 
-    private static void applyEffects(Player player, double radiation) {
-        int amp;
+    public static double getRadiationResistance(LivingEntity entity) {
+        double resistance = 0d;
 
-        if (radiation < 10) return;
-        else if (radiation < 25) amp = 0;
-        else if (radiation < 50) amp = 1;
+        AttributeInstance attribute = entity.getAttribute(CNAttributes.IRRADIATED_RESISTANCE.get());
+
+        if (attribute != null) resistance += attribute.getValue();
+
+        for (ItemStack stack : entity.getArmorSlots()) {
+            if (!(stack.getItem() instanceof AntiRadiationArmorItem)) {
+                resistance -= 0.25;
+            }
+        }
+
+        return Mth.clamp(resistance, 0.0,1.0);
+    }
+
+    private static void applyEffects(Player player, double radiation) {
+        final double radiation_desactive = 0, radiation_level_1 = 10, radiation_level_2 = 25, radiation_level_3 = 50;
+        MobEffect radiationEffect = CNEffects.RADIATION.get();
+
+        if (radiation <= radiation_desactive) return;
+
+        int amp;
+        if (radiation < radiation_level_1) amp = 0;
+        else if (radiation < radiation_level_2) amp = 0;
+        else if (radiation < radiation_level_3) amp = 1;
         else amp = 2;
 
-        player.addEffect(new MobEffectInstance(CNEffects.RADIATION.get(), 100, amp, true, true));
+        MobEffectInstance current = player.getEffect(radiationEffect);
+
+        if (current != null && current.getAmplifier() != amp) {
+            player.removeEffect(radiationEffect);
+            current = null;
+        }
+
+        if (current == null || current.getDuration() <= 40) {
+            player.addEffect(new MobEffectInstance(CNEffects.RADIATION.get(), 100, amp, true, true));
+        }
     }
 }
