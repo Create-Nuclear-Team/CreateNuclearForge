@@ -24,6 +24,7 @@ import net.nuclearteam.createnuclear.api.radiation.IRadiationSource;
 import net.nuclearteam.createnuclear.foundation.networking.radiation.RadiationSyncPacket;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.foundation.utility.InventoryHashUtil;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 public class RadiationCapability implements IRadiationCapability {
     private double radiation;
@@ -71,15 +72,17 @@ public class RadiationCapability implements IRadiationCapability {
 
                 double radiation = 0;
 
-                for (ItemStack stack : player.getInventory().items) {
-                    if (stack.getItem() instanceof IRadiationSource source) {
-                        radiation += source.getRadiation(stack, player);
+                if (CNConfigs.server().radiation.enabledItemRadiation.get()) {
+                    for (ItemStack stack : player.getInventory().items) {
+                        if (stack.getItem() instanceof IRadiationSource source) {
+                            radiation += source.getRadiation(stack, player);
+                        }
                     }
-                }
 
-                for (ItemStack stack : player.getInventory().offhand) {
-                    if (stack.getItem() instanceof IRadiationSource source) {
-                        radiation += source.getRadiation(stack, player);
+                    for (ItemStack stack : player.getInventory().offhand) {
+                        if (stack.getItem() instanceof IRadiationSource source) {
+                            radiation += source.getRadiation(stack, player);
+                        }
                     }
                 }
 
@@ -112,16 +115,16 @@ public class RadiationCapability implements IRadiationCapability {
     }
 
     private static void applyEffects(Player player, double radiation) {
-        final double radiation_desactive = 0, radiation_level_1 = 10, radiation_level_2 = 25, radiation_level_3 = 50;
+        final double radiation_desactive = 0;
         MobEffect radiationEffect = CNEffects.RADIATION.get();
 
         if (radiation <= radiation_desactive) return;
 
         int amp;
-        if (radiation < radiation_level_1) amp = 0;
-        else if (radiation < radiation_level_2) amp = 0;
-        else if (radiation < radiation_level_3) amp = 1;
-        else amp = 2;
+        if (radiation < CNConfigs.server().radiation.radiationLevel1.get()) amp = CNConfigs.server().radiation.amplifierLevel0.get();
+        else if (radiation < CNConfigs.server().radiation.radiationLevel2.get()) amp = CNConfigs.server().radiation.amplifierLevel0.get();
+        else if (radiation < CNConfigs.server().radiation.radiationLevel3.get()) amp = CNConfigs.server().radiation.amplifierLevel1.get();
+        else amp = CNConfigs.server().radiation.amplifierLevel2.get();
 
         MobEffectInstance current = player.getEffect(radiationEffect);
 
