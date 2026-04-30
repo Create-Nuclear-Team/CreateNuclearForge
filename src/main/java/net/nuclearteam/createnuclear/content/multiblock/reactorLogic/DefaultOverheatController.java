@@ -1,5 +1,9 @@
 package net.nuclearteam.createnuclear.content.multiblock.reactorLogic;
 
+import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
+import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
+
 class DefaultOverheatController implements IOverheatController {
     private int overFlowHeatTimer = 0;
     private int overFlowLimiter = 30;
@@ -8,12 +12,13 @@ class DefaultOverheatController implements IOverheatController {
     private final int maxUraniumPerGraphite = 3;
     private final int graphiteTimer = 3600;
     private final int uraniumTimer = 3600;
+    private final int liquidTimer = 3600;
 
     @Override
-    public void updateState(int countGraphiteRod, int countUraniumRod) {
-        if (countGraphiteRod <= 0) return;
-
-        if (countUraniumRod > countGraphiteRod * maxUraniumPerGraphite) {
+    public void updateState(int countGraphiteRod, int countUraniumRod, BigFluidStack bigFluidStack, ReactorFluidType type) {
+        int fluidAmount = bigFluidStack == null ? 0 : bigFluidStack.amount;
+        int fluidEfficency = type == null ? -1 : type.efficiency();
+        if (countUraniumRod > countGraphiteRod * maxUraniumPerGraphite || fluidEfficency == -1 || fluidAmount < fluidEfficency) {
             overFlowHeatTimer++;
             if (overFlowHeatTimer >= overFlowLimiter) {
                 overHeat += 1;
@@ -36,4 +41,7 @@ class DefaultOverheatController implements IOverheatController {
 
     @Override
     public int getUraniumTimer() { return uraniumTimer; }
+
+    @Override
+    public int getLiquidTimer()  { return liquidTimer; }
 }

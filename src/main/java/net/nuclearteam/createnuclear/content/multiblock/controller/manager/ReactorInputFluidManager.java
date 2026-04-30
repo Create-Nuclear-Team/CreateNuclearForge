@@ -139,24 +139,22 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
      */
     public boolean extractFluids(Level level, int fluidNeeded) {
         if (level == null) return false;
+        boolean isExtracted = false;
         List<IFluidHandler> handlers = getFuildHandlers(level);
         if (handlers.isEmpty()) return false;
-
-        int fluidRemaining = fluidNeeded;
 
         for (IFluidHandler handler : handlers) {
             int tank = handler.getTanks();
             FluidStack stack = handler.getFluidInTank(tank);
             if (stack.isEmpty()) continue;
-            if (fluidRemaining > 0) {
-                int toExtract = Math.min(fluidRemaining, stack.getAmount());
+            int toExtract = Math.min(fluidNeeded, stack.getAmount());
+            if (toExtract > 1) {
                 handler.drain(toExtract, FluidAction.EXECUTE);
-                fluidRemaining -= toExtract;
+                isExtracted = true;
             }
-
-            if (fluidRemaining <= 0) break;
+            if (fluidNeeded <= 0) break;
         }
 
-        return fluidRemaining <= 0;
+        return isExtracted;
     }
 }

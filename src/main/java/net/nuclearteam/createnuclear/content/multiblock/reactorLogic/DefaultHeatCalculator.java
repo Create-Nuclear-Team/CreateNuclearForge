@@ -78,12 +78,6 @@ public class DefaultHeatCalculator implements IHeatCalculator {
             }
         }
 
-        double heatCaculed = heat + overHeat;
-
-        if (heatCaculed > type.maxHeat() && bigFluidStack.amount > type.efficiency()) {
-            heat = 9_999_999;
-        }
-
-        return heat;
+        return heat + overHeat;
     }
 }

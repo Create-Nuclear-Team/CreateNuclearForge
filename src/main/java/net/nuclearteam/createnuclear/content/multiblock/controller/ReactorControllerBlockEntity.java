@@ -95,6 +95,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private boolean isExploding = false;
 
     private double total;
+    private double liquidLife;
     private ItemStack configuredPattern;
 
     private BigItemStack bigFuelItem;
@@ -142,6 +143,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public double getTotal() { return this.total; }
     public void setTotal(double t) { this.total = t; }
 
+    public double getLiquidLife() { return this.liquidLife; }
+    public void setLiquidLife(double l) { this.liquidLife = l; }
+
     /** Main constructor allowing dependency injection for testability and DIP compliance. */
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -172,7 +176,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
-        if(!configuredPattern.getOrCreateTag().isEmpty()) {
+        if(!configuredPattern.getTag().isEmpty()) {
             CreateLang.translate("gui.gauge.info_header")
                 .style(ChatFormatting.GRAY)
                 .forGoggles(tooltip);
@@ -259,6 +263,18 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         double totalUraniumRodLife = (double) heatService.getUraniumTimer() / Math.max(1, countUraniumRod);
 
         return totalGraphiteRodLife + totalUraniumRodLife;
+    }
+
+    public double calculateLiquidProgress() {
+        return switch (reactorSize) {
+            case 5 -> (double) heatService.getLiquidTimer() / 40;
+            case 7 -> (double) heatService.getLiquidTimer() / 147;
+            case 9 -> (double) heatService.getLiquidTimer() / 360;
+            default -> {
+                CreateNuclear.LOGGER.error("Invalid reactor size value: " + reactorSize);
+                yield 1;
+            }
+        };
     }
 
     public void test() {
@@ -422,12 +438,22 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         // ready to run
         this.setChanged();
         this.notifyUpdate();
-
-        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, bigFluidStack.get(0), countGraphiteRod, countUraniumRod, inventory, level));
+        BigFluidStack fluidStack = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
+        configuredPattern.getOrCreateTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, fluidStack, countGraphiteRod, countUraniumRod, inventory, level));
         if (!this.outputManager.getBlocksPosition().isEmpty()) {
             rotate(getBlockState(), getLevel(), heat);
         }
 
+        if (fluidStack != null) {
+            if (fluidStack.amount > 1) {
+                if (updateLiquidTimers()) {
+                    boolean extracted = inputFluidManager.extractFluids(level, fluidStack.getFluidtype(level).efficiency());
+                    if (extracted) {
+                        liquidLife = calculateLiquidProgress();
+                    }
+                }
+            }
+        }
         if (updateTimers()) {
             boolean extracted = inputManager.extractItems(level, 1, 1);
             if (extracted) {
@@ -552,8 +578,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return !isEmptyConfiguredPattern()
                 && bigFuelItem.count > 0
                 && bigCoolerItem.count > 0
-                && !bigFluidStack.isEmpty()
-                && bigFluidStack.get(0).amount > 0
                 && this.inputManager.size() > 0
                 && this.inputFluidManager.size() > 0;
     }
@@ -576,6 +600,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
         total -= 1;
         return total <= 0;//(total/constTotal) <= 0;
+    }
+
+    private boolean updateLiquidTimers()  {
+        liquidLife -= 1;
+        return liquidLife <= 0;
     }
 
 
