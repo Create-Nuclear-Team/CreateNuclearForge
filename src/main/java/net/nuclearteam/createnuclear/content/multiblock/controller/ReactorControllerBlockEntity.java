@@ -107,6 +107,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
     private int[] reactorPos;
     private boolean needsToResolveEntities = false;
+    private double fluidBuffer = 0.0;
 
     private final ReactorInputManagerI inputManager;
     private final ReactorOutputManagerI outputManager;
@@ -431,10 +432,23 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
         if (fluidStack != null) {
             if (fluidStack.amount > 1) {
-                if (updateLiquidTimers()) {
-                    boolean extracted = inputFluidManager.extractFluids(level, fluidStack.getFluidtype(level).efficiency());
+                double amountPerCycle = (double) fluidStack.getFluidtype(level).efficiency();
+                switch (reactorSize) {
+                    case 5 -> amountPerCycle /= (double) heatService.getLiquidTimer() / 40;
+                    case 7 -> amountPerCycle /= (double) heatService.getLiquidTimer() / 147;
+                    case 9 -> amountPerCycle /= (double) heatService.getLiquidTimer() / 360;
+                }
+
+                fluidBuffer += amountPerCycle;
+
+                if (fluidBuffer >= 1.0) {
+                    int toExtract = (int) Math.floor(fluidBuffer);
+
+                    boolean extracted = inputFluidManager.extractFluids(level, toExtract);
+
                     if (extracted) {
-                        liquidLife = calculateLiquidProgress();
+                        fluidBuffer -= toExtract;
+                        //this.liquidLife = calculateLiquidProgress();
                     }
                 }
             }
