@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.content.multiblock.reactorLogic;
 
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 
@@ -17,8 +16,8 @@ class DefaultOverheatController implements IOverheatController {
     @Override
     public void updateState(int countGraphiteRod, int countUraniumRod, BigFluidStack bigFluidStack, ReactorFluidType type) {
         int fluidAmount = bigFluidStack == null ? 0 : bigFluidStack.amount;
-        int fluidEfficency = type == null ? -1 : type.efficiency();
-        if (countUraniumRod > countGraphiteRod * maxUraniumPerGraphite || fluidEfficency == -1 || fluidAmount < fluidEfficency) {
+        int fluidEfficiency = type == null ? -1 : type.efficiency();
+        if (countUraniumRod > countGraphiteRod * maxUraniumPerGraphite || fluidEfficiency == -1 || fluidAmount < fluidEfficiency) {
             overFlowHeatTimer++;
             if (overFlowHeatTimer >= overFlowLimiter) {
                 overHeat += 1;
