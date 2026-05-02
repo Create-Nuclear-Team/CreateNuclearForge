@@ -72,15 +72,13 @@ public class CNBlocks {
 
     public static final BlockEntry<ReactorCasing> REACTOR_CASING = CreateNuclear.REGISTRATE
         .block("reactor_casing", properties -> new ReactorCasing(properties, ReactorCasing.TypeBlock.CASING))
-        .properties(p -> p.explosionResistance(3F)
-                .destroyTime(4F)
-                .sound(new ForgeSoundType(1, .5f, CNSoundEvents.REACTOR_CASING_BREAD::getMainEvent,
-                        CNSoundEvents.REACTOR_CASING_STEP::getMainEvent, CNSoundEvents.REACTOR_CASING_PLACE::getMainEvent,
-                        CNSoundEvents.REACTOR_CASING_HIT::getMainEvent, CNSoundEvents.REACTOR_CASING_FALL::getMainEvent))
+        .properties(p -> p
+            .explosionResistance(3F)
+            .destroyTime(4F)
         )
         .blockstate((c, p) -> p.getVariantBuilder(c.getEntry()).forAllStates((state) -> ConfiguredModel.builder()
-                .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/casing/block")))
-                .build()))
+            .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/casing/block")))
+            .build()))
         .onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(CNSpriteShifts.REACTOR_CASING)))
         .onRegister(casingConnectivity((block, cc) -> cc.makeCasing(block, CNSpriteShifts.REACTOR_CASING)))
         .tag(BlockTags.NEEDS_DIAMOND_TOOL)
@@ -95,9 +93,9 @@ public class CNBlocks {
         .tag(BlockTags.NEEDS_DIAMOND_TOOL)
         .blockstate((c, p) -> p.getVariantBuilder(c.getEntry())
         .forAllStates(state -> ConfiguredModel.builder()
-                .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/core/block")))
-                .uvLock(false)
-                .build()))
+            .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/core/block")))
+            .uvLock(false)
+            .build()))
         .transform(pickaxeOnly())
         .simpleItem()
         .register();
@@ -110,22 +108,22 @@ public class CNBlocks {
         .transform(pickaxeOnly())
         .tag(BlockTags.NEEDS_DIAMOND_TOOL)
         .blockstate((c, p) -> p.getVariantBuilder(c.getEntry())
-                .forAllStatesExcept(state -> {
-                        ReactorFrame.Part part = state.getValue(ReactorFrame.PART);
-                        String baseFile = "block/reactor/frame/frame_";
-                        ModelFile start = p.models().getExistingFile(p.modLoc(baseFile + "top"));
-                        ModelFile middle = p.models().getExistingFile(p.modLoc(baseFile + "middle"));
-                        ModelFile bottom = p.models().getExistingFile(p.modLoc(baseFile + "bottom"));
-                        ModelFile none = p.models().getExistingFile(p.modLoc(baseFile + "none"));
-                        return ConfiguredModel.builder().modelFile(switch (part) {
-                                case START -> start;
-                                case MIDDLE -> middle;
-                                case END -> bottom;
-                                default -> none;
-                        })
-                        .uvLock(false)
-                        .build();
-                }))
+            .forAllStatesExcept(state -> {
+                ReactorFrame.Part part = state.getValue(ReactorFrame.PART);
+                String baseFile = "block/reactor/frame/frame_";
+                ModelFile start = p.models().getExistingFile(p.modLoc(baseFile + "top"));
+                ModelFile middle = p.models().getExistingFile(p.modLoc(baseFile + "middle"));
+                ModelFile bottom = p.models().getExistingFile(p.modLoc(baseFile + "bottom"));
+                ModelFile none = p.models().getExistingFile(p.modLoc(baseFile + "none"));
+                return ConfiguredModel.builder().modelFile(switch (part) {
+                        case START -> start;
+                        case MIDDLE -> middle;
+                        case END -> bottom;
+                        default -> none;
+                })
+                .uvLock(false)
+                .build();
+            }))
             .item(ReactorframeItem::new)
             .model(AssetLookup.customBlockItemModel("reactor", "frame", "item"))
             .build()
@@ -133,11 +131,12 @@ public class CNBlocks {
 
     public static final BlockEntry<ReactorCooler> REACTOR_COOLER = CreateNuclear.REGISTRATE
             .block("reactor_cooler", ReactorCooler::new)
-            .properties(p -> p.explosionResistance(3F)
-                    .destroyTime(4F))
+            .properties(p -> p
+                .explosionResistance(3F)
+                .destroyTime(4F))
             .blockstate((c, p) -> p.getVariantBuilder(c.getEntry()).forAllStates((state) -> ConfiguredModel.builder()
-                    .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/cooler/block")))
-                    .build()))
+                .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/cooler/block")))
+                .build()))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .simpleItem()
             .transform(pickaxeOnly())
