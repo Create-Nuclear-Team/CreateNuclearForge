@@ -69,13 +69,9 @@ public class ReactorInputMenu extends MenuBase<ReactorInputEntity> {
             }
         }
 
-        Slot slot1 = new SlotItemHandler(contentHolder.inventory, 0, 24, 29);
-        Slot slot2 = new SlotItemHandler(contentHolder.inventory, 1, 57, 29);
+        Slot slot1 = new SlotItemHandler(contentHolder.inventory, 0, 40, 29);
 
         addSlot(slot1);
-        addSlot(slot2);
-
-
     }
 
     @Override
