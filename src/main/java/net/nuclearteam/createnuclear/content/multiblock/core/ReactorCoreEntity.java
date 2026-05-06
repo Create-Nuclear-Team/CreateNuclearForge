@@ -33,12 +33,16 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
         if (level.isClientSide() || hasExploded) return;
 
         BlockPos controllerPos = getBlockPosForReactor();
+        int heat = 0;
         if (!(level.getBlockEntity(controllerPos) instanceof ReactorControllerBlockEntity reactorController)) {
             countdownTicks = 0;
             return;
         }
-
-        int heat = (int) reactorController.getConfiguredPattern()
+        if (reactorController.getConfiguredPattern() == null) {
+            countdownTicks = 0;
+            return;
+        }
+        heat = (int) reactorController.getConfiguredPattern()
                 .getOrCreateTag()
                 .getDouble("heat");
 

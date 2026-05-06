@@ -262,6 +262,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
 
     public double calculateProgress() {
+        if (!isEmptyConfiguredPattern()) return 0;
         CompoundTag tag = this.getConfiguredPatternTag();
 
         if (tag == null || tag.isEmpty()) {
@@ -327,7 +328,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         if (level.isClientSide || isExploding)
             return;
 
-        int currentHeat = (int) this.getConfiguredPatternTag().getDouble("heat");
+
+        int currentHeat = isEmptyConfiguredPattern () ? 0: (int) this.getConfiguredPatternTag().getDouble("heat");
 
         // Récupération des configs pour l'utilitaire
         int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
@@ -388,10 +390,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             explosionCountdown = 0;
         }
 
-        int heat = (int) this.getConfiguredPatternTag().getDouble("heat");
-        countGraphiteRod = this.getConfiguredPatternTag().getInt("countGraphiteRod");
-        countUraniumRod = this.getConfiguredPatternTag().getInt("countUraniumRod");
-
+        if (!isEmptyConfiguredPattern()) {
+            int heat = (int) this.getConfiguredPatternTag().getDouble("heat");
+            countGraphiteRod = this.getConfiguredPatternTag().getInt("countGraphiteRod");
+            countUraniumRod = this.getConfiguredPatternTag().getInt("countUraniumRod");
+        }
         resolveEntitiesIfNeeded();
 
         if (!isAssembled()) return;
@@ -596,9 +599,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
         if (!isEmptyConfiguredPattern()) {
             heat = heatService.calculateHeat(fuel, cooler, fluid, countGraphiteRod, countUraniumRod, inventory, level);
+            this.getConfiguredPatternTag().putDouble("heat", heat);
         }
-
-        this.getConfiguredPatternTag().putDouble("heat", heat);
     }
 
     private boolean isEmptyConfiguredPattern() {
