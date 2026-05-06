@@ -1,17 +1,13 @@
 package net.nuclearteam.createnuclear.content.effects;
 
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ItemStack;
-import net.nuclearteam.createnuclear.CNAttributes;
 
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
+import net.nuclearteam.createnuclear.content.effects.capability.RadiationCapability;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.nuclearteam.createnuclear.foundation.damageTypes.CreateNuclearDamageSources;
@@ -27,25 +23,14 @@ public class RadiationEffect extends VicinityEffect {
                 amplifier -> 10,
                 e -> {
                     boolean isWearingAntiRadiationArmor = false;
-                  
-//                    for (ItemStack armor : e.getArmorSlots()) {
-//                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
-//                            isWearingAntiRadiationArmor = true;
-//                            break;
-//                        }
-//                    }
-//                    for (ItemStack armor : e.getArmorSlots()) {
-//                        if (AntiRadiationArmorItem.Armor.isArmored(armor)) {
-//                            isWearingAntiRadiationArmor = true;
-//                            break;
-//                        }
-//                    }
 
+                    double resistance = RadiationCapability.getRadiationResistance(e);
+                    if (resistance >= 1) isWearingAntiRadiationArmor = true;
 
                     return !e.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)
-                                && !e.hasEffect(CNEffects.RADIATION.get())
-                                && !isWearingAntiRadiationArmor
-                        ;
+                        && !e.hasEffect(CNEffects.RADIATION.get())
+                        && !isWearingAntiRadiationArmor
+                    ;
                 },
                 timer -> {},
                 () -> new MobEffectInstance(CNEffects.RADIATION.get(), 300)); // Custom color (hex value)
@@ -80,9 +65,14 @@ public class RadiationEffect extends VicinityEffect {
     public void applyEffectTick(LivingEntity entity, int amplifier) {
         super.applyEffectTick(entity, amplifier);
 
-        // Apply radiation damage (magic type), scaled by amplifier
-        int damage = 1 << amplifier;
-        entity.hurt(CreateNuclearDamageSources.radiation(entity.level()), damage);
+        double resistance = RadiationCapability.getRadiationResistance(entity);
 
+        float damage = (float) ((1 << amplifier) * (1.0 - resistance));
+
+        if (damage <= 0.0f) {
+            return;
+        }
+
+        entity.hurt(CreateNuclearDamageSources.radiation(entity.level()), damage);
     }
 }

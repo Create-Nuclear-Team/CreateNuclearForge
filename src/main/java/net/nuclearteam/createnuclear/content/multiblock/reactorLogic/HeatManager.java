@@ -26,15 +26,16 @@ public class HeatManager {
     }
 
     public double calculateHeat(BigItemStack fuel, BigItemStack cooler, BigFluidStack bigFluidStack, int graphiteCount, int uraniumCount, ReactorControllerInventory inventory, Level level) {
-        if (fuel == null || cooler == null || bigFluidStack == null) return 0;
-        if (fuel.count <= 0 || cooler.count <= 0 || bigFluidStack.amount <= 0) return 0;
+        if (fuel == null || cooler == null) return 0;
+        if (fuel.count <= 0 || cooler.count <= 0) return 0;
 
-        overheatController.updateState(graphiteCount, uraniumCount);
-        ReactorFluidType type = bigFluidStack.getFluidtype(level);
+        ReactorFluidType type = bigFluidStack == null ? null : bigFluidStack.getFluidtype(level);
+        overheatController.updateState(graphiteCount, uraniumCount, bigFluidStack, type);
 
         return calculator.computeHeat(fuel, cooler, bigFluidStack, type, graphiteCount, uraniumCount, inventory, overheatController.getOverHeat());
     }
 
     public int getGraphiteTimer() { return overheatController.getGraphiteTimer(); }
     public int getUraniumTimer() { return overheatController.getUraniumTimer(); }
+    public int getLiquidTimer() { return  overheatController.getLiquidTimer();}
 }
