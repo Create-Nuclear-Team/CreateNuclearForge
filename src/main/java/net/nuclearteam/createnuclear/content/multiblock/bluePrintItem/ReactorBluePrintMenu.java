@@ -128,14 +128,9 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
             boolean isFuel = stack.is(CNItemTags.FUEL.tag) || typeRod.type() == TypeRod.FUEL;
             boolean isCooler = stack.is(CNItemTags.COOLER.tag) || typeRod.type() == TypeRod.COOLER;
-            boolean isMixte = typeRod.type() == TypeRod.MIXTE;
 
             if (isCooler) countCooledRod++;
             if (isFuel) countFuelRod++;
-            if (isMixte) {
-                countFuelRod++;
-                countCooledRod++;
-            }
         }
 
         contentHolder.getOrCreateTag().put("pattern", ghostInventory.serializeNBT());
@@ -153,9 +148,8 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
             boolean isFuel = stack.is(CNItemTags.FUEL.tag) || typeRod.type() == TypeRod.FUEL;
             boolean isCooler = stack.is(CNItemTags.COOLER.tag) || typeRod.type() == TypeRod.COOLER;
-            boolean isMixte = typeRod.type() == TypeRod.MIXTE;
 
-            if (!(isFuel || isCooler || isMixte)) {
+            if (!(isFuel || isCooler)) {
                 ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));
             }
         }
