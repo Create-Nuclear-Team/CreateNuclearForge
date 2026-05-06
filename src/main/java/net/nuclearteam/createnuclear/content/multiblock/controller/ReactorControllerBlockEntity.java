@@ -262,7 +262,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
 
     public double calculateProgress() {
-        if (!isEmptyConfiguredPattern()) return 0;
+        if (isEmptyConfiguredPattern()) return 0;
         CompoundTag tag = this.getConfiguredPatternTag();
 
         if (tag == null || tag.isEmpty()) {
@@ -456,8 +456,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 }
             }
         }
-
-        CreateNuclear.LOGGER.warn("updateTimers: {}, {}", updateTimers(), total);
 
         if (updateTimers()) {
             boolean extracted = inputManager.extractItems(level, 1, 1);
