@@ -27,7 +27,6 @@ import joptsimple.internal.Strings;
 
 public class ReactorSummaryDisplaySource extends DisplaySource {
 
-    // --- CONSTANTES D'ERREUR (COMME LE BOILER) ---
     public static final List<MutableComponent> notEnoughSpaceSingle =
             List.of(CreateNuclearLang.translateDirect("display_source.reactor.not_enough_space")
                     .append(CreateNuclearLang.translateDirect("display_source.reactor.for_reactor_status")));
@@ -42,19 +41,27 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
 
     @Override
     public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
-        // Le réacteur a besoin de 6 lignes pour tout afficher proprement
         if (stats.maxRows() < 2) return notEnoughSpaceSingle;
-        else if (stats.maxRows() < 6) return notEnoughSpaceDouble;
+        if (stats.maxRows() < 6) return notEnoughSpaceDouble;
+
+        int gaugeWidth = (stats.maxColumns() >= 80) ? 10 : 6;
+
+        List<List<MutableComponent>> components = getComponents(context, false, gaugeWidth).toList();
+
+        // Sécurité : Si le contrôleur est absent, on affiche juste le message d'erreur (index 0)
+        if (components.size() < 6) {
+            return List.of(components.get(0).stream().reduce(MutableComponent::append).orElse(EMPTY_LINE));
+        }
 
         if (context.getTargetBlockEntity() instanceof LecternBlockEntity) {
-            Stream<MutableComponent> componentList = getComponents(context, false).map(components -> {
-                return components.stream().reduce(MutableComponent::append).orElse(EMPTY_LINE);
+            Stream<MutableComponent> componentList = components.stream().map(list -> {
+                return list.stream().reduce(MutableComponent::append).orElse(EMPTY_LINE);
             });
             return List.of(componentList.reduce((c1, c2) -> c1.append(Component.literal("\n")).append(c2)).orElse(EMPTY_LINE));
         }
 
-        return getComponents(context, false).map(components -> {
-            return components.stream().reduce(MutableComponent::append).orElse(EMPTY_LINE);
+        return components.stream().map(list -> {
+            return list.stream().reduce(MutableComponent::append).orElse(EMPTY_LINE);
         }).toList();
     }
 
@@ -65,10 +72,17 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
             return notEnoughSpaceFlap;
         }
 
-        List<List<MutableComponent>> components = getComponents(context, true).toList();
+        int gaugeWidth = 6;
+        List<List<MutableComponent>> components = getComponents(context, true, gaugeWidth).toList();
 
-        // Vérification de la largeur horizontale (calculée comme le Boiler)
-        if (stats.maxColumns() * FlapDisplaySection.MONOSPACE < 6 * FlapDisplaySection.MONOSPACE + components.get(1)
+        // --- FIX DU CRASH ---
+        // On vérifie que le contrôleur est bien présent (liste complète de 6 éléments)
+        // avant de tenter le calcul de largeur sur l'index 2.
+        if (components.size() < 6) {
+            return components;
+        }
+
+        if (stats.maxColumns() * FlapDisplaySection.MONOSPACE < 6 * FlapDisplaySection.MONOSPACE + components.get(2)
                 .get(1).getString().length() * FlapDisplaySection.WIDE_MONOSPACE) {
             context.flapDisplayContext = Boolean.FALSE;
             return notEnoughSpaceFlap;
@@ -79,7 +93,6 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
 
     @Override
     public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout, int lineIndex) {
-        // Si erreur d'espace, on remet le layout par défaut
         if (lineIndex == 0 || context.flapDisplayContext instanceof Boolean b && !b) {
             if (layout.isLayout("Default")) return;
             layout.loadDefault(flapDisplay.getMaxCharCount());
@@ -99,52 +112,47 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
         layout.configure(layoutKey, List.of(label, symbols));
     }
 
-    private Stream<List<MutableComponent>> getComponents(DisplayLinkContext context, boolean forFlapDisplay) {
+    private Stream<List<MutableComponent>> getComponents(DisplayLinkContext context, boolean forFlapDisplay, int gaugeWidth) {
         ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(context.level(), context.getSourcePos());
-        if (controller == null) return Stream.of(EMPTY);
 
-        // MODES : 0: Normal, 1: Value, 2: Percent, 3: Gauge
+        // Sécurité Triple-Check : null, removed ou non assemblé
+        if (controller == null || controller.isRemoved()) {
+            return Stream.of(List.of(CreateNuclearLang.translateDirect("display_source.reactor.no_controller")));
+        }
+
         int mode = context.sourceConfig().getInt("display_mode");
 
         int heat = (int) controller.getConfiguredPattern().getOrCreateTag().getDouble("heat");
-        int fuel = controller.getBigFuelItem().count;
-        int cooler = controller.getBigCoolerItem().count;
+        var fuelStack = controller.getBigFuelItem();
+        int fuel = (fuelStack != null) ? fuelStack.count : 0;
+        var coolerStack = controller.getBigCoolerItem();
+        int cooler = (coolerStack != null) ? coolerStack.count : 0;
         int size = controller.getMultiblockSize();
-        int fluid = controller.getBigFluidStack().isEmpty() ? 0 : (int) controller.getBigFluidStack().get(0).amount;
-
-        MutableComponent statusLabel = labelOf("status");
-        MutableComponent sizeLabel = labelOf("size");
-        MutableComponent fuelLabel = labelOf("fuel");
-        MutableComponent coolerLabel = labelOf("cooler");
-        MutableComponent fluidLabel = labelOf("fluid");
-        MutableComponent heatLabel = labelOf("heat");
+        var fluidList = controller.getBigFluidStack();
+        int fluid = (fluidList != null && !fluidList.isEmpty() && fluidList.get(0) != null) ? (int) fluidList.get(0).amount : 0;
 
         int lw = labelWidth();
-        if (forFlapDisplay) {
-            statusLabel = Component.literal(Strings.repeat(' ', lw - labelWidthOf("status"))).append(statusLabel);
-            sizeLabel = Component.literal(Strings.repeat(' ', lw - labelWidthOf("size"))).append(sizeLabel);
-            fuelLabel = Component.literal(Strings.repeat(' ', lw - labelWidthOf("fuel"))).append(fuelLabel);
-            coolerLabel = Component.literal(Strings.repeat(' ', lw - labelWidthOf("cooler"))).append(coolerLabel);
-            fluidLabel = Component.literal(Strings.repeat(' ', lw - labelWidthOf("fluid"))).append(fluidLabel);
-            heatLabel = Component.literal(Strings.repeat(' ', lw - labelWidthOf("heat"))).append(heatLabel);
-        }
+        MutableComponent lStatus = padLabel("status", lw).append(" ");
+        MutableComponent lSize   = padLabel("size", lw).append(" ");
+        MutableComponent lFuel   = padLabel("fuel", lw).append(" ");
+        MutableComponent lCooler = padLabel("cooler", lw).append(" ");
+        MutableComponent lFluid  = padLabel("fluid", lw).append(" ");
+        MutableComponent lHeat   = padLabel("heat", lw).append(" ");
 
         return Stream.of(
-                // Statut
-                List.of(statusLabel, controller.isAssembled() ?
+                List.of(lStatus, controller.isAssembled() ?
                         CreateNuclearLang.translateDirect("display_source.reactor.active").withStyle(ChatFormatting.GOLD) :
                         CreateNuclearLang.translateDirect("display_source.reactor.idle").withStyle(ChatFormatting.GRAY)),
-                // Taille
-                List.of(sizeLabel, formatSize(size)),
-                // Fuel
-                List.of(fuelLabel, formatValue(fuel, 64, mode, false, ChatFormatting.GREEN)),
-                // Cooler
-                List.of(coolerLabel, formatValue(cooler, 64, mode, false, ChatFormatting.AQUA)),
-                // Fluid (mB)
-                List.of(fluidLabel, formatFluid(fluid, 16000, mode, ChatFormatting.BLUE)),
-                // Chaleur
-                List.of(heatLabel, formatValue(heat, 1000, mode, true, IHeat.HeatLevel.of(heat).getTextColor()))
+                List.of(lSize, formatSize(size)),
+                List.of(lFuel,   formatValue(fuel, 64, mode, false, ChatFormatting.GREEN, gaugeWidth)),
+                List.of(lCooler, formatValue(cooler, 64, mode, false, ChatFormatting.AQUA, gaugeWidth)),
+                List.of(lFluid,  formatFluid(fluid, 16000, mode, ChatFormatting.BLUE, gaugeWidth)),
+                List.of(lHeat,   formatValue(heat, 1000, mode, true, IHeat.HeatLevel.of(heat).getTextColor(), gaugeWidth))
         );
+    }
+
+    private MutableComponent padLabel(String key, int lw) {
+        return Component.literal(Strings.repeat(' ', lw - labelWidthOf(key))).append(labelOf(key));
     }
 
     private MutableComponent formatSize(int size) {
@@ -152,26 +160,21 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
         return CreateNuclearLang.translateDirect("display_source.reactor.size." + key).withStyle(ChatFormatting.BLUE);
     }
 
-    private MutableComponent formatFluid(int current, int max, int mode, ChatFormatting color) {
-        if (mode == 0 || mode == 3) return drawGauge(current, max, color);
+    private MutableComponent formatFluid(int current, int max, int mode, ChatFormatting color, int width) {
+        if (mode == 0 || mode == 3) return drawGauge(current, max, color, width);
         if (mode == 2) return Component.literal((current * 100 / max) + "%").withStyle(color);
-
-        return Component.literal(String.valueOf(current))
-                .append(" ")
-                .append(CreateNuclearLang.translateDirect("generic.unit.fluid.value"))
-                .withStyle(color);
+        return Component.literal(String.valueOf(current)).append(" ").append(CreateNuclearLang.translateDirect("generic.unit.fluid.value")).withStyle(color);
     }
 
-    private MutableComponent formatValue(int current, int max, int mode, boolean gaugeOnNormal, ChatFormatting color) {
-        if (mode == 3 || (mode == 0 && gaugeOnNormal)) return drawGauge(current, max, color);
+    private MutableComponent formatValue(int current, int max, int mode, boolean gaugeOnNormal, ChatFormatting color, int width) {
+        if (mode == 3 || (mode == 0 && gaugeOnNormal)) return drawGauge(current, max, color, width);
         if (mode == 2) return Component.literal((current * 100 / max) + "%").withStyle(color);
         return Component.literal(String.valueOf(current)).withStyle(color);
     }
 
-    private MutableComponent drawGauge(int current, int max, ChatFormatting color) {
-        int width = 10;
+    private MutableComponent drawGauge(int current, int max, ChatFormatting color, int width) {
         int filled = (int) (Mth.clamp((float) current / max, 0, 1) * width);
-        return Component.literal("█".repeat(filled) + "░".repeat(width - filled)).withStyle(color);
+        return Component.literal("█".repeat(filled) + "▒".repeat(Math.max(0, width - filled))).withStyle(color);
     }
 
     private int labelWidth() {

@@ -5,60 +5,60 @@ import com.simibubi.create.content.redstone.displayLink.source.NumericSingleLine
 import com.simibubi.create.content.redstone.displayLink.target.DisplayTargetStats;
 import com.simibubi.create.foundation.gui.ModularGuiLineBuilder;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 public class HeatDisplaySource extends NumericSingleLineDisplaySource {
+
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
-        if (!(context.getSourceBlockEntity() instanceof ReactorControllerBlockEntity controller)) return ZERO.copy();
+        ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(context.level(), context.getSourcePos());
+        if (controller == null || controller.isRemoved()) return ZERO.copy();
 
-        boolean heatOriginal = context.sourceConfig().getInt("heat") == 0;
-        boolean heatValue = context.sourceConfig().getInt("heat") == 1;
-        boolean heatType = context.sourceConfig().getInt("heat") == 2;
+        // Ajout du Label + Espace
+        MutableComponent label = CreateNuclearLang.translateDirect("display_source.reactor.heat").append(" ");
 
-        int heat = (int) controller.getConfiguredPattern().getTag().getDouble("heat");
+        int mode = context.sourceConfig().getInt("display_mode");
+        int heat = (int) controller.getConfiguredPattern().getOrCreateTag().getDouble("heat");
+        int maxHeat = 1000;
 
-        if (heatOriginal) {
-            return CreateNuclearLang.number(heat)
-                .space()
-                .translate("generic.unit.heat.value")
-                .component();
-        } else if (heatValue) {
-            return CreateNuclearLang.number(Math.abs(heat /4))
-                .space()
-                .translate("generic.unit.heat.rotation")
-                .component();
-        } else if (heatType) {
-            return CreateNuclearLang
-                .translateDirect("generic.unit.heat.type", IHeat.HeatLevel.of(heat))
-                .withStyle(IHeat.HeatLevel.of(heat).getTextColor());
-        } else {
-            return null;
-        }
+        return label.append(switch (mode) {
+            case 1 -> Component.literal((heat * 100 / maxHeat) + "%")
+                    .withStyle(IHeat.HeatLevel.of(heat).getTextColor());
 
+            case 2 -> {
+                // Largeur réduite pour laisser de la place au label
+                int gaugeWidth = 6;
+                yield drawGauge(heat, maxHeat, IHeat.HeatLevel.of(heat).getTextColor(), gaugeWidth);
+            }
+
+            default -> Component.literal(String.valueOf(heat))
+                    .append(CreateNuclearLang.translateDirect("generic.unit.heat.value"))
+                    .withStyle(IHeat.HeatLevel.of(heat).getTextColor());
+        });
     }
 
-    @Override
-    protected String getTranslationKey() {
-        return "heat";
+    private MutableComponent drawGauge(int current, int max, net.minecraft.ChatFormatting color, int width) {
+        int filled = (int) (Mth.clamp((float) current / max, 0, 1) * width);
+        int empty = Math.max(0, width - filled);
+        return Component.literal("█".repeat(filled) + "▒".repeat(empty)).withStyle(color);
     }
+
+    @Override protected String getTranslationKey() { return "heat"; }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public void initConfigurationWidgets(DisplayLinkContext context, ModularGuiLineBuilder builder, boolean isFirstLine) {
-        super.initConfigurationWidgets(context, builder, isFirstLine);
         if (isFirstLine) return;
-
-        builder.addSelectionScrollInput(0, 95, (selectionScrollInput, label) -> selectionScrollInput
-                .forOptions(CreateNuclearLang.translatedOptions("display_source.heat", "value", "rotation", "type")), "heat");
+        builder.addSelectionScrollInput(0, 100, (selectionScrollInput, l) -> selectionScrollInput
+                .forOptions(CreateNuclearLang.translatedOptions("display_source.reactor.mode", "value", "percent", "gauge")), "display_mode");
     }
 
-    @Override
-    protected boolean allowsLabeling(DisplayLinkContext context) {
-        return true;
-    }
+    @Override protected boolean allowsLabeling(DisplayLinkContext context) { return true; }
 }

@@ -14,29 +14,28 @@ import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
-public class LiquidLevelDisplaySource extends NumericSingleLineDisplaySource {
+public class CoolerDisplaySource extends NumericSingleLineDisplaySource {
 
     @Override
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(context.level(), context.getSourcePos());
         if (controller == null || controller.isRemoved()) return ZERO.copy();
 
-        MutableComponent label = CreateNuclearLang.translateDirect("display_source.reactor.fluid").append(" ");
+        // Label + Espace
+        MutableComponent label = CreateNuclearLang.translateDirect("display_source.reactor.cooler").append(" ");
 
         int mode = context.sourceConfig().getInt("display_mode");
-        var fluidList = controller.getBigFluidStack();
-        int fluid = (fluidList != null && !fluidList.isEmpty()) ? (int) fluidList.get(0).amount : 0;
-        int maxFluid = 16000;
+        var coolerStack = controller.getBigCoolerItem();
+        int cooler = (coolerStack != null) ? coolerStack.count : 0;
+        int maxCooler = 64;
 
         return label.append(switch (mode) {
-            case 1 -> Component.literal((fluid * 100 / maxFluid) + "%").withStyle(ChatFormatting.BLUE);
+            case 1 -> Component.literal((cooler * 100 / maxCooler) + "%").withStyle(ChatFormatting.AQUA);
             case 2 -> {
                 int gaugeWidth = 6;
-                yield drawGauge(fluid, maxFluid, ChatFormatting.BLUE, gaugeWidth);
+                yield drawGauge(cooler, maxCooler, ChatFormatting.AQUA, gaugeWidth);
             }
-            default -> Component.literal(String.valueOf(fluid))
-                    .append(CreateNuclearLang.translateDirect("generic.unit.fluid.value"))
-                    .withStyle(ChatFormatting.BLUE);
+            default -> Component.literal(String.valueOf(cooler)).withStyle(ChatFormatting.AQUA);
         });
     }
 
@@ -45,7 +44,7 @@ public class LiquidLevelDisplaySource extends NumericSingleLineDisplaySource {
         return Component.literal("█".repeat(filled) + "▒".repeat(Math.max(0, width - filled))).withStyle(color);
     }
 
-    @Override protected String getTranslationKey() { return "liquid_level"; }
+    @Override protected String getTranslationKey() { return "cooler"; }
 
     @Override
     @OnlyIn(Dist.CLIENT)
