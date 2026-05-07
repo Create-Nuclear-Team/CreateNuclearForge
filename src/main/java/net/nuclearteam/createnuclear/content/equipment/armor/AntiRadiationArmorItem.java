@@ -8,8 +8,7 @@ import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
@@ -19,12 +18,11 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.*;
 import net.nuclearteam.createnuclear.CNAttributes;
+import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.foundation.util.ClothTagHelper;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
@@ -100,31 +98,7 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
         consumer.accept(new AntiRadiationArmorClientExtensions());
     }
   
-   /* public static class Helmet extends ArmorItem {
-        protected final DyeColor color;
-
-
-        public Helmet(Properties properties, DyeColor color) {
-            super(ARMOR_MATERIAL, HELMET, properties);
-            this.color = color;
-        }
-
-        @Override
-        public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-            return getSingleLayerTexture(this.color);
-        }
-
-        @Override
-        public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-            AntiRadiationArmorItem.attachCustomModel(consumer);
-        }
-
-        public static class DyeItemHelmetList<T extends Helmet> implements Iterable<ItemEntry<T>> {
-            private static final int COLOR_AMOUNT = DyeColor.values().length;
-            private final ItemEntry<?>[] entry = new ItemEntry<?>[COLOR_AMOUNT];
-*/
-
-    public static class Helmet extends AntiRadiationArmorItem {
+    public static class Helmet extends AntiRadiationArmorItem implements IGoggleHelmet {
         public Helmet(Properties p, DyeColor color) {
             super(ArmorMaterials.ANTI_RADIATION_SUIT, Type.HELMET, p, color);
         }
@@ -173,6 +147,13 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
             if (slot != this.getType().getSlot()) return super.getDefaultAttributeModifiers(slot);
             Multimap<Attribute, AttributeModifier> map = super.getDefaultAttributeModifiers(slot);
             return AntiRadiationArmorItem.irradiatedArmorAttribute(map, Type.BOOTS);
+        }
+    }
+
+    public interface IGoggleHelmet {
+        static boolean isGoggleHelmet(LivingEntity entity) {
+            ItemStack headSlot = entity.getItemBySlot(EquipmentSlot.HEAD);
+            return CNItems.ANTI_RADIATION_HELMETS.isIn(headSlot);
         }
     }
 }

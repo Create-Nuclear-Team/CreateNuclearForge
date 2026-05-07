@@ -207,10 +207,10 @@ public class CNItems {
         THORIUM_ROD = CreateNuclear.REGISTRATE
             .item("thorium_rod", Item::new)
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .rodTimer(4500)
-                .baseRodHeat(200)
-                .proximityRodHeat(2)
-                .mixteRodType()))
+                .rodTimer(3600)
+                .baseRodHeat(16)
+                .proximityRodHeat(8)
+                .fuelRodType()))
             .tag(CNTags.forgeItemTag("rods"))
             .register()
     ;

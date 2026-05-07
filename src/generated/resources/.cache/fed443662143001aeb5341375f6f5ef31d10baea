@@ -1,7 +1,8 @@
-// 1.20.1	2026-04-22T21:44:23.4996458	CreateNuclear Generated Registry Entries
+// 1.20.1	2026-04-24T23:54:21.7228063	CreateNuclear Generated Registry Entries
 aa1897ff27a6aa83e2efbee29e12ad6dab2f6a0a data/createnuclear/createnuclear/fluids/type/fallback.json
+d7c754aa51cea393a10bce85986c1c0c641150d5 data/createnuclear/createnuclear/fluids/type/nitrogen.json
 afee3d8f15bf8285e175f73befba7b46fdc94b19 data/createnuclear/createnuclear/fluids/type/water.json
-51fdf9ee1116f02230db3e0706b0554e3217d07c data/createnuclear/createnuclear/rods/type/fallback.json
+6df0fec4d8ee202479f435e6d45b397d54dab29c data/createnuclear/createnuclear/rods/type/fallback.json
 9b26dc9810e426fa58e03de22a96f45403e5f1b3 data/createnuclear/damage_type/fan_radiation.json
 8c374052eefd34e87959a1f643e60b674f0345f8 data/createnuclear/damage_type/radiation.json
 5edbd74546f4088818e02bb7a5c5eb2ecfe25623 data/createnuclear/forge/biome_modifier/lead_ore.json
@@ -9,7 +10,7 @@ afee3d8f15bf8285e175f73befba7b46fdc94b19 data/createnuclear/createnuclear/fluids
 72173023e6a31748692e750db0f5fa8c555d1009 data/createnuclear/forge/biome_modifier/striated_ores_overworld.json
 1d15657126bab7c0b4355d0dcb9addc2d417ed01 data/createnuclear/forge/biome_modifier/thorium_ore.json
 fa32145101dc12ec914684fec8c5cbb995d2c051 data/createnuclear/forge/biome_modifier/uranium_ore.json
-bec3aa19be2740b8347902856a2ad920b0641804 data/createnuclear/worldgen/biome/irradiated_plain.json
+738687a49c3cd8473d1c511f55e274637fe44478 data/createnuclear/worldgen/biome/irradiated_plain.json
 b68555f371c9700aa4ecfa9370b010de8fe25b60 data/createnuclear/worldgen/configured_feature/lead_ore.json
 c904589fc02f6289ee57e56b85cff0aefb7da964 data/createnuclear/worldgen/configured_feature/nitrate_ore.json
 4f11c0a518c0de7857919983fc638ba551c6630a data/createnuclear/worldgen/configured_feature/striated_ores_overworld.json

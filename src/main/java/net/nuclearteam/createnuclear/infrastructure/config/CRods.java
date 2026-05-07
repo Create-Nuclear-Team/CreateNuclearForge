@@ -9,12 +9,12 @@ public class CRods extends ConfigBase {
     public final ConfigInt rodFuelMaxForCoolerRod = i(3, 0, 20, "Maximum number of fuel rods allowed per cooled rod", Comments.warning, Comments.maxFuelPerCooled);
 
     public final ConfigInt uraniumRodLifetime = i(3600, 100, 5000, "Uranium rod lifetime (in ticks)", Comments.uraniumRodLifetime, Comments.hintTick);
-    public final ConfigInt uraniumProxyBonus = i(5, -20, 20, "Heat bonus from nearby uranium rods", Comments.warning, Comments.uraniumProximityBonus);
-    public final ConfigInt baseValueUranium = i(25, -50, 50, "Base heat value for uranium rods", Comments.warning, Comments.uraniumBaseValue);
+    public final ConfigInt uraniumProxyBonus = i(32, -70, 70, "Heat bonus from nearby uranium rods", Comments.warning, Comments.uraniumProximityBonus);
+    public final ConfigInt baseValueUranium = i(64, -70, 70, "Base heat value for uranium rods", Comments.warning, Comments.uraniumBaseValue);
 
     public final ConfigInt graphiteRodLifetime = i(3600, 100, 5000, "Graphite (cooling) rod lifetime (in ticks)", Comments.graphiteRodLifetime, Comments.hintTick);
-    public final ConfigInt graphiteProxyMalus = i(-5, -20, 20, "Heat penalty from nearby graphite rods", Comments.warning, Comments.graphiteProximityMalus);
-    public final ConfigInt baseValueGraphite = i(-10, -50, 50, "Base heat value for graphite rods", Comments.warning, Comments.graphiteBaseValue);
+    public final ConfigInt graphiteProxyMalus = i(-1/4, -70, 70, "Heat penalty from nearby graphite rods", Comments.warning, Comments.graphiteProximityMalus);
+    public final ConfigInt baseValueGraphite = i(-32, -50, 50, "Base heat value for graphite rods", Comments.warning, Comments.graphiteBaseValue);
 
 
     @Override

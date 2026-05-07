@@ -3,6 +3,7 @@ package net.nuclearteam.createnuclear.content.multiblock.fluid;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.material.Fluids;
+import net.nuclearteam.createnuclear.CNFluids;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
@@ -39,6 +40,12 @@ public class CNReactorFluidTypes {
             .maxHeat(2048)
             .efficiency(1000)
             .build()
+        );
+        register(ctx, "nitrogen", new ReactorFluidType.Builder()
+                .fluid(CNFluids.LIQUID_NITROGEN.getSource())
+                .maxHeat(8196)
+                .efficiency(100)
+                .build()
         );
     }
 

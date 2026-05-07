@@ -27,8 +27,8 @@ public class ReactorInputInventory extends ItemStackHandler {
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
         RodType rodType = ItemRodTypesValue.getRodType(stack.getItem());
         return switch (slot) {
-            case 0 -> CNTags.CNItemTags.FUEL.matches(stack) || rodType.type() == TypeRod.FUEL || rodType.type() == TypeRod.MIXTE;
-            case 1 -> CNTags.CNItemTags.COOLER.matches(stack) || rodType.type() == TypeRod.COOLER || rodType.type() == TypeRod.MIXTE;
+            case 0 -> CNTags.CNItemTags.FUEL.matches(stack) || rodType.type() == TypeRod.FUEL;
+            case 1 -> CNTags.CNItemTags.COOLER.matches(stack) || rodType.type() == TypeRod.COOLER;
             default -> !super.isItemValid(slot, stack);
         };
     }

@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear;
 
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.CreateBuildInfo;
+import com.simibubi.create.content.equipment.goggles.GogglesItem;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.KineticStats;
@@ -23,6 +24,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.IGoggleHelmet;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
 import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
@@ -84,6 +86,8 @@ public class CreateNuclear {
         CNAttributes.register(modEventBus);
 
         PROXY.commonInit();
+
+        GogglesItem.addIsWearingPredicate(IGoggleHelmet::isGoggleHelmet);
 
         modEventBus.addListener(CreateNuclear::init);
         modEventBus.addListener(CreateNuclear::onRegister);

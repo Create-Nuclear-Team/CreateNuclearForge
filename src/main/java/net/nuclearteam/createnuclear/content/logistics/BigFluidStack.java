@@ -1,7 +1,7 @@
 package net.nuclearteam.createnuclear.content.logistics;
 
 import com.simibubi.create.content.logistics.BigItemStack;
-import net.minecraft.client.Minecraft;
+import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
@@ -90,7 +90,9 @@ public class BigFluidStack {
     }
 
     public ReactorFluidType getFluidtype(@Nullable Level level) {
-        if (level == null) level = Minecraft.getInstance().level;
+        if (level == null) {
+            return ReactorFluidTypesValue.getReactorFluidType(this.stack.getFluid());
+        }
         return ReactorFluidType.resolveReactorFluidType(this.stack.getFluid(), level);
     }
 }
