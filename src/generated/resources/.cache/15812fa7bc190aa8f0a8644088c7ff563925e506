@@ -1,4 +1,4 @@
-// 1.20.1	2026-04-22T20:27:45.8969098	CreateNuclear's Processing Recipes
+// 1.20.1	2026-05-07T11:02:30.4509436	CreateNuclear's Processing Recipes
 bccfe326d6c91bd2df207a38225fbca413e1013f data/createnuclear/recipes/compacting/thorium_fluid_to_thorium_ingot.json
 c711d032a04e1a9350ad9bc4d9c4d74f54689862 data/createnuclear/recipes/compacting/uranium_fluid_to_yellowcake.json
 33becbc558bd2fbe277be096b292c0093f84e44c data/createnuclear/recipes/crushing/coal.json
@@ -8,7 +8,6 @@ c711d032a04e1a9350ad9bc4d9c4d74f54689862 data/createnuclear/recipes/compacting/u
 4feb59d85e86e34ed565c18b6a4df120fe050bc7 data/createnuclear/recipes/crushing/raw_copper.json
 e79a01c53e63fe0c0b8519a6b9b76a2044179efa data/createnuclear/recipes/crushing/raw_thorium.json
 78ba5a2791f2f30bd22d6a1111447d1a39928277 data/createnuclear/recipes/crushing/raw_thorium_block.json
-cf17713133d3e05e99164e2ea6649de3aef017fd data/createnuclear/recipes/crushing/raw_uranium_block.json
 26d2787e831b9986ed6f90f8ea803d5fdc544bf5 data/createnuclear/recipes/crushing/raw_zinc.json
 e42be7d17c5e057e62c4b1176cbf43319a157f51 data/createnuclear/recipes/enriched/enriched_yellowcake.json
 74555eb2cce0827f99dc5c4ff91362bdaecad725 data/createnuclear/recipes/enriched/enriching_campfire.json
