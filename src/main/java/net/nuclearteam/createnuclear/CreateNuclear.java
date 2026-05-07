@@ -58,6 +58,7 @@ public class CreateNuclear {
         REGISTRATE.registerEventListeners(modEventBus);
 
         CNSoundEvents.prepare();
+        CNDisplaySources.register();
         CNTags.init();
         CNBlocks.register();
         CNBlockEntityTypes.register();

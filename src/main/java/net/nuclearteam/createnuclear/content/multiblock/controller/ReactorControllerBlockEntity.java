@@ -100,6 +100,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public void setBigFuelItem(BigItemStack b) { this.bigFuelItem = b; }
     public BigItemStack getBigCoolerItem() { return this.bigCoolerItem; }
     public void setBigCoolerItem(BigItemStack b) { this.bigCoolerItem = b; }
+    public List<BigFluidStack> getBigFluidStack() { return this.bigFluidStack; }
+    public void setBigFluidStack(List<BigFluidStack> b) { this.bigFluidStack = b; }
 
     public int getMultiblockSize() { return this.reactorSize; }
     public void setMultiblockSize(int s) { this.reactorSize = s; }
@@ -112,6 +114,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     public double getTotal() { return this.total; }
     public void setTotal(double t) { this.total = t; }
+
+    public int getCountUraniumRod() {
+        return this.countUraniumRod;
+    }
+
+    public int getCountGraphiteRod() {
+        return this.countGraphiteRod;
+    }
 
     /** Main constructor allowing dependency injection for testability and DIP compliance. */
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -151,6 +161,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
             IHeat.HeatLevel.getFormattedHeatText(configuredPattern.getOrCreateTag().getInt("heat")).forGoggles(tooltip);
 
+            CreateNuclear.LOGGER.warn("fuel: {}, cooled: {}", bigFuelItem, bigCoolerItem);
+
             if (bigFuelItem.stack.isEmpty()) {
                 // if rod empty we initialize it at 1 (and display it as 0) to avoid having air item displayed instead of the rod
                 IHeat.HeatLevel.getFormattedItemText(new ItemStack(CNItems.URANIUM_ROD.asItem(), 1), true).forGoggles(tooltip);
@@ -181,7 +193,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
 
-    //(Si les methode read et write ne sont pas implémenté alors lorsque l'on relance le monde minecraft les items dans le composant auront disparu !)
+    // (Si les methode read et write ne sont pas implémenté alors lorsque l'on relance le monde minecraft les items dans le composant auront disparu !)
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket); // Toujours en premier pour les coordonnées de base
@@ -352,7 +364,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
     private boolean updateTimers() {
-
         total -= 1;
         return total <= 0;//(total/constTotal) <= 0;
     }
