@@ -234,6 +234,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         final Block reactorOutputBlock = CNBlocks.REACTOR_OUTPUT.get();
         final Block reactorInputBlock = CNBlocks.REACTOR_INPUT.get();
         final Block reactorInputFluidBlock = CNBlocks.REACTOR_LIQUID_INPUT.get();
+        final Block reactorAlarmBlock = CNBlocks.REACTOR_ALARM.get();
 
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
@@ -260,6 +261,8 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     }
                     else if (state.is(reactorInputFluidBlock)) {
                         controllerBlockEntity.addInputFluid(mutablePos.immutable());
+                    } else if (state.is(reactorAlarmBlock)) {
+                        controllerBlockEntity.addAlarm(mutablePos.immutable());
                     }
                 }
             }

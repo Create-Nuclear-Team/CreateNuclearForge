@@ -605,8 +605,8 @@ public class CNBlocks {
             .build()
             .register();
 
-    public static final BlockEntry<Block> REACTOR_ALARM =
-        CreateNuclear.REGISTRATE.block("reactor_alarm", Block::new)
+    public static final BlockEntry<ReactorAlarm> REACTOR_ALARM =
+        CreateNuclear.REGISTRATE.block("reactor_alarm", ReactorAlarm::new)
             .initialProperties(SharedProperties::stone)
             .transform(pickaxeOnly())
             .item()
