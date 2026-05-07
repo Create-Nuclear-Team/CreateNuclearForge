@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -112,11 +113,11 @@ public class ReactorFrame extends Block implements IWrenchable {
         List<? extends Player> players = level.players();
         pattern.FindController(pos, level, players, true);
     }
+
     @Override // called when the player destroys the block, with or without a tool
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         List<? extends Player> players = level.players();
         pattern.FindController(pos, level, players, false);
     }
-
 }

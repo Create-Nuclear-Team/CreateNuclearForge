@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.infrastructure.data;
 
+import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.data.TagGen.CreateTagsProvider;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.RegistrateTagsProvider;

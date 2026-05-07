@@ -39,7 +39,7 @@ public class CreateNuclear {
 
     static {
         REGISTRATE.setTooltipModifierFactory(item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
-                .andThen(TooltipModifier.mapNull(KineticStats.create(item))).andThen(RodsStats.create(item)));
+            .andThen(TooltipModifier.mapNull(KineticStats.create(item))).andThen(RodsStats.create(item)));
     }
 
     public CreateNuclear() {
@@ -90,8 +90,11 @@ public class CreateNuclear {
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
-        event.enqueueWork(CNPotions::registerPotionsRecipes);
         event.enqueueWork(() -> IrradiatedAnimal.VANILLA_TO_IRRADIATED.put(EntityType.CHICKEN, CNEntityType.IRRADIATED_CHICKEN.get()));
+        event.enqueueWork(() -> {
+            CNPotions.registerPotionsRecipes();
+            CNOpenPipeEffectHandlers.registerDefaults();
+        });
     }
 
     public static void onRegister(final RegisterEvent event) {
