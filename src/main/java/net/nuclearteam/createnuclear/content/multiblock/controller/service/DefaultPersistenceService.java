@@ -32,7 +32,6 @@ public class DefaultPersistenceService implements IPersistenceService {
         }
 
         compound.putDouble("total", owner.calculateProgress());
-        compound.putDouble("liquidProgress", owner.calculateLiquidProgress());
 
         if (!clientPacket) {
             compound.put("pattern", owner.serializeInventory());

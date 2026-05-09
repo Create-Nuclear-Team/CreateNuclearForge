@@ -280,18 +280,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return totalGraphiteRodLife + totalUraniumRodLife;
     }
 
-    public double calculateLiquidProgress() {
-        return switch (reactorSize) {
-            case 5 -> (double) heatService.getLiquidTimer() / 40;
-            case 7 -> (double) heatService.getLiquidTimer() / 147;
-            case 9 -> (double) heatService.getLiquidTimer() / 360;
-            default -> {
-                CreateNuclear.LOGGER.error("Invalid reactor size value: {}", reactorSize);
-                yield 1;
-            }
-        };
-    }
-
     public void logReactorConnections() {
         CreateNuclear.LOGGER.debug("Reactor input count: {}", this.inputManager.size());
         CreateNuclear.LOGGER.debug("Reactor output count: {}", this.outputManager.size());
@@ -406,7 +394,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.bigCoolerItem = virtualReactorInputsItem.getBigCooledRod();
         this.bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
 
-        handleAssembledState(heat);
+        handleAssembledState();
     }
 
     // --- extracted sub-steps to keep single responsibility per method ---
@@ -418,7 +406,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.setChanged();
     }
 
-    private void handleAssembledState(int heat) {
+    private void handleAssembledState() {
         if (!isReadyToRun()) {
             updateHeatOnly();
             if (!this.outputManager.getBlocksPosition().isEmpty()) rotate(getBlockState(), getLevel(), 0);
@@ -426,12 +414,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             this.notifyUpdate();
             return;
         }
-
         // ready to run
         this.setChanged();
         this.notifyUpdate();
         BigFluidStack fluidStack = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
-        this.getConfiguredPatternTag().putDouble("heat", heatService.calculateHeat(bigFuelItem, bigCoolerItem, fluidStack, countGraphiteRod, countUraniumRod, inventory, level));
+        heat = (int) heatService.calculateHeat(bigFuelItem, bigCoolerItem, fluidStack, countGraphiteRod, countUraniumRod, inventory, level);
+        this.getConfiguredPatternTag().putDouble("heat", heat);
 
         if (fluidStack != null) {
             if (fluidStack.amount > 1) {
@@ -456,26 +444,24 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 }
             }
         }
-
         if (updateTimers()) {
             boolean extracted = inputManager.extractItems(level, 1, 1);
             if (extracted) {
                 this.setChanged();
                 this.notifyUpdate();
                 total = calculateProgress();
-
-                if (IHeat.HeatLevel.isNotDanger(heat)) {
-                    // normal
-                    if (!this.outputManager.getBlocksPosition().isEmpty()) {
-                        rotate(getBlockState(), getLevel(), heat);
-                    }
-                } /*else {
+            }
+        }
+        if (IHeat.HeatLevel.isNotDanger(heat)) {
+            // normal
+            if (!this.outputManager.getBlocksPosition().isEmpty()) {
+                rotate(getBlockState(), getLevel(), heat);
+            }
+        } /*else {
                     EventTriggerPacket packet = new EventTriggerPacket(600);
                     CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
                     CNPackets.sendToNear(level, getBlockPos(), 32, packet);
                 }*/
-            }
-        }
     }
 
     private void triggerNuclearExplosion() {
@@ -658,14 +644,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                         entity.heat = 0;
                     }
                     entity.updateSpeed = true;
+                    entity.setSpeedAndUpdate(dividedRotation);
                     entity.updateGeneratedRotation();
-                    entity.setSpeed(dividedRotation);
 
                 }
             } else {
                 if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
                     ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
-                    entity.setSpeed(0);
+                    entity.setSpeedAndUpdate(0);
                     entity.heat = 0;
                     entity.updateSpeed = true;
                     entity.updateGeneratedRotation();
