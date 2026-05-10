@@ -1,7 +1,10 @@
 package net.nuclearteam.createnuclear.content.effects;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 
 import net.nuclearteam.createnuclear.CNEffects;
@@ -11,6 +14,11 @@ import net.nuclearteam.createnuclear.content.effects.capability.RadiationCapabil
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.nuclearteam.createnuclear.foundation.damageTypes.CreateNuclearDamageSources;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
+import net.nuclearteam.createnuclear.infrastructure.config.CRadiation;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class RadiationEffect extends VicinityEffect {
 
@@ -27,9 +35,18 @@ public class RadiationEffect extends VicinityEffect {
                     double resistance = RadiationCapability.getRadiationResistance(e);
                     if (resistance >= 1) isWearingAntiRadiationArmor = true;
 
+                    Set<EntityType<?>> target = new HashSet<>();
+
+                    CRadiation.ConfiguredList.loadValueInList(CNConfigs.server().radiation.list.getEntityBlackList(), target, entity -> {
+                        ResourceLocation location = ResourceLocation.tryParse(entity);
+                        return BuiltInRegistries.ENTITY_TYPE.get(location);
+                    });
+
                     return !e.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)
                         && !e.hasEffect(CNEffects.RADIATION.get())
                         && !isWearingAntiRadiationArmor
+                        && CNConfigs.server().radiation.enabledItemRadiation.get()
+                        && !target.contains(e.getType())
                     ;
                 },
                 timer -> {},
