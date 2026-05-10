@@ -9,11 +9,11 @@ import net.minecraft.world.entity.LivingEntity;
 
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CNTags;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.effects.capability.RadiationCapability;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.nuclearteam.createnuclear.foundation.damageTypes.CreateNuclearDamageSources;
+import net.nuclearteam.createnuclear.foundation.utility.ConfigValueResolver;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.config.CRadiation;
 
@@ -37,7 +37,7 @@ public class RadiationEffect extends VicinityEffect {
 
                     Set<EntityType<?>> target = new HashSet<>();
 
-                    CRadiation.ConfiguredList.loadValueInList(CNConfigs.server().radiation.list.getEntityBlackList(), target, entity -> {
+                    ConfigValueResolver.loadValuesInSet(CNConfigs.server().radiation.configuredLists.getEntityBlackList(), target, entity -> {
                         ResourceLocation location = ResourceLocation.tryParse(entity);
                         return BuiltInRegistries.ENTITY_TYPE.get(location);
                     });
@@ -47,6 +47,7 @@ public class RadiationEffect extends VicinityEffect {
                         && !isWearingAntiRadiationArmor
                         && CNConfigs.server().radiation.enabledItemRadiation.get()
                         && !target.contains(e.getType())
+                        && !e.isSpectator()
                     ;
                 },
                 timer -> {},
