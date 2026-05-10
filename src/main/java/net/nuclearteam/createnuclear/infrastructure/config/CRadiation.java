@@ -3,17 +3,13 @@ package net.nuclearteam.createnuclear.infrastructure.config;
 import net.createmod.catnip.config.ConfigBase;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.nuclearteam.createnuclear.CreateNuclear;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 public class CRadiation extends ConfigBase {
     public final ConfigBool enabledItemRadiation = b(true, "enabledItemRadiation", Comments.enabled);
-    public final ConfiguredList list = nested(0, ConfiguredList::new);
+    public final ConfiguredLists configuredLists = nested(0, ConfiguredLists::new, Comments.list);
     public final ConfigInt radiationLevel1 = i(10, 0, 50, "radiationLevel1", Comments.radiationLevel1);
     public final ConfigInt radiationLevel2 = i(25, 0, 50, "radiationLevel2", Comments.radiationLevel2);
     public final ConfigInt radiationLevel3 = i(50, 0, 50, "radiationLevel3", Comments.radiationLevel3);
@@ -41,15 +37,33 @@ public class CRadiation extends ConfigBase {
                 + "In Minecraft, amplifier 1 means Radiation II.";
         static String amplifierLevel2 = "Mob effect amplifier used for the third radiation tier. "
                 + "In Minecraft, amplifier 2 means Radiation III.";
+        static String list = "Contains configurable lists related to radiation, such as the entity blacklist.\n" +
+                "\n" +
+                "The entity blacklist is mainly used to prevent certain non-living entities (like item frames or armor stands)\n" +
+                "from transmitting radiation effects. This avoids unwanted side effects where decorative or technical entities\n" +
+                "would otherwise be affected by or propagate radiation.";
+        static String blackListEntity = "List of entity IDs that are excluded from radiation effects.\n" +
+                "Add the registry names (e.g., \"minecraft:armor_stand\") of entities you want to ignore for radiation.\n" +
+                "This is useful for entities like item frames or armor stands that should not be affected.\n" +
+                "\n" +
+                "How to fill:\n" +
+                "- Each entry must be a valid entity ID in the format namespace:entity_name.\n" +
+                "- To add a new entity, simply add its ID as a new string in the list.\n" +
+                "- Example: \"minecraft:bat\" will prevent bats from being affected by radiation.\n" +
+                "- To remove an entity from the blacklist, delete its line from the list.\n" +
+                "\n" +
+                "This style of configuration is standard in many mods: simply list the entity IDs you want to exclude.\n" +
+                "If you are unsure of an entity's ID, check the mod's documentation or use the /summon command in-game to see the correct ID.";
     }
 
-    public static class ConfiguredList extends ConfigBase {
+    public static class ConfiguredLists extends ConfigBase {
         private static ForgeConfigSpec.ConfigValue<List<? extends String>> ENTITY_BLACKLIST = null;
 
         @Override
         public void registerAll(ForgeConfigSpec.Builder builder) {
+
             ENTITY_BLACKLIST = builder
-                    .comment("")
+                    .comment(Comments.blackListEntity)
                     .defineListAllowEmpty(
                             List.of("entityBlackList"),
                             () -> List.of(
@@ -65,28 +79,11 @@ public class CRadiation extends ConfigBase {
 
         @Override
         public String getName() {
-            return "listValue";
+            return "lists";
         }
 
         public List<? extends String> getEntityBlackList() {
             return ENTITY_BLACKLIST.get();
-        }
-
-        public static <T> void loadValueInList(List<? extends String> valuesIds, Set<T> targetSet, Function<String, T> func) {
-            targetSet.clear();
-            for (String valueId : valuesIds) {
-                try {
-                    T value = func.apply(valueId);
-
-                    if (value != null) {
-                        targetSet.add(value);
-                    } else {
-                        CreateNuclear.LOGGER.error("Unknown entity type in config: {}", value);
-                    }
-                } catch (Exception e) {
-                    CreateNuclear.LOGGER.error("Unknown entity type in config: {} - {}", valueId, e.getMessage());
-                }
-            }
         }
     }
 }
