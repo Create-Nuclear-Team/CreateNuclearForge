@@ -66,6 +66,7 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
         /*if (level.getBlockEntity(controllerPos) instanceof ReactorControllerBlockEntity reactorController) {
             int heat = (int) reactorController.getConfiguredPattern().getOrCreateTag().getDouble("heat");
             if (IHeat.HeatLevel.of(heat) == IHeat.HeatLevel.DANGER) {
+
                 if (countdownTicks >= CNConfigs.server().explode.time.get()) { // 300 ticks = 15 secondes
                     explodeReactorCore(level, getBlockPos());
                 } else {
@@ -111,6 +112,25 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
 
         level.addFreshEntity(explosion);
          */
+//    private void explodeReactorCore(Level level, BlockPos pos) {
+//        for (int x = -1; x <= 1; x++) {
+//            for (int y = -1; y <= 1; y++) {
+//                for (int z = -1; z <= 1; z++) {
+//                    BlockPos currentPos = pos.offset(x, y, z);
+//                    //le problème viens de la il ne rentre pas dans le if
+//                    if (level.getBlockState(currentPos).is(CNBlocks.REACTOR_CORE.get())) {
+//                        // Create and execute the explosion
+//                        Explosion explosion = new Explosion(level, null, currentPos.getX(), currentPos.getY(), currentPos.getZ(), 4.0F, false, Explosion.BlockInteraction.DESTROY);
+//                        explosion.explode();
+//                        explosion.finalizeExplosion(true);
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+    private void explodeReactorCore(Level world, BlockPos pos) {
+        level.explode(null, pos.getX(), pos.getY(), pos.getZ(), 20F, Level.ExplosionInteraction.BLOCK);
     }
 
     /* ===================== MULTIBLOCK ===================== */

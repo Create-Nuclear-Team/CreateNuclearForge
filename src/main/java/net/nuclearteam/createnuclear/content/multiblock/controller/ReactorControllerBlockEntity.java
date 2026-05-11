@@ -134,6 +134,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public void setBigFuelItem(BigItemStack b) { this.bigFuelItem = b; }
     public BigItemStack getBigCoolerItem() { return this.bigCoolerItem; }
     public void setBigCoolerItem(BigItemStack b) { this.bigCoolerItem = b; }
+    public List<BigFluidStack> getBigFluidStack() { return this.bigFluidStack; }
+    public void setBigFluidStack(List<BigFluidStack> b) { this.bigFluidStack = b; }
 
     public int getMultiblockSize() { return this.reactorSize; }
     public void setMultiblockSize(int s) { this.reactorSize = s; }
@@ -221,7 +223,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
 
-    //(Si les methode read et write ne sont pas implémenté alors lorsque l'on relance le monde minecraft les items dans le composant auront disparu !)
+    // (Si les methode read et write ne sont pas implémenté alors lorsque l'on relance le monde minecraft les items dans le composant auront disparu !)
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket); // Toujours en premier pour les coordonnées de base

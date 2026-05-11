@@ -1,7 +1,5 @@
-package net.nuclearteam.createnuclear.foundation.ponder;
+package net.nuclearteam.createnuclear.infrastructure.ponder;
 
-import com.simibubi.create.Create;
-import com.simibubi.create.infrastructure.ponder.AllCreatePonderTags;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import net.createmod.catnip.platform.CatnipServices;
 import net.createmod.ponder.api.registration.PonderTagRegistrationHelper;
@@ -10,6 +8,7 @@ import net.minecraft.world.level.ItemLike;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
+import static com.simibubi.create.infrastructure.ponder.AllCreatePonderTags.DISPLAY_SOURCES;
 import static com.simibubi.create.infrastructure.ponder.AllCreatePonderTags.KINETIC_SOURCES;
 
 
@@ -30,6 +29,10 @@ public class CNCreateNuclearPonderTags {
                 .register();
 
         HELPER.addToTag(KINETIC_SOURCES)
+                .add(CNBlocks.REACTOR_CONTROLLER)
+        ;
+
+        HELPER.addToTag(DISPLAY_SOURCES)
                 .add(CNBlocks.REACTOR_CONTROLLER)
         ;
 

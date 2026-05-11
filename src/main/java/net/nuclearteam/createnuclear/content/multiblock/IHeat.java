@@ -10,6 +10,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 public interface IHeat extends IWrenchable {
@@ -90,30 +93,22 @@ public interface IHeat extends IWrenchable {
             return builder;
         }
 
-        public static LangBuilder getFormattedItemText(ItemStack itemRod, Boolean IsEmpty) {
+        public static LangBuilder getFormattedItemText(ItemStack itemRod, Boolean isEmpty) {
             LangBuilder builder = Lang.builder(CreateNuclear.MOD_ID);
 
-            String tooltip = "unknown";
-
-            if (itemRod.is(CNItemTags.FUEL.tag)) {
-                tooltip = "uranium";
-            }
-
-            if (itemRod.is(CNItemTags.COOLER.tag)) {
-                tooltip = "graphene";
-            }
+            String tooltip = TypeRodPredicate.tooltipKey(itemRod);
 
             builder.translate("tooltip.item." + tooltip + ".rod")
-                    // when it's empty, we show the number minus one to display zero because we fake the item count as 1
-                    .add(CreateNuclearLang.number(Math.abs((IsEmpty ? itemRod.getCount() - 1 : itemRod.getCount()))))
-                    .style(ChatFormatting.BLUE)
+                // when it's empty, we show the number minus one to display zero because we fake the item count as 1
+                .add(CreateNuclearLang.number(Math.abs((isEmpty ? itemRod.getCount() - 1 : itemRod.getCount()))))
+                .style(ChatFormatting.BLUE)
             ;
 
             return builder;
         }
 
-        public static LangBuilder getFormattedItemText(BigItemStack itemRod, Boolean IsEmpty) {
-            return getFormattedItemText(new ItemStack(itemRod.stack.getItem(), itemRod.count), IsEmpty);
+        public static LangBuilder getFormattedItemText(BigItemStack itemRod, Boolean isEmpty) {
+            return getFormattedItemText(new ItemStack(itemRod.stack.getItem(), itemRod.count), isEmpty);
         }
 
         public static LangBuilder getName(String name) {
