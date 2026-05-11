@@ -83,10 +83,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     /** The assembled state is stored in the block state (`ReactorControllerBlock.ASSEMBLED`).
      *  Use the helper accessors below to query or toggle it to keep entity/blockstate consistent.
      */
-    // configurable public surface reduced; fields are private and accessible via getters/setters
-    private int speed = 16; // This is the result speed of the reactor, change this to change the total capacity
-
-    private ReactorControllerBlock controller;
     private final ReactorPattern pattern = new ReactorPattern();
     private final ReactorControllerInventory inventory;
     private int countUraniumRod;
@@ -627,7 +623,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return liquidLife <= 0;
     }
 
-
+    @Deprecated
     private BlockPos getBlockPosForReactor(char character) {
         BlockPos pos = pattern.VerifyPattern5x5(character);
         BlockPos posController = getBlockPos();
