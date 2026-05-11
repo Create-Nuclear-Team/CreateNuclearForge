@@ -53,7 +53,7 @@ public record RodType(HolderSet<Item> items,
         Codec.INT.fieldOf("baseRodHeat").forGetter(RodType::baseRodHeat),
         Codec.INT.fieldOf("proximityRodHeat").forGetter(RodType::proximityRodHeat),
         Codec.INT.fieldOf("rodTimer").forGetter(RodType::rodTimer),
-        StringRepresentable.fromEnum(TypeRod::values).optionalFieldOf("type", TypeRod.MIXTE).forGetter(RodType::type)
+        StringRepresentable.fromEnum(TypeRod::values).fieldOf("type").forGetter(RodType::type)
     ).apply(i, RodType::new));
 
     /**
@@ -68,7 +68,7 @@ public record RodType(HolderSet<Item> items,
     public static Optional<Reference<RodType>> getTypeForItem(RegistryAccess registryAccess, Item item) {
         return registryAccess.lookupOrThrow(CreateNuclearRegistries.ROD_TYPE)
             .listElements()
-            .filter(ref -> ref.value().items.contains(ForgeRegistries.ITEMS.getDelegateOrThrow(item)))
+            .filter(ref -> ref.value().items.contains(item.builtInRegistryHolder()))
             .findFirst();
     }
 
@@ -87,8 +87,8 @@ public record RodType(HolderSet<Item> items,
             .orElseGet(() -> {
                 RodType fromItem = ItemRodTypesValue.getRodType(item);
                 return fromItem.isNotEmptyItem()
-                        ? fromItem
-                        : world.registryAccess()
+                    ? fromItem
+                    : world.registryAccess()
                         .registryOrThrow(CreateNuclearRegistries.ROD_TYPE)
                         .getHolderOrThrow(CNRodTypes.FALLBACK)
                         .value();
@@ -115,7 +115,7 @@ public record RodType(HolderSet<Item> items,
         private int baseRodHeat = 0;
         private int proximityRodHeat = 0;
         private int rodTimer = 0;
-        private TypeRod type = TypeRod.MIXTE;
+        private TypeRod type = TypeRod.FUEL;
         private boolean useConfig = false;
 
         private boolean itemsSet = false;
@@ -183,17 +183,6 @@ public record RodType(HolderSet<Item> items,
         }
 
         /**
-         * Sets the rod type to {@link TypeRod#MIXTE}.
-         *
-         * @return this builder
-         */
-        public Builder mixteRodType() {
-            this.type = TypeRod.MIXTE;
-            this.typeSet = true;
-            return this;
-        }
-
-        /**
          * Adds one or more items that represent this rod type.
          *
          * @param items array of {@link ItemLike} elements to associate
@@ -232,8 +221,7 @@ public record RodType(HolderSet<Item> items,
                  * Only MIXTE is considered an error for "useConfig" because there are
                  * no configuration defaults for the mixed type.
                  */
-                if (this.type == TypeRod.MIXTE)
-                    missing.add("Configuration defaults cannot be applied to the MIXTE (mixed) rod type");
+//                missing.add("Configuration defaults cannot be applied to the rod type");
             }
 
             if (!missing.isEmpty())
@@ -261,9 +249,9 @@ public record RodType(HolderSet<Item> items,
     public int proximityRodHeat() {
         if (!useConfig) return proximityRodHeat;
         try {
-            return switch (type) {
+            return (int) switch (type) {
                 case FUEL -> CNConfigs.server().rods.uraniumProxyBonus.get();
-                case COOLER -> CNConfigs.server().rods.graphiteProxyMalus.get();
+                case COOLER -> Math.round(CNConfigs.server().rods.graphiteProxyMalus.get());
                 default -> proximityRodHeat;
             };
         } catch (IllegalStateException e) {
@@ -294,11 +282,8 @@ public record RodType(HolderSet<Item> items,
         /**
          * Cooler rod: reduces or absorbs heat.
          */
-        COOLER,
-        /**
-         * Mixed rod: hybrid behavior or default.
-         */
-        MIXTE;
+        COOLER
+        ;
 
         @Override
         public String getSerializedName() {

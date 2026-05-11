@@ -87,6 +87,7 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
+        withBlockEntityDo(level, pos, be -> ItemHelper.dropContents(level, pos, be.inventory));
         MultiblockHelpers.handleRemoval(pos, level, ReactorControllerBlockEntity::removeInput);
     }
 

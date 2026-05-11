@@ -1,26 +1,12 @@
 package net.nuclearteam.createnuclear.content.multiblock.core;
 
-import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.GameRules;
-import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CNEntityType;
-import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasingEntity;
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
-import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
-
-import static net.nuclearteam.createnuclear.content.multiblock.CNMultiblock.*;
 
 @SuppressWarnings({"unused"})
 public class ReactorCoreEntity extends ReactorCasingEntity {
-
-    private int countdownTicks = 0;
-    private boolean hasExploded = false;
 
     public ReactorCoreEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
