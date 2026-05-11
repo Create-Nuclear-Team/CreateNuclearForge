@@ -11,10 +11,11 @@ import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.content.multiblock.rod.CNRodTypes;
@@ -22,7 +23,9 @@ import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Represents a rod type used by the mod's multiblock.
@@ -285,6 +288,29 @@ public record RodType(HolderSet<Item> items,
         @Override
         public String getSerializedName() {
             return name();
+        }
+    }
+
+    public static final class TypeRodPredicate {
+        public static final Predicate<ItemStack> IS_NOT_NULL = Objects::nonNull;
+
+        public static final Predicate<ItemStack> IS_MIXTE = s -> IS_NOT_NULL.test(s) && ItemRodTypesValue.getRodType(s.getItem()).type == TypeRod.MIXTE;
+
+        public static final Predicate<ItemStack> IS_FUEL = s -> {
+            TypeRod type = ItemRodTypesValue.getRodType(s.getItem()).type;
+            return IS_NOT_NULL.test(s) && (s.is(CNItemTags.FUEL.tag) || type == TypeRod.FUEL);
+        };
+
+        public static final Predicate<ItemStack> IS_COOLED = s -> {
+            TypeRod type = ItemRodTypesValue.getRodType(s.getItem()).type;
+            return IS_NOT_NULL.test(s) && (s.is(CNItemTags.COOLER.tag) || type == TypeRod.COOLER);
+        };
+
+        public static String tooltipKey(ItemStack stack) {
+            if (!IS_NOT_NULL.test(stack)) return "unknown";
+            if (IS_FUEL.or(IS_MIXTE).test(stack)) return "fuel";
+            if (IS_COOLED.or(IS_MIXTE).test(stack)) return "cooled";
+            return "unknown";
         }
     }
 }

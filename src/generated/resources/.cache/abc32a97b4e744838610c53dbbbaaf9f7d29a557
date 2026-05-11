@@ -1,5 +1,6 @@
-// 1.20.1	2026-03-29T10:45:21.296617	Create Nuclear Advancements
-b6aa52d55ebb681fa0784c5419667c88a4b0e6db data/createnuclear/advancements/anti_radiation_armor.json
+// 1.20.1	2026-04-11T14:42:53.7753998	Create Nuclear Advancements
+384b002f95b70c595cedc692ed219d45931f1f5b data/createnuclear/advancements/anti_radiation_armor.json
+
 41069c530d33ea7d59cccddada0ceececd69f5af data/createnuclear/advancements/automatic_uranium.json
 2e8127a4546d680ab502c6e3c71f49d8df2b1b18 data/createnuclear/advancements/coal_dust.json
 f4f6036f5f95e5eca66c5377237166bb3c297010 data/createnuclear/advancements/dye_anti_radiation_armor.json

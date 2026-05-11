@@ -1,17 +1,15 @@
-package net.nuclearteam.createnuclear.foundation.ponder;
+package net.nuclearteam.createnuclear.infrastructure.ponder.scenes;
 
 import net.createmod.catnip.math.Pointing;
 import net.createmod.ponder.api.scene.SceneBuilder;
 import net.createmod.ponder.api.scene.SceneBuildingUtil;
-import net.createmod.ponder.foundation.element.InputWindowElement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 
-public class CNPonderReactor {
+public class CNPonderReactorScenes {
 
     private static final BlockPos CONTROLLER = new BlockPos(4, 4, 6);
     private static final BlockPos OUTPUT = new BlockPos(4, 1, 6);

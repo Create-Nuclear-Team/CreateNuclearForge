@@ -6,6 +6,8 @@ import com.simibubi.create.content.decoration.encasing.EncasedCTBehaviour;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.data.SharedProperties;
+import static com.simibubi.create.api.behaviour.display.DisplaySource.displaySource;
+
 
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
@@ -84,6 +86,12 @@ public class CNBlocks {
         .tag(BlockTags.NEEDS_DIAMOND_TOOL)
         .simpleItem()
         .transform(pickaxeOnly())
+        .transform(displaySource(CNDisplaySources.HEAT))
+        .transform(displaySource(CNDisplaySources.LIQUID_LEVEL))
+        .transform(displaySource(CNDisplaySources.FUEL))
+        .transform(displaySource(CNDisplaySources.COOLER))
+        .transform(displaySource(CNDisplaySources.REACTOR_SIZE))
+        .transform(displaySource(CNDisplaySources.REACTOR_SUMMARY))
         .register();
 
     public static final BlockEntry<ReactorCore> REACTOR_CORE = CreateNuclear.REGISTRATE
@@ -190,6 +198,12 @@ public class CNBlocks {
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate(new ReactorControllerGenerator()::generate)
+            .transform(displaySource(CNDisplaySources.HEAT))
+            .transform(displaySource(CNDisplaySources.LIQUID_LEVEL))
+            .transform(displaySource(CNDisplaySources.FUEL))
+            .transform(displaySource(CNDisplaySources.COOLER))
+            .transform(displaySource(CNDisplaySources.REACTOR_SIZE))
+            .transform(displaySource(CNDisplaySources.REACTOR_SUMMARY))
             .item()
             .transform(customItemModel("reactor", "controller", "item"))
             .register();
