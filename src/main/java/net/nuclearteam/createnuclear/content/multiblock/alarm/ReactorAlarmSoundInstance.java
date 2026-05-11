@@ -13,34 +13,38 @@ public class ReactorAlarmSoundInstance extends AbstractTickableSoundInstance {
     private final Level level;
 
     public ReactorAlarmSoundInstance(Level level, BlockPos pos, SoundEvent sound) {
-        super(sound, SoundSource.BLOCKS, level.random);
+        super(sound, SoundSource.BLOCKS, level != null ? level.random : null);
         this.level = level;
         this.pos = pos;
-        this.x = pos.getX();
-        this.y = pos.getY();
-        this.z = pos.getZ();
+        if (pos != null) {
+            this.x = pos.getX();
+            this.y = pos.getY();
+            this.z = pos.getZ();
+        }
         this.looping = true;
         this.delay = 0;
-        this.volume = 1.5F; // Volume un peu plus raisonnable
+        this.volume = 1.5F;
     }
 
     @Override
     public void tick() {
-        if (this.level == null) {
-            this.stop();
-            return;
+        try {
+            if (level == null || pos == null) {
+                stop();
+                return;
+            }
+
+            BlockState state = level.getBlockState(pos);
+            if (!(state.getBlock() instanceof ReactorAlarm)) {
+                stop();
+            }
+        } catch (Exception e) {
+            stop();
+            CreateNuclear.LOGGER.warn(e.getMessage());
         }
+    }
 
-        BlockState state = this.level.getBlockState(this.pos);
-
-        // On arrête le son si :
-        // 1. Le bloc n'est plus une alarme
-        // 2. Le bloc n'est plus alimenté
-        if (!(state.getBlock() instanceof ReactorAlarm) || !state.getValue(ReactorAlarm.POWERED)) {
-            CreateNuclear.LOGGER.info("Sound Stopped : " + state.getBlock());
-
-            this.stop();
-            ReactorAlarm.stopSound(this.pos);
-        }
+    public void fadeOut() {
+        stop();
     }
 }
