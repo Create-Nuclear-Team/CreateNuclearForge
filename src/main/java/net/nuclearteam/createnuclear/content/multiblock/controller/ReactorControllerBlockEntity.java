@@ -344,7 +344,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         }
 
 
-        int currentHeat = isEmptyConfiguredPattern () ? 0: (int) this.getConfiguredPatternTag().getDouble("heat");
+        currentHeat = isEmptyConfiguredPattern () ? 0: (int) this.getConfiguredPatternTag().getDouble("heat");
 
         // Récupération des configs pour l'utilitaire
         int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
