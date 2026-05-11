@@ -294,8 +294,6 @@ public record RodType(HolderSet<Item> items,
     public static final class TypeRodPredicate {
         public static final Predicate<ItemStack> IS_NOT_NULL = Objects::nonNull;
 
-        public static final Predicate<ItemStack> IS_MIXTE = s -> IS_NOT_NULL.test(s) && ItemRodTypesValue.getRodType(s.getItem()).type == TypeRod.MIXTE;
-
         public static final Predicate<ItemStack> IS_FUEL = s -> {
             TypeRod type = ItemRodTypesValue.getRodType(s.getItem()).type;
             return IS_NOT_NULL.test(s) && (s.is(CNItemTags.FUEL.tag) || type == TypeRod.FUEL);
@@ -308,8 +306,8 @@ public record RodType(HolderSet<Item> items,
 
         public static String tooltipKey(ItemStack stack) {
             if (!IS_NOT_NULL.test(stack)) return "unknown";
-            if (IS_FUEL.or(IS_MIXTE).test(stack)) return "fuel";
-            if (IS_COOLED.or(IS_MIXTE).test(stack)) return "cooled";
+            if (IS_FUEL.test(stack)) return "fuel";
+            if (IS_COOLED.test(stack)) return "cooled";
             return "unknown";
         }
     }
