@@ -77,7 +77,7 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
 
 
                     // Copie des états (accroupi, bébé, chevauchement...)
-                    castedOriginal.copyPropertiesTo(this.model);
+//                    castedOriginal.copyPropertiesTo(this.model);
 
     public List<Component> makeSummary(ItemStack item) {
         if (!item.hasTag()) return Collections.emptyList();

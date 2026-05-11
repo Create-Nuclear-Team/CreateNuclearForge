@@ -9,5 +9,6 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorContro
 public interface IHeatService {
     int getGraphiteTimer();
     int getUraniumTimer();
+    int getLiquidTimer();
     double calculateHeat(BigItemStack fuel, BigItemStack cooler, BigFluidStack bigFluidStack, int graphiteCount, int uraniumCount, ReactorControllerInventory inventory, Level level);
 }

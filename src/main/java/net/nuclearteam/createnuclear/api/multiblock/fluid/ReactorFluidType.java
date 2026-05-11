@@ -14,14 +14,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
 import net.nuclearteam.createnuclear.content.multiblock.fluid.CNReactorFluidTypes;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Represents a reactor fluid type used by the mod's multiblock.
@@ -78,11 +79,11 @@ public record ReactorFluidType(HolderSet<Fluid> fluids, int maxHeat, int efficie
                 .orElseGet(() -> {
                     ReactorFluidType fromFluid = ReactorFluidTypesValue.getReactorFluidType(fluid);
                     return fromFluid.isNotEmptyFluid()
-                            ? fromFluid
-                            : world.registryAccess()
-                                .registryOrThrow(CreateNuclearRegistries.FLUID_TYPE)
-                                .getHolderOrThrow(CNReactorFluidTypes.FALLBACK)
-                                .value();
+                        ? fromFluid
+                        : world.registryAccess()
+                            .registryOrThrow(CreateNuclearRegistries.FLUID_TYPE)
+                            .getHolderOrThrow(CNReactorFluidTypes.FALLBACK)
+                            .value();
                 });
     }
 
@@ -210,5 +211,20 @@ public record ReactorFluidType(HolderSet<Fluid> fluids, int maxHeat, int efficie
         } catch (IllegalStateException e) {
             return efficiency;
         }
+    }
+
+    @Override
+    public @NotNull String toString() {
+        String fluidNames = this.fluids.stream()
+            .map(h -> h.unwrapKey()
+                .map(k -> k.location().toString())
+                .orElseGet(() -> {
+                    ResourceLocation rl = ForgeRegistries.FLUIDS.getKey(h.value());
+                    return rl != null ? rl.toString() : h.value().toString();
+                })
+            )
+            .collect(Collectors.joining(", "));
+
+        return "ReactorFluidType{fluids=[" + fluidNames + "], maxHeat=" + maxHeat() + ", efficiency=" + efficiency() + "}";
     }
 }

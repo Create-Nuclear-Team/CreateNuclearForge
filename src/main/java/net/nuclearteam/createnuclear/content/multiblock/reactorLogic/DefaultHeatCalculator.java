@@ -5,6 +5,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.CNTags;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
@@ -77,13 +78,6 @@ public class DefaultHeatCalculator implements IHeatCalculator {
                 }
             }
         }
-
-        double heatCaculed = heat + overHeat;
-
-        if (heatCaculed > type.maxHeat() && bigFluidStack.amount > type.efficiency()) {
-            heat = 9_999_999;
-        }
-
-        return heat;
+        return heat + overHeat;
     }
 }

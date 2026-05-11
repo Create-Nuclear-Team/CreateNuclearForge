@@ -43,7 +43,7 @@ public record VirtualReactorInputFluid(Map<ResourceLocation, Long> fluids) {
      * @param amount maximum amount to remove
      */
     public FluidStack removeFluid(@NotNull ResourceLocation fluidId, long amount) {
-        if (amount <= 0 || fluidId == null) return FluidStack.EMPTY;
+        if (amount < 0 || fluidId == null) return FluidStack.EMPTY;
         long current = fluids.getOrDefault(fluidId, 0L);
         long removed = Math.min(current, amount);
         if (removed == 0) return FluidStack.EMPTY;

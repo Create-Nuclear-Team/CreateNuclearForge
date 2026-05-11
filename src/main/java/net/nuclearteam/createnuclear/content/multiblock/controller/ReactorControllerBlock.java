@@ -77,7 +77,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
 
         ItemStack heldItem = player.getItemInHand(handIn);
         if (heldItem.is(Items.PAPER)) {
-            withBlockEntityDo(worldIn, pos, ReactorControllerBlockEntity::test);
+            withBlockEntityDo(worldIn, pos, ReactorControllerBlockEntity::logReactorConnections);
         }
 
         if (!state.getValue(ASSEMBLED)) {
@@ -123,9 +123,6 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         withBlockEntityDo(worldIn, pos, be -> ItemHelper.dropContents(worldIn, pos, be.getInventoryObject()));
         worldIn.removeBlockEntity(pos);
 
-        ReactorControllerBlock controller = (ReactorControllerBlock) state.getBlock();
-
-        controller.Rotate(state, pos.below(3), worldIn, 0);
         if (!worldIn.isClientSide && worldIn instanceof ServerLevel serverLevel) {
             PersistentFluidLocks.get(serverLevel).clearLock(pos);
         } else FluidLockManager.clearLock(pos);
@@ -152,7 +149,6 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         ReactorControllerBlock controller = (ReactorControllerBlock) state.getBlock();
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
         if (!entity.isAssembled()) return;
-        controller.Rotate(state, pos.below(3), level, 0);
         List<? extends Player> players = level.players();
         for (Player p : players) {
             p.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
@@ -193,26 +189,6 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false));
             entity.setAssembled(false);
             entity.removeIOAll();
-            Rotate(state, pos.below(3), level, 0);
-        }
-    }
-    public void Rotate(BlockState state, BlockPos pos, Level level, int rotation) {
-        if (level.getBlockState(pos).is(CNBlocks.REACTOR_OUTPUT.get())) {
-            ReactorOutput block = (ReactorOutput) level.getBlockState(pos).getBlock();
-            ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
-
-            if (state.getValue(ASSEMBLED) && rotation != 0) { // Starting the energy
-                entity.speed = rotation;
-                entity.setSpeed(Math.abs(entity.speed));
-            } else { // stopping the energy
-
-                entity.setSpeed(0);
-                entity.speed = 0;
-            }
-            entity.updateSpeed = true;
-            entity.updateGeneratedRotation();
-
-            entity.setSpeed(rotation);
         }
     }
 

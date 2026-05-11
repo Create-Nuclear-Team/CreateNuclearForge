@@ -31,6 +31,8 @@ import net.minecraftforge.fluids.FluidInteractionRegistry.InteractionInformation
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
+import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
+import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteStoneTypes;
 import org.joml.Vector3f;
 import net.nuclearteam.createnuclear.CNTags.CNFluidTags;
