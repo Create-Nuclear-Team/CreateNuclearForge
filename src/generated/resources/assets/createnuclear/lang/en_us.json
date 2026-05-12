@@ -165,6 +165,7 @@
   "createnuclear.generic.unit.heat.type": "Heat Level: %s",
   "createnuclear.generic.unit.heat.value": "Q",
   "createnuclear.generic.unit.liquid": "WIP",
+  "createnuclear.generic.unit.seconds": "s",
   "createnuclear.gui.reactor_controller.info_header.title": "Heat value",
   "createnuclear.notification.reactor.critical_failure": "CRITICAL FAILURE",
   "createnuclear.notification.reactor.destroyed": "REACTOR DESTROYED",

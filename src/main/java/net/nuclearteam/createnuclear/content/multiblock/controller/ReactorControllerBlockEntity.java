@@ -321,28 +321,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         int currentHeat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
         boolean isDanger = IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER;
 
-        // --- GESTION DES ALARMES (TRIÉE POUR STABILITÉ) ---
-        List<BlockPos> alarms = new ArrayList<>(this.alarmManager.getBlocksPosition());
-        if (!alarms.isEmpty()) {
-            alarms.sort((p1, p2) -> {
-                if (p1.getX() != p2.getX()) return p1.getX() - p2.getX();
-                if (p1.getY() != p2.getY()) return p1.getY() - p2.getY();
-                return p1.getZ() - p2.getZ();
-            });
-
-            BlockPos primaryAlarm = alarms.get(0);
-            for (BlockPos p : alarms) {
-                if (!level.isLoaded(p)) continue;
-                BlockState state = level.getBlockState(p);
-                if (state.getBlock() instanceof ReactorAlarm) {
-                    boolean shouldBePowered = isDanger && p.equals(primaryAlarm);
-                    if (state.getValue(ReactorAlarm.POWERED) != shouldBePowered) {
-                        level.setBlock(p, state.setValue(ReactorAlarm.POWERED, shouldBePowered), 3);
-                    }
-                }
-            }
-        }
-
+        activateAlarms(isDanger);
 
         currentHeat = isEmptyConfiguredPattern () ? 0: (int) this.getConfiguredPatternTag().getDouble("heat");
 
@@ -407,6 +386,18 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
 
         handleAssembledState();
+    }
+
+    private void activateAlarms(boolean activate) {
+        if (alarmManager == null) return;
+        for (BlockPos pos : alarmManager.getBlocksPosition(level)) {
+            if (level.isLoaded(pos)) {
+                BlockState state = level.getBlockState(pos);
+                if (state.getBlock() instanceof ReactorAlarm && state.getValue(ReactorAlarm.POWERED) != activate) {
+                    level.setBlock(pos, state.setValue(ReactorAlarm.POWERED, activate), 3);
+                }
+            }
+        }
     }
 
     // --- extracted sub-steps to keep single responsibility per method ---
