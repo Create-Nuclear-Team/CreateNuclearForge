@@ -27,9 +27,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
-
-import static net.nuclearteam.createnuclear.foundation.advancement.CreateNuclearAdvancement.TaskType.SILENT;
-import static net.nuclearteam.createnuclear.foundation.advancement.CreateNuclearAdvancement.TaskType.SECRET;
+import static net.nuclearteam.createnuclear.foundation.advancement.CreateNuclearAdvancement.TaskType.*;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -44,6 +42,13 @@ public class CNAdvancement implements DataProvider {
             .description("Unlock the basics of nuclear energy and get your first uranium powder")
             .awardedForFree()
             .special(SILENT)),
+
+    T1_REACTOR = create("t1", b -> b.icon(CNBlocks.REACTOR_CONTROLLER.asItem())
+            .title("Reactor Controller T1")
+            .description("Unlock the basics of nuclear energy and get your first uranium powder")
+            .special(EXPERT)
+            .after(ROOT)
+    ),
 
     RAW_URANIUM = create("raw_uranium", b -> b.icon(CNItems.RAW_URANIUM)
             .title("The Raw Power")
@@ -247,4 +252,6 @@ public class CNAdvancement implements DataProvider {
         for (CreateNuclearAdvancement advancement : ENTRIES)
             advancement.provideLang(consumer);
     }
+
+    public static void register() {}
 }

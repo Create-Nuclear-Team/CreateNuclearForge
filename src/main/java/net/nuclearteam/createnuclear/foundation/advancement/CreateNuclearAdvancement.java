@@ -1,7 +1,5 @@
 package net.nuclearteam.createnuclear.foundation.advancement;
 
-import com.simibubi.create.foundation.advancement.AllTriggers;
-import com.simibubi.create.foundation.advancement.SimpleCreateTrigger;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.CriterionTriggerInstance;
@@ -30,7 +28,7 @@ public class CreateNuclearAdvancement {
     static final String SECRET_SUFFIX = "\n\u00A77(Hidden Advancement)";
 
     private final Advancement.Builder builder;
-    private SimpleCreateTrigger builtinTrigger;
+    private SimpleCreateNuclearTrigger builtinTrigger;
     private CreateNuclearAdvancement parent;
 
     Advancement datagenResult;
@@ -48,7 +46,7 @@ public class CreateNuclearAdvancement {
         b.apply(t);
 
         if (!t.externalTrigger) {
-            builtinTrigger = AllTriggers.addSimple(id + "_builtin");
+            builtinTrigger = CNTriggers.addSimple(id + "_builtin");
             builder.addCriterion("0", builtinTrigger.instance());
         }
 
