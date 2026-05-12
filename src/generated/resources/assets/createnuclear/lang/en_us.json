@@ -43,6 +43,8 @@
   "advancement.createnuclear.root.desc": "Unlock the basics of nuclear energy and get your first uranium powder",
   "advancement.createnuclear.steel_ingot": "Steel Ingot",
   "advancement.createnuclear.steel_ingot.desc": "Combine coal dust and iron ingots to create steel ingots",
+  "advancement.createnuclear.t1": "Reactor Controller T1",
+  "advancement.createnuclear.t1.desc": "Unlock the basics of nuclear energy and get your first uranium powder",
   "advancement.createnuclear.uranium_liquid": "Turning Solid To Liquid",
   "advancement.createnuclear.uranium_liquid.desc": "Obtain some uranium liquid by mixing uranium powder",
   "advancement.createnuclear.uranium_powder": "Powdered Uranium",

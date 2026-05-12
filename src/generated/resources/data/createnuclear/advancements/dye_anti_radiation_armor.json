@@ -3,7 +3,7 @@
   "criteria": {
     "0": {
       "conditions": {},
-      "trigger": "create:dye_anti_radiation_armor_builtin"
+      "trigger": "createnuclear:dye_anti_radiation_armor_builtin"
     }
   },
   "display": {
