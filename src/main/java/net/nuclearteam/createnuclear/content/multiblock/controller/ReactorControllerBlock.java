@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -33,6 +34,8 @@ import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockMan
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
 
 import javax.annotation.Nullable;
@@ -133,9 +136,20 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         }
     }
 
+//    @Override
+//    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+//        super.onPlace(state, level, pos, oldState, movedByPiston);
+//        if (state.getValue(ASSEMBLED))
+//            return;
+//        List<? extends Player> players = level.players();
+//        ReactorControllerBlock controller = (ReactorControllerBlock) state.getBlock();
+//        controller.Verify(state, pos, level, players, true);
+//    }
+
     @Override
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-        super.onPlace(state, level, pos, oldState, movedByPiston);
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, pPlacer, stack);
+        CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
         if (state.getValue(ASSEMBLED))
             return;
         List<? extends Player> players = level.players();
@@ -169,6 +183,9 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                 if (create && !entity.isAssembled()) {
                     player.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
                     level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, true));
+
+                    entity.getAdvancement().awardPlayer(CNAdvancement.T1_REACTOR);
+
                     entity.setMultiblockSize(result.data().getSize());
                     entity.setAssembled(true);
 

@@ -49,6 +49,8 @@ import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
@@ -106,6 +108,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private boolean needsToResolveEntities = false;
     private double fluidBuffer = 0.0;
 
+    private CNAdvancementBehaviour advancement;
+
     private final ReactorInputManagerI inputManager;
     private final ReactorOutputManagerI outputManager;
     private final ReactorInputFluidManagerI inputFluidManager;
@@ -150,6 +154,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public double getLiquidLife() { return this.liquidLife; }
     public void setLiquidLife(double l) { this.liquidLife = l; }
 
+    public CNAdvancementBehaviour getAdvancement() {
+        CreateNuclear.LOGGER.warn("Advancement behaviour not implemented yet!: {}", this.advancement);
+        return this.advancement;
+    }
+
     /** Main constructor allowing dependency injection for testability and DIP compliance. */
     public ReactorControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -171,7 +180,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
-
+        behaviours.add(advancement = new CNAdvancementBehaviour(this, CNAdvancement.T1_REACTOR));
     }
 
     public boolean getAssembled() { // permet de savoir si le réacteur est formé ou pas.
