@@ -131,6 +131,8 @@ public class CNFluids {
                     entity.setTicksFrozen(CNFluids.TICK++);
                 }
                 entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
+            } else if (entity.isInFluidType(THORIUM.getType())) {
+                entity.lavaHurt();
             } else {
                 CNFluids.TICK = 0;
             }
