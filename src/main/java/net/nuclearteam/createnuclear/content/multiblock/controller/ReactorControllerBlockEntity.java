@@ -42,6 +42,7 @@ import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
+import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
@@ -82,10 +83,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     /** The assembled state is stored in the block state (`ReactorControllerBlock.ASSEMBLED`).
      *  Use the helper accessors below to query or toggle it to keep entity/blockstate consistent.
      */
-    // configurable public surface reduced; fields are private and accessible via getters/setters
-    private int speed = 16; // This is the result speed of the reactor, change this to change the total capacity
-
-    private ReactorControllerBlock controller;
     private final ReactorPattern pattern = new ReactorPattern();
     private final ReactorControllerInventory inventory;
     private int countUraniumRod;
@@ -112,6 +109,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private final ReactorInputManagerI inputManager;
     private final ReactorOutputManagerI outputManager;
     private final ReactorInputFluidManagerI inputFluidManager;
+    private final ReactorAlarmManagerI alarmManager;
 
     // services (dependencies) - abstracted behind interfaces to follow DIP
     private final IHeatService heatService;
@@ -161,6 +159,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.inputManager = new ReactorInputManager();
         this.outputManager = new ReactorOutputManager();
         this.inputFluidManager = new ReactorInputFluidManager();
+        this.alarmManager = new ReactorAlarmManager();
 
         this.bigFuelItem = new BigItemStack(ItemStack.EMPTY);
         this.bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
@@ -231,6 +230,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.inputManager.read(compound);
         this.outputManager.read(compound);
         this.inputFluidManager.read(compound);
+        this.alarmManager.read(compound);
 
         this.persistenceService.readBasicState(this, compound, clientPacket);
         this.needsToResolveEntities = true;
@@ -242,6 +242,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.inputManager.write(compound);
         this.outputManager.write(compound);
         this.inputFluidManager.write(compound);
+        this.alarmManager.write(compound);
 
         this.persistenceService.writeBasicState(this, compound, clientPacket);
     }
@@ -317,65 +318,55 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         super.tick();
         if (level.isClientSide || isExploding)
             return;
+        int currentHeat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
+        boolean isDanger = IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER;
 
+        activateAlarms(isDanger);
 
-        int currentHeat = isEmptyConfiguredPattern () ? 0: (int) this.getConfiguredPatternTag().getDouble("heat");
+        currentHeat = isEmptyConfiguredPattern () ? 0: (int) this.getConfiguredPatternTag().getDouble("heat");
 
         // Récupération des configs pour l'utilitaire
         int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
         boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
-        if (IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER) {
+        if (isDanger) {
             explosionCountdown++;
-
             int secondsLeft = (300 - explosionCountdown) / 20;
 
-            // --- PHASE CRITIQUE : 10 dernières secondes (Action Bar clignotante) ---
+            // --- AFFICHAGE ALERTES ACTION BAR (TRADUITES) ---
             if (secondsLeft <= 10 && secondsLeft > 0) {
-                // Clignotement : change de couleur tous les 5 ticks (0.25s)
                 boolean isWhite = (level.getGameTime() / 5) % 2 == 0;
                 ChatFormatting flashColor = isWhite ? ChatFormatting.WHITE : ChatFormatting.RED;
 
-                NotifyUtil.sendActionBar(
-                        level, getBlockPos(),
-                        "CORE MELTDOWN IN " + secondsLeft + "s",
-                        flashColor,
-                        configRadius, configWarnAll
-                );
-            }
-            // --- PHASE D'ALERTE : Entre 15s et 11s (Action Bar fixe) ---
-            else if (secondsLeft > 10 && explosionCountdown % 20 == 0) {
-                NotifyUtil.sendActionBar(
-                        level, getBlockPos(),
-                        "WARNING: CORE OVERHEATING",
-                        ChatFormatting.DARK_RED,
-                        configRadius, configWarnAll
-                );
+                NotifyUtil.sendActionBar(level, getBlockPos(),
+                        CreateNuclearLang.translate("notification.reactor.meltdown_in")
+                                .add(CreateNuclearLang.number(secondsLeft))
+                                .add(CreateNuclearLang.translate("generic.unit.seconds"))
+                                .string(),
+                        flashColor, configRadius, configWarnAll);
+
+            } else if (secondsLeft > 10 && explosionCountdown % 20 == 0) {
+                NotifyUtil.sendActionBar(level, getBlockPos(),
+                        CreateNuclearLang.translate("notification.reactor.overheating").string(),
+                        ChatFormatting.DARK_RED, configRadius, configWarnAll);
             }
 
             // --- MOMENT DE L'EXPLOSION ---
             if (explosionCountdown >= 300) {
-                // Affichage d'un titre final géant avant de tout faire sauter
-                NotifyUtil.sendTitle(
-                        level, getBlockPos(),
-                        "CRITICAL FAILURE",
-                        "IMMINENT EXPLOSION",
-                        ChatFormatting.DARK_RED,
-                        configRadius, configWarnAll,
-                        0, 40, 10
-                );
+                NotifyUtil.sendTitle(level, getBlockPos(),
+                        CreateNuclearLang.translate("notification.reactor.critical_failure").string(),
+                        CreateNuclearLang.translate("notification.reactor.imminent_explosion").string(),
+                        ChatFormatting.DARK_RED, configRadius, configWarnAll, 0, 40, 10);
 
                 triggerNuclearExplosion();
+                return;
             }
         } else {
             // --- CŒUR STABILISÉ ---
             if (explosionCountdown > 0) {
-                NotifyUtil.sendActionBar(
-                        level, getBlockPos(),
-                        "CORE STABILIZED",
-                        ChatFormatting.GREEN,
-                        configRadius, configWarnAll
-                );
+                NotifyUtil.sendActionBar(level, getBlockPos(),
+                        CreateNuclearLang.translate("notification.reactor.stabilized").string(),
+                        ChatFormatting.GREEN, configRadius, configWarnAll);
             }
             explosionCountdown = 0;
         }
@@ -386,10 +377,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             countUraniumRod = this.getConfiguredPatternTag().getInt("countUraniumRod");
         }
         resolveEntitiesIfNeeded();
-
         if (!isAssembled()) return;
 
-        // gather IO snapshot
         VirtualReactorInputsItem virtualReactorInputsItem = inputManager.getInventory(level);
         VirtualReactorInputFluid virtualReactorInputFluid = inputFluidManager.getInventory(level);
         this.bigFuelItem = virtualReactorInputsItem.getBigFuelRod();
@@ -397,6 +386,18 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
 
         handleAssembledState();
+    }
+
+    private void activateAlarms(boolean activate) {
+        if (alarmManager == null) return;
+        for (BlockPos pos : alarmManager.getBlocksPosition(level)) {
+            if (level.isLoaded(pos)) {
+                BlockState state = level.getBlockState(pos);
+                if (state.getBlock() instanceof ReactorAlarm && state.getValue(ReactorAlarm.POWERED) != activate) {
+                    level.setBlock(pos, state.setValue(ReactorAlarm.POWERED, activate), 3);
+                }
+            }
+        }
     }
 
     // --- extracted sub-steps to keep single responsibility per method ---
@@ -475,26 +476,38 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
         if (level instanceof ServerLevel serverLevel) {
-            // --- MESSAGE D'EXPLOSION FINALE ---
-            NotifyUtil.sendTitle(
-                level, getBlockPos(),
-                "RÉACTEUR DÉTRUIT",
-                "Fusion critique terminée",
-                ChatFormatting.DARK_RED,
-                configRadius, configWarnAll,
-                10, 60, 20
-            );
+            // --- MESSAGE D'EXPLOSION FINALE (TRADUIT) ---
+            NotifyUtil.sendTitle(level, getBlockPos(),
+                    CreateNuclearLang.translate("notification.reactor.destroyed").string(),
+                    CreateNuclearLang.translate("notification.reactor.meltdown_finished").string(),
+                    ChatFormatting.DARK_RED, configRadius, configWarnAll, 10, 60, 20);
 
             NuclearExplosionEntity explosion = new NuclearExplosionEntity(
                     CNEntityType.NUCLEAR_EXPLOSION.get(),
                     serverLevel
             );
 
-            explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() - 2.0D);
+            // --- CALCUL D'EXPLOSION ÉQUILIBRÉ ---
 
-            float size = Mth.clamp(countUraniumRod * 0.075F, 1.0F, 4.0F);
+            // 1. On définit un modificateur de structure plus progressif
+            // Au lieu de 1, 2, 3, on utilise un ratio basé sur la taille réelle
+            float structureFactor = reactorSize / 5.0F; // 5x5 -> 1.0 | 7x7 -> 1.4 | 9x9 -> 1.8
+
+            /* 2. Utilisation de la racine carrée (Mth.sqrt)
+               L'uranium augmente la puissance, mais avec des rendements décroissants.
+               Plus on ajoute d'uranium, plus chaque barre supplémentaire ajoute "moins" au rayon.
+            */
+            float fuelImpact = Mth.sqrt(countUraniumRod) * 0.3F;
+
+            // 3. Taille finale : Base constante + (Impact Fuel * Facteur Structure)
+            float size = 1.5F + (fuelImpact * structureFactor);
+
+            size = Mth.clamp(size, 1.0F, 10.0F);
+
+            explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() - 2.0D);
             explosion.setSize(size);
 
+            // Griefing selon les gamerules
             boolean griefing = serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
             explosion.setNoGriefing(!griefing);
 
@@ -503,7 +516,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
             // On détruit le bloc après avoir envoyé les messages
             level.destroyBlock(getBlockPos(), false);
 
-            changeBiome(CNBiomes.Irradiated.PLAIN, (int)size*30, explosionPos, serverLevel);
+            // Changement de biome vers Irradiated Plain
+            changeBiome(CNBiomes.Irradiated.PLAIN, (int)size * 30, explosionPos, serverLevel);
         }
     }
 
@@ -603,7 +617,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         return liquidLife <= 0;
     }
 
-
+    @Deprecated
     private BlockPos getBlockPosForReactor(char character) {
         BlockPos pos = pattern.VerifyPattern5x5(character);
         BlockPos posController = getBlockPos();
@@ -748,10 +762,21 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.setChanged();
     }
 
+    public void addAlarm(BlockPos alarmPos) {
+        this.alarmManager.addBlock(alarmPos);
+        this.setChanged();
+    }
+
+    public void removeAlarm(BlockPos alarmPos) {
+        this.alarmManager.removeBlock(alarmPos);
+        this.setChanged();
+    }
+
     public void removeIOAll() {
         this.inputManager.clearInvalid(level);
         this.outputManager.clearInvalid(level);
         this.inputFluidManager.clearInvalid(level);
+        this.alarmManager.clearInvalid(level);
         this.setChanged();
     }
 

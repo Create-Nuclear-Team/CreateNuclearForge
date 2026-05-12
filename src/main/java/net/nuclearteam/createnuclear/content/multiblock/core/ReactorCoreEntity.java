@@ -20,6 +20,5 @@ public class ReactorCoreEntity extends ReactorCasingEntity {
         super.tick();
 
         if (level.isClientSide() || hasExploded) return;
-
     }
 }

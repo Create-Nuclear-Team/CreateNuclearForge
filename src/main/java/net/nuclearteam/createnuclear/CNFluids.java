@@ -106,6 +106,7 @@ public class CNFluids {
                 .explosionResistance(100f)
             )
             .source(ForgeFlowingFluid.Source::new)
+            //.onRegister(ReactorFluidTypesValue.setReactorFluidTypeInfos(8196, 100))
             .bucket()
             .onRegister(CNFluids::registerFluidDispenseBehavior)
             .lang("Nitrogen Bucket")

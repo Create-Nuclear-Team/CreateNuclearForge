@@ -78,6 +78,15 @@
   "createnuclear.tooltip.fluid": "Fluid: %s ",
   "createnuclear.tooltip.fluid.amount": "%d mb",
 
+  "createnuclear.generic.unit.seconds": "s",
+  "createnuclear.notification.reactor.meltdown_in": "CORE MELTDOWN IN ",
+  "createnuclear.notification.reactor.overheating": "WARNING: CORE OVERHEATING",
+  "createnuclear.notification.reactor.critical_failure": "CRITICAL FAILURE",
+  "createnuclear.notification.reactor.imminent_explosion": "IMMINENT EXPLOSION",
+  "createnuclear.notification.reactor.stabilized": "CORE STABILIZED",
+  "createnuclear.notification.reactor.destroyed": "REACTOR DESTROYED",
+  "createnuclear.notification.reactor.meltdown_finished": "Critical meltdown completed",
+
   "death.attack.createnuclear.radiation": "%1$s died from radiation",
   "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast"
 }
