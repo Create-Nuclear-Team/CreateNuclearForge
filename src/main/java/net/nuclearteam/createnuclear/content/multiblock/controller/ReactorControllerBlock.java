@@ -87,8 +87,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
         }
         else {
-
-            if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()){
+            if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty() && heldItem.getTag() != null){
                 withBlockEntityDo(worldIn, pos, be -> {
                     be.getInventoryObject().setStackInSlot(0, heldItem);
                     be.setConfiguredPattern(heldItem);
@@ -136,15 +135,6 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         }
     }
 
-//    @Override
-//    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-//        super.onPlace(state, level, pos, oldState, movedByPiston);
-//        if (state.getValue(ASSEMBLED))
-//            return;
-//        List<? extends Player> players = level.players();
-//        ReactorControllerBlock controller = (ReactorControllerBlock) state.getBlock();
-//        controller.Verify(state, pos, level, players, true);
-//    }
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
@@ -178,7 +168,6 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
         if (result != null) { // the pattern is correct
             CreateNuclear.LOGGER.warn("Verify@BlockPattern<TypeMultiblock> id: {}, data<TypeMultiblock>$getSize: {}, data<TypeMultiblock>$getName: {}", result.id(), result.data().getSize(), result.data().getName());
-//            entity.removeIOAll();
             for (Player player : players) {
                 if (create && !entity.isAssembled()) {
                     player.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
@@ -254,7 +243,8 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     }
                     else if (state.is(reactorInputFluidBlock)) {
                         controllerBlockEntity.addInputFluid(mutablePos.immutable());
-                    } else if (state.is(reactorAlarmBlock)) {
+                    }
+                    else if (state.is(reactorAlarmBlock)) {
                         controllerBlockEntity.addAlarm(mutablePos.immutable());
                     }
                 }

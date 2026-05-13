@@ -111,6 +111,6 @@ public class CNAdvancementBehaviour extends BlockEntityBehaviour {
 
     @Override
     public String toString() {
-        return "CNAdvancementBehaviour: [playerId => " + playerId + ", advancement => " + advancements.toString() + "]";
+        return "CNAdvancementBehaviour: [playerId => " + playerId + ", advancement => " + advancements.toArray() + "]";
     }
 }
