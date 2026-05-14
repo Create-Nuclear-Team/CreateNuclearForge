@@ -120,6 +120,46 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
         return fuelRemaining <= 0 && coolerRemaining <= 0;
     }
 
+    public boolean extractItemByName(Level level, String itemName) {
+        if (level == null || itemName == null) return false;
+
+        List<IItemHandler> handlers = getItemHandlers(level);
+        if (handlers.isEmpty()) return false;
+
+        for (IItemHandler handler : handlers) {
+            int slots = handler.getSlots();
+            for (int s = 0; s < slots; s++) {
+                ItemStack stack = handler.getStackInSlot(s);
+                if (stack.isEmpty()) continue;
+
+                // On récupère le nom de l'item (ex: "uranium_rod")
+                String registryPath = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).getPath();
+
+                // Comparaison intelligente : on ignore la casse et les underscores (_)
+                if (isMatching(registryPath, itemName)) {
+                    // On tente d'extraire 1 unité
+                    ItemStack extracted = handler.extractItem(s, 1, false);
+
+                    // Si l'extraction a réussi, on s'arrête là et on renvoie true
+                    if (!extracted.isEmpty()) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false; // On n'a pas trouvé l'item demandé
+    }
+
+    /**
+     * Helper pour comparer "GraphiteRod" avec "graphite_rod"
+     */
+    private boolean isMatching(String registryPath, String configName) {
+        String cleanPath = registryPath.replace("_", "").toLowerCase();
+        String cleanConfig = configName.replace("_", "").toLowerCase();
+        return cleanPath.equals(cleanConfig);
+    }
+
     /**
      * Cleans up invalid positions (unloaded chunk, missing block entity,
      * or not a `Container`).
