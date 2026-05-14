@@ -49,6 +49,7 @@ import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.rod.ActiveTimer;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
@@ -91,7 +92,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     private int explosionCountdown = 0;
     private boolean isExploding = false;
 
-    private double total;
+    private final List<ActiveTimer> runningTimers = new ArrayList<>();
     private double liquidLife;
     private ItemStack configuredPattern;
 
@@ -144,8 +145,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     public int[] getMultiblockPos() { return this.reactorPos; }
     public void setMultiblockStructure(int[] p) { this.reactorPos = p; }
 
-    public double getTotal() { return this.total; }
-    public void setTotal(double t) { this.total = t; }
+    public void clearTimers() {
+        this.runningTimers.clear();
+    }
 
     public double getLiquidLife() { return this.liquidLife; }
     public void setLiquidLife(double l) { this.liquidLife = l; }
@@ -234,6 +236,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
         this.persistenceService.readBasicState(this, compound, clientPacket);
         this.needsToResolveEntities = true;
+        
+        this.runningTimers.clear();
+        if (compound.contains("runningTimers")) {
+            net.minecraft.nbt.ListTag timersTag = compound.getList("runningTimers", net.minecraft.nbt.Tag.TAG_COMPOUND);
+            for (int i = 0; i < timersTag.size(); i++) {
+                this.runningTimers.add(ActiveTimer.deserializeNBT(timersTag.getCompound(i)));
+            }
+        }
     }
 
     @Override
@@ -245,6 +255,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
         this.alarmManager.write(compound);
 
         this.persistenceService.writeBasicState(this, compound, clientPacket);
+        
+        net.minecraft.nbt.ListTag timersTag = new net.minecraft.nbt.ListTag();
+        for (ActiveTimer timer : runningTimers) {
+            timersTag.add(timer.serializeNBT());
+        }
+        compound.put("runningTimers", timersTag);
     }
 
 
@@ -264,23 +280,40 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
     }
 
 
-    public double calculateProgress() {
-        if (isEmptyConfiguredPattern()) return 0;
+    private void startNewCycle() {
         CompoundTag tag = this.getConfiguredPatternTag();
+        if (tag == null || tag.isEmpty()) return;
 
-        if (tag == null || tag.isEmpty()) {
-            countGraphiteRod = 0;
-            countUraniumRod = 0;
-            return 0.0D;
+        net.minecraftforge.items.ItemStackHandler handler = new net.minecraftforge.items.ItemStackHandler(57);
+        if (tag.contains("patternAll")) {
+            handler.deserializeNBT(tag.getCompound("patternAll"));
+        } else if (tag.contains("pattern")) {
+            handler.deserializeNBT(tag.getCompound("pattern"));
+        } else {
+            return;
         }
 
-        countGraphiteRod = tag.getInt("countGraphiteRod");
-        countUraniumRod = tag.getInt("countUraniumRod");
+        java.util.Map<net.minecraft.world.item.Item, Integer> itemCounts = new java.util.HashMap<>();
+        for (int i = 0; i < handler.getSlots(); i++) {
+            ItemStack stack = handler.getStackInSlot(i);
+            if (!stack.isEmpty() && !stack.is(net.minecraft.world.item.Items.GLASS_PANE)) {
+                itemCounts.put(stack.getItem(), itemCounts.getOrDefault(stack.getItem(), 0) + 1);
+            }
+        }
 
-        double totalGraphiteRodLife = (double) heatService.getGraphiteTimer() / Math.max(1, countGraphiteRod);
-        double totalUraniumRodLife = (double) heatService.getUraniumTimer() / Math.max(1, countUraniumRod);
+        for (java.util.Map.Entry<net.minecraft.world.item.Item, Integer> entry : itemCounts.entrySet()) {
+            net.minecraft.world.item.Item item = entry.getKey();
+            int count = entry.getValue();
+            net.nuclearteam.createnuclear.api.multiblock.rods.RodType rodType = net.nuclearteam.createnuclear.api.multiblock.rods.RodType.resolveRodType(item, level);
 
-        return totalGraphiteRodLife + totalUraniumRodLife;
+            if (rodType.isNotEmptyItem()) {
+                String itemName = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item).getPath();
+                int timer = rodType.rodTimer() / Math.max(1, count);
+                runningTimers.add(new ActiveTimer(itemName, timer, count));
+            }
+        }
+
+        this.setChanged();
     }
 
     public void logReactorConnections() {
@@ -447,13 +480,33 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 }
             }
         }
-        if (updateTimers()) {
-            boolean extracted = inputManager.extractItems(level, 1, 1);
-            if (extracted) {
-                this.setChanged();
-                this.notifyUpdate();
-                total = calculateProgress();
+
+        if (runningTimers.isEmpty() && !isEmptyConfiguredPattern()) {
+            startNewCycle();
+        }
+
+        if (!runningTimers.isEmpty()) {
+            if (level.getGameTime() % 20 == 0) {
+                for (ActiveTimer t : runningTimers) {
+                    CreateNuclear.LOGGER.info("Timer Debug - Item: {}, Temps restant: {} ticks, Quantité à extract: {}", 
+                        t.name, t.remainingTicks, t.remainingExtracts);
+                }
             }
+
+            boolean anyFinished = runningTimers.removeIf(timer -> {
+                if (timer.tick()) {
+                    boolean success = inputManager.extractItemByName(level, timer.name);
+                    
+                    if (timer.remainingExtracts > 1) {
+                        timer.remainingExtracts--;
+                        timer.remainingTicks = timer.maxTicks;
+                        return false;
+                    }
+                    return true;
+                }
+                return false;
+            });
+
         }
         if (IHeat.HeatLevel.isNotDanger(heat)) {
             // normal
@@ -605,11 +658,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     private boolean isEmptyConfiguredPattern() {
         return configuredPattern.isEmpty() || this.getConfiguredPatternTag().isEmpty();
-    }
-
-    private boolean updateTimers() {
-        total -= 1;
-        return total <= 0;//(total/constTotal) <= 0;
     }
 
     private boolean updateLiquidTimers()  {
