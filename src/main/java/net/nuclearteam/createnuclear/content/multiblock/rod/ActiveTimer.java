@@ -1,5 +1,7 @@
 package net.nuclearteam.createnuclear.content.multiblock.rod;
 
+import net.minecraft.nbt.CompoundTag;
+
 public class ActiveTimer {
     public String name;
     public int remainingTicks;
@@ -19,15 +21,12 @@ public class ActiveTimer {
 
     public boolean tick() {
         if (remainingTicks > 0) remainingTicks--;
-        
-        if (remainingTicks <= 0) {
-            return true;
-        }
-        return false;
+
+        return remainingTicks <= 0;
     }
 
-    public net.minecraft.nbt.CompoundTag serializeNBT() {
-        net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+    public CompoundTag serializeNBT() {
+        CompoundTag tag = new CompoundTag();
         tag.putString("name", name);
         tag.putInt("remainingTicks", remainingTicks);
         tag.putInt("maxTicks", maxTicks);
@@ -35,7 +34,7 @@ public class ActiveTimer {
         return tag;
     }
 
-    public static ActiveTimer deserializeNBT(net.minecraft.nbt.CompoundTag tag) {
+    public static ActiveTimer deserializeNBT(CompoundTag tag) {
         ActiveTimer timer = new ActiveTimer(tag.getString("name"), tag.getInt("maxTicks"), tag.getInt("remainingExtracts"));
         timer.remainingTicks = tag.getInt("remainingTicks");
         return timer;

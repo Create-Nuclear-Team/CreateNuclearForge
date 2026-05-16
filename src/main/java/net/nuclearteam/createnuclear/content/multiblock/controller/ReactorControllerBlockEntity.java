@@ -4,6 +4,7 @@ import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
+import com.simibubi.create.foundation.item.TooltipHelper;
 import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import net.minecraft.ChatFormatting;
@@ -13,6 +14,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -20,7 +23,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -38,8 +43,11 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
@@ -54,9 +62,8 @@ import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
@@ -71,10 +78,6 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.service.IHeat
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultHeatService;
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.IPersistenceService;
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultPersistenceService;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
@@ -116,8 +119,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private final ReactorAlarmManagerI alarmManager;
 
     // Client Display Data (Synced via NBT)
-    private java.util.Map<net.minecraft.world.item.Item, Integer> clientDisplayItems = new java.util.HashMap<>();
-    private List<BigFluidStack> clientDisplayFluids = new java.util.ArrayList<>();
+    private Map<Item, Integer> clientDisplayItems = new HashMap<>();
+    private List<BigFluidStack> clientDisplayFluids = new ArrayList<>();
     private long clientMaxFluidCapacity = 0;
 
     // services (dependencies) - abstracted behind interfaces to follow DIP
@@ -260,13 +263,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         if (clientDisplayItems.isEmpty()) {
             CreateNuclearLang.builder()
-                    .add(net.minecraft.network.chat.Component.literal("Input Items ").copy()
-                            .withStyle(ChatFormatting.GRAY))
-                    .text(": ")
+                    .add(Component.translatable("tooltip.item.empty.rod").withStyle(ChatFormatting.GRAY))
                     .add(CreateNuclearLang.number(0).style(ChatFormatting.GOLD))
                     .forGoggles(tooltip);
         } else {
-            for (java.util.Map.Entry<net.minecraft.world.item.Item, Integer> entry : clientDisplayItems.entrySet()) {
+            for (Map.Entry<Item, Integer> entry : clientDisplayItems.entrySet()) {
                 ItemStack stack = new ItemStack(entry.getKey());
                 int count = entry.getValue();
                 CreateNuclearLang.itemName(stack)
@@ -279,12 +280,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         if (clientDisplayFluids.isEmpty()) {
             CreateNuclearLang
-                    .translate("tooltip.fluid", net.minecraft.network.chat.Component.literal("None"))
+                    .translate("tooltip.fluid.none")
                     .style(ChatFormatting.GRAY)
                     .forGoggles(tooltip);
 
             CreateNuclearLang.builder()
-                    .text(com.simibubi.create.foundation.item.TooltipHelper.makeProgressBar(5, 0))
+                    .text(TooltipHelper.makeProgressBar(5, 0))
                     .style(ChatFormatting.BLUE)
                     .space()
                     .text("0%")
@@ -302,7 +303,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                         .forGoggles(tooltip);
 
                 CreateNuclearLang.builder()
-                        .text(com.simibubi.create.foundation.item.TooltipHelper.makeProgressBar(5, filledBars))
+                        .text(TooltipHelper.makeProgressBar(5, filledBars))
                         .style(ChatFormatting.BLUE)
                         .space()
                         .text(Math.round(fillRatio * 100) + "%")
@@ -330,12 +331,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (clientPacket) {
             clientDisplayItems.clear();
             if (compound.contains("clientDisplayItems")) {
-                net.minecraft.nbt.ListTag list = compound.getList("clientDisplayItems",
-                        net.minecraft.nbt.Tag.TAG_COMPOUND);
+                ListTag list = compound.getList("clientDisplayItems",
+                        Tag.TAG_COMPOUND);
                 for (int i = 0; i < list.size(); i++) {
                     CompoundTag tag = list.getCompound(i);
-                    net.minecraft.world.item.Item item = net.minecraftforge.registries.ForgeRegistries.ITEMS
-                            .getValue(new net.minecraft.resources.ResourceLocation(tag.getString("Item")));
+                    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(tag.getString("Item")));
                     if (item != null) {
                         clientDisplayItems.put(item, tag.getInt("Count"));
                     }
@@ -344,11 +344,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
             clientDisplayFluids.clear();
             if (compound.contains("clientDisplayFluids")) {
-                net.minecraft.nbt.ListTag list = compound.getList("clientDisplayFluids",
-                        net.minecraft.nbt.Tag.TAG_COMPOUND);
+                ListTag list = compound.getList("clientDisplayFluids",
+                        Tag.TAG_COMPOUND);
                 for (int i = 0; i < list.size(); i++) {
                     CompoundTag tag = list.getCompound(i);
-                    net.minecraftforge.fluids.FluidStack fstack = net.minecraftforge.fluids.FluidStack
+                    FluidStack fstack = FluidStack
                             .loadFluidStackFromNBT(tag);
                     clientDisplayFluids.add(new BigFluidStack(fstack, tag.getInt("BigAmount")));
                 }
@@ -358,7 +358,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         this.runningTimers.clear();
         if (compound.contains("runningTimers")) {
-            net.minecraft.nbt.ListTag timersTag = compound.getList("runningTimers", net.minecraft.nbt.Tag.TAG_COMPOUND);
+            ListTag timersTag = compound.getList("runningTimers", Tag.TAG_COMPOUND);
             for (int i = 0; i < timersTag.size(); i++) {
                 this.runningTimers.add(ActiveTimer.deserializeNBT(timersTag.getCompound(i)));
             }
@@ -376,17 +376,16 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.persistenceService.writeBasicState(this, compound, clientPacket);
 
         if (clientPacket) {
-            net.minecraft.nbt.ListTag displayItemsTag = new net.minecraft.nbt.ListTag();
-            for (java.util.Map.Entry<net.minecraft.world.item.Item, Integer> entry : clientDisplayItems.entrySet()) {
+            ListTag displayItemsTag = new ListTag();
+            for (Map.Entry<Item, Integer> entry : clientDisplayItems.entrySet()) {
                 CompoundTag tag = new CompoundTag();
-                tag.putString("Item",
-                        net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(entry.getKey()).toString());
+                tag.putString("Item", ForgeRegistries.ITEMS.getKey(entry.getKey()).toString());
                 tag.putInt("Count", entry.getValue());
                 displayItemsTag.add(tag);
             }
             compound.put("clientDisplayItems", displayItemsTag);
 
-            net.minecraft.nbt.ListTag displayFluidsTag = new net.minecraft.nbt.ListTag();
+            ListTag displayFluidsTag = new ListTag();
             for (BigFluidStack stack : clientDisplayFluids) {
                 CompoundTag tag = new CompoundTag();
                 stack.stack.writeToNBT(tag);
@@ -397,7 +396,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             compound.putLong("clientMaxFluidCapacity", clientMaxFluidCapacity);
         }
 
-        net.minecraft.nbt.ListTag timersTag = new net.minecraft.nbt.ListTag();
+        ListTag timersTag = new ListTag();
         for (ActiveTimer timer : runningTimers) {
             timersTag.add(timer.serializeNBT());
         }
@@ -426,7 +425,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (tag == null || tag.isEmpty())
             return;
 
-        net.minecraftforge.items.ItemStackHandler handler = new net.minecraftforge.items.ItemStackHandler(57);
+        ItemStackHandler handler = new ItemStackHandler(57);
         if (tag.contains("patternAll")) {
             handler.deserializeNBT(tag.getCompound("patternAll"));
         } else if (tag.contains("pattern")) {
@@ -435,22 +434,22 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             return;
         }
 
-        java.util.Map<net.minecraft.world.item.Item, Integer> itemCounts = new java.util.HashMap<>();
+        Map<Item, Integer> itemCounts = new HashMap<>();
         for (int i = 0; i < handler.getSlots(); i++) {
             ItemStack stack = handler.getStackInSlot(i);
-            if (!stack.isEmpty() && !stack.is(net.minecraft.world.item.Items.GLASS_PANE)) {
+            if (!stack.isEmpty() && !stack.is(Items.GLASS_PANE)) {
                 itemCounts.put(stack.getItem(), itemCounts.getOrDefault(stack.getItem(), 0) + 1);
             }
         }
 
-        for (java.util.Map.Entry<net.minecraft.world.item.Item, Integer> entry : itemCounts.entrySet()) {
-            net.minecraft.world.item.Item item = entry.getKey();
+        for (Map.Entry<Item, Integer> entry : itemCounts.entrySet()) {
+            Item item = entry.getKey();
             int count = entry.getValue();
-            net.nuclearteam.createnuclear.api.multiblock.rods.RodType rodType = net.nuclearteam.createnuclear.api.multiblock.rods.RodType
-                    .resolveRodType(item, level);
+
+            RodType rodType = RodType.resolveRodType(item, level);
 
             if (rodType.isNotEmptyItem()) {
-                String itemName = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item).getPath();
+                String itemName = ForgeRegistries.ITEMS.getKey(item).getPath();
                 int timer = rodType.rodTimer() / Math.max(1, count);
                 runningTimers.add(new ActiveTimer(itemName, timer, count));
             }
@@ -558,8 +557,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         // Populate display fields for client sync
         clientDisplayItems.clear();
-        java.util.List<net.minecraftforge.items.IItemHandler> itemHandlers = this.inputManager.getItemHandlers(level);
-        for (net.minecraftforge.items.IItemHandler h : itemHandlers) {
+        List<IItemHandler> itemHandlers = this.inputManager.getItemHandlers(level);
+        for (IItemHandler h : itemHandlers) {
             for (int s = 0; s < h.getSlots(); s++) {
                 ItemStack st = h.getStackInSlot(s);
                 if (!st.isEmpty()) {
@@ -570,7 +569,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         }
 
         clientMaxFluidCapacity = 0;
-        java.util.List<IFluidHandler> fhandlers = this.inputFluidManager.getFuildHandlers(level);
+        List<IFluidHandler> fhandlers = this.inputFluidManager.getFuildHandlers(level);
         for (IFluidHandler h : fhandlers) {
             if (h.getTanks() > 0) {
                 clientMaxFluidCapacity += h.getTankCapacity(0);
