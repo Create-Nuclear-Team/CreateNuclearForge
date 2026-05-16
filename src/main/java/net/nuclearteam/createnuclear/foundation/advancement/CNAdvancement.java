@@ -50,6 +50,20 @@ public class CNAdvancement implements DataProvider {
             .after(ROOT)
     ),
 
+    T2_REACTOR = create("t2", b -> b.icon(CNBlocks.REACTOR_CONTROLLER.asItem())
+            .title("Reactor Controller T2")
+            .description("Unlock the basics of nuclear energy and get your first uranium powder")
+            .special(EXPERT)
+            .after(T1_REACTOR)
+    ),
+
+    T3_REACTOR = create("t3", b -> b.icon(CNBlocks.REACTOR_CONTROLLER.asItem())
+            .title("Reactor Controller T3")
+            .description("Unlock the basics of nuclear energy and get your first uranium powder")
+            .special(EXPERT)
+            .after(T2_REACTOR)
+    ),
+
     RAW_URANIUM = create("raw_uranium", b -> b.icon(CNItems.RAW_URANIUM)
             .title("The Raw Power")
             .description("Mine uranium ore to obtain raw uranium for further processing")
