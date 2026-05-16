@@ -173,7 +173,11 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     player.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
                     level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, true));
 
-                    entity.getAdvancement().awardPlayer(CNAdvancement.T1_REACTOR);
+                    switch (result.data()) {
+                        case REACTOR_T1 -> entity.getAdvancement().awardPlayer(CNAdvancement.T1_REACTOR);
+                        case REACTOR_T2 -> entity.getAdvancement().awardPlayer(CNAdvancement.T2_REACTOR);
+                        case REACTOR_T3 -> entity.getAdvancement().awardPlayer(CNAdvancement.T3_REACTOR);
+                    };
 
                     entity.setMultiblockSize(result.data().getSize());
                     entity.setAssembled(true);
