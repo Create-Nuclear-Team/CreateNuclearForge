@@ -1,4 +1,4 @@
-// 1.20.1	2026-05-12T21:14:49.8237214	Create Nuclear Advancements
+// 1.20.1	2026-05-16T22:54:23.6232272	Create Nuclear Advancements
 b6aa52d55ebb681fa0784c5419667c88a4b0e6db data/createnuclear/advancements/anti_radiation_armor.json
 fe81bbd052ebe4a70c48912b47e12ed4e4523d1d data/createnuclear/advancements/automatic_uranium.json
 2e8127a4546d680ab502c6e3c71f49d8df2b1b18 data/createnuclear/advancements/coal_dust.json
@@ -22,6 +22,8 @@ b19a554150aa4d9dee594574e310c436d7bfc66d data/createnuclear/advancements/reactor
 a7b50865e9c0a441d749bf386f38e0a9dd69e5c8 data/createnuclear/advancements/root.json
 a44ae76ec00fae36f7df13e43f20ebe389b416d5 data/createnuclear/advancements/steel_ingot.json
 f031d5096e6504f906b7b3982b1423f6e006c72e data/createnuclear/advancements/t1.json
+663bc37c0587b13e9578d75309825f76c0abe4b9 data/createnuclear/advancements/t2.json
+8f8e494675b2a506e1801c92a4ab34410e286871 data/createnuclear/advancements/t3.json
 5a41894d2428fb7297b98a6b78925a17af2a3095 data/createnuclear/advancements/uranium_liquid.json
 01ac168072fa666f64148113ae806ec0b5ea5158 data/createnuclear/advancements/uranium_powder.json
 06d1bfea924a4ea35ce78937adcab967cce02b67 data/createnuclear/advancements/uranium_rod.json
