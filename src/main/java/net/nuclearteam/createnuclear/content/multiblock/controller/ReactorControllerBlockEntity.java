@@ -169,7 +169,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
-        behaviours.add(advancement = new CNAdvancementBehaviour(this, CNAdvancement.T1_REACTOR, CNAdvancement.T2_REACTOR, CNAdvancement.T3_REACTOR));
+        behaviours.add(advancement = new CNAdvancementBehaviour(this, CNAdvancement.T1_REACTOR, CNAdvancement.T2_REACTOR, CNAdvancement.T3_REACTOR, CNAdvancement.NO_TIME_TO_DIE, CNAdvancement.SILENCE_THE_CORE));
     }
 
     public boolean getAssembled() { // permet de savoir si le réacteur est formé ou pas.
@@ -393,6 +393,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity implements II
                 BlockState state = level.getBlockState(pos);
                 if (state.getBlock() instanceof ReactorAlarm && state.getValue(ReactorAlarm.POWERED) != activate) {
                     level.setBlock(pos, state.setValue(ReactorAlarm.POWERED, activate), 3);
+                    if (activate) this.advancement.awardPlayer(CNAdvancement.SILENCE_THE_CORE);
                 }
             }
         }
