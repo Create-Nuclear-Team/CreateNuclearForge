@@ -30,6 +30,7 @@ import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
+import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
@@ -99,6 +100,10 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             }
             else if (heldItem.isEmpty() && !controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()) {
                 withBlockEntityDo(worldIn, pos, be -> {
+                    if (IHeat.HeatLevel.of(be.getInventoryObject().getItem(0).getOrCreateTag().getInt("heat")) == IHeat.HeatLevel.DANGER) {
+                        be.getAdvancement().setPlayer(player.getUUID());
+                        be.getAdvancement().awardPlayer(CNAdvancement.NO_TIME_TO_DIE);
+                    }
                     player.setItemInHand(handIn, be.getInventoryObject().getItem(0));
                     be.getInventoryObject().setStackInSlot(0, ItemStack.EMPTY);
                     be.setConfiguredPattern(ItemStack.EMPTY);
