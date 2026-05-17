@@ -34,6 +34,7 @@ import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteStoneTypes;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import org.joml.Vector3f;
 import net.nuclearteam.createnuclear.CNTags.CNFluidTags;
 
@@ -131,6 +132,9 @@ public class CNFluids {
                     entity.setTicksFrozen(CNFluids.TICK++);
                 }
                 entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
+                if (entity instanceof  Player player && player.isSwimming()) {
+                    CNAdvancement.CRYOGENIC_BAPTISM.awardTo(player);
+                }
             } else if (entity.isInFluidType(THORIUM.getType())) {
                 entity.lavaHurt();
             } else {
