@@ -1,92 +1,155 @@
 {
-  "large_nuclear_explosion": {
+  "alarm/alarm": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:large_nuclear_explosion"
+        "name": "createnuclear:alarm/alarm"
       }
     ],
-    "subtitle": "createnuclear.subtitle.large_nuclear_explosion"
+    "subtitle": "createnuclear.subtitle.alarm/alarm"
   },
-  "nuclear_explosion": {
+  "alarm/reactor_alarm": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:nuclear_explosion"
+        "name": "createnuclear:alarm/reactor_alarm"
       }
     ],
-    "subtitle": "createnuclear.subtitle.nuclear_explosion"
+    "subtitle": "createnuclear.subtitle.alarm/reactor_alarm"
   },
-  "nuclear_explosion_ringing": {
+  "explosion/large_nuclear_explosion": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:nuclear_explosion_ringing"
+        "name": "createnuclear:explosion/large_nuclear_explosion"
       }
     ],
-    "subtitle": "createnuclear.subtitle.nuclear_explosion_ringing"
+    "subtitle": "createnuclear.subtitle.explosion/large_nuclear_explosion"
   },
-  "nuclear_explosion_rumble": {
+  "explosion/main": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:nuclear_explosion_rumble"
+        "name": "createnuclear:explosion/main"
       }
     ],
-    "subtitle": "createnuclear.subtitle.nuclear_explosion_rumble"
+    "subtitle": "createnuclear.subtitle.explosion/main"
   },
-  "reactor_alarm": {
+  "explosion/nuclear_explosion": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reactor_alarm"
+        "name": "createnuclear:explosion/nuclear_explosion"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reactor_alarm"
+    "subtitle": "createnuclear.subtitle.explosion/nuclear_explosion"
   },
-  "reactor_casing_break": {
+  "explosion/nuclear_explosion_ringing": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reactor_casing_break"
+        "name": "createnuclear:explosion/nuclear_explosion_ringing"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reactor_casing_break"
+    "subtitle": "createnuclear.subtitle.explosion/nuclear_explosion_ringing"
   },
-  "reactor_casing_fall": {
+  "explosion/nuclear_explosion_rumble": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reactor_casing_fall"
+        "name": "createnuclear:explosion/nuclear_explosion_rumble"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reactor_casing_fall"
+    "subtitle": "createnuclear.subtitle.explosion/nuclear_explosion_rumble"
   },
-  "reactor_casing_hit": {
+  "explosion/rumble": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reactor_casing_hit"
+        "name": "createnuclear:explosion/rumble"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reactor_casing_hit"
+    "subtitle": "createnuclear.subtitle.explosion/rumble"
   },
-  "reactor_casing_place": {
+  "explosion/shockwave": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reactor_casing_place"
+        "name": "createnuclear:explosion/shockwave"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reactor_casing_place"
+    "subtitle": "createnuclear.subtitle.explosion/shockwave"
   },
-  "reactor_casing_step": {
+  "geiger/high": {
     "sounds": [
       {
         "type": "file",
-        "name": "createnuclear:reactor_casing_step"
+        "name": "createnuclear:geiger/high"
       }
     ],
-    "subtitle": "createnuclear.subtitle.reactor_casing_step"
+    "subtitle": "createnuclear.subtitle.geiger/high"
+  },
+  "geiger/low": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:geiger/low"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.geiger/low"
+  },
+  "geiger/medium": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:geiger/medium"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.geiger/medium"
+  },
+  "reacteur/casing_break": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reacteur/casing_break"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reacteur/casing_break"
+  },
+  "reacteur/casing_fall": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reacteur/casing_fall"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reacteur/casing_fall"
+  },
+  "reacteur/casing_hit": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reacteur/casing_hit"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reacteur/casing_hit"
+  },
+  "reacteur/casing_place": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reacteur/casing_place"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reacteur/casing_place"
+  },
+  "reacteur/casing_step": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reacteur/casing_step"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reacteur/casing_step"
   }
 }
