@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public abstract class AntiRadiationArmorItem extends ArmorItem {
+    public static final double RADIATION_VALUE = 0.25;
     protected final DyeColor color;
 
     public AntiRadiationArmorItem(ArmorMaterials materials, Type type, Properties properties, DyeColor color) {
@@ -51,7 +52,7 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
         ImmutableMultimap.Builder<Attribute, AttributeModifier> builder = ImmutableMultimap.builder();
         builder.putAll(map);
         // Use ADDITION so pieces add up to a resistance fraction (e.g. 0.25 per piece -> full set = 1.0)
-        builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", 0.25, AttributeModifier.Operation.ADDITION));
+        builder.put(CNAttributes.IRRADIATED_RESISTANCE.get(), new AttributeModifier(uuid, "Armor Resistance Irradiation", RADIATION_VALUE, AttributeModifier.Operation.ADDITION));
 
         return builder.build();
     }
@@ -73,9 +74,6 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
         tooltip.addAll(makeSummary);
     }
 
-
-                    // Copie des états (accroupi, bébé, chevauchement...)
-//                    castedOriginal.copyPropertiesTo(this.model);
 
     public List<Component> makeSummary(ItemStack item) {
         if (!item.hasTag()) return Collections.emptyList();
