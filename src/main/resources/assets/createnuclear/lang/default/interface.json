@@ -88,17 +88,5 @@
   "createnuclear.notification.reactor.meltdown_finished": "Critical meltdown completed",
 
   "death.attack.createnuclear.radiation": "%1$s died from radiation",
-  "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast",
-
-  "createnuclear.ponder.reactor.title.t1": "Reactor T1 — Construction",
-  "createnuclear.ponder.reactor.title.t2": "Reactor T2 — Construction",
-  "createnuclear.ponder.reactor.title.t3": "Reactor T3 — Construction",
-  "createnuclear.ponder.reactor.floor": "Floor ",
-  "createnuclear.ponder.reactor.input1": "Input: stores uranium/graphite. One per rod.",
-  "createnuclear.ponder.reactor.input2": "Input 2: secondary input (place on an edge, not on the frame).",
-  "createnuclear.ponder.reactor.liquid_input": "Liquid input: cooling fluid inlet. Place on an edge.",
-  "createnuclear.ponder.reactor.alarm": "Alarm: place on an edge (not on the frame). Triggers on overheating.",
-  "createnuclear.ponder.reactor.output": "Output: produces energy (SU).",
-  "createnuclear.ponder.reactor.controller": "Controller: central block that manages the reactor.",
-  "createnuclear.ponder.reactor.use_blueprint": "Use the Reactor Blueprint to assemble the multiblock."
+  "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast"
 }
