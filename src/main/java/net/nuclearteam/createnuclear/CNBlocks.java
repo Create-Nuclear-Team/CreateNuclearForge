@@ -63,6 +63,7 @@ import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
 import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
+import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreItem;
 
 import static com.simibubi.create.foundation.data.CreateRegistrate.casingConnectivity;
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
@@ -380,7 +381,7 @@ public class CNBlocks {
                 CNTags.forgeBlockTag("ores/uranium"),
                 CNBlockTags.URANIUM_ORES.tag
             )
-            .item()
+            .item((b, p) -> new UraniumOreItem(b, p, 3))
             .tag(CNItemTags.URANIUM_ORES.tag, CNTags.forgeItemTag("ores/uranium"))
             .build()
             .register();
@@ -443,7 +444,7 @@ public class CNBlocks {
                 CNTags.forgeBlockTag("ores/uranium"),
                 CNBlockTags.URANIUM_ORES.tag
             )
-            .item()
+            .item((b, p) -> new UraniumOreItem(b, p, 3))
             .tag(CNItemTags.URANIUM_ORES.tag, CNTags.forgeItemTag("ores/uranium"))
             .build()
             .register();
@@ -540,7 +541,7 @@ public class CNBlocks {
                 .pattern("RRR")
                 .pattern("RRR")
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
-            .item()
+            .item((b, p) -> new UraniumOreItem(b, p, 27))
             .tag(CNTags.forgeItemTag("storage_blocks/raw_uranium"))
             .build()
             .register();
