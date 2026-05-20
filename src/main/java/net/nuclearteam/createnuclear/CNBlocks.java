@@ -112,7 +112,7 @@ public class CNBlocks {
     public static final BlockEntry<ReactorFrame> REACTOR_FRAME = CreateNuclear.REGISTRATE
         .block("reactor_frame", ReactorFrame::new)
         .initialProperties(SharedProperties::stone)
-        .properties(p -> p.explosionResistance(3F).destroyTime(2F))
+        .properties(p -> p.explosionResistance(3F).destroyTime(2F).noOcclusion())
         .addLayer(() -> RenderType::cutoutMipped)
         .transform(pickaxeOnly())
         .tag(BlockTags.NEEDS_DIAMOND_TOOL)
