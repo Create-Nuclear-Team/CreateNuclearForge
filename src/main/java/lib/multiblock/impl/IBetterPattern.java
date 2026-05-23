@@ -23,9 +23,4 @@ public class IBetterPattern implements IMultiBlockPattern {
     public void construct(Level level, BlockPos pos, BiPredicate<Character, BlockState> blockStateBiPredicate) {
 
     }
-
-    @Override
-    public boolean matches(java.util.logging.Level level, BlockPos pos, Rotation rotation) {
-        return false;
-    }
 }

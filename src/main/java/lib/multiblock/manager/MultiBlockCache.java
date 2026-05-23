@@ -3,9 +3,8 @@ package lib.multiblock.manager;
 import lib.multiblock.impl.IMultiBlockPattern;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
-
-import java.util.logging.Level;
 
 public class MultiBlockCache<T extends IMultiBlockPattern> {
     private T cachedResult;

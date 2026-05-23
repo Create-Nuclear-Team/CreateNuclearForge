@@ -28,7 +28,7 @@ public class ReactorAlarm extends Block implements IBE<ReactorAlarmEntity> {
 
     public ReactorAlarm(Properties props) {
         super(props);
-        this.registerDefaultState(this.stateDefinition.any().setValue(POWERED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false));
     }
 
     // AJOUT : Inscription au multiblock lors de la pose

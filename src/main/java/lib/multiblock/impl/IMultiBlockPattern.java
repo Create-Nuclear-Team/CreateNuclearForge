@@ -36,5 +36,4 @@ public interface IMultiBlockPattern {
     }
 
 
-    boolean matches(java.util.logging.Level level, BlockPos pos, Rotation rotation);
 }
