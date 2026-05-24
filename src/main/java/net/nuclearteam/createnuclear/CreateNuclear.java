@@ -29,6 +29,7 @@ import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProces
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNTriggers;
 import net.nuclearteam.createnuclear.foundation.item.RodsStats;
+import net.nuclearteam.createnuclear.foundation.item.radiation.CNRadiationValues;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.CNPlacementModifiers;
@@ -107,6 +108,7 @@ public class CreateNuclear {
         event.enqueueWork(() -> {
             CNPotions.registerPotionsRecipes();
             CNOpenPipeEffectHandlers.registerDefaults();
+            CNRadiationValues.register();
         });
 
         CNAdvancement.register();

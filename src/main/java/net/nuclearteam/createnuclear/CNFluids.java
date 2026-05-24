@@ -35,6 +35,8 @@ import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteStoneTypes;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+import net.nuclearteam.createnuclear.foundation.item.radiation.RadiationBucketItem;
+
 import org.joml.Vector3f;
 import net.nuclearteam.createnuclear.CNTags.CNFluidTags;
 
@@ -59,7 +61,7 @@ public class CNFluids {
                 .explosionResistance(100f)
             )
             .source(ForgeFlowingFluid.Source::new)
-            .bucket()
+            .bucket((s, p) -> new RadiationBucketItem(s, p, 20))
             .onRegister(CNFluids::registerFluidDispenseBehavior)
             .tag(CNTags.forgeItemTag("buckets/uranium"))
             .lang("Uranium Bucket")

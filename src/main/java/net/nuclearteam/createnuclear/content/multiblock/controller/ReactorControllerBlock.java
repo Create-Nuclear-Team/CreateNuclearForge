@@ -100,7 +100,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     player.setItemInHand(handIn, be.getInventoryObject().getItem(0));
                     be.getInventoryObject().setStackInSlot(0, ItemStack.EMPTY);
                     be.setConfiguredPattern(ItemStack.EMPTY);
-                    be.setTotal(0.0);
+                    //be.clearTimers(); // retirer le commentaire si on veux que le timer se reset quand le reacteur s'arrete
                     be.rotate(be.getBlockState(), be.getLevel(), 0);
                     be.notifyUpdate();
                 });
