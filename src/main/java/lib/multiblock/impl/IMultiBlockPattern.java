@@ -34,6 +34,4 @@ public interface IMultiBlockPattern {
     default void contruct(Level level, BlockPos pos) {
         construct(level, pos, (a,b) -> true);
     }
-
-
 }

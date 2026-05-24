@@ -1,0 +1,119 @@
+package net.nuclearteam.createnuclear.content.multiblock;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.nuclearteam.createnuclear.CNBlocks;
+import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
+import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
+import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
+
+import java.util.List;
+
+public final class ReactorAssembler {
+
+    private ReactorAssembler() {}
+
+    public static void assemble(BlockPos pos, Level level) {
+        ReactorControllerBlockEntity entity = getBlockEntity(level, pos);
+        if (entity == null) return;
+
+        BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity);
+        if (result == null) return;
+
+        CreateNuclear.LOGGER.warn("ReactorAssembler#assemble id: {}, size: {}, name: {}",
+                result.id(), result.data().getSize(), result.data().getName());
+
+        sendMessageToPlayer(level, pos, Component.translatable("reactor.info.assembled.creator"), !entity.isAssembled());
+
+        switch (result.data()) {
+            case REACTOR_T1 -> entity.getAdvancement().awardPlayer(CNAdvancement.T1_REACTOR);
+            case REACTOR_T2 -> entity.getAdvancement().awardPlayer(CNAdvancement.T2_REACTOR);
+            case REACTOR_T3 -> entity.getAdvancement().awardPlayer(CNAdvancement.T3_REACTOR);
+        }
+
+        entity.setMultiblockSize(result.data().getSize());
+        entity.setAssembled(true);
+        entity.setMultiblockStructure(entity.getStructureBounds(pos, entity.getMultiblockSize(), entity.getMultiblockFacing()));
+
+        findAndRegisterSpecialBlocks(entity.getMultiblockPos(), entity, level);
+    }
+
+    public static void disassemble(BlockPos pos, Level level) {
+        ReactorControllerBlockEntity entity = getBlockEntity(level, pos);
+        if (entity == null || !entity.isAssembled()) return;
+
+        BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity);
+        if (result != null) return;
+
+        sendMessageToPlayer(level, pos, Component.translatable("reactor.info.assembled.destroyer"), true);
+
+        entity.setAssembled(false);
+        entity.removeIOAll();
+    }
+
+    public static void findAndRegisterSpecialBlocks(int[] reactorPos, ReactorControllerBlockEntity entity, Level level) {
+        int xMin = reactorPos[0], xMax = reactorPos[1];
+        int yMin = reactorPos[2], yMax = reactorPos[3];
+        int zMin = reactorPos[4], zMax = reactorPos[5];
+
+        final Block reactorOutputBlock = CNBlocks.REACTOR_OUTPUT.get();
+        final Block reactorInputBlock = CNBlocks.REACTOR_INPUT.get();
+        final Block reactorInputFluidBlock = CNBlocks.REACTOR_LIQUID_INPUT.get();
+        final Block reactorAlarmBlock = CNBlocks.REACTOR_ALARM.get();
+
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+
+        for (int y = yMin; y <= yMax; y++) {
+            boolean isYBoundary = (y == yMin || y == yMax);
+            for (int x = xMin; x <= xMax; x++) {
+                boolean isXBoundary = (x == xMin || x == xMax);
+                for (int z = zMin; z <= zMax; z++) {
+                    boolean isZBoundary = (z == zMin || z == zMax);
+
+                    if (!(isYBoundary || isXBoundary || isZBoundary)) continue;
+
+                    mutablePos.set(x, y, z);
+                    BlockState blockState = level.getBlockState(mutablePos);
+
+                    if (blockState.is(reactorOutputBlock)) {
+                        entity.addOutput(mutablePos.immutable());
+                    } else if (blockState.is(reactorInputBlock)) {
+                        entity.addInput(mutablePos.immutable());
+                    } else if (blockState.is(reactorInputFluidBlock)) {
+                        entity.addInputFluid(mutablePos.immutable());
+                    } else if (blockState.is(reactorAlarmBlock)) {
+                        entity.addAlarm(mutablePos.immutable());
+                    }
+                }
+            }
+        }
+    }
+
+    private static ReactorControllerBlockEntity getBlockEntity(Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof ReactorControllerBlockEntity entity) {
+            return entity;
+        }
+        return null;
+    }
+
+    private static List<Player> getPlayersInRadius(Level level, BlockPos center, double radius) {
+        AABB box = new AABB(center).inflate(radius);
+        return level.getEntitiesOfClass(Player.class, box);
+    }
+
+    private static void sendMessageToPlayer(Level level, BlockPos pos, MutableComponent component, boolean condition) {
+        if (!condition) return;
+        for (Player player : getPlayersInRadius(level, pos, 30D)) {
+            player.sendSystemMessage(component);
+        }
+    }
+}
