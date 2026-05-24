@@ -31,7 +31,7 @@ public class CNMultiblock {
                         .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OA*AO")
                         .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OABAO")
                         .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OABAO")
-                        .aisle("OOOOO", "OAAAO", "OAAAO", "OAAAO", "OOAOO")
+                        .aisle("OOOOO", "OAAAO", "OAAAO", "OAAAO", "OOOOO")
                         .where('A', blockInWorldAPredicate)
                         .where('B', stateIs(CNBlocks.REACTOR_FRAME.get()))
                         .where('C', stateIs(CNBlocks.REACTOR_CORE.get()))

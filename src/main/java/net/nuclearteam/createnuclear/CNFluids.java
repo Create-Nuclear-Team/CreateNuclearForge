@@ -34,6 +34,7 @@ import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteStoneTypes;
+import net.nuclearteam.createnuclear.foundation.item.radiation.RadiationBucketItem;
 import org.joml.Vector3f;
 import net.nuclearteam.createnuclear.CNTags.CNFluidTags;
 
@@ -58,7 +59,7 @@ public class CNFluids {
                 .explosionResistance(100f)
             )
             .source(ForgeFlowingFluid.Source::new)
-            .bucket()
+            .bucket((s, p) -> new RadiationBucketItem(s, p, 20))
             .onRegister(CNFluids::registerFluidDispenseBehavior)
             .tag(CNTags.forgeItemTag("buckets/uranium"))
             .lang("Uranium Bucket")
@@ -131,6 +132,8 @@ public class CNFluids {
                     entity.setTicksFrozen(CNFluids.TICK++);
                 }
                 entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
+            } else if (entity.isInFluidType(THORIUM.getType())) {
+                entity.lavaHurt();
             } else {
                 CNFluids.TICK = 0;
             }

@@ -24,4 +24,5 @@ public interface ReactorInputManagerI extends ReactorIOManager {
     VirtualReactorInputsItem getInventory(Level level);
 
     boolean extractItems(Level level, int fuelNeeded, int coolerNeeded);
+    boolean extractItemByName(Level level, String itemName);
 }
