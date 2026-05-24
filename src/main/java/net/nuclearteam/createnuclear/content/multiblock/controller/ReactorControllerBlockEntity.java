@@ -20,9 +20,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -43,9 +40,10 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.nuclearteam.createnuclear.*;
 
-import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
+import net.nuclearteam.createnuclear.CNBlocks;
+import net.nuclearteam.createnuclear.CNEntityType;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
@@ -63,8 +61,8 @@ import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
 
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
