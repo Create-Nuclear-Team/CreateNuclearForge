@@ -458,6 +458,65 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.setChanged();
     }
 
+    private void resetTimersCycle() {
+        CompoundTag tag = this.getConfiguredPatternTag();
+        if (tag == null || tag.isEmpty())
+            return;
+
+        ItemStackHandler handler = new ItemStackHandler(57);
+        if (tag.contains("patternAll")) {
+            handler.deserializeNBT(tag.getCompound("patternAll"));
+        } else if (tag.contains("pattern")) {
+            handler.deserializeNBT(tag.getCompound("pattern"));
+        } else {
+            return;
+        }
+
+        Map<Item, Integer> itemCounts = new HashMap<>();
+        for (int i = 0; i < handler.getSlots(); i++) {
+            ItemStack stack = handler.getStackInSlot(i);
+            if (!stack.isEmpty() && !stack.is(Items.GLASS_PANE)) {
+                itemCounts.put(stack.getItem(), itemCounts.getOrDefault(stack.getItem(), 0) + 1);
+            }
+        }
+
+        List<ActiveTimer> timersToKeep = new ArrayList<>();
+
+        for (Map.Entry<Item, Integer> entry : itemCounts.entrySet()) {
+            Item item = entry.getKey();
+            int count = entry.getValue();
+
+            RodType rodType = RodType.resolveRodType(item, level);
+
+            if (rodType.isNotEmptyItem()) {
+                String itemName = ForgeRegistries.ITEMS.getKey(item).getPath();
+                int timer = rodType.rodTimer() / Math.max(1, count);
+
+                boolean found = false;
+                for (ActiveTimer t : runningTimers) {
+                    if (t.name.equals(itemName)) {
+                        inputManager.extractItemByName(level, itemName);
+                        t.nbInPattern = count;
+                        t.maxTicks = timer;
+                        t.remainingTicks = timer;
+                        timersToKeep.add(t);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    timersToKeep.add(new ActiveTimer(itemName, timer, count));
+                }
+            }
+        }
+
+        runningTimers.clear();
+        runningTimers.addAll(timersToKeep);
+
+        this.setChanged();
+    }
+
     public void logReactorConnections() {
         CreateNuclear.LOGGER.debug("Reactor input count: {}", this.inputManager.size());
         CreateNuclear.LOGGER.debug("Reactor output count: {}", this.outputManager.size());
@@ -657,9 +716,39 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         if (!runningTimers.isEmpty()) {
             if (level.getGameTime() % 20 == 0) {
+                boolean needsReset = false;
+
                 for (ActiveTimer t : runningTimers) {
-                    CreateNuclear.LOGGER.info("Timer Debug - Item: {}, Temps restant: {} ticks, Quantité à extract: {}",
-                            t.name, t.remainingTicks, t.remainingExtracts);
+                    String tagKey = "count" + t.name.substring(0, 1).toUpperCase()
+                            + t.name.substring(1).replace("_rod", "Rod");
+                    if (this.getConfiguredPatternTag().getInt(tagKey) != t.nbInPattern) {
+                        needsReset = true;
+                        break;
+                    }
+                }
+                if (needsReset) {
+                    resetTimersCycle();
+                } else {
+                    for (String key : this.getConfiguredPatternTag().getAllKeys()) {
+                        if (key.startsWith("count") && key.endsWith("Rod")) {
+                            int expectedCount = this.getConfiguredPatternTag().getInt(key);
+                            if (expectedCount > 0) {
+                                String expectedName = key.substring(5, 6).toLowerCase()
+                                        + key.substring(6).replace("Rod", "_rod");
+                                boolean hasTimer = false;
+                                for (ActiveTimer t : runningTimers) {
+                                    if (t.name.equals(expectedName)) {
+                                        hasTimer = true;
+                                        break;
+                                    }
+                                }
+                                if (!hasTimer) {
+                                    needsReset = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -667,8 +756,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                 if (timer.tick()) {
                     boolean success = inputManager.extractItemByName(level, timer.name);
 
-                    if (timer.remainingExtracts > 1) {
-                        timer.remainingExtracts--;
+                    if (timer.nbInPattern > 1) {
                         timer.remainingTicks = timer.maxTicks;
                         return false;
                     }

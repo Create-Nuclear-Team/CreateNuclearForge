@@ -6,13 +6,13 @@ public class ActiveTimer {
     public String name;
     public int remainingTicks;
     public int maxTicks;
-    public int remainingExtracts;
+    public int nbInPattern;
 
-    public ActiveTimer(String name, int ticks, int extracts) {
+    public ActiveTimer(String name, int ticks, int nbInPattern) {
         this.name = name;
         this.remainingTicks = ticks;
         this.maxTicks = ticks;
-        this.remainingExtracts = extracts;
+        this.nbInPattern = nbInPattern;
     }
 
     public ActiveTimer(String name, int ticks) {
@@ -30,12 +30,12 @@ public class ActiveTimer {
         tag.putString("name", name);
         tag.putInt("remainingTicks", remainingTicks);
         tag.putInt("maxTicks", maxTicks);
-        tag.putInt("remainingExtracts", remainingExtracts);
+        tag.putInt("nbInPattern", nbInPattern);
         return tag;
     }
 
     public static ActiveTimer deserializeNBT(CompoundTag tag) {
-        ActiveTimer timer = new ActiveTimer(tag.getString("name"), tag.getInt("maxTicks"), tag.getInt("remainingExtracts"));
+        ActiveTimer timer = new ActiveTimer(tag.getString("name"), tag.getInt("maxTicks"), tag.getInt("nbInPattern"));
         timer.remainingTicks = tag.getInt("remainingTicks");
         return timer;
     }
