@@ -1,4 +1,4 @@
-// 1.20.1	2026-05-27T10:20:26.1937279	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-05-27T16:36:10.7067932	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -30,7 +30,7 @@ f628f8c7aa1e150ad2b5a3ce87dbe7f00b462e74 assets/createnuclear/blockstates/polish
 63aaf78c3e0c16c2f37b069c5392e3d1a93ac058 assets/createnuclear/blockstates/raw_uranium_block.json
 1c9953bedf6cec725a6db7a199d826dcdfe9dfa7 assets/createnuclear/blockstates/reactor_alarm.json
 0fbc9288622efc18fe39b6c8ba89e7e2281dee26 assets/createnuclear/blockstates/reactor_casing.json
-60ca260d5b5bcd975c0a3918b461748786cde95e assets/createnuclear/blockstates/reactor_controller.json
+eb176a1e7da662524b15b3a9ce9f983c8dc55994 assets/createnuclear/blockstates/reactor_controller.json
 3c259041f317bb8868fb4f177c457fc12b8d28f5 assets/createnuclear/blockstates/reactor_cooler.json
 3cced3f7d35371f1881b0485ee324788adcd2c74 assets/createnuclear/blockstates/reactor_core.json
 ff68065029f7d47434aaf3f60e5ec3319302d2d8 assets/createnuclear/blockstates/reactor_frame.json
@@ -97,6 +97,9 @@ b950ac6ca2df77ffe3abd02e13c38567602e5536 assets/createnuclear/models/block/polis
 cf8b4d604330762358b21b6e079aaab1eb2987f4 assets/createnuclear/models/block/raw_lead_block.json
 de9b4dee9580161263fa8020d326ac5fe4e38ed4 assets/createnuclear/models/block/raw_thorium_block.json
 561c9f9a4e153fc648a3c7224812c71c8ac2da5c assets/createnuclear/models/block/raw_uranium_block.json
+db9c48204d28b67a19436da4a5439adfef7cb773 assets/createnuclear/models/block/reactor/controller/reactor_controller_off.json
+e8f5d1143ab04ff4d2a5e7c50826b3184b7ede27 assets/createnuclear/models/block/reactor/controller/reactor_controller_on.json
+a59f42cb666f10d68837f9c4936fc6a21fa3df76 assets/createnuclear/models/block/reactor/controller/reactor_controller_standby.json
 d5acc57be1c8ccc3e61c40cf11856933d35803b3 assets/createnuclear/models/block/reactor_alarm.json
 7cdeee7f4740b6a86802354534be24dbb251e211 assets/createnuclear/models/block/reinforced_glass.json
 e94d3eb865d17234b18241d89acdec2b10a1d21a assets/createnuclear/models/block/small_autunite_brick.json

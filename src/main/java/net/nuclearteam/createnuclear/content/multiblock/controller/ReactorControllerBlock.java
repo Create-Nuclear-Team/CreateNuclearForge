@@ -44,14 +44,20 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock implements IWrenchable, IBE<ReactorControllerBlockEntity> {
     public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
+    public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
     public ReactorControllerBlock(Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(FACING, net.minecraft.core.Direction.NORTH)
+                .setValue(ASSEMBLED, false)
+                .setValue(ACTIVE, false) // Par défaut inactif
+        );
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING).add(ASSEMBLED);
+        builder.add(FACING).add(ASSEMBLED).add(ACTIVE);
         super.createBlockStateDefinition(builder);
     }
 
@@ -59,7 +65,8 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState()
                 .setValue(FACING, context.getHorizontalDirection().getOpposite())
-                .setValue(ASSEMBLED, false);
+                .setValue(ASSEMBLED, false)
+                .setValue(ACTIVE, false);
     }
     @Override
     public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos,
@@ -186,7 +193,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             for (Player player : players) {
                 player.sendSystemMessage(Component.translatable("reactor.info.assembled.destroyer"));
             }
-            level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false));
+            level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false).setValue(ACTIVE, false));
             entity.setAssembled(false);
             entity.removeIOAll();
         }
