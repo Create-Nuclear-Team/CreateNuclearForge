@@ -27,6 +27,7 @@ import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.IGoggleHelmet;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
 import net.nuclearteam.createnuclear.foundation.item.RodsStats;
+import net.nuclearteam.createnuclear.foundation.item.radiation.CNRadiationValues;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.data.CreateNuclearDatagen;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.CNPlacementModifiers;
@@ -105,6 +106,7 @@ public class CreateNuclear {
         event.enqueueWork(() -> {
             CNPotions.registerPotionsRecipes();
             CNOpenPipeEffectHandlers.registerDefaults();
+            CNRadiationValues.register();
         });
     }
 
