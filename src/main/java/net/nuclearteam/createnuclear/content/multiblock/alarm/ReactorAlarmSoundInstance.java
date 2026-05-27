@@ -23,7 +23,7 @@ public class ReactorAlarmSoundInstance extends AbstractTickableSoundInstance {
         }
         this.looping = true;
         this.delay = 0;
-        this.volume = 1.5F;
+        this.volume = 10F;
     }
 
     @Override

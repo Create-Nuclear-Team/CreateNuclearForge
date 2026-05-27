@@ -30,14 +30,44 @@ public class ReactorInputMenu extends MenuBase<ReactorInputEntity> {
     }
 
     @Override
-    public ItemStack quickMoveStack(Player player, int index) {
-        Slot clickedSlot = getSlot(index);
-        if (!clickedSlot.hasItem()) return ItemStack.EMPTY;
-        ItemStack stack = clickedSlot.getItem();
-        if (index < 2) moveItemStackTo(stack, 2, slots.size(), false);
-        else moveItemStackTo(stack, 0, 2, false);
-        return ItemStack.EMPTY;
+    public ItemStack quickMoveStack(Player playerIn, int index) {
+        ItemStack result = ItemStack.EMPTY;
+        Slot slot = this.slots.get(index);
+        if (slot != null && slot.hasItem()) {
+            ItemStack stackInSlot = slot.getItem();
+            result = stackInSlot.copy();
+
+            int playerInventorySize = player.getInventory().items.size(); // normalement 36
+            int containerStart = playerInventorySize;
+            int containerEnd = containerStart + 1; // 1 slot de machine
+
+            // Si on a cliqué un slot de machine (après les slots joueurs)
+            if (index >= containerStart && index < containerEnd) {
+                if (!this.moveItemStackTo(stackInSlot, 0, playerInventorySize, true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else {
+                // On a cliqué un slot joueur — essayer d'aller dans le container (machine)
+                if (!this.moveItemStackTo(stackInSlot, containerStart, containerEnd, false)) {
+                    return ItemStack.EMPTY;
+                }
+            }
+
+            if (stackInSlot.isEmpty()) {
+                slot.set(ItemStack.EMPTY);
+            } else {
+                slot.setChanged();
+            }
+
+            if (stackInSlot.getCount() == result.getCount()) {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTake(playerIn, stackInSlot);
+        }
+        return result;
     }
+
 
     @Override
     protected ReactorInputEntity createOnClient(FriendlyByteBuf extraData) {
@@ -69,13 +99,9 @@ public class ReactorInputMenu extends MenuBase<ReactorInputEntity> {
             }
         }
 
-        Slot slot1 = new SlotItemHandler(contentHolder.inventory, 0, 24, 29);
-        Slot slot2 = new SlotItemHandler(contentHolder.inventory, 1, 57, 29);
+        Slot slot1 = new SlotItemHandler(contentHolder.inventory, 0, 42, 29);
 
         addSlot(slot1);
-        addSlot(slot2);
-
-
     }
 
     @Override

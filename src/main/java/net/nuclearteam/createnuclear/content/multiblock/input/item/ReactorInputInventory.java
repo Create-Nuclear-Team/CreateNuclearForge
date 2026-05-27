@@ -13,7 +13,7 @@ public class ReactorInputInventory extends ItemStackHandler {
     private final ReactorInputEntity be;
 
     public ReactorInputInventory(ReactorInputEntity be) {
-        super(2);
+        super(1);
         this.be = be;
     }
 
@@ -27,8 +27,7 @@ public class ReactorInputInventory extends ItemStackHandler {
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
         RodType rodType = ItemRodTypesValue.getRodType(stack.getItem());
         return switch (slot) {
-            case 0 -> CNTags.CNItemTags.FUEL.matches(stack) || rodType.type() == TypeRod.FUEL;
-            case 1 -> CNTags.CNItemTags.COOLER.matches(stack) || rodType.type() == TypeRod.COOLER;
+            case 0 -> CNTags.CNItemTags.FUEL.matches(stack) || rodType.type() == TypeRod.FUEL || CNTags.CNItemTags.COOLER.matches(stack) || rodType.type() == TypeRod.COOLER;
             default -> !super.isItemValid(slot, stack);
         };
     }

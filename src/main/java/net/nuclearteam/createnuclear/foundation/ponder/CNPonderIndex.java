@@ -15,16 +15,15 @@ public class CNPonderIndex {
     public static void register(PonderSceneRegistrationHelper<ResourceLocation> helper) {
         PonderSceneRegistrationHelper<ItemProviderEntry<?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
 
-        // Reactor
+        // Reactor - Storyboards pour chaque taille
         HELPER.forComponents(CNBlocks.REACTOR_CONTROLLER)
-                .addStoryBoard("reactor/setup", CNPonderReactorScenes::init)
-                .addStoryBoard("reactor/setup", CNPonderReactorScenes::enable);
-
+                .addStoryBoard("reactor/reactor_t1_ponder", CNPonderReactorScenes::t1)
+                .addStoryBoard("reactor/reactor_t2_ponder", CNPonderReactorScenes::t2)
+                .addStoryBoard("reactor/reactor_t3_ponder", CNPonderReactorScenes::t3);
 
         HELPER.forComponents(CNItems.REACTOR_BLUEPRINT)
-                .addStoryBoard("reactor/setup", CNPonderReactorScenes::enable);
-
-        ;
-
+                .addStoryBoard("reactor/reactor_t1_ponder", CNPonderReactorScenes::t1)
+                .addStoryBoard("reactor/reactor_t2_ponder", CNPonderReactorScenes::t2)
+                .addStoryBoard("reactor/reactor_t3_ponder", CNPonderReactorScenes::t3);
     }
 }
