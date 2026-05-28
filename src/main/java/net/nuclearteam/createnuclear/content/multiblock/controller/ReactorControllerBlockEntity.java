@@ -547,6 +547,22 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         }
     }
 
+    private void updateReactorStateVisibility() {
+        if (level == null || level.isClientSide) return;
+
+        BlockState state = getBlockState();
+        if (!(state.getBlock() instanceof ReactorControllerBlock)) return;
+
+        boolean currentActive = state.getValue(ReactorControllerBlock.ACTIVE);
+
+        // Le réacteur est "ACTIVE" (ON) seulement s'il est assemblé ET qu'il a ses ressources
+        boolean targetActive = isAssembled() && isReadyToRun();
+
+        if (currentActive != targetActive) {
+            level.setBlock(worldPosition, state.setValue(ReactorControllerBlock.ACTIVE, targetActive), 3);
+        }
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -643,6 +659,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.bigCoolerItem = virtualReactorInputsItem.getBigCooledRod();
         this.bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
 
+        updateReactorStateVisibility();
         handleAssembledState();
     }
 
