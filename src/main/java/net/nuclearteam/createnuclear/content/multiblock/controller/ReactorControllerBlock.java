@@ -34,6 +34,9 @@ import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFl
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -88,7 +91,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         }
 
         if (!state.getValue(ASSEMBLED)) {
-            player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
+            // player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
         }
         else {
 
@@ -134,10 +137,15 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             PersistentFluidLocks.get(serverLevel).clearLock(pos);
         } else FluidLockManager.clearLock(pos);
 
-        List<? extends Player> players = worldIn.players();
-        for (Player p : players) {
-            p.sendSystemMessage(Component.translatable("reactor.info.assembled.destroyer"));
-        }
+        if (!state.getValue(ASSEMBLED))
+            return;
+
+        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+        NotifyUtil.sendActionBar(worldIn, pos,
+                CreateNuclearLang.translate("notification.reactor.disassembled").string(),
+                ChatFormatting.GOLD, configRadius, configWarnAll
+        );
     }
 
     @Override
@@ -168,31 +176,35 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(pos).getBlock();
         ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
         if (entity == null) return;
+        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
         BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
         if (result != null) { // the pattern is correct
             CreateNuclear.LOGGER.warn("Verify@BlockPattern<TypeMultiblock> id: {}, data<TypeMultiblock>$getSize: {}, data<TypeMultiblock>$getName: {}", result.id(), result.data().getSize(), result.data().getName());
 //            entity.removeIOAll();
-            for (Player player : players) {
-                if (create && !entity.isAssembled()) {
-                    player.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
-                    level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, true));
-                    entity.setMultiblockSize(result.data().getSize());
-                    entity.setAssembled(true);
+            if (create && !entity.isAssembled()) {
+                NotifyUtil.sendActionBar(level, pos,
+                        CreateNuclearLang.translate("notification.reactor.assembled").string(),
+                        ChatFormatting.GOLD, configRadius, configWarnAll
+                );
+                level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, true));
+                entity.setMultiblockSize(result.data().getSize());
+                entity.setAssembled(true);
 
-                    entity.setMultiblockStructure(entity.getStructureBounds(pos, entity.getMultiblockSize(), entity.getMultiblockFacing()));
-                    // Register existing special blocks (inputs/outputs) so the controller
-                    // detects ReactorInput/ReactorOutput placed before the controller.
-                    FindSpecialBlocksInReactor(entity.getMultiblockPos(), entity, level);
-                }
+                entity.setMultiblockStructure(entity.getStructureBounds(pos, entity.getMultiblockSize(), entity.getMultiblockFacing()));
+                // Register existing special blocks (inputs/outputs) so the controller
+                // detects ReactorInput/ReactorOutput placed before the controller.
+                FindSpecialBlocksInReactor(entity.getMultiblockPos(), entity, level);
             }
             return;
         }
 
         // the pattern is incorrect
         if (!create && entity.isAssembled()) {
-            for (Player player : players) {
-                player.sendSystemMessage(Component.translatable("reactor.info.assembled.destroyer"));
-            }
+            NotifyUtil.sendActionBar(level, pos,
+                    CreateNuclearLang.translate("notification.reactor.disassembled").string(),
+                    ChatFormatting.GOLD, configRadius, configWarnAll
+            );
             level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false).setValue(ACTIVE, false));
             entity.setAssembled(false);
             entity.removeIOAll();

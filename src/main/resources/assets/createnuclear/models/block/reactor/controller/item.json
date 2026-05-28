@@ -2,9 +2,9 @@
   "credit": "Made with Blockbench",
   "parent": "block/cube",
   "textures": {
-    "1": "createnuclear:block/reactor/controller/controller_panel",
+    "1": "createnuclear:block/reactor/controller/controller_panel_on",
     "2": "createnuclear:block/reactor/casing/reactor_casing",
-    "particle": "createnuclear:block/reactor/controller/controller_panel"
+    "particle": "createnuclear:block/reactor/controller/controller_panel_on"
   },
   "elements": [
     {
