@@ -26,12 +26,6 @@ public class DefaultHeatCalculator implements IHeatCalculator {
     };
     private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
-    // configuration constants (can be refactored to config object if needed)
-    private final int baseUraniumHeat = 25;
-    private final int baseGraphiteHeat = -10;
-    private final int proximityUraniumHeat = 5;
-    private final int proximityGraphiteHeat = -5;
-
     @Override
     public double computeHeat(BigItemStack bigFuelItem, BigItemStack bigCoolerItem, BigFluidStack bigFluidStack, ReactorFluidType type, int countGraphiteRod, int countUraniumRod, ReactorControllerInventory inventory, double overHeat) {
         int heat = 0;
@@ -43,11 +37,11 @@ public class DefaultHeatCalculator implements IHeatCalculator {
             RodType rod = ItemRodTypesValue.getRodType(currentStack.getItem());
             String currentRod = "";
             if (currentStack.is(CNTags.CNItemTags.FUEL.tag) || (rod.items().size() > 0 && rod.type() == RodType.TypeRod.FUEL)) {
-                heat += baseUraniumHeat;
-                currentRod = "u";
+                heat += rod.baseRodHeat();
+                currentRod = "fuel";
             } else if (currentStack.is(CNTags.CNItemTags.COOLER.tag) || (rod.items().size() > 0 && rod.type() == RodType.TypeRod.COOLER)) {
-                heat += baseGraphiteHeat;
-                currentRod = "g";
+                heat += rod.baseRodHeat();
+                currentRod = "cooler";
             }
 
             // find position in formattedPattern and check neighbors
@@ -64,12 +58,12 @@ public class DefaultHeatCalculator implements IHeatCalculator {
                         int neighborSlot = formattedPattern[nj][nk];
                         for (int l = 0; l < list.size(); l++) {
                             if (list.getCompound(l).getInt("Slot") == neighborSlot) {
-                                if ("u".equals(currentRod)) {
+                                if ("fuel".equals(currentRod)) {
                                     ItemStack stack = ItemStack.of(list.getCompound(l));
                                     if (stack.is(CNTags.CNItemTags.FUEL.tag)) {
-                                        heat += proximityUraniumHeat;
+                                        heat += rod.baseRodHeat();
                                     } else if (stack.is(CNTags.CNItemTags.COOLER.tag)) {
-                                        heat += proximityGraphiteHeat;
+                                        heat += rod.baseRodHeat() / ItemRodTypesValue.getRodType(stack.getItem()).proximityRodHeat();
                                     }
                                 }
                             }
