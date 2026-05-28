@@ -63,7 +63,7 @@ public class DefaultHeatCalculator implements IHeatCalculator {
                                     if (stack.is(CNTags.CNItemTags.FUEL.tag)) {
                                         heat += rod.baseRodHeat();
                                     } else if (stack.is(CNTags.CNItemTags.COOLER.tag)) {
-                                        heat += rod.baseRodHeat() / ItemRodTypesValue.getRodType(stack.getItem()).proximityRodHeat();
+                                        heat += rod.baseRodHeat() / Math.max(1, ItemRodTypesValue.getRodType(stack.getItem()).proximityRodHeat());
                                     }
                                 }
                             }
