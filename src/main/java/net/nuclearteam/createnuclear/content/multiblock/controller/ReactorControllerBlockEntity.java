@@ -57,7 +57,7 @@ import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
-import net.nuclearteam.createnuclear.content.multiblock.rod.ActiveTimer;
+import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.ConsumptionCycleManager;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
@@ -98,7 +98,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private int explosionCountdown = 0;
     private boolean isExploding = false;
 
-    private final List<ActiveTimer> runningTimers = new ArrayList<>();
+    private final ConsumptionCycleManager cycleManager = new ConsumptionCycleManager();
     private double liquidLife;
     private ItemStack configuredPattern;
 
@@ -203,7 +203,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     public void clearTimers() {
-        this.runningTimers.clear();
+        this.cycleManager.clear();
     }
 
     public double getLiquidLife() {
@@ -356,12 +356,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             clientMaxFluidCapacity = compound.getLong("clientMaxFluidCapacity");
         }
 
-        this.runningTimers.clear();
-        if (compound.contains("runningTimers")) {
-            ListTag timersTag = compound.getList("runningTimers", Tag.TAG_COMPOUND);
-            for (int i = 0; i < timersTag.size(); i++) {
-                this.runningTimers.add(ActiveTimer.deserializeNBT(timersTag.getCompound(i)));
-            }
+        this.cycleManager.clear();
+        if (compound.contains("cycleManager")) {
+            this.cycleManager.deserializeNBT(compound.getCompound("cycleManager"));
         }
     }
 
@@ -396,11 +393,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             compound.putLong("clientMaxFluidCapacity", clientMaxFluidCapacity);
         }
 
-        ListTag timersTag = new ListTag();
-        for (ActiveTimer timer : runningTimers) {
-            timersTag.add(timer.serializeNBT());
-        }
-        compound.put("runningTimers", timersTag);
+        compound.put("cycleManager", cycleManager.serializeNBT());
     }
 
     public boolean isAssembled() {
@@ -417,103 +410,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (level == null)
             return;
         level.setBlockAndUpdate(worldPosition, getBlockState().setValue(ASSEMBLED, assembled));
-        this.setChanged();
-    }
-
-    private void startNewCycle() {
-        CompoundTag tag = this.getConfiguredPatternTag();
-        if (tag == null || tag.isEmpty())
-            return;
-
-        ItemStackHandler handler = new ItemStackHandler(57);
-        if (tag.contains("patternAll")) {
-            handler.deserializeNBT(tag.getCompound("patternAll"));
-        } else if (tag.contains("pattern")) {
-            handler.deserializeNBT(tag.getCompound("pattern"));
-        } else {
-            return;
-        }
-
-        Map<Item, Integer> itemCounts = new HashMap<>();
-        for (int i = 0; i < handler.getSlots(); i++) {
-            ItemStack stack = handler.getStackInSlot(i);
-            if (!stack.isEmpty() && !stack.is(Items.GLASS_PANE)) {
-                itemCounts.put(stack.getItem(), itemCounts.getOrDefault(stack.getItem(), 0) + 1);
-            }
-        }
-
-        for (Map.Entry<Item, Integer> entry : itemCounts.entrySet()) {
-            Item item = entry.getKey();
-            int count = entry.getValue();
-
-            RodType rodType = RodType.resolveRodType(item, level);
-
-            if (rodType.isNotEmptyItem()) {
-                String itemName = ForgeRegistries.ITEMS.getKey(item).getPath();
-                int timer = rodType.rodTimer() / Math.max(1, count);
-                runningTimers.add(new ActiveTimer(itemName, timer, count));
-            }
-        }
-
-        this.setChanged();
-    }
-
-    private void resetTimersCycle() {
-        CompoundTag tag = this.getConfiguredPatternTag();
-        if (tag == null || tag.isEmpty())
-            return;
-
-        ItemStackHandler handler = new ItemStackHandler(57);
-        if (tag.contains("patternAll")) {
-            handler.deserializeNBT(tag.getCompound("patternAll"));
-        } else if (tag.contains("pattern")) {
-            handler.deserializeNBT(tag.getCompound("pattern"));
-        } else {
-            return;
-        }
-
-        Map<Item, Integer> itemCounts = new HashMap<>();
-        for (int i = 0; i < handler.getSlots(); i++) {
-            ItemStack stack = handler.getStackInSlot(i);
-            if (!stack.isEmpty() && !stack.is(Items.GLASS_PANE)) {
-                itemCounts.put(stack.getItem(), itemCounts.getOrDefault(stack.getItem(), 0) + 1);
-            }
-        }
-
-        List<ActiveTimer> timersToKeep = new ArrayList<>();
-
-        for (Map.Entry<Item, Integer> entry : itemCounts.entrySet()) {
-            Item item = entry.getKey();
-            int count = entry.getValue();
-
-            RodType rodType = RodType.resolveRodType(item, level);
-
-            if (rodType.isNotEmptyItem()) {
-                String itemName = ForgeRegistries.ITEMS.getKey(item).getPath();
-                int timer = rodType.rodTimer() / Math.max(1, count);
-
-                boolean found = false;
-                for (ActiveTimer t : runningTimers) {
-                    if (t.name.equals(itemName)) {
-                        inputManager.extractItemByName(level, itemName);
-                        t.nbInPattern = count;
-                        t.maxTicks = timer;
-                        t.remainingTicks = timer;
-                        timersToKeep.add(t);
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    timersToKeep.add(new ActiveTimer(itemName, timer, count));
-                }
-            }
-        }
-
-        runningTimers.clear();
-        runningTimers.addAll(timersToKeep);
-
         this.setChanged();
     }
 
@@ -710,61 +606,16 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             }
         }
 
-        if (runningTimers.isEmpty() && !isEmptyConfiguredPattern()) {
-            startNewCycle();
+        if (cycleManager.isEmpty() && !isEmptyConfiguredPattern()) {
+            cycleManager.startCycle(configuredPattern, level);
         }
 
-        if (!runningTimers.isEmpty()) {
-            if (level.getGameTime() % 20 == 0) {
-                boolean needsReset = false;
-
-                for (ActiveTimer t : runningTimers) {
-                    String tagKey = "count" + t.name.substring(0, 1).toUpperCase()
-                            + t.name.substring(1).replace("_rod", "Rod");
-                    if (this.getConfiguredPatternTag().getInt(tagKey) != t.nbInPattern) {
-                        needsReset = true;
-                        break;
-                    }
-                }
-                if (needsReset) {
-                    resetTimersCycle();
-                } else {
-                    for (String key : this.getConfiguredPatternTag().getAllKeys()) {
-                        if (key.startsWith("count") && key.endsWith("Rod")) {
-                            int expectedCount = this.getConfiguredPatternTag().getInt(key);
-                            if (expectedCount > 0) {
-                                String expectedName = key.substring(5, 6).toLowerCase()
-                                        + key.substring(6).replace("Rod", "_rod");
-                                boolean hasTimer = false;
-                                for (ActiveTimer t : runningTimers) {
-                                    if (t.name.equals(expectedName)) {
-                                        hasTimer = true;
-                                        break;
-                                    }
-                                }
-                                if (!hasTimer) {
-                                    needsReset = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
+        if (!cycleManager.isEmpty()) {
+            if (level.getGameTime() % 20 == 0
+                    && cycleManager.hasPatternChanged(configuredPattern, level)) {
+                cycleManager.resetCycle(configuredPattern, level, inputManager);
             }
-
-            boolean anyFinished = runningTimers.removeIf(timer -> {
-                if (timer.tick()) {
-                    boolean success = inputManager.extractItemByName(level, timer.name);
-
-                    if (timer.nbInPattern > 1) {
-                        timer.remainingTicks = timer.maxTicks;
-                        return false;
-                    }
-                    return true;
-                }
-                return false;
-            });
-
+            cycleManager.tick(inputManager, level);
         }
         if (IHeat.HeatLevel.isNotDanger(heat)) {
             // normal
