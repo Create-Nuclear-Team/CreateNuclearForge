@@ -282,7 +282,9 @@ public record RodType(HolderSet<Item> items,
         /**
          * Cooler rod: reduces or absorbs heat.
          */
-        COOLER
+        COOLER,
+
+        NONE
         ;
 
         @Override

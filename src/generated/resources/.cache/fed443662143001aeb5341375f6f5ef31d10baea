@@ -1,8 +1,8 @@
-// 1.20.1	2026-04-24T23:54:21.7228063	CreateNuclear Generated Registry Entries
+// 1.20.1	2026-05-27T16:14:47.9357255	CreateNuclear Generated Registry Entries
 aa1897ff27a6aa83e2efbee29e12ad6dab2f6a0a data/createnuclear/createnuclear/fluids/type/fallback.json
 d7c754aa51cea393a10bce85986c1c0c641150d5 data/createnuclear/createnuclear/fluids/type/nitrogen.json
 afee3d8f15bf8285e175f73befba7b46fdc94b19 data/createnuclear/createnuclear/fluids/type/water.json
-6df0fec4d8ee202479f435e6d45b397d54dab29c data/createnuclear/createnuclear/rods/type/fallback.json
+4316ed7bbe868eb35b802bbbde11d9466f8d707f data/createnuclear/createnuclear/rods/type/fallback.json
 9b26dc9810e426fa58e03de22a96f45403e5f1b3 data/createnuclear/damage_type/fan_radiation.json
 8c374052eefd34e87959a1f643e60b674f0345f8 data/createnuclear/damage_type/radiation.json
 5edbd74546f4088818e02bb7a5c5eb2ecfe25623 data/createnuclear/forge/biome_modifier/lead_ore.json

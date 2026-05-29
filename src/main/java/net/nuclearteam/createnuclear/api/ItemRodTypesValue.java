@@ -17,7 +17,7 @@ public class ItemRodTypesValue {
      * Default RodType returned when no mapping exists in the registry.
      * Built once to avoid allocating a new instance on each lookup.
      */
-    public static final RodType DEFAULT_ROD_TYPE = new RodType(HolderSet.direct(Collections.emptyList()), -1, -1, -1, null);
+    public static final RodType DEFAULT_ROD_TYPE = new RodType(HolderSet.direct(Collections.emptyList()), -1, -1, -1, RodType.TypeRod.NONE);
 
     /**
      * Get the {@link RodType} associated with the given {@link Item}.

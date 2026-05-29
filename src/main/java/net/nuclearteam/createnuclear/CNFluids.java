@@ -10,6 +10,8 @@ import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageEffects;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -22,6 +24,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.feature.SnowAndFreezeFeature;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.SoundActions;
@@ -118,27 +121,50 @@ public class CNFluids {
 
     public static void register() {}
 
-    public static int TICK = 0;
-
     public static void handleFluidEffect(LivingEvent.LivingTickEvent event) {
-
         LivingEntity entity = event.getEntity();
-        if (entity.isAlive() && !(entity.isSpectator())) {
-            if (entity.tickCount % 20 == 0) return;
-            if (entity.isInFluidType(URANIUM.getType())) {
+        if (!entity.isAlive() || entity.isSpectator()) return;
+
+        Level level = entity.level();
+
+        // 1. EFFET DE L'URANIUM (Radiation)
+        if (entity.isInFluidType(URANIUM.getType())) {
+            if (entity.tickCount % 20 == 0) {
                 entity.addEffect(new MobEffectInstance(CNEffects.RADIATION.get(), 100, 0));
-            } else if (entity.isInFluidType(LIQUID_NITROGEN.getType())) {
-                if (!entity.isFullyFrozen()) {
-                    entity.setTicksFrozen(CNFluids.TICK++);
-                }
-                entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
-            } else if (entity.isInFluidType(THORIUM.getType())) {
-                entity.lavaHurt();
-            } else {
-                CNFluids.TICK = 0;
             }
         }
 
+        // 2. EFFET DE L'AZOTE LIQUIDE (Gel type Neige Poudreuse)
+        else if (entity.isInFluidType(LIQUID_NITROGEN.getType())) {
+            // PROBLÈME 1 RÉSOLU : Si l'entité est en feu, on l'éteint immédiatement
+            if (entity.isOnFire()) {
+                entity.clearFire();
+            }
+
+            int currentTicks = entity.getTicksFrozen();
+            int maxTicks = entity.getTicksRequiredToFreeze();
+            int freezeSpeed = 3;
+
+            if (level.isClientSide) {
+                // On vise maxTicks + 1 pour que la baisse de -1 du client ramène pile à maxTicks
+                entity.setTicksFrozen(Math.min(maxTicks + 1, currentTicks + freezeSpeed + 1));
+            } else {
+                // On vise maxTicks + 2 pour que la baisse de -2 du serveur ramène pile à maxTicks
+                entity.setTicksFrozen(Math.min(maxTicks + 2, currentTicks + freezeSpeed + 2));
+
+                // PROBLÈME 2 RÉSOLU : On vérifie le gel APRÈS modification ou avec la compensation
+                if (entity.getTicksFrozen() >= maxTicks && entity.tickCount % 10 == 0) {
+                    entity.hurt(entity.damageSources().freeze(), 2.0F);
+                }
+
+                entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1, true, false, false));
+            }
+        }
+
+        // 3. EFFET DU THORIUM (Brûlure)
+        else if (entity.isInFluidType(THORIUM.getType())) {
+            entity.lavaHurt();
+        }
     }
 
     public static void registerFluidInteractions() {
