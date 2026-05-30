@@ -28,7 +28,6 @@ public class CreateNuclearClient extends CNClientProxy {
         PonderIndex.addPlugin(new CreateNuclearPonderPlugin());
     }
 
-    @SuppressWarnings("removal")
     @Override
     public void commonInit() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -40,19 +39,5 @@ public class CreateNuclearClient extends CNClientProxy {
         registry.registerSpecial(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD.get(), new NuclearMushroomCloudParticle.Factory());
         registry.registerSpriteSet(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD_SMOKE.get(), SmallNuclearExplosionParticle.NukeFactory::new);
         registry.registerSpriteSet(CNParticleRegistry.NUCLEAR_MUSHROOM_CLOUD_EXPLOSION.get(), SmallNuclearExplosionParticle.NukeFactory::new);
-        ItemProperties.register(CNItems.ANTI_RADIATION_HELMETS.asItem(), CreateNuclear.asResource("cloth"),
-            (itemStack, clientLevel, livingEntity, i) -> {
-                CompoundTag tag = itemStack.getOrCreateTag();
-                CreateNuclear.LOGGER.warn("ItemProperties::register tag: {}, {}", tag.toString(), itemStack);
-                if (!tag.contains("Cloth")) return 0f;
-
-                return switch (tag.getString("Cloth")){
-                    case "black" -> 1f;
-                    case "blue" -> 2f;
-                    default -> 0f;
-                };
-
-            }
-        );
     }
 }
