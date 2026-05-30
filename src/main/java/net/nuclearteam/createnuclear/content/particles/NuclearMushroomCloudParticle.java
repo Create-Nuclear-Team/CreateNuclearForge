@@ -65,8 +65,8 @@ public class NuclearMushroomCloudParticle extends Particle {
             ((AlexscaveCompat)alexscaveHandler).NukeParam();
         }
         else {
-            ((CNClientProxy) CreateNuclear.PROXY).renderNukeSkyDarkFor = 70;
-            ((CNClientProxy) CreateNuclear.PROXY).muteNonNukeSoundsFor = 50;
+            CNClientProxy.renderNukeSkyDarkFor = 70;
+            CNClientProxy.muteNonNukeSoundsFor = 50;
         }
         boolean large = this.scale > 2.0F;
         if(age > BALL_FOR / 2 + 5){
@@ -94,7 +94,7 @@ public class NuclearMushroomCloudParticle extends Particle {
                     playedRinging = true;
                     playSound(CNSoundEvents.NUCLEAR_EXPLOSION_RINGING.getMainEvent(), 100, 50, 0.05F, true);
                 }
-                ((CNClientProxy) CreateNuclear.PROXY).renderNukeFlashFor = 16;
+                CNClientProxy.renderNukeFlashFor = 16;
             }
         } else if (age < lifetime - FADE_SPEED) {
             float life = (float) (Math.log(1 + (age - BALL_FOR) / (float) (lifetime - BALL_FOR))) * 2F;
