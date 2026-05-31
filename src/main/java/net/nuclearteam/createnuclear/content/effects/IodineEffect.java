@@ -13,7 +13,7 @@ public class IodineEffect extends MobEffect {
     protected IodineEffect(MobEffectCategory pCategory, int pColor) {
         super(pCategory, pColor);
 
-        this.addAttributeModifier(CNAttributes.IRRADIATED_RESISTANCE.get(), IODINE_UUID.toString(), .75D, AttributeModifier.Operation.ADDITION);
+        this.addAttributeModifier(CNAttributes.IRRADIATED_RESISTANCE.get(), IODINE_UUID.toString(), 1D, AttributeModifier.Operation.ADDITION);
     }
 
     public IodineEffect() {
