@@ -13,7 +13,7 @@ public class CRods extends ConfigBase {
     public final ConfigInt baseValueUranium = i(64, -70, 70, "Base heat value for uranium rods", Comments.warning, Comments.uraniumBaseValue);
 
     public final ConfigInt graphiteRodLifetime = i(3600, 100, 5000, "Graphite (cooling) rod lifetime (in ticks)", Comments.graphiteRodLifetime, Comments.hintTick);
-    public final ConfigInt graphiteProxyMalus = i(-1/4, -70, 70, "Heat penalty from nearby graphite rods", Comments.warning, Comments.graphiteProximityMalus);
+    public final ConfigFloat graphiteProxyMalus = f((float) -1/4, -70, 70, "Heat penalty from nearby graphite rods", Comments.warning, Comments.graphiteProximityMalus);
     public final ConfigInt baseValueGraphite = i(-32, -50, 50, "Base heat value for graphite rods", Comments.warning, Comments.graphiteBaseValue);
 
 
