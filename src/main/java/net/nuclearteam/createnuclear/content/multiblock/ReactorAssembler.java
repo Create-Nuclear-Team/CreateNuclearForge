@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock;
 
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -38,7 +39,7 @@ public final class ReactorAssembler {
         CreateNuclear.LOGGER.warn("ReactorAssembler#assemble id: {}, size: {}, name: {}",
                 result.id(), result.data().getSize(), result.data().getName());
 
-        sendMessageToPlayer(level, pos, Component.translatable("createnuclear.notification.reactor.assembled"), !entity.isAssembled());
+        sendMessageToPlayer(level, pos, CreateNuclearLang.translate("notification.reactor.assembled"), !entity.isAssembled());
 
         switch (result.data()) {
             case REACTOR_T1 -> entity.getAdvancement().awardPlayer(CNAdvancement.T1_REACTOR);
@@ -60,7 +61,7 @@ public final class ReactorAssembler {
         BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity);
         if (result != null) return;
 
-        sendMessageToPlayer(level, pos, Component.translatable("createnuclear.notification.reactor.disassembled"), true);
+        sendMessageToPlayer(level, pos, CreateNuclearLang.translate("notification.reactor.disassembled"), true);
 
         entity.setAssembled(false);
         entity.removeIOAll();
@@ -117,7 +118,7 @@ public final class ReactorAssembler {
         return level.getEntitiesOfClass(Player.class, box);
     }
 
-    private static void sendMessageToPlayer(Level level, BlockPos pos, MutableComponent component, boolean condition) {
+    private static void sendMessageToPlayer(Level level, BlockPos pos, LangBuilder component, boolean condition) {
         if (!condition) return;
 
         NotifyUtil.sendActionBar(level, pos,

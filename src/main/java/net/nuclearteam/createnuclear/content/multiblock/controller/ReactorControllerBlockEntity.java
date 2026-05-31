@@ -197,7 +197,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     public CNAdvancementBehaviour getAdvancement() {
-        CreateNuclear.LOGGER.warn("Advancement behaviour not implemented yet!: {}", this.advancement);
         return this.advancement;
     }
 
@@ -507,8 +506,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             // --- MOMENT DE L'EXPLOSION ---
             if (explosionCountdown >= 300) {
                 NotifyUtil.sendTitle(level, getBlockPos(),
-                        CreateNuclearLang.translate("notification.reactor.critical_failure").string(),
-                        CreateNuclearLang.translate("notification.reactor.imminent_explosion").string(),
+                        CreateNuclearLang.translate("notification.reactor.critical_failure"),
+                        CreateNuclearLang.translate("notification.reactor.imminent_explosion"),
                         ChatFormatting.DARK_RED, configRadius, configWarnAll, 0, 40, 10);
 
                 triggerNuclearExplosion();
@@ -668,8 +667,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (level instanceof ServerLevel serverLevel) {
             // --- MESSAGE D'EXPLOSION FINALE (TRADUIT) ---
             NotifyUtil.sendTitle(level, getBlockPos(),
-                    CreateNuclearLang.translate("notification.reactor.destroyed").string(),
-                    CreateNuclearLang.translate("notification.reactor.meltdown_finished").string(),
+                    CreateNuclearLang.translate("notification.reactor.destroyed"),
+                    CreateNuclearLang.translate("notification.reactor.meltdown_finished"),
                     ChatFormatting.DARK_RED, configRadius, configWarnAll, 10, 60, 20);
 
             NuclearExplosionEntity explosion = new NuclearExplosionEntity(

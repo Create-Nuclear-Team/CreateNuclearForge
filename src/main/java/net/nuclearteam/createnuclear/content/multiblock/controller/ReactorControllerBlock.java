@@ -176,5 +176,4 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     public BlockEntityType<? extends ReactorControllerBlockEntity> getBlockEntityType() {
         return CNBlockEntityTypes.REACTOR_CONTROLLER.get();
     }
-
 }
