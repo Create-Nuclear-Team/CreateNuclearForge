@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -14,11 +15,16 @@ import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.List;
 
 public final class ReactorAssembler {
+
+    public static final int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+    public static final boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
     private ReactorAssembler() {}
 
@@ -32,7 +38,7 @@ public final class ReactorAssembler {
         CreateNuclear.LOGGER.warn("ReactorAssembler#assemble id: {}, size: {}, name: {}",
                 result.id(), result.data().getSize(), result.data().getName());
 
-        sendMessageToPlayer(level, pos, Component.translatable("reactor.info.assembled.creator"), !entity.isAssembled());
+        sendMessageToPlayer(level, pos, Component.translatable("createnuclear.notification.reactor.assembled"), !entity.isAssembled());
 
         switch (result.data()) {
             case REACTOR_T1 -> entity.getAdvancement().awardPlayer(CNAdvancement.T1_REACTOR);
@@ -54,7 +60,7 @@ public final class ReactorAssembler {
         BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity);
         if (result != null) return;
 
-        sendMessageToPlayer(level, pos, Component.translatable("reactor.info.assembled.destroyer"), true);
+        sendMessageToPlayer(level, pos, Component.translatable("createnuclear.notification.reactor.disassembled"), true);
 
         entity.setAssembled(false);
         entity.removeIOAll();
@@ -105,6 +111,7 @@ public final class ReactorAssembler {
         return null;
     }
 
+    @Deprecated
     private static List<Player> getPlayersInRadius(Level level, BlockPos center, double radius) {
         AABB box = new AABB(center).inflate(radius);
         return level.getEntitiesOfClass(Player.class, box);
@@ -112,8 +119,10 @@ public final class ReactorAssembler {
 
     private static void sendMessageToPlayer(Level level, BlockPos pos, MutableComponent component, boolean condition) {
         if (!condition) return;
-        for (Player player : getPlayersInRadius(level, pos, 30D)) {
-            player.sendSystemMessage(component);
-        }
+
+        NotifyUtil.sendActionBar(level, pos,
+                component,
+                ChatFormatting.GOLD, configRadius, configWarnAll
+        );
     }
 }

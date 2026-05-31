@@ -495,13 +495,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                 NotifyUtil.sendActionBar(level, getBlockPos(),
                         CreateNuclearLang.translate("notification.reactor.meltdown_in")
                                 .add(CreateNuclearLang.number(secondsLeft))
-                                .add(CreateNuclearLang.translate("generic.unit.seconds"))
-                                .string(),
+                                .add(CreateNuclearLang.translate("generic.unit.seconds")),
                         flashColor, configRadius, configWarnAll);
 
             } else if (secondsLeft > 10 && explosionCountdown % 20 == 0) {
                 NotifyUtil.sendActionBar(level, getBlockPos(),
-                        CreateNuclearLang.translate("notification.reactor.overheating").string(),
+                        CreateNuclearLang.translate("notification.reactor.overheating"),
                         ChatFormatting.DARK_RED, configRadius, configWarnAll);
             }
 
@@ -519,7 +518,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             // --- CŒUR STABILISÉ ---
             if (explosionCountdown > 0) {
                 NotifyUtil.sendActionBar(level, getBlockPos(),
-                        CreateNuclearLang.translate("notification.reactor.stabilized").string(),
+                        CreateNuclearLang.translate("notification.reactor.stabilized"),
                         ChatFormatting.GREEN, configRadius, configWarnAll);
             }
             explosionCountdown = 0;
