@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.content.effects.capability;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
@@ -11,7 +12,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
@@ -22,16 +23,18 @@ import net.nuclearteam.createnuclear.CNPackets;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.radiation.IRadiationSource;
 import net.nuclearteam.createnuclear.api.radiation.RadiationRegistry;
-import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
 import net.nuclearteam.createnuclear.foundation.networking.radiation.RadiationSyncPacket;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.RADIATION_VALUE;
 import net.nuclearteam.createnuclear.foundation.utility.InventoryHashUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
+import java.util.Objects;
+
 public class RadiationCapability implements IRadiationCapability {
     private double radiation;
     private long inventoryHash;
+    private ResourceLocation lastBiomeLocation;
 
     @Override
     public double getRadiation() {
@@ -53,6 +56,16 @@ public class RadiationCapability implements IRadiationCapability {
         this.inventoryHash = hash;
     }
 
+    @Override
+    public ResourceLocation getLastBiomeLocation() {
+        return this.lastBiomeLocation;
+    }
+
+    @Override
+    public void setLastBiomeLocation(ResourceLocation location) {
+        this.lastBiomeLocation = location;
+    }
+
     public static void attach(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player) {
             event.addCapability(CreateNuclear.asResource("irradiated_resistance"), new RadiationProvider());
@@ -68,40 +81,54 @@ public class RadiationCapability implements IRadiationCapability {
         if (level.isClientSide) return;
 
         player.getCapability(RadiationProvider.CAP).ifPresent(cap -> {
-            long newHash = InventoryHashUtil.compute(player);
+            boolean needsSync = false;
 
+            long newHash = InventoryHashUtil.compute(player);
             if (newHash != cap.getInventoryHash()) {
                 cap.setInventoryHash(newHash);
-
-                double radiation = 0;
-
-                if (CNConfigs.server().radiation.enabledItemRadiation.get()) {
-                    for (ItemStack stack : player.getInventory().items) {
-                        if (stack.getItem() instanceof IRadiationSource source) {
-                            radiation += source.getRadiation(stack, player);
-                        }
-                        radiation += RadiationRegistry.getRadiation(stack, player);
-                    }
-
-                    for (ItemStack stack : player.getInventory().offhand) {
-                        if (stack.getItem() instanceof IRadiationSource source) {
-                            radiation += source.getRadiation(stack, player);
-                        }
-                        radiation += RadiationRegistry.getRadiation(stack, player);
-                    }
-                }
-
-                double resistance = getRadiationResistance(player);
-//                CreateNuclear.LOGGER.warn("Radiation: {}, resistance: {}, calcule: {}", radiation, resistance, (1.0 - resistance));
-                radiation *= (1.0 - resistance);
-
-                cap.setRadiation(Math.max(0, radiation));
-
-                CNPackets.getChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new RadiationSyncPacket(radiation));
+                cap.setRadiation(Math.max(0, computeItemRadiation(player)));
+                needsSync = true;
             }
 
-            applyEffects(player, cap.getRadiation());
+            ResourceKey<Biome> biomeKey = level.getBiome(player.blockPosition()).unwrapKey().orElse(null);
+            ResourceLocation biomeLoc = biomeKey != null ? biomeKey.location() : null;
+            if (!Objects.equals(biomeLoc, cap.getLastBiomeLocation())) {
+                cap.setLastBiomeLocation(biomeLoc);
+                needsSync = true;
+            }
+
+            if (!CNConfigs.server().radiation.enabledItemRadiation.get()) return;
+
+            double totalRaw = cap.getRadiation() + getRawBiomeRadiation(biomeKey);
+            double resistance = getRadiationResistance(player);
+            double totalRadiation = totalRaw * (1.0 - resistance);
+
+            if (needsSync) {
+                CNPackets.getChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new RadiationSyncPacket(totalRadiation));
+            }
+
+            applyEffects(player, totalRadiation);
         });
+    }
+
+    private static double computeItemRadiation(Player player) {
+        double radiation = 0;
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.getItem() instanceof IRadiationSource source)
+                radiation += source.getRadiation(stack, player);
+            radiation += RadiationRegistry.getRadiation(stack, player);
+        }
+        for (ItemStack stack : player.getInventory().offhand) {
+            if (stack.getItem() instanceof IRadiationSource source)
+                radiation += source.getRadiation(stack, player);
+            radiation += RadiationRegistry.getRadiation(stack, player);
+        }
+        return radiation;
+    }
+
+    private static double getRawBiomeRadiation(ResourceKey<Biome> biomeKey) {
+        if (biomeKey == null) return 0;
+        return RadiationRegistry.get(biomeKey);
     }
 
     public static double getRadiationResistance(LivingEntity entity) {
@@ -113,7 +140,7 @@ public class RadiationCapability implements IRadiationCapability {
 
 //        resistance += getArmorResistance(entity.getArmorSlots());
 
-        return Mth.clamp(resistance, 0.0,1.0);
+        return Mth.clamp(resistance, 0.0, 1.0);
     }
 
     private static double getArmorResistance(Iterable<ItemStack> stacks) {
