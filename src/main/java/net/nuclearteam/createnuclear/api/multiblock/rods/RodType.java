@@ -36,11 +36,11 @@ import java.util.function.Predicate;
  */
 @MethodsReturnNonnullByDefault
 public record RodType(HolderSet<Item> items,
-                      int baseRodHeat, int proximityRodHeat,
+                      int baseRodHeat, float proximityRodHeat,
                       int rodTimer, TypeRod type, boolean useConfig) {
 
     public RodType(HolderSet<Item> items,
-                   int baseRodHeat, int proximityRodHeat,
+                   int baseRodHeat, float proximityRodHeat,
                    int rodTimer, TypeRod type) {
         this(items, baseRodHeat, proximityRodHeat, rodTimer, type, false);
     }
@@ -51,7 +51,7 @@ public record RodType(HolderSet<Item> items,
     public static final Codec<RodType> CODEC = RecordCodecBuilder.create(i -> i.group(
         RegistryCodecs.homogeneousList(Registries.ITEM).fieldOf("items").forGetter(RodType::items),
         Codec.INT.fieldOf("baseRodHeat").forGetter(RodType::baseRodHeat),
-        Codec.INT.fieldOf("proximityRodHeat").forGetter(RodType::proximityRodHeat),
+        Codec.FLOAT.fieldOf("proximityRodHeat").forGetter(RodType::proximityRodHeat),
         Codec.INT.fieldOf("rodTimer").forGetter(RodType::rodTimer),
         StringRepresentable.fromEnum(TypeRod::values).fieldOf("type").forGetter(RodType::type)
     ).apply(i, RodType::new));
@@ -246,10 +246,10 @@ public record RodType(HolderSet<Item> items,
     }
 
     @Override
-    public int proximityRodHeat() {
+    public float proximityRodHeat() {
         if (!useConfig) return proximityRodHeat;
         try {
-            return (int) switch (type) {
+            return switch (type) {
                 case FUEL -> CNConfigs.server().rods.uraniumProxyBonus.get();
                 case COOLER -> Math.round(CNConfigs.server().rods.graphiteProxyMalus.get());
                 default -> proximityRodHeat;

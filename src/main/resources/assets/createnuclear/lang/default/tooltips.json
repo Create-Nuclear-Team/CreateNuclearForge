@@ -44,7 +44,7 @@
 
   "createnuclear.tooltip.statRod": "Rod Stat Pattern:",
   "createnuclear.tooltip.baseRodHeat": "Base Rod Heat: %d Q",
-  "createnuclear.tooltip.proximityRodHeat": "Proximity Rod Heat: %d Q",
+  "createnuclear.tooltip.proximityRodHeat": "Proximity Rod Heat: %.2f Q",
   "createnuclear.tooltip.rodTimer": "Rod Duration: %d tick",
   "createnuclear.tooltip.typeRod": "Rod Type: %s",
   "createnuclear.tooltip.cloth.color": "Color of armor piece: %s",

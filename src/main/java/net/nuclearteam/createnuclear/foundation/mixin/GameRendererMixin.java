@@ -2,7 +2,6 @@ package net.nuclearteam.createnuclear.foundation.mixin;
 
 import net.minecraft.client.renderer.GameRenderer;
 import net.nuclearteam.createnuclear.CNClientProxy;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,8 +21,7 @@ public abstract class GameRendererMixin {
             at = @At(value = "TAIL")
     )
     public void cn_tick(CallbackInfo ci) {
-        // On utilise ton propre Proxy
-        if (((CNClientProxy) CreateNuclear.PROXY).renderNukeSkyDarkFor > 0 && darkenWorldAmount < 1.0F) {
+        if (CNClientProxy.renderNukeSkyDarkFor > 0 && darkenWorldAmount < 1.0F) {
             darkenWorldAmount = Math.min(darkenWorldAmount + 0.3F, 1.0F);
         }
     }
@@ -39,6 +37,6 @@ public abstract class GameRendererMixin {
             )
     )
     public void cn_render(float partialTick, long nanos, boolean idk, CallbackInfo ci) {
-        ((CNClientProxy) CreateNuclear.PROXY).preScreenRender(partialTick);
+        CNClientProxy.preScreenRender(partialTick);
     }
 }

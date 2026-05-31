@@ -31,6 +31,9 @@ import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFl
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -41,14 +44,20 @@ import java.util.List;
 @SuppressWarnings("deprecation")
 public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock implements IWrenchable, IBE<ReactorControllerBlockEntity> {
     public static final BooleanProperty ASSEMBLED = BooleanProperty.create("assembled");
+    public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
 
     public ReactorControllerBlock(Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(FACING, net.minecraft.core.Direction.NORTH)
+                .setValue(ASSEMBLED, false)
+                .setValue(ACTIVE, false) // Par défaut inactif
+        );
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING).add(ASSEMBLED);
+        builder.add(FACING).add(ASSEMBLED).add(ACTIVE);
         super.createBlockStateDefinition(builder);
     }
 
@@ -56,7 +65,8 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState()
                 .setValue(FACING, context.getHorizontalDirection().getOpposite())
-                .setValue(ASSEMBLED, false);
+                .setValue(ASSEMBLED, false)
+                .setValue(ACTIVE, false);
     }
     @Override
     public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos,
@@ -78,7 +88,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         }
 
         if (!state.getValue(ASSEMBLED)) {
-            player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
+            // player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
         }
         else {
             if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty() && heldItem.getTag() != null){
@@ -127,12 +137,16 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             PersistentFluidLocks.get(serverLevel).clearLock(pos);
         } else FluidLockManager.clearLock(pos);
 
-        List<? extends Player> players = worldIn.players();
-        for (Player p : players) {
-            p.sendSystemMessage(Component.translatable("reactor.info.assembled.destroyer"));
-        }
-    }
+          if (!state.getValue(ASSEMBLED))
+            return;
 
+        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+        NotifyUtil.sendActionBar(worldIn, pos,
+                CreateNuclearLang.translate("notification.reactor.disassembled").string(),
+                ChatFormatting.GOLD, configRadius, configWarnAll
+        );
+    }
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
@@ -150,6 +164,47 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         if (!entity.isAssembled()) return;
         for (Player p : level.players()) {
             p.sendSystemMessage(Component.translatable("reactor.info.assembled.creator"));
+        }
+//        entity.removeIOAll();
+    }
+
+    // this is the Function that verifies if the pattern is correct (as a test, we added the energy output)
+    public void Verify(BlockState state, BlockPos pos, Level level, List<? extends Player> players, boolean create){
+        ReactorControllerBlock controller = (ReactorControllerBlock) level.getBlockState(pos).getBlock();
+        ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos);
+        if (entity == null) return;
+        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
+        BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity); // control the pattern
+        if (result != null) { // the pattern is correct
+            CreateNuclear.LOGGER.warn("Verify@BlockPattern<TypeMultiblock> id: {}, data<TypeMultiblock>$getSize: {}, data<TypeMultiblock>$getName: {}", result.id(), result.data().getSize(), result.data().getName());
+//            entity.removeIOAll();
+            if (create && !entity.isAssembled()) {
+                NotifyUtil.sendActionBar(level, pos,
+                        CreateNuclearLang.translate("notification.reactor.assembled").string(),
+                        ChatFormatting.GOLD, configRadius, configWarnAll
+                );
+                level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, true));
+                entity.setMultiblockSize(result.data().getSize());
+                entity.setAssembled(true);
+
+                entity.setMultiblockStructure(entity.getStructureBounds(pos, entity.getMultiblockSize(), entity.getMultiblockFacing()));
+                // Register existing special blocks (inputs/outputs) so the controller
+                // detects ReactorInput/ReactorOutput placed before the controller.
+                FindSpecialBlocksInReactor(entity.getMultiblockPos(), entity, level);
+            }
+            return;
+        }
+
+        // the pattern is incorrect
+        if (!create && entity.isAssembled()) {
+            NotifyUtil.sendActionBar(level, pos,
+                    CreateNuclearLang.translate("notification.reactor.disassembled").string(),
+                    ChatFormatting.GOLD, configRadius, configWarnAll
+            );
+            level.setBlockAndUpdate(pos, state.setValue(ASSEMBLED, false).setValue(ACTIVE, false));
+            entity.setAssembled(false);
+            entity.removeIOAll();
         }
     }
 

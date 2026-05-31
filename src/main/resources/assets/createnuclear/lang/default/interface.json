@@ -87,6 +87,8 @@
   "createnuclear.notification.reactor.stabilized": "CORE STABILIZED",
   "createnuclear.notification.reactor.destroyed": "REACTOR DESTROYED",
   "createnuclear.notification.reactor.meltdown_finished": "Critical meltdown completed",
+  "createnuclear.notification.reactor.disassembled": "Reactor has been disassembled",
+  "createnuclear.notification.reactor.assembled": "Reactor has been assembled",
 
   "death.attack.createnuclear.radiation": "%1$s died from radiation",
   "death.attack.createnuclear.fan_radiation": "%1$s died from radiation blast"

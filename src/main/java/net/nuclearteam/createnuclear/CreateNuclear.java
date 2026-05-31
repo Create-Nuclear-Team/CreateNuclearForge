@@ -40,8 +40,6 @@ public class CreateNuclear {
     public static final String MOD_ID = "createnuclear";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static CNCommonProxy PROXY = DistExecutor.runForDist(() -> CreateNuclearClient::new, () -> CNCommonProxy::new);
-
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID)
             .defaultCreativeTab((ResourceKey<CreativeModeTab>) null);
 
@@ -88,8 +86,6 @@ public class CreateNuclear {
         CNRecipeTypes.register(modEventBus);
 //        CNSounds.register(modEventBus);
         CNAttributes.register(modEventBus);
-
-        PROXY.commonInit();
 
         GogglesItem.addIsWearingPredicate(IGoggleHelmet::isGoggleHelmet);
 
