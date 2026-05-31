@@ -1,8 +1,10 @@
 package net.nuclearteam.createnuclear.foundation.utility;
 
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
@@ -15,6 +17,11 @@ import java.util.List;
 
 public class NotifyUtil {
 
+
+    public static void sendActionBar(Level level, BlockPos pos, LangBuilder message, ChatFormatting color, int radius, boolean warnAll) {
+        sendActionBar(level, pos, message.component(), color, radius, warnAll);
+    }
+
     /**
      * Envoie un message dans l'Action Bar (au-dessus de la barre d'inventaire).
      * Plus propre et moins intrusif que les titres géants.
@@ -25,11 +32,11 @@ public class NotifyUtil {
      * @param radius   Distance maximale pour recevoir l'alerte
      * @param warnAll  Si vrai, tout le serveur reçoit le message
      */
-    public static void sendActionBar(Level level, BlockPos pos, String message, ChatFormatting color, int radius, boolean warnAll) {
+    public static void sendActionBar(Level level, BlockPos pos, MutableComponent message, ChatFormatting color, int radius, boolean warnAll) {
         if (level.isClientSide) return;
 
         // Création du composant texte en GRAS avec la couleur choisie
-        Component actionBarComp = Component.literal(message).withStyle(color, ChatFormatting.BOLD);
+        Component actionBarComp = message.withStyle(color, ChatFormatting.BOLD);
 
         List<ServerPlayer> targets = getTargetPlayers(level, pos, radius, warnAll);
 

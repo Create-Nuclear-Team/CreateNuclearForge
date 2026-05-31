@@ -4,6 +4,7 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nuclearteam.createnuclear.CNSoundEvents;
@@ -12,12 +13,15 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorContro
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 
 import java.util.List;
 
 public class ReactorAlarmEntity extends SmartBlockEntity {
 
     public ReactorControllerBlockEntity controller = null;
+    private CNAdvancementBehaviour advancement;
 
     @OnlyIn(Dist.CLIENT)
     protected ReactorAlarmSoundInstance soundInstance;
@@ -31,14 +35,18 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
         super.tick();
         if (level == null || !(getBlockState().getBlock() instanceof ReactorAlarm)) return;
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            try {
-                tickAudio();
-            } catch (Exception e) {
-                // Log l'erreur si nécessaire, mais évite les crashes
-                CreateNuclear.LOGGER.warn(e.getMessage());
-            }
-        });
+        if (level.isClientSide) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+                try {
+                    tickAudio();
+                } catch (Exception e) {
+                    // Log l'erreur si nécessaire, mais évite les crashes
+                    CreateNuclear.LOGGER.warn(e.getMessage());
+                }
+            });
+        }
+
+        tickServer();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -76,8 +84,22 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
         }
     }
 
+    private void tickServer() {
+        BlockState state = getBlockState();
+
+        if (!(state.getBlock() instanceof ReactorAlarm)) return;
+
+        boolean powered = state.getValue(ReactorAlarm.POWERED);
+
+        if (powered) {
+            this.advancement.awardPlayer(CNAdvancement.SILENCE_THE_CORE);
+        }
+    }
+
     @Override
-    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
+    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
+        behaviours.add(advancement = new CNAdvancementBehaviour(this, CNAdvancement.SILENCE_THE_CORE));
+    }
 
     public void setController(ReactorControllerBlockEntity controller) {
         this.controller = controller;

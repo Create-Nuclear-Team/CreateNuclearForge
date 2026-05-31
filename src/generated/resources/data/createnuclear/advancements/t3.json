@@ -1,25 +1,25 @@
 {
-  "parent": "createnuclear:root",
+  "parent": "createnuclear:t2",
   "criteria": {
     "0": {
       "conditions": {},
-      "trigger": "createnuclear:automatic_uranium_builtin"
+      "trigger": "createnuclear:t3_builtin"
     }
   },
   "display": {
     "announce_to_chat": true,
     "description": {
       "color": "#DBA213",
-      "translate": "advancement.createnuclear.automatic_uranium.desc"
+      "translate": "advancement.createnuclear.t3.desc"
     },
     "frame": "goal",
-    "hidden": true,
+    "hidden": false,
     "icon": {
-      "item": "createnuclear:uranium_powder"
+      "item": "createnuclear:reactor_controller"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancement.createnuclear.automatic_uranium"
+      "translate": "advancement.createnuclear.t3"
     }
   },
   "requirements": [

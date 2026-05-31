@@ -26,6 +26,8 @@ import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedA
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.IGoggleHelmet;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.CNFanProcessingTypes;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+import net.nuclearteam.createnuclear.foundation.advancement.CNTriggers;
 import net.nuclearteam.createnuclear.foundation.item.RodsStats;
 import net.nuclearteam.createnuclear.foundation.item.radiation.CNRadiationValues;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
@@ -104,6 +106,9 @@ public class CreateNuclear {
             CNOpenPipeEffectHandlers.registerDefaults();
             CNRadiationValues.register();
         });
+
+        CNAdvancement.register();
+        CNTriggers.register();
     }
 
     public static void onRegister(final RegisterEvent event) {

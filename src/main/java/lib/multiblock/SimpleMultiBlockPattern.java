@@ -69,11 +69,6 @@ public record SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffset
         }
     }
 
-    @Override
-    public boolean matches(java.util.logging.Level level, BlockPos pos, Rotation rotation) {
-        return false;
-    }
-
     public List<MultiBlockOffsetPos> test() {
         return this.multiBlockOffsetPosList;
     }

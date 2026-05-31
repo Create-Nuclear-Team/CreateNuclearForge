@@ -4,9 +4,8 @@ import com.simibubi.create.api.registry.SimpleRegistry;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import net.minecraft.world.item.Item;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
+import static net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRod.NONE;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
 
 import net.minecraft.core.HolderSet;
@@ -17,7 +16,7 @@ public class ItemRodTypesValue {
      * Default RodType returned when no mapping exists in the registry.
      * Built once to avoid allocating a new instance on each lookup.
      */
-    public static final RodType DEFAULT_ROD_TYPE = new RodType(HolderSet.direct(Collections.emptyList()), -1, -1, -1, RodType.TypeRod.NONE);
+    public static final RodType DEFAULT_ROD_TYPE = new RodType(HolderSet.direct(Collections.emptyList()), -1, -1, -1, NONE);
 
     /**
      * Get the {@link RodType} associated with the given {@link Item}.

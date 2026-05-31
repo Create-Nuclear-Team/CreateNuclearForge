@@ -161,7 +161,7 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
         if (!hasSource() || getGeneratedSpeed() > getTheoreticalSpeed())
         {
             assert level != null;
-            pattern.FindController(getBlockPos(), level, level.players(), true);
+            pattern.findController(getBlockPos(), level, true);
         }
     }
 

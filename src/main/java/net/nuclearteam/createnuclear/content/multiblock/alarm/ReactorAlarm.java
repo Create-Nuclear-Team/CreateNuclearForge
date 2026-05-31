@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear.content.multiblock.alarm;
 
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -17,6 +18,7 @@ import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 
 import javax.annotation.Nullable;
 
@@ -26,7 +28,7 @@ public class ReactorAlarm extends Block implements IBE<ReactorAlarmEntity> {
 
     public ReactorAlarm(Properties props) {
         super(props);
-        this.registerDefaultState(this.stateDefinition.any().setValue(POWERED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false));
     }
 
     // AJOUT : Inscription au multiblock lors de la pose
@@ -41,6 +43,12 @@ public class ReactorAlarm extends Block implements IBE<ReactorAlarmEntity> {
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         MultiblockHelpers.handleRemoval(pos, level, ReactorControllerBlockEntity::removeAlarm);
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, pPlacer, stack);
+        CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
     }
 
     // CORRECTION : Désinscription au multiblock lors du retrait (piston, explosion, etc.)

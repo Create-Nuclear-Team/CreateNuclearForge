@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -29,6 +30,7 @@ import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNShapes;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.block.MultiDirectionalReactorBlock;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,18 +72,11 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
         MultiblockHelpers.handleOnPlace(pos, level, ReactorControllerBlockEntity::addInput);
     }
 
-    // @Override // ! may be useless
-    // public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-    //     super.setPlacedBy(worldIn, pos, state, placer, stack);
-    //     if (worldIn.isClientSide)
-    //         return;
-    //     if (stack == null)
-    //         return;
-    //     withBlockEntityDo(worldIn, pos, be -> {
-    //         CompoundTag orCreateTag = stack.getOrCreateTag();
-    //         be.readInventory(orCreateTag.getCompound("Inventory"));
-    //     });
-    // }
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, pPlacer, stack);
+        CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
+    }
 
 
     @Override

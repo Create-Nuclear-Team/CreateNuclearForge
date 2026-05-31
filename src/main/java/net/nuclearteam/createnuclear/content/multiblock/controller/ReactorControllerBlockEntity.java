@@ -20,16 +20,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
@@ -45,8 +40,10 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.nuclearteam.createnuclear.*;
-import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
+
+import net.nuclearteam.createnuclear.CNBlocks;
+import net.nuclearteam.createnuclear.CNEntityType;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
@@ -54,23 +51,24 @@ import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.ConsumptionCycleManager;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
-import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
-import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
@@ -78,6 +76,8 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.service.IHeat
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultHeatService;
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.IPersistenceService;
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultPersistenceService;
+
+import java.util.Map;
 
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
@@ -112,6 +112,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private int[] reactorPos;
     private boolean needsToResolveEntities = false;
     private double fluidBuffer = 0.0;
+
+    private CNAdvancementBehaviour advancement;
 
     private final ReactorInputManagerI inputManager;
     private final ReactorOutputManagerI outputManager;
@@ -194,6 +196,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.reactorFacing = f;
     }
 
+    public CNAdvancementBehaviour getAdvancement() {
+        CreateNuclear.LOGGER.warn("Advancement behaviour not implemented yet!: {}", this.advancement);
+        return this.advancement;
+    }
+
+    /** Main constructor allowing dependency injection for testability and DIP compliance. */
     public int[] getMultiblockPos() {
         return this.reactorPos;
     }
@@ -238,7 +246,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
-
+        behaviours.add(advancement = new CNAdvancementBehaviour(this, CNAdvancement.T1_REACTOR, CNAdvancement.T2_REACTOR, CNAdvancement.T3_REACTOR, CNAdvancement.NO_TIME_TO_DIE, CNAdvancement.SILENCE_THE_CORE));
     }
 
     public boolean getAssembled() { // permet de savoir si le réacteur est formé ou pas.
@@ -487,13 +495,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                 NotifyUtil.sendActionBar(level, getBlockPos(),
                         CreateNuclearLang.translate("notification.reactor.meltdown_in")
                                 .add(CreateNuclearLang.number(secondsLeft))
-                                .add(CreateNuclearLang.translate("generic.unit.seconds"))
-                                .string(),
+                                .add(CreateNuclearLang.translate("generic.unit.seconds")),
                         flashColor, configRadius, configWarnAll);
 
             } else if (secondsLeft > 10 && explosionCountdown % 20 == 0) {
                 NotifyUtil.sendActionBar(level, getBlockPos(),
-                        CreateNuclearLang.translate("notification.reactor.overheating").string(),
+                        CreateNuclearLang.translate("notification.reactor.overheating"),
                         ChatFormatting.DARK_RED, configRadius, configWarnAll);
             }
 
@@ -511,7 +518,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             // --- CŒUR STABILISÉ ---
             if (explosionCountdown > 0) {
                 NotifyUtil.sendActionBar(level, getBlockPos(),
-                        CreateNuclearLang.translate("notification.reactor.stabilized").string(),
+                        CreateNuclearLang.translate("notification.reactor.stabilized"),
                         ChatFormatting.GREEN, configRadius, configWarnAll);
             }
             explosionCountdown = 0;
@@ -567,6 +574,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                 BlockState state = level.getBlockState(pos);
                 if (state.getBlock() instanceof ReactorAlarm && state.getValue(ReactorAlarm.POWERED) != activate) {
                     level.setBlock(pos, state.setValue(ReactorAlarm.POWERED, activate), 3);
+                    if (activate) this.advancement.awardPlayer(CNAdvancement.SILENCE_THE_CORE);
                 }
             }
         }

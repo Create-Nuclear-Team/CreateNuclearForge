@@ -18,14 +18,9 @@ public class MultiblockHelpers {
      * invoke provided callbacks to register or remove parts.
      */
     public static void handleOnPlace(BlockPos pos, Level level, BiConsumer<ReactorControllerBlockEntity, BlockPos> register) {
-        /**
-         * Called when a multiblock part is placed. Locates the controller and
-         * invokes {@code register} with the controller and placed part position.
-         */
-        List<? extends Player> players = level.players();
-        pattern.FindController(pos, level, players, true);
+        handleOnPlace(pos, level);
 
-        BlockPos controllerPos = pattern.findControllerPos(pos, level, players, true);
+        BlockPos controllerPos = pattern.findControllerPos(pos, level);
         if (controllerPos != null) {
             ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
             if (controllerBlockEntity != null) {
@@ -34,21 +29,16 @@ public class MultiblockHelpers {
         }
     }
 
-    public static void handleRemoval(BlockPos pos, Level level, BiConsumer<ReactorControllerBlockEntity, BlockPos> remover) {
-        /**
-         * Called when a multiblock part is removed. Locates the controller and
-         * invokes {@code remover} with the controller and removed part position.
-         */
-        List<? extends Player> players = level.players();
-        pattern.FindController(pos, level, players, false);
+    /**
+     * Called when a multiblock part is placed. Locates the controller and
+     * invokes {@code register} with the controller and placed part position.
+     */
+    public static void handleOnPlace(BlockPos pos, Level level) {
+        pattern.findController(pos, level, true);
+    }
 
-        BlockPos controllerPos = pattern.findControllerPos(pos, level, players, true);
-        if (controllerPos != null) {
-            ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
-            if (controllerBlockEntity != null) {
-                remover.accept(controllerBlockEntity, pos);
-            }
-        }
+    public static void handleRemoval(BlockPos pos, Level level, BiConsumer<ReactorControllerBlockEntity, BlockPos> remover) {
+        handleOnPlace(pos, level, remover);
     }
 
     public static ReactorControllerBlockEntity getControllerForPart(Level level, BlockPos pos) {
@@ -56,8 +46,7 @@ public class MultiblockHelpers {
          * Returns the controller entity for the given part position, or null
          * if no valid controller is found.
          */
-        List<? extends Player> players = level.players();
-        BlockPos controllerPos = pattern.findControllerPos(pos, level, players, true);
+        BlockPos controllerPos = pattern.findControllerPos(pos, level);
         if (controllerPos != null) {
             return  (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
         }

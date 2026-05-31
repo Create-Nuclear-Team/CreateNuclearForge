@@ -4,7 +4,7 @@ import net.createmod.catnip.config.ConfigBase;
 
 public class CNCCommon extends ConfigBase {
     public final CWorldGen worldGen = nested(0, CWorldGen::new, Comments.worldGen);
-    public final CNReactor NUCLEAR = nested(0, CNReactor::new);
+//    public final CNReactor NUCLEAR = nested(0, CNReactor::new);
 
     @Override
     public String getName() {

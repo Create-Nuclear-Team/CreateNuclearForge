@@ -1,26 +1,25 @@
 {
-  "parent": "createnuclear:anti_radiation_armor",
+  "parent": "createnuclear:root",
   "criteria": {
     "0": {
       "conditions": {},
-      "trigger": "createnuclear:dye_anti_radiation_armor_builtin"
+      "trigger": "createnuclear:silence_the_core_builtin"
     }
   },
   "display": {
     "announce_to_chat": false,
     "description": {
       "color": "#DBA213",
-      "translate": "advancement.createnuclear.dye_anti_radiation_armor.desc"
+      "translate": "advancement.createnuclear.silence_the_core.desc"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "createnuclear:default_anti_radiation_helmet",
-      "nbt": "{Damage:0}"
+      "item": "createnuclear:reactor_alarm"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancement.createnuclear.dye_anti_radiation_armor"
+      "translate": "advancement.createnuclear.silence_the_core"
     }
   },
   "requirements": [

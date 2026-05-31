@@ -3,7 +3,7 @@
   "criteria": {
     "0": {
       "conditions": {},
-      "trigger": "create:full_anti_radiation_armor_builtin"
+      "trigger": "createnuclear:full_anti_radiation_armor_builtin"
     }
   },
   "display": {
