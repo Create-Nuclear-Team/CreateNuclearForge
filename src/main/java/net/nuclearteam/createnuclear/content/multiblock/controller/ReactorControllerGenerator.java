@@ -5,6 +5,7 @@ import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 
 public class ReactorControllerGenerator extends SpecialBlockStateGen {
@@ -24,25 +25,44 @@ public class ReactorControllerGenerator extends SpecialBlockStateGen {
 
     @Override
     public <T extends Block> ModelFile getModel(DataGenContext<Block, T> ctx, RegistrateBlockstateProvider prov, BlockState state) {
-        // Sécurité si l'état est foireux au tout début du scan de Minecraft
-        if (state == null || !state.hasProperty(ReactorControllerBlock.ASSEMBLED) || !state.hasProperty(ReactorControllerBlock.ACTIVE)) {
-            return prov.models().cubeAll("block/reactor/controller/reactor_controller_off", prov.modLoc("block/reactor/controller/controller_panel_off"));
+        final String controllerPath = "block/reactor/controller/controller_panel_";
+
+        // Safety fallback if the state is invalid at the start of Minecraft's block scan
+        if (!state.hasProperty(ReactorControllerBlock.ASSEMBLED) || !state.hasProperty(ReactorControllerBlock.ACTIVE)) {
+            return prov.models()
+                    .withExistingParent("block/reactor/controller/" + ControllerVisualState.OFF.getSuffix(), prov.modLoc("block/reactor/controller/block"))
+                    .texture("1", prov.modLoc(controllerPath + ControllerVisualState.OFF.getSuffix()))
+                    .texture("particle", prov.modLoc(controllerPath + ControllerVisualState.OFF.getSuffix()));
         }
 
-        // Récupération de nos deux booléens natifs
-        boolean assembled = state.getValue(ReactorControllerBlock.ASSEMBLED);
-        boolean active = state.getValue(ReactorControllerBlock.ACTIVE);
+        boolean isAssembled = state.getValue(ReactorControllerBlock.ASSEMBLED);
+        boolean isActive = state.getValue(ReactorControllerBlock.ACTIVE);
 
-        // Déduction de l'état visuel
-        String suffix = "off";
-        if (assembled) {
-            suffix = active ? "on" : "standby";
+        ControllerVisualState controllerState = ControllerVisualState.OFF;
+        if (isAssembled) {
+            controllerState = isActive ? ControllerVisualState.ON : ControllerVisualState.STANDBY;
         }
 
-        // Génération automatique des fichiers comme avant
-        String modelName = "block/reactor/controller/reactor_controller_" + suffix;
-        String texturePath = "block/reactor/controller/controller_panel_" + suffix;
+        return prov.models()
+                .withExistingParent("block/reactor/controller/" + controllerState.getSuffix(), prov.modLoc("block/reactor/controller/block"))
+                .texture("1", prov.modLoc(controllerPath + controllerState.getSuffix()))
+                .texture("particle", prov.modLoc(controllerPath + controllerState.getSuffix()));
+    }
 
-        return prov.models().cubeAll(modelName, prov.modLoc(texturePath));
+    enum ControllerVisualState {
+        OFF("off"),
+        ON("on"),
+        STANDBY("standby")
+        ;
+
+        private final String suffix;
+
+        ControllerVisualState(String suffix) {
+            this.suffix = suffix;
+        }
+
+        public String getSuffix() {
+            return this.suffix;
+        }
     }
 }
