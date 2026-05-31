@@ -25,6 +25,7 @@ import net.nuclearteam.createnuclear.api.radiation.RadiationRegistry;
 import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
 import net.nuclearteam.createnuclear.foundation.networking.radiation.RadiationSyncPacket;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
+import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.RADIATION_VALUE;
 import net.nuclearteam.createnuclear.foundation.utility.InventoryHashUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
@@ -91,6 +92,7 @@ public class RadiationCapability implements IRadiationCapability {
                 }
 
                 double resistance = getRadiationResistance(player);
+//                CreateNuclear.LOGGER.warn("Radiation: {}, resistance: {}, calcule: {}", radiation, resistance, (1.0 - resistance));
                 radiation *= (1.0 - resistance);
 
                 cap.setRadiation(Math.max(0, radiation));
@@ -109,13 +111,21 @@ public class RadiationCapability implements IRadiationCapability {
 
         if (attribute != null) resistance += attribute.getValue();
 
-        for (ItemStack stack : entity.getArmorSlots()) {
-            if (!(stack.getItem() instanceof AntiRadiationArmorItem)) {
-                resistance -= 0.25;
+//        resistance += getArmorResistance(entity.getArmorSlots());
+
+        return Mth.clamp(resistance, 0.0,1.0);
+    }
+
+    private static double getArmorResistance(Iterable<ItemStack> stacks) {
+        double resistance = 0d;
+
+        for (ItemStack stack : stacks) {
+            if (stack.getItem() instanceof AntiRadiationArmorItem) {
+                resistance += RADIATION_VALUE;
             }
         }
 
-        return Mth.clamp(resistance, 0.0,1.0);
+        return resistance;
     }
 
     private static void applyEffects(Player player, double radiation) {
