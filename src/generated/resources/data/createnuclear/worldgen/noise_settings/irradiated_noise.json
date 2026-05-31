@@ -346,7 +346,7 @@
           "false_at_and_above": {
             "absolute": 4
           },
-          "random_name": "minecraft:lunaslate",
+          "random_name": "minecraft:enriched",
           "true_at_and_below": {
             "absolute": -4
           }

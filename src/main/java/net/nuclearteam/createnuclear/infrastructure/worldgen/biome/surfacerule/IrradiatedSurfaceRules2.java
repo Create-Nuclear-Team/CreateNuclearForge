@@ -1,7 +1,6 @@
 package net.nuclearteam.createnuclear.infrastructure.worldgen.biome.surfacerule;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -20,24 +19,24 @@ import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNNoiseData;
 import org.jetbrains.annotations.NotNull;
 
 public class IrradiatedSurfaceRules2 {
-    private static final ConditionSource IS_MARE = biome(CNBiomes.Irradiated.PLAIN);
+    private static final ConditionSource IS_IRRADIATED_PLAIN = biome(CNBiomes.Irradiated.PLAIN);
     private static final ConditionSource IS_HIGHLANDS = biome();
 
     private static final RuleSource BEDROCK = block(Blocks.BEDROCK);
-    private static final RuleSource LUNASLATE = block(CNBlocks.ENRICHED_SOUL_SOIL.get());
+    private static final RuleSource ENRICHED_SOUL_SOIL = block(CNBlocks.ENRICHED_SOUL_SOIL.get());
     private static final RuleSource MOON_DIRT = block(CNBlocks.STEEL_BLOCK.get());
-    private static final RuleSource MOON_ROCK = block(CNBlocks.LEAD_BLOCK.get());
-    private static final RuleSource MOON_TURF = block(CNBlocks.LEAD_ORE.get());
-    private static final RuleSource MOON_BASALT = block(CNBlocks.RAW_LEAD_BLOCK.get());
+    private static final RuleSource LEAD_ROCK = block(CNBlocks.LEAD_BLOCK.get());
+    private static final RuleSource LEAD_TURF = block(CNBlocks.LEAD_ORE.get());
+    private static final RuleSource RAW_LEAD_BASALT = block(CNBlocks.RAW_LEAD_BLOCK.get());
     private static final RuleSource DEBUG_STATE = block(CNBlocks.REACTOR_CASING.get());
 
     private static final RuleSource SECONDARY_MATERIAL = SurfaceRules.sequence(
-            SurfaceRules.ifTrue(IS_MARE, MOON_BASALT),
+            SurfaceRules.ifTrue(IS_IRRADIATED_PLAIN, RAW_LEAD_BASALT),
             SurfaceRules.ifTrue(IS_HIGHLANDS, MOON_DIRT)
     );
     private static final RuleSource SURFACE_MATERIAL = SurfaceRules.sequence(
-            SurfaceRules.ifTrue(IS_MARE, MOON_BASALT),
-            SurfaceRules.ifTrue(IS_HIGHLANDS, MOON_TURF)
+            SurfaceRules.ifTrue(IS_IRRADIATED_PLAIN, RAW_LEAD_BASALT),
+            SurfaceRules.ifTrue(IS_HIGHLANDS, LEAD_TURF)
     );
     private static final RuleSource SURFACE_GENERATION = SurfaceRules.sequence(
             SurfaceRules.ifTrue(SurfaceRules.ON_FLOOR, SURFACE_MATERIAL),
@@ -53,22 +52,22 @@ public class IrradiatedSurfaceRules2 {
                         SurfaceRules.sequence(
                                 SurfaceRules.ifTrue(
                                         SurfaceRules.noiseCondition(CNNoiseData.EROSION, 0.035, 0.0465),
-                                        MOON_TURF
+                                        LEAD_TURF
                                 ),
                                 SurfaceRules.ifTrue(
                                         SurfaceRules.noiseCondition(CNNoiseData.EROSION, 0.039, 0.0545),
-                                        MOON_ROCK
+                                        LEAD_ROCK
                                 ),
                                 SurfaceRules.ifTrue(
                                         SurfaceRules.noiseCondition(CNNoiseData.EROSION, 0.0545, 0.069),
-                                        MOON_BASALT
+                                        RAW_LEAD_BASALT
                                 )
                         )
                 ),
 
                 SurfaceRules.ifTrue(SurfaceRules.verticalGradient("bedrock_floor", VerticalAnchor.bottom(), VerticalAnchor.aboveBottom(5)), BEDROCK),
                 SurfaceRules.ifTrue(SurfaceRules.abovePreliminarySurface(), SURFACE_GENERATION),
-                SurfaceRules.ifTrue(SurfaceRules.verticalGradient("lunaslate", VerticalAnchor.absolute(-4), VerticalAnchor.absolute(4)), LUNASLATE)
+                SurfaceRules.ifTrue(SurfaceRules.verticalGradient("enriched", VerticalAnchor.absolute(-4), VerticalAnchor.absolute(4)), ENRICHED_SOUL_SOIL)
         );
     }
 

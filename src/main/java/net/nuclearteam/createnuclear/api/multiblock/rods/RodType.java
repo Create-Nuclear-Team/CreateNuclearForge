@@ -251,7 +251,7 @@ public record RodType(HolderSet<Item> items,
         try {
             return switch (type) {
                 case FUEL -> CNConfigs.server().rods.uraniumProxyBonus.get();
-                case COOLER -> Math.round(CNConfigs.server().rods.graphiteProxyMalus.get());
+                case COOLER -> CNConfigs.server().rods.graphiteProxyMalus.getF();
                 default -> proximityRodHeat;
             };
         } catch (IllegalStateException e) {
@@ -314,5 +314,15 @@ public record RodType(HolderSet<Item> items,
             if (IS_COOLED.test(stack)) return "cooled";
             return "unknown";
         }
+    }
+
+    @Override
+    public String toString() {
+        return "RodType [items: " + this.items() +
+                ", baseRodHeat: " + this.baseRodHeat() +
+                ", proximityRodHeat: " + this.proximityRodHeat() +
+                ", rodTimer: " + this.rodTimer() +
+                ", type: " + this.type() +
+                ", useConfig:  " + this.useConfig() + "]";
     }
 }

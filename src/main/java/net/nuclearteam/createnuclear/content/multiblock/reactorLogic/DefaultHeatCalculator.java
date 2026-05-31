@@ -28,7 +28,7 @@ public class DefaultHeatCalculator implements IHeatCalculator {
 
     @Override
     public double computeHeat(BigItemStack bigFuelItem, BigItemStack bigCoolerItem, BigFluidStack bigFluidStack, ReactorFluidType type, int countGraphiteRod, int countUraniumRod, ReactorControllerInventory inventory, double overHeat) {
-        int heat = 0;
+        double heat = 0;
 
         ListTag list = inventory.getStackInSlot(0).getOrCreateTag().getCompound("pattern").getList("Items", Tag.TAG_COMPOUND);
 
