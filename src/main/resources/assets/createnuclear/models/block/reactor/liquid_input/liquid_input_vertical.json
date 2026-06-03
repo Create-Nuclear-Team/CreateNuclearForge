@@ -2,7 +2,7 @@
   "credit": "Made with Blockbench",
   "parent": "block/block",
   "textures": {
-    "0": "createnuclear:block/reactor/input/input",
+    "0": "createnuclear:block/reactor/liquid_input/input",
     "1": "createnuclear:block/reactor/casing/reactor_casing",
     "2": "createnuclear:block/reactor/casing/reactor_casing",
     "particle": "createnuclear:block/reactor/input/input"

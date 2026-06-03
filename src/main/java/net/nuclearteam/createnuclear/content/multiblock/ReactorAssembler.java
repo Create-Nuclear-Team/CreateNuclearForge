@@ -81,6 +81,9 @@ public final class ReactorAssembler {
 
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
+        int frameMinY = Integer.MAX_VALUE;
+        int frameMaxY = Integer.MIN_VALUE;
+
         for (int y = yMin; y <= yMax; y++) {
             boolean isYBoundary = (y == yMin || y == yMax);
             for (int x = xMin; x <= xMax; x++) {
@@ -105,9 +108,15 @@ public final class ReactorAssembler {
                         if (level.getBlockEntity(mutablePos) instanceof ReactorFrameEntity frame) {
                             frame.setController(entity.getBlockPos());
                         }
+                        frameMinY = Math.min(frameMinY, y);
+                        frameMaxY = Math.max(frameMaxY, y);
                     }
                 }
             }
+        }
+
+        if (frameMinY != Integer.MAX_VALUE) {
+            entity.setFrameColumn(frameMinY, frameMaxY);
         }
     }
 

@@ -33,19 +33,39 @@ public class ReactorFrameRenderer extends SafeBlockEntityRenderer<ReactorFrameEn
         FluidStack fluid = controller.getDisplayedFluid();
         if (fluid == null || fluid.isEmpty()) return;
 
-        // Vertical bounds match the fluid volume that used to be baked into each
-        // frame part model (frame_top / frame_middle / frame_bottom / frame_none).
-        float yMin;
-        float yMax;
+        // Local vertical bounds of the liquid volume inside this block, matching
+        // what used to be baked into each frame part model
+        // (frame_top / frame_middle / frame_bottom / frame_none).
+        float boxYMin;
+        float boxYMax;
         switch (be.getBlockState().getValue(ReactorFrame.PART)) {
-            case START -> { yMin = 0f;          yMax = 9f / 16f; }
-            case MIDDLE -> { yMin = 0f;         yMax = 1f; }
-            case END -> { yMin = 4f / 16f;      yMax = 1f; }
-            default -> { yMin = 2.9f / 16f;     yMax = 9.9f / 16f; }
+            case START -> { boxYMin = 0f;          boxYMax = 9f / 16f; }
+            case MIDDLE -> { boxYMin = 0f;         boxYMax = 1f; }
+            case END -> { boxYMin = 4f / 16f;      boxYMax = 1f; }
+            default -> { boxYMin = 2.9f / 16f;     boxYMax = 9.9f / 16f; }
         }
 
+        // Clamp the liquid to the reactor's global fill level so the whole wall
+        // shares one continuous surface that rises from the bottom as the input
+        // fills. The level is mapped over the range that liquid actually occupies:
+        // from the bottom frame's lip (frameMinY + 4/16) to the top frame's cap
+        // (frameMaxY + 9/16), so even a nearly-empty reactor still shows a sliver.
+        float yMax = boxYMax;
+        if (controller.hasFrameColumn()) {
+            float ratio = controller.getDisplayedFluidFillRatio();
+            double liquidBottomWorldY = controller.getFrameColumnMinY() + 4.0 / 16.0;
+            double liquidTopWorldY = controller.getFrameColumnMaxY() + 9.0 / 16.0;
+            double surfaceWorldY = liquidBottomWorldY + ratio * (liquidTopWorldY - liquidBottomWorldY);
+            double localSurface = surfaceWorldY - be.getBlockPos().getY();
+            if (localSurface <= boxYMin) return; // liquid level is below this block
+            yMax = (float) Math.min(boxYMax, localSurface);
+        }
+
+        // Last arg (invertGasses) must be false: liquid nitrogen has density 0, so
+        // it counts as "lighter than air" and would otherwise be flipped 180°,
+        // hiding the top surface. We always fill bottom-to-top here.
         ForgeCatnipServices.FLUID_RENDERER.renderFluidBox(fluid,
-                X_MIN, yMin, Z_MIN, X_MAX, yMax, Z_MAX,
-                buffer, ms, light, false, true);
+                X_MIN, boxYMin, Z_MIN, X_MAX, yMax, Z_MAX,
+                buffer, ms, light, false, false);
     }
 }
