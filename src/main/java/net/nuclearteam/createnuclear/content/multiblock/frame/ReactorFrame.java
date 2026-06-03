@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.content.multiblock.frame;
 
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
+import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -14,17 +15,19 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ReactorFrame extends Block implements IWrenchable {
+public class ReactorFrame extends Block implements IWrenchable, IBE<ReactorFrameEntity> {
     public static final Property<Part> PART = EnumProperty.create("part", Part.class);
     protected ReactorPattern pattern =  new ReactorPattern();
     public ReactorFrame(Properties properties) {
@@ -119,5 +122,15 @@ public class ReactorFrame extends Block implements IWrenchable {
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
         pattern.findController(pos, level, false);
+    }
+
+    @Override
+    public Class<ReactorFrameEntity> getBlockEntityClass() {
+        return ReactorFrameEntity.class;
+    }
+
+    @Override
+    public BlockEntityType<? extends ReactorFrameEntity> getBlockEntityType() {
+        return CNBlockEntityTypes.REACTOR_FRAME.get();
     }
 }

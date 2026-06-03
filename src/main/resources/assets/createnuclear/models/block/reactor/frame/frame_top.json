@@ -5,8 +5,6 @@
 	"textures": {
 		"2": "createnuclear:block/reactor/frame/window",
 		"3": "createnuclear:block/reactor/casing/reactor_casing",
-		"4": "createnuclear:fluid/uranium_still",
-		"5": "createnuclear:fluid/uranium_flow",
 		"particle": "createnuclear:block/reactor/casing/reactor_casing"
 	},
 	"elements": [
@@ -174,19 +172,6 @@
 				"west": {"uv": [0, 0, 16, 4], "texture": "#3", "cullface": "west"},
 				"up": {"uv": [0, 0, 16, 16], "texture": "#3", "cullface": "up"},
 				"down": {"uv": [0, 0, 16, 16], "texture": "#3"}
-			}
-		},
-		{
-			"name": "fluid",
-			"from": [1, 0, 1],
-			"to": [15, 9, 15],
-			"faces": {
-				"north": {"uv": [0, 0, 7, 4.5], "texture": "#4"},
-				"east": {"uv": [0, 0, 7, 4.5], "texture": "#4"},
-				"south": {"uv": [0, 0, 7, 4.5], "texture": "#4"},
-				"west": {"uv": [0, 0, 7, 4.5], "texture": "#4"},
-				"up": {"uv": [0, 0, 14, 14], "texture": "#5"},
-				"down": {"uv": [0, 0, 14, 14], "texture": "#5"}
 			}
 		}
 	],

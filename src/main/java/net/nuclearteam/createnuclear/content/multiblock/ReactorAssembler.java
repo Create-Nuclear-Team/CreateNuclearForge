@@ -15,6 +15,7 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrameEntity;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
@@ -76,6 +77,7 @@ public final class ReactorAssembler {
         final Block reactorInputBlock = CNBlocks.REACTOR_INPUT.get();
         final Block reactorInputFluidBlock = CNBlocks.REACTOR_LIQUID_INPUT.get();
         final Block reactorAlarmBlock = CNBlocks.REACTOR_ALARM.get();
+        final Block reactorFrameBlock = CNBlocks.REACTOR_FRAME.get();
 
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
 
@@ -99,6 +101,10 @@ public final class ReactorAssembler {
                         entity.addInputFluid(mutablePos.immutable());
                     } else if (blockState.is(reactorAlarmBlock)) {
                         entity.addAlarm(mutablePos.immutable());
+                    } else if (blockState.is(reactorFrameBlock)) {
+                        if (level.getBlockEntity(mutablePos) instanceof ReactorFrameEntity frame) {
+                            frame.setController(entity.getBlockPos());
+                        }
                     }
                 }
             }

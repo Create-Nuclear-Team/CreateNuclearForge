@@ -180,6 +180,20 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.bigFluidStack = b;
     }
 
+    /**
+     * Returns the fluid currently held by the reactor, used by the frame
+     * renderer to draw the matching liquid in the window. On the client this
+     * reads the synced {@link #clientDisplayFluids}; on the server it reads the
+     * aggregated {@link #bigFluidStack}. Returns {@link FluidStack#EMPTY} when
+     * the reactor holds no fluid.
+     */
+    public FluidStack getDisplayedFluid() {
+        List<BigFluidStack> source = (level != null && level.isClientSide) ? clientDisplayFluids : bigFluidStack;
+        if (source == null || source.isEmpty()) return FluidStack.EMPTY;
+        FluidStack stack = source.get(0).stack;
+        return stack == null ? FluidStack.EMPTY : stack;
+    }
+
     public int getMultiblockSize() {
         return this.reactorSize;
     }
