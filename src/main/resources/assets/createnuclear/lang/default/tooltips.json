@@ -34,10 +34,14 @@
   "item.createnuclear.uranium_rod.tooltip.summary": "_Stick_ to be used in the _reactor input_ to operate it.",
 
   "item.createnuclear.reactor_blueprint_item.tooltip.summary": "It allows you to configure your own pattern.",
-  "item.createnuclear.reactor_blueprint_item.tooltip.condition1": "Filled with graphite and uranium rods",
+  "item.createnuclear.reactor_blueprint_item.tooltip.condition1": "Filled with cooling and fuel rods",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "_Right_ click to fill it.",
   "item.createnuclear.reactor_blueprint_item.tooltip.condition2": "The reactor must be assembled",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour2": "_Right_ click on the reactor controller to open it.",
+  "item.createnuclear.reactor_blueprint.tooltip": "Used to design and visualize the reactor's interior layout.",
+  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Press §eShift + Right Click §7to with the blueprint in hand to get the Wiki link.",
+  "item.createnuclear.reactor_blueprint.chat_info": "Follow the link to open the documentation:",
+  "item.createnuclear.reactor_blueprint.wiki_link": "[Open Official Wiki]",
 
   "block.createnuclear.enriched_soul_soil.tooltip.summary": "The _only_ block who create _enriched fire_.Can be used to _craft_ enriched campfire or just to make a _green fire_.",
 
