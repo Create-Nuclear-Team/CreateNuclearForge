@@ -6,7 +6,7 @@
       "tag": "forge:ingots/lead"
     },
     "Y": {
-      "item": "create:brass_ingot"
+      "tag": "forge:ingots/brass"
     },
     "Z": {
       "item": "createnuclear:graphite_rod"
