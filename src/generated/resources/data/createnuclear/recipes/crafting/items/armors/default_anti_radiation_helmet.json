@@ -6,7 +6,7 @@
       "tag": "forge:ingots/lead"
     },
     "Y": {
-      "item": "createnuclear:black_cloth"
+      "tag": "forge:ingots/brass"
     },
     "Z": {
       "item": "createnuclear:reinforced_glass"

@@ -1,4 +1,4 @@
-// 1.20.1	2026-05-31T12:51:39.2694373	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-06-09T16:58:41.3490313	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -400,10 +400,10 @@ f91f43a39c80f583f878ea1a0d944798c05f2388 data/createnuclear/loot_tables/entities
 9819e80259d08c1518b30ee9d4cf5c18689d3efc data/createnuclear/recipes/autunite_pillar_from_stone_types_autunite_stonecutting.json
 af0091392c2d5784455a57783bfa62d0d60d13ae data/createnuclear/recipes/crafting/enriched_soul_soil.json
 3ce1aa65e8260fbe5fe84c9064b8de3745762605 data/createnuclear/recipes/crafting/enriching_campfire.json
-ecd980bbb19a4f3beea68886ae6688d476230cd5 data/createnuclear/recipes/crafting/items/armors/default_anti_radiation_boots.json
-3cafc9ca85bdcca15cf7597e49be468499138f81 data/createnuclear/recipes/crafting/items/armors/default_anti_radiation_chestplate.json
-92bfa5e93dcef5a533c511199124862d0ff74c28 data/createnuclear/recipes/crafting/items/armors/default_anti_radiation_helmet.json
-bd6da68dc49bf8b0fb798fbdb0bd7086b5039dee data/createnuclear/recipes/crafting/items/armors/default_anti_radiation_leggings.json
+3c2942b0a34c94bf074e19169a7f35834d5cb1cb data/createnuclear/recipes/crafting/items/armors/default_anti_radiation_boots.json
+c02e0f491c8db972860d217e88013858a090b39d data/createnuclear/recipes/crafting/items/armors/default_anti_radiation_chestplate.json
+6a3f2e0a58b380803fa33025e84919b039143aa9 data/createnuclear/recipes/crafting/items/armors/default_anti_radiation_helmet.json
+7fb19c3769092282a6bf6034260c55c3cc390501 data/createnuclear/recipes/crafting/items/armors/default_anti_radiation_leggings.json
 ad29e797fed10865a6c15d95c3de1278c0427df8 data/createnuclear/recipes/crafting/lead_ingot_from_decompacting.json
 42fa720bf96a1d46e206db30cbd38e1b04ea7f63 data/createnuclear/recipes/crafting/lead_nugget_from_decompacting.json
 befcdaaf4abf86e29d7f7008d489638c5f3cd6bd data/createnuclear/recipes/crafting/raw/raw_thorium_block.json
