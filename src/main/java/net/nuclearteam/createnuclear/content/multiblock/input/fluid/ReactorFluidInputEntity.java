@@ -28,16 +28,43 @@ import java.util.List;
 
 public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGoggleInformation {
 
+    /** Capacité par défaut tant que l'input n'est rattaché à aucun réacteur assemblé. */
+    public static final int DEFAULT_CAPACITY = 16000;
+
     private final FluidTank internalTank;
     private LazyOptional<IFluidHandler> capability;
     private LerpedFloat fluidLevel;
 
     public ReactorFluidInputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        internalTank = new SmartFluidTank(16000, this::onTankContentsChanged);
+        internalTank = new SmartFluidTank(DEFAULT_CAPACITY, this::onTankContentsChanged);
         capability = LazyOptional.of(() -> internalTank);
 
         refreshCapability();
+    }
+
+    /**
+     * Capacité du tank en fonction de la taille du réacteur (tier).
+     * 5x5 -> tier 1, 7x7 -> tier 2, 9x9 -> tier 3.
+     */
+    public static int getCapacityForReactorSize(int reactorSize) {
+        return switch (reactorSize) {
+            case 5 -> 144000;
+            case 7 -> 448000;
+            case 9 -> 848000;
+            default -> DEFAULT_CAPACITY;
+        };
+    }
+
+    /** Applique la capacité correspondant à la taille du réacteur à laquelle cet input appartient. */
+    public void applyReactorTierCapacity(int reactorSize) {
+        int capacity = getCapacityForReactorSize(reactorSize);
+        if (internalTank.getCapacity() == capacity) return;
+        internalTank.setCapacity(capacity);
+        if (level != null && !level.isClientSide) {
+            setChanged();
+            sendData();
+        }
     }
 
     @Override
@@ -49,11 +76,14 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
         super.write(tag, clientPacket);
         CompoundTag tankTag = internalTank.writeToNBT(new CompoundTag());
         tag.put("tank", tankTag);
+        tag.putInt("capacity", internalTank.getCapacity());
     }
 
     @Override
     protected void read(CompoundTag tag, boolean clientPacket) {
         super.read(tag, clientPacket);
+        if (tag.contains("capacity"))
+            internalTank.setCapacity(tag.getInt("capacity"));
         internalTank.readFromNBT(tag.getCompound("tank"));
 
         if (tag.contains("ForceFluidLevel") || fluidLevel == null)

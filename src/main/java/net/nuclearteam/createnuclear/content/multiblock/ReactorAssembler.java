@@ -16,6 +16,7 @@ import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrameEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
@@ -102,6 +103,9 @@ public final class ReactorAssembler {
                         entity.addInput(mutablePos.immutable());
                     } else if (blockState.is(reactorInputFluidBlock)) {
                         entity.addInputFluid(mutablePos.immutable());
+                        if (level.getBlockEntity(mutablePos) instanceof ReactorFluidInputEntity fluidInput) {
+                            fluidInput.applyReactorTierCapacity(entity.getMultiblockSize());
+                        }
                     } else if (blockState.is(reactorAlarmBlock)) {
                         entity.addAlarm(mutablePos.immutable());
                     } else if (blockState.is(reactorFrameBlock)) {
