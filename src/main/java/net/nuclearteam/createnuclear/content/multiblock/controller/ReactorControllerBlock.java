@@ -70,7 +70,15 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     @Override
     public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos,
                                 boolean isMoving) {
-        withBlockEntityDo(worldIn, pos, be -> be.setAssembled(false));
+        if (worldIn.isClientSide)
+            return;
+        // Un voisin direct du controller a changé. On ne désassemble PAS aveuglément :
+        // on ne le fait que si la structure est réellement cassée. Sinon, poser/remplacer
+        // un bloc adjacent au controller (frame au-dessus/en-dessous, input/alarm sur les
+        // côtés, cooler derrière) annulerait l'assemblage qui vient juste d'être validé.
+        // disassemble() vérifie findStructure et ne fait rien si la structure est complète.
+        if (state.getValue(ASSEMBLED))
+            ReactorAssembler.disassemble(pos, worldIn);
     }
 
     @Override
