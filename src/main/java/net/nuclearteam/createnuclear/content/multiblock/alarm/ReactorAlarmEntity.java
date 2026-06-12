@@ -4,7 +4,6 @@ import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nuclearteam.createnuclear.CNSoundEvents;
@@ -12,7 +11,6 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.DistExecutor;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 
@@ -22,6 +20,7 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
 
     public ReactorControllerBlockEntity controller = null;
     private CNAdvancementBehaviour advancement;
+    private boolean advancementAwarded = false; // Anti-spam réseau
 
     @OnlyIn(Dist.CLIENT)
     protected ReactorAlarmSoundInstance soundInstance;
@@ -36,25 +35,15 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
         if (level == null || !(getBlockState().getBlock() instanceof ReactorAlarm)) return;
 
         if (level.isClientSide) {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-                try {
-                    tickAudio();
-                } catch (Exception e) {
-                    // Log l'erreur si nécessaire, mais évite les crashes
-                    CreateNuclear.LOGGER.warn(e.getMessage());
-                }
-            });
+            tickAudio(); // Plus besoin de DistExecutor ici, le check de level suffit et évite le lag de thread
+        } else {
+            tickServer();
         }
-
-        tickServer();
     }
 
     @OnlyIn(Dist.CLIENT)
     protected void tickAudio() {
-        if (level == null) return;
-
         BlockState state = getBlockState();
-
         boolean powered = state.hasProperty(ReactorAlarm.POWERED) && state.getValue(ReactorAlarm.POWERED);
 
         if (!powered) {
@@ -65,9 +54,10 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
         if (soundInstance == null || soundInstance.isStopped()) {
             Minecraft minecraft = Minecraft.getInstance();
             try {
-                minecraft.getSoundManager().play(soundInstance = new ReactorAlarmSoundInstance(level, worldPosition, CNSoundEvents.REACTOR_ALARM_2.getMainEvent()));
+                soundInstance = new ReactorAlarmSoundInstance(level, worldPosition, CNSoundEvents.REACTOR_ALARM_2.getMainEvent());
+                minecraft.getSoundManager().play(soundInstance);
             } catch (Exception e) {
-                CreateNuclear.LOGGER.warn(e.getMessage());
+                CreateNuclear.LOGGER.warn("Échec du lancement du son d'alarme: " + e.getMessage());
             }
         }
     }
@@ -86,13 +76,17 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
 
     private void tickServer() {
         BlockState state = getBlockState();
-
         if (!(state.getBlock() instanceof ReactorAlarm)) return;
 
         boolean powered = state.getValue(ReactorAlarm.POWERED);
 
         if (powered) {
-            this.advancement.awardPlayer(CNAdvancement.SILENCE_THE_CORE);
+            if (!advancementAwarded) { // On l'envoie UNE SEULE FOIS au front montant
+                this.advancement.awardPlayer(CNAdvancement.SILENCE_THE_CORE);
+                advancementAwarded = true;
+            }
+        } else {
+            advancementAwarded = false; // Reset quand l'alarme s'éteint
         }
     }
 

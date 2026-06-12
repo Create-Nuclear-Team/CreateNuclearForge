@@ -54,8 +54,10 @@ public class ReactorAlarm extends Block implements IBE<ReactorAlarmEntity> {
     // CORRECTION : Désinscription au multiblock lors du retrait (piston, explosion, etc.)
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        MultiblockHelpers.handleRemoval(pos, level, ReactorControllerBlockEntity::removeAlarm);
-        super.onRemove(state, level, pos, newState, isMoving);
+        if (!state.is(newState.getBlock())) {
+            MultiblockHelpers.handleRemoval(pos, level, ReactorControllerBlockEntity::removeAlarm);
+            super.onRemove(state, level, pos, newState, isMoving);
+        }
     }
 
     @Override
