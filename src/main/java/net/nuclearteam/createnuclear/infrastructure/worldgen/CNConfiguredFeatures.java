@@ -52,13 +52,13 @@ public class CNConfiguredFeatures {
                 OreConfiguration.target(stoneOreReplaceable, CNBlocks.THORIUM_ORE.getDefaultState()),
                 OreConfiguration.target(deepslateOreReplaceables, CNBlocks.DEEPSLATE_THORIUM_ORE.getDefaultState())
         );
-        register(ctx, THORIUM_ORE, Feature.ORE, new OreConfiguration(thoriumTargetStates, 7));
+        register(ctx, THORIUM_ORE, Feature.ORE, new OreConfiguration(thoriumTargetStates, 16));
 
         List<TargetBlockState> nitrateTargetStates = List.of(
                 OreConfiguration.target(stoneOreReplaceable, CNBlocks.NITRATE_ORE.getDefaultState()),
                 OreConfiguration.target(deepslateOreReplaceables, CNBlocks.DEEPSLATE_NITRATE_ORE.getDefaultState())
         );
-        register(ctx, NITRATE_ORE, Feature.ORE, new OreConfiguration(nitrateTargetStates, 7));
+        register(ctx, NITRATE_ORE, Feature.ORE, new OreConfiguration(nitrateTargetStates, 10));
 
         List<LayerPattern> overworldLayerPatterns = List.of(
                 CNLayerPatterns.AUTUNITE.get()

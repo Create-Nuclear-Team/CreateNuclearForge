@@ -35,6 +35,8 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
@@ -372,7 +374,8 @@ public class CNBlocks {
             .loot((lt, b) -> lt.add(b,
                 RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
                     lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                        .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0F, 4.0F)))
+                        .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 1))
             ))))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL,
                 BlockTags.NEEDS_IRON_TOOL,
@@ -414,7 +417,8 @@ public class CNBlocks {
             .loot((lt, b) -> lt.add(b,
                 RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
                     lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
-                        .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
+                        .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 5))
             ))))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL,
                 CNTags.forgeBlockTag("ores"),
@@ -435,7 +439,8 @@ public class CNBlocks {
             .loot((lt, b) -> lt.add(b,
                 RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
                     lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                        .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0F, 4.0F)))
+                        .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 1))
             ))))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL,
                 BlockTags.NEEDS_IRON_TOOL,
@@ -477,7 +482,8 @@ public class CNBlocks {
             .loot((lt, b) -> lt.add(b,
                 RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
                     lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
-                        .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
+                        .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 5))
             ))))
             .tag(BlockTags.NEEDS_IRON_TOOL,
                 CNTags.forgeBlockTag("ores"),

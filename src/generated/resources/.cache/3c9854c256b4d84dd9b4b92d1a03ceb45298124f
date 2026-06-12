@@ -1,4 +1,4 @@
-// 1.20.1	2026-06-12T09:38:49.8476043	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-06-12T10:26:06.6469655	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -358,8 +358,8 @@ e6e624e978fdacfa3cdd123d23d021f504308149 data/createnuclear/loot_tables/blocks/c
 f28efa9fb383b86c770b8c7344fc30f6ab9200d3 data/createnuclear/loot_tables/blocks/cut_autunite_wall.json
 113d87359e902ec9112e063f87adf5646cd01dbc data/createnuclear/loot_tables/blocks/deepslate_lead_ore.json
 ab2a2b6038a5f6d841ec21a28db2e5e693d7ee82 data/createnuclear/loot_tables/blocks/deepslate_nitrate_ore.json
-8fbcd34624f6dab2ceb86f7ef273509ba23851ce data/createnuclear/loot_tables/blocks/deepslate_thorium_ore.json
-ac0d262ec298e481314387399c378ecd454e20cc data/createnuclear/loot_tables/blocks/deepslate_uranium_ore.json
+06f3370110396372b9bef4d6c0805affbe70cec4 data/createnuclear/loot_tables/blocks/deepslate_thorium_ore.json
+063436e2539f1d04b6a96427801ea0fa70c03be5 data/createnuclear/loot_tables/blocks/deepslate_uranium_ore.json
 76ca23065681dfd7f18dbbc5a65b8ab8bc40c20c data/createnuclear/loot_tables/blocks/enriched_soul_soil.json
 62f405d930be8b534e863c8aac205687b943f3ef data/createnuclear/loot_tables/blocks/enriching_campfire.json
 aa8efeb48b11261953f7d90e6d7db38411550694 data/createnuclear/loot_tables/blocks/enriching_fire.json
@@ -390,8 +390,8 @@ d51f9b307f2986ac086d32f48bd41e6dc4024348 data/createnuclear/loot_tables/blocks/s
 8718c7e7cce27e299611ee34792cdb59f3434e39 data/createnuclear/loot_tables/blocks/small_autunite_brick_wall.json
 94dc8e72195da5aa505c6d5a3785ccfea30f7c05 data/createnuclear/loot_tables/blocks/steel_block.json
 bc1497c8412144515b94799c007cfdb277d5736f data/createnuclear/loot_tables/blocks/thorium_block.json
-4be8262da5a9789bafa641fec2ae0fb5cb8570e1 data/createnuclear/loot_tables/blocks/thorium_ore.json
-401811bf59cdb43ffb0c0bb5ba40eb954d7fa216 data/createnuclear/loot_tables/blocks/uranium_ore.json
+c1c889e441f52d3c7fcf50dd2a4dab7311c9b262 data/createnuclear/loot_tables/blocks/thorium_ore.json
+28feab8379c2951034bed4016eb91981d07dd24b data/createnuclear/loot_tables/blocks/uranium_ore.json
 fba1a7bdb0835c034aa5ef52ebf589123d41b33e data/createnuclear/loot_tables/entities/irradiated_cat.json
 2d8f5d7d7babd2b02ae836846e62daabf84de427 data/createnuclear/loot_tables/entities/irradiated_chicken.json
 900719d49cec9385da31bb392649c65f4297288c data/createnuclear/loot_tables/entities/irradiated_cow.json

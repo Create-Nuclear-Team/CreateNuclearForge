@@ -33,17 +33,11 @@ public class CNMixingRecipeGen extends MixingRecipeGen {
             .requiresHeat(HeatCondition.HEATED)
         ),
 
-//        NITRATE_SLUDGE = create("nitrate_sludge", b -> b
-//            .require(CNTags.forgeItemTag("fuels/bio"))
-//            .require(Fluids.WATER, 1000)
-//            .output(CNItems.NITRATE_SLUDGE)
-//        ),
-
         NITROGEN = create("liquid_nitrogen", b -> b
                 .require(CNItems.COOLED_NITROGEN_CONCENTRATE)
                 .duration(20)
                 .require(Items.ICE)
-                .output(CNFluids.LIQUID_NITROGEN.get(), 1000)
+                .output(CNFluids.LIQUID_NITROGEN.get(), 100)
         );
     ;
 
