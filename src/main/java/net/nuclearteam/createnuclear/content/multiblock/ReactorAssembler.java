@@ -3,12 +3,14 @@ package net.nuclearteam.createnuclear.content.multiblock;
 import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CreateNuclear;
@@ -51,7 +53,7 @@ public final class ReactorAssembler {
 
         entity.setMultiblockSize(result.data().getSize());
         entity.setAssembled(true);
-        entity.setMultiblockStructure(entity.getStructureBounds(pos, entity.getMultiblockSize(), entity.getMultiblockFacing()));
+        entity.setMultiblockStructure(ReactorAssembler.getStructureBound(pos, entity.getMultiblockSize(), entity.getMultiblockFacing()));
 
         findAndRegisterSpecialBlocks(entity.getMultiblockPos(), entity, level);
     }
@@ -69,10 +71,10 @@ public final class ReactorAssembler {
         entity.removeIOAll();
     }
 
-    public static void findAndRegisterSpecialBlocks(int[] reactorPos, ReactorControllerBlockEntity entity, Level level) {
-        int xMin = reactorPos[0], xMax = reactorPos[1];
-        int yMin = reactorPos[2], yMax = reactorPos[3];
-        int zMin = reactorPos[4], zMax = reactorPos[5];
+    public static void findAndRegisterSpecialBlocks(BoundingBox reactorPos, ReactorControllerBlockEntity entity, Level level) {
+        int xMin = reactorPos.minX(), xMax = reactorPos.maxX();
+        int yMin = reactorPos.minY(), yMax = reactorPos.maxY();
+        int zMin = reactorPos.minZ(), zMax = reactorPos.maxZ();
 
         final Block reactorOutputBlock = CNBlocks.REACTOR_OUTPUT.get();
         final Block reactorInputBlock = CNBlocks.REACTOR_INPUT.get();
@@ -144,5 +146,23 @@ public final class ReactorAssembler {
                 component,
                 ChatFormatting.GOLD, configRadius, configWarnAll
         );
+    }
+
+    public static BoundingBox getStructureBound(BlockPos center, int size, Direction facing) {
+        int radius = (size - 1) / 2;
+        int height = radius + 1;
+        int depth = size - 1;
+        Direction into = facing.getOpposite();
+
+        int axisX = into.getStepX() * depth;
+        int axisZ = into.getStepZ() * depth;
+
+        int minX = center.getX() + Math.min(0, axisX) - (axisX == 0 ? radius : 0);
+        int maxX = center.getX() + Math.max(0, axisX) + (axisX == 0 ? radius : 0);
+        int minZ = center.getZ() + Math.min(0, axisZ) - (axisZ == 0 ? radius : 0);
+        int maxZ = center.getZ() + Math.max(0, axisZ) + (axisZ == 0 ? radius : 0);
+
+        return new BoundingBox(minX, center.getY() - height, minZ,
+                maxX, center.getY() + height, maxZ);
     }
 }

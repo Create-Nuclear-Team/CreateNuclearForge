@@ -8,10 +8,7 @@ import com.simibubi.create.foundation.item.TooltipHelper;
 import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.SectionPos;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -32,6 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
@@ -56,6 +54,7 @@ import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehavio
 import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.ConsumptionCycleManager;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
+import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.BiomeIrradiationService;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 
 import java.util.ArrayList;
@@ -105,9 +104,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private List<BigFluidStack> bigFluidStack;
 
     private int reactorSize = 0;
-    private String reactorFacing = "null";
+    private Direction reactorFacing = null;
     // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
-    private int[] reactorPos;
+    private BoundingBox reactorPos;
 
 
     private boolean needsToResolveEntities = false;
@@ -190,12 +189,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     @Override
-    public String getMultiblockFacing() {
+    public Direction getMultiblockFacing() {
         return this.reactorFacing;
     }
 
     @Override
-    public void setMultiblockFacing(String f) {
+    public void setMultiblockFacing(Direction f) {
         this.reactorFacing = f;
     }
 
@@ -204,11 +203,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     /** Main constructor allowing dependency injection for testability and DIP compliance. */
-    public int[] getMultiblockPos() {
+    public BoundingBox getMultiblockPos() {
         return this.reactorPos;
     }
 
-    public void setMultiblockStructure(int[] p) {
+    public void setMultiblockStructure(BoundingBox p) {
         this.reactorPos = p;
     }
 
@@ -715,70 +714,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             level.destroyBlock(getBlockPos(), false);
 
             // Changement de biome vers Irradiated Plain
-            changeBiome(CNBiomes.Irradiated.PLAIN, (int) size * 30, explosionPos, serverLevel);
+            BiomeIrradiationService.circularArea(serverLevel, explosionPos, CNBiomes.Irradiated.PLAIN, (int) (size * 30));
         }
-    }
-
-    private void changeBiome(ResourceKey<Biome> biomeResourceKey, int radius, BlockPos center, ServerLevel serverLevel) {
-        Registry<Biome> biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME);
-        Holder<Biome> targetBiomeHolder = biomeRegistry.getHolderOrThrow(biomeResourceKey);
-
-        // Vérification rapide du centre
-        Holder<Biome> current = serverLevel.getBiome(center);
-        if (current.is(biomeResourceKey)) {
-            return;
-        }
-
-        // Définition de la zone de recherche (Bounding Box carrée qui contient le
-        // cercle)
-        int minX = center.getX() - radius;
-        int maxX = center.getX() + radius;
-        int minZ = center.getZ() - radius;
-        int maxZ = center.getZ() + radius;
-
-        double radiusSq = (double) radius * radius;
-        ArrayList<ChunkAccess> chunks = new ArrayList<>();
-
-        // On parcourt les chunks impactés
-        for (int cz = SectionPos.blockToSectionCoord(minZ); cz <= SectionPos.blockToSectionCoord(maxZ); ++cz) {
-            for (int cx = SectionPos.blockToSectionCoord(minX); cx <= SectionPos.blockToSectionCoord(maxX); ++cx) {
-                ChunkAccess chunkAccess = serverLevel.getChunk(cx, cz, ChunkStatus.FULL, false);
-                if (chunkAccess != null) {
-                    // On utilise un resolver personnalisé qui vérifie la distance
-                    chunkAccess.fillBiomesFromNoise(
-                            createCircularResolver(targetBiomeHolder, center, radiusSq, serverLevel),
-                            serverLevel.getChunkSource().randomState().sampler());
-                    chunkAccess.setUnsaved(true);
-                    chunks.add(chunkAccess);
-                }
-            }
-        }
-
-        // Notification aux clients
-        serverLevel.getChunkSource().chunkMap.resendBiomesForChunks(chunks);
-    }
-
-    // Le resolver magique pour la forme circulaire
-    private BiomeResolver createCircularResolver(Holder<Biome> targetBiome, BlockPos center, double radiusSq,
-            ServerLevel level) {
-        return (x, y, z, noise) -> {
-            // x, y, z ici sont en "biome coordinates" (1 unité = 4 blocs)
-            // On les multiplie par 4 pour revenir à une échelle de blocs
-            int blockX = x << 2;
-            int blockZ = z << 2;
-
-            double distX = blockX - center.getX();
-            double distZ = blockZ - center.getZ();
-
-            // Equation du cercle : x² + z² <= r²
-            if ((distX * distX) + (distZ * distZ) <= radiusSq) {
-                return targetBiome;
-            }
-
-            // Si hors du cercle, on garde le biome d'origine (ou on laisse le bruit faire)
-            // Note : Ici on demande au niveau le biome actuel à cette position
-            return level.getBiome(new BlockPos(blockX, y << 2, blockZ));
-        };
     }
 
     private boolean isReadyToRun() {
@@ -810,30 +747,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private boolean updateLiquidTimers() {
         liquidLife -= 1;
         return liquidLife <= 0;
-    }
-
-    @Deprecated
-    private BlockPos getBlockPosForReactor(char character) {
-        BlockPos pos = pattern.VerifyPattern5x5(character);
-        BlockPos posController = getBlockPos();
-        BlockPos posInput = new BlockPos(posController.getX(), posController.getY(), posController.getZ());
-
-        int[][] directions = {
-                { 0, 0, pos.getX() }, // NORTH
-                { 0, 0, -pos.getX() }, // SOUTH
-                { -pos.getX(), 0, 0 }, // EAST
-                { pos.getX(), 0, 0 } // WEST
-        };
-
-        for (int[] direction : directions) {
-            BlockPos newPos = posController.offset(direction[0], direction[1], direction[2]);
-            if (level.getBlockState(newPos).is(CNBlocks.REACTOR_INPUT.get())) {
-                posInput = newPos;
-                break;
-            }
-        }
-
-        return posInput;
     }
 
     public void rotate(BlockState state, Level level, int rotation) {
@@ -870,75 +783,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                 }
             }
         }
-    }
-
-    @Deprecated
-    public int[] getStructureBounds(BlockPos startPos, int structureSize, String facing) {
-        int[] northOffsets5x5 = new int[] { -2, 2, -3, 3, 0, 4 };
-        int[] northOffsets7x7 = new int[] { -3, 3, -4, 4, 0, 6 };
-        int[] northOffsets9x9 = new int[] { -4, 4, -5, 5, 0, 8 };
-
-        int[] eastOffsets5x5 = new int[] { -4, 0, -3, 3, -2, 2 };
-        int[] eastOffsets7x7 = new int[] { -6, 0, -4, 4, -3, 3 };
-        int[] eastOffsets9x9 = new int[] { -8, 0, -5, 5, -4, 4 };
-
-        int[] southOffsets5x5 = new int[] { -2, 2, -3, 3, -4, 0 };
-        int[] southOffsets7x7 = new int[] { -3, 3, -4, 4, -6, 0 };
-        int[] southOffsets9x9 = new int[] { -4, 4, -5, 5, -8, 0 };
-
-        int[] westOffsets5x5 = new int[] { 0, 4, -3, 3, -2, 2 };
-        int[] westOffsets7x7 = new int[] { 0, 6, -4, 4, -3, 3 };
-        int[] westOffsets9x9 = new int[] { 0, 8, -5, 5, -4, 4 };
-
-        switch (facing) {
-            case "north":
-                switch (structureSize) {
-                    case 5:
-                        return applyOffset(startPos, northOffsets5x5);
-                    case 7:
-                        return applyOffset(startPos, northOffsets7x7);
-                    case 9:
-                        return applyOffset(startPos, northOffsets9x9);
-                }
-            case "east":
-                switch (structureSize) {
-                    case 5:
-                        return applyOffset(startPos, eastOffsets5x5);
-                    case 7:
-                        return applyOffset(startPos, eastOffsets7x7);
-                    case 9:
-                        return applyOffset(startPos, eastOffsets9x9);
-                }
-            case "south":
-                switch (structureSize) {
-                    case 5:
-                        return applyOffset(startPos, southOffsets5x5);
-                    case 7:
-                        return applyOffset(startPos, southOffsets7x7);
-                    case 9:
-                        return applyOffset(startPos, southOffsets9x9);
-                }
-            case "west":
-                switch (structureSize) {
-                    case 5:
-                        return applyOffset(startPos, westOffsets5x5);
-                    case 7:
-                        return applyOffset(startPos, westOffsets7x7);
-                    case 9:
-                        return applyOffset(startPos, westOffsets9x9);
-                }
-            default:
-                return new int[] { 0, 0, 0, 0, 0, 0 };
-        }
-    }
-
-    @Deprecated
-    private int[] applyOffset(BlockPos pos, int[] offset) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
-        return new int[] { x + offset[0], x + offset[1], y + offset[2], y + offset[3], z + offset[4], z + offset[5] };
     }
 
     public void addInput(BlockPos inputPos) {

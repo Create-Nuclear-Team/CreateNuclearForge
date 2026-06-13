@@ -30,7 +30,7 @@ public class MultiBlockManagerBeta <T> {
             for (BlockPattern<T> structure : structures) {
                 boolean result = structure.structure().matches(level, pos, direction);
                 if (result){
-                    entity.setMultiblockFacing(direction.getCounterClockWise().getName());
+                    entity.setMultiblockFacing(direction.getCounterClockWise());
                     return structure;
                 }
             }

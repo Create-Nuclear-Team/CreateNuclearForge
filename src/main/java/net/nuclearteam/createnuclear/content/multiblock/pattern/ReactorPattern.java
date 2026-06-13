@@ -8,9 +8,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.content.multiblock.ReactorAssembler;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -132,11 +134,7 @@ public class ReactorPattern {
         return null;
     }
 
-    public boolean isInReactorRange(int []reactorPos, BlockPos blockPos) {
-        //[xMin, xMax, yMin, yMax, zMin, zMax]
-        if (reactorPos == null || reactorPos.length < 6) return false;
-        return blockPos.getX() >= reactorPos[0] && blockPos.getX() <= reactorPos[1]
-                && blockPos.getY() >= reactorPos[2] && blockPos.getY() <= reactorPos[3]
-                && blockPos.getZ() >= reactorPos[4] && blockPos.getZ() <= reactorPos[5];
+    public boolean isInReactorRange(@Nullable BoundingBox reactorPos, BlockPos blockPos) {
+        return reactorPos != null && reactorPos.isInside(blockPos);
     }
 }
