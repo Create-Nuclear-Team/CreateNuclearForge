@@ -5,8 +5,8 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 public class CRods extends ConfigBase {
-    public final ConfigInt maxHeat = i(1000, 200, 1000, "Maximum heat the reactor block can handle", Comments.maxHeat, Comments.hintHeat);
-    public final ConfigInt rodFuelMaxForCoolerRod = i(3, 0, 20, "Maximum number of fuel rods allowed per cooled rod", Comments.warning, Comments.maxFuelPerCooled);
+//    public final ConfigInt maxHeat = i(1000, 200, 1000, "Maximum heat the reactor block can handle", Comments.maxHeat, Comments.hintHeat);
+//    public final ConfigInt rodFuelMaxForCoolerRod = i(3, 0, 20, "Maximum number of fuel rods allowed per cooled rod", Comments.warning, Comments.maxFuelPerCooled);
 
     public final ConfigInt uraniumRodLifetime = i(3600, 100, 5000, "Uranium rod lifetime (in ticks)", Comments.uraniumRodLifetime, Comments.hintTick);
     public final ConfigInt uraniumProxyBonus = i(32, -70, 70, "Heat bonus from nearby uranium rods", Comments.warning, Comments.uraniumProximityBonus);
