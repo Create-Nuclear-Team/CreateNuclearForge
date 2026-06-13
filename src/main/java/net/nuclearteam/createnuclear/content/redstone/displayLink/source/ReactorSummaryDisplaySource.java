@@ -1,7 +1,6 @@
 package net.nuclearteam.createnuclear.content.redstone.displayLink.source;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import com.simibubi.create.api.behaviour.display.DisplaySource;

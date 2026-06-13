@@ -10,7 +10,6 @@ import lib.multiblock.misc.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
-import net.nuclearteam.createnuclear.CreateNuclear;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class SimpleMultiBlockAislePatternBuilder implements IMultiBlockPatternBuilder {
     public static SimpleMultiBlockAislePatternBuilder start() {

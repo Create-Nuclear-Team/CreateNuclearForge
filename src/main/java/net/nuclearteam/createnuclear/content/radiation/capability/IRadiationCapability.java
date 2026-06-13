@@ -2,7 +2,6 @@ package net.nuclearteam.createnuclear.content.radiation.capability;
 
 import net.minecraft.resources.ResourceLocation;
 
-
 public interface IRadiationCapability {
     double getRadiation();
     void setRadiation(double value);

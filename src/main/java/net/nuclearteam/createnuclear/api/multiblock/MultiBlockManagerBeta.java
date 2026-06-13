@@ -4,8 +4,6 @@ import lib.multiblock.impl.IMultiBlockPattern;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
-import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;

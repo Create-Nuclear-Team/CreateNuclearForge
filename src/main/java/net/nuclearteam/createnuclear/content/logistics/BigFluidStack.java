@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.content.logistics;
 
-import com.simibubi.create.content.logistics.BigItemStack;
 import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;

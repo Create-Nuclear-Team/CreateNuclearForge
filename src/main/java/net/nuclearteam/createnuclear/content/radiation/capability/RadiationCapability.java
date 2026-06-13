@@ -21,9 +21,10 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.radiation.IRadiationSource;
 import net.nuclearteam.createnuclear.api.radiation.RadiationRegistry;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.RADIATION_VALUE;
 import net.nuclearteam.createnuclear.foundation.utility.InventoryHashUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
+
+import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.RADIATION_VALUE;
 
 import java.util.Objects;
 
