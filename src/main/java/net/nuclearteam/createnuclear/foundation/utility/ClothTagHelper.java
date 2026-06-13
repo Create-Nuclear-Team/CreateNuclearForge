@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.foundation.util;
+package net.nuclearteam.createnuclear.foundation.utility;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;

@@ -6,7 +6,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.nuclearteam.createnuclear.content.effects.IodineEffect;
-import net.nuclearteam.createnuclear.content.effects.RadiationEffect;
+import net.nuclearteam.createnuclear.content.radiation.RadiationEffect;
 
 public class CNEffects {
     public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, CreateNuclear.MOD_ID);

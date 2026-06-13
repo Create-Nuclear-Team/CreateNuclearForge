@@ -1,14 +1,14 @@
-package net.nuclearteam.createnuclear.foundation.events.overlay;
+package net.nuclearteam.createnuclear.content.radiation.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.foundation.events.overlay.EasingHudOverlay;
 import net.nuclearteam.createnuclear.foundation.utility.RenderHelper;
 
 /**

@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.effects.capability;
+package net.nuclearteam.createnuclear.content.radiation.capability;
 
 import net.minecraft.resources.ResourceLocation;
 

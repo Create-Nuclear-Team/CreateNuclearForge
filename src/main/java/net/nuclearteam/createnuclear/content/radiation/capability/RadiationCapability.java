@@ -1,8 +1,7 @@
-package net.nuclearteam.createnuclear.content.effects.capability;
+package net.nuclearteam.createnuclear.content.radiation.capability;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -16,14 +15,11 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.network.PacketDistributor;
 import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNEffects;
-import net.nuclearteam.createnuclear.CNPackets;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.radiation.IRadiationSource;
 import net.nuclearteam.createnuclear.api.radiation.RadiationRegistry;
-import net.nuclearteam.createnuclear.foundation.networking.radiation.RadiationSyncPacket;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.RADIATION_VALUE;
 import net.nuclearteam.createnuclear.foundation.utility.InventoryHashUtil;
@@ -81,20 +77,16 @@ public class RadiationCapability implements IRadiationCapability {
         if (level.isClientSide) return;
 
         player.getCapability(RadiationProvider.CAP).ifPresent(cap -> {
-            boolean needsSync = false;
-
             long newHash = InventoryHashUtil.compute(player);
             if (newHash != cap.getInventoryHash()) {
                 cap.setInventoryHash(newHash);
                 cap.setRadiation(Math.max(0, computeItemRadiation(player)));
-                needsSync = true;
             }
 
             ResourceKey<Biome> biomeKey = level.getBiome(player.blockPosition()).unwrapKey().orElse(null);
             ResourceLocation biomeLoc = biomeKey != null ? biomeKey.location() : null;
             if (!Objects.equals(biomeLoc, cap.getLastBiomeLocation())) {
                 cap.setLastBiomeLocation(biomeLoc);
-                needsSync = true;
             }
 
             if (!CNConfigs.server().radiation.enabledItemRadiation.get()) return;
@@ -102,10 +94,6 @@ public class RadiationCapability implements IRadiationCapability {
             double totalRaw = cap.getRadiation() + getRawBiomeRadiation(biomeKey);
             double resistance = getRadiationResistance(player);
             double totalRadiation = totalRaw * (1.0 - resistance);
-
-            if (needsSync) {
-                CNPackets.getChannel().send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), new RadiationSyncPacket(totalRadiation));
-            }
 
             applyEffects(player, totalRadiation);
         });

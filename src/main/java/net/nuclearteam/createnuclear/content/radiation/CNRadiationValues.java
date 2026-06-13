@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.foundation.item.radiation;
+package net.nuclearteam.createnuclear.content.radiation;
 
 import com.simibubi.create.AllItems;
 import net.nuclearteam.createnuclear.api.radiation.RadiationRegistry;

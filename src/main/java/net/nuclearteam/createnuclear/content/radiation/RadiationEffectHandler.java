@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.impl.effect;
+package net.nuclearteam.createnuclear.content.radiation;
 
 import com.simibubi.create.api.effect.OpenPipeEffectHandler;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -10,7 +10,7 @@ import net.nuclearteam.createnuclear.CNEffects;
 
 import java.util.List;
 
-public class RadiationEffetcHandler implements OpenPipeEffectHandler {
+public class RadiationEffectHandler implements OpenPipeEffectHandler {
     @Override
     public void apply(Level level, AABB area, FluidStack fluid) {
         if (level.getGameTime() % 5 != 0) return;

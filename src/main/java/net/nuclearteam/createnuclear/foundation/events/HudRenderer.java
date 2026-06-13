@@ -4,7 +4,6 @@ import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.nuclearteam.createnuclear.foundation.events.overlay.EventTextOverlay;
 import net.nuclearteam.createnuclear.foundation.events.overlay.HelmetOverlay;
 import net.nuclearteam.createnuclear.foundation.events.overlay.HudOverlay;
-import net.nuclearteam.createnuclear.foundation.events.overlay.RadiationOverlay;
 
 import java.util.Comparator;
 import java.util.List;

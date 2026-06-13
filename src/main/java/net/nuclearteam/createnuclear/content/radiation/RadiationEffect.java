@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.content.effects;
+package net.nuclearteam.createnuclear.content.radiation;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -9,13 +9,13 @@ import net.minecraft.world.entity.LivingEntity;
 
 import net.nuclearteam.createnuclear.CNEffects;
 import net.nuclearteam.createnuclear.CNTags;
-import net.nuclearteam.createnuclear.content.effects.capability.RadiationCapability;
+import net.nuclearteam.createnuclear.content.effects.VicinityEffect;
+import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.nuclearteam.createnuclear.foundation.damageTypes.CreateNuclearDamageSources;
 import net.nuclearteam.createnuclear.foundation.utility.ConfigValueResolver;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
-import net.nuclearteam.createnuclear.infrastructure.config.CRadiation;
 
 import java.util.HashSet;
 import java.util.Set;
