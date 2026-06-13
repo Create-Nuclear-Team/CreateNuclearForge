@@ -84,7 +84,6 @@ public class CreateNuclear {
         CNParticleTypes.register(modEventBus);
         CNParticleRegistry.DEF_REG.register(modEventBus);
         CNRecipeTypes.register(modEventBus);
-//        CNSounds.register(modEventBus);
         CNAttributes.register(modEventBus);
 
         GogglesItem.addIsWearingPredicate(IGoggleHelmet::isGoggleHelmet);

@@ -4,7 +4,6 @@ import com.simibubi.create.api.data.recipe.MixingRecipeGen;
 import com.simibubi.create.content.processing.recipe.HeatCondition;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.Tags;
 import net.nuclearteam.createnuclear.CNFluids;
 import net.nuclearteam.createnuclear.CNItems;

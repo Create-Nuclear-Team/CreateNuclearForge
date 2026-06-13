@@ -11,8 +11,6 @@ import net.minecraft.world.level.levelgen.synth.BlendedNoise;
 import net.nuclearteam.createnuclear.CreateNuclear;
 
 public class CNDensityFunctions {
-    public static final ResourceKey<DensityFunction> NOODLES = createKey("caves/noodles");
-
     public static final class Irradiated {
         public static final ResourceKey<DensityFunction> EROSION = createKey("irradiated/erosion");
         public static final ResourceKey<DensityFunction> FINAL_DENSITY = createKey("irradiated/final_density");
@@ -23,12 +21,6 @@ public class CNDensityFunctions {
     }
 
     public static void bootstrapRegistries(BootstapContext<DensityFunction> context) {
-        var vanillaRegistry = context.lookup(Registries.DENSITY_FUNCTION);
-        var noiseRegistry = context.lookup(Registries.NOISE);
-//        DensityFunction shiftX = getFunction(vanillaRegistry, NoiseRouterData.SHIFT_X);
-//        DensityFunction shiftZ = getFunction(vanillaRegistry, NoiseRouterData.SHIFT_Z);
-//        DensityFunction y = getFunction(vanillaRegistry, NoiseRouterData.Y);
-
         context.register(Irradiated.EROSION, DensityFunctions.add(
                 DensityFunctions.yClampedGradient(0, 90, 1, -1),
                 BlendedNoise.createUnseeded(0.25, 0.375, 80.0, 160.0, 8.0)

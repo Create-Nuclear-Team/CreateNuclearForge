@@ -14,11 +14,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
-import net.nuclearteam.createnuclear.content.multiblock.rod.CNRodTypes;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.ArrayList;
@@ -90,7 +88,7 @@ public record RodType(HolderSet<Item> items,
                     ? fromItem
                     : world.registryAccess()
                         .registryOrThrow(CreateNuclearRegistries.ROD_TYPE)
-                        .getHolderOrThrow(CNRodTypes.FALLBACK)
+                        .getHolderOrThrow(CreateNuclearRegistries.FALLBACK_ROD)
                         .value();
             });
     }

@@ -19,7 +19,7 @@ public class MultiBlockManagerBeta <T> {
         structures.add(new BlockPattern<>(id, data, blockPattern));
     }
 
-    public BlockPattern<T> findStructure(Level level, BlockPos pos, ReactorControllerBlockEntity entity) {
+    public BlockPattern<T> findStructure(Level level, BlockPos pos, IMultiblockController entity) {
         List<Direction> directions = new ArrayList<>();
         directions.add(Direction.NORTH);
         directions.add(Direction.WEST);

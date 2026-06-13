@@ -42,7 +42,6 @@ public class ItemRodTypesValue {
         return item -> ROD_TYPE.register(item, type.addItems(item).build());
     }
 
-
     /**
      * Create a consumer that builds a {@link RodType} using the provided numeric
      * parameters and registers it for the item passed to the consumer.

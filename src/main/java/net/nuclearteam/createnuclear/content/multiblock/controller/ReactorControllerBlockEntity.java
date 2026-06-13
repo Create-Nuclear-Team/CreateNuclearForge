@@ -42,6 +42,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.multiblock.IMultiblockController;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
@@ -80,7 +81,7 @@ import static net.nuclearteam.createnuclear.content.multiblock.controller.Reacto
 
 @SuppressWarnings({ "unused" })
 public class ReactorControllerBlockEntity extends SmartBlockEntity
-        implements IInteractionChecker, IHaveGoggleInformation {
+        implements IInteractionChecker, IHaveGoggleInformation, IMultiblockController {
     /**
      * The assembled state is stored in the block state
      * (`ReactorControllerBlock.ASSEMBLED`).
@@ -268,11 +269,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.reactorSize = s;
     }
 
+    @Override
     public String getMultiblockFacing() {
         return this.reactorFacing;
     }
 
-    public void setMultiblockFacing(String f) {
+    @Override
+    public void
+    setMultiblockFacing(String f) {
         this.reactorFacing = f;
     }
 

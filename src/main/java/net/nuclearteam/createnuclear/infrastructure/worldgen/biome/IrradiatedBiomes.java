@@ -17,13 +17,7 @@ public class IrradiatedBiomes {
     }
 
     public static void monsters(MobSpawnSettings.Builder builder, int zombieWeight, int zombieVillagerWeight, int skeletonWeight) {
-
-        // builder.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(CNEntityType.IRRADIATED_CAT.get(), 100, 2, 4));
-        // builder.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(CNEntityType.IRRADIATED_CHICKEN.get(), 100, 1, 4));
-        // builder.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(CNEntityType.IRRADIATED_WOLF.get(), 100, 2, 4));
     }
-
-
 
     public static void addDefaultIrradiatedOres(BiomeGenerationSettings.Builder builder) {
         builder.addFeature(GenerationStep.Decoration.UNDERGROUND_STRUCTURES, MiscOverworldPlacements.BLUE_ICE);
