@@ -120,7 +120,7 @@ public final class ReactorAssembler {
         }
 
         if (frameMinY != Integer.MAX_VALUE) {
-            entity.setFrameColumn(frameMinY, frameMaxY);
+            entity.getFrameDisplayManager().setFrameColumn(frameMinY, frameMaxY, entity::notifyUpdate);
         }
     }
 

@@ -108,16 +108,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private String reactorFacing = "null";
     // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
     private int[] reactorPos;
-    // Vertical span (block Y) of the reactor frame columns, used to map the
-    // fluid fill ratio onto the liquid actually drawn in the frame windows.
-    private int frameColumnMinY = Integer.MAX_VALUE;
-    private int frameColumnMaxY = Integer.MIN_VALUE;
-    // Per-tick cache for the fluid drawn in the frame windows. Recomputed from the
-    // live (synced) input tanks so the displayed fluid and its fill ratio always
-    // come from the same source and stay consistent for every fluid type.
-    private long frameFluidCacheTick = -1;
-    private FluidStack frameFluidCache = FluidStack.EMPTY;
-    private float frameFluidFillRatioCache = 0f;
+
+
     private boolean needsToResolveEntities = false;
     private double fluidBuffer = 0.0;
 
@@ -127,6 +119,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private final ReactorOutputManagerI outputManager;
     private final ReactorInputFluidManagerI inputFluidManager;
     private final ReactorAlarmManagerI alarmManager;
+    private final ReactorFrameDisplayManagerI frameDisplayManager;
 
     // Client Display Data (Synced via NBT)
     private Map<Item, Integer> clientDisplayItems = new HashMap<>();
@@ -188,79 +181,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.bigFluidStack = b;
     }
 
-    /**
-     * Returns the fluid currently held by the reactor, used by the frame
-     * renderer to draw the matching liquid in the window. On the client this
-     * reads the synced {@link #clientDisplayFluids}; on the server it reads the
-     * aggregated {@link #bigFluidStack}. Returns {@link FluidStack#EMPTY} when
-     * the reactor holds no fluid.
-     *
-     * Recomputes, at most once per game tick, the fluid shown in the frame
-     * windows and how full the input is. Both values are read from the same live
-     * input tanks (whose contents are synced to the client), so they always agree
-     * regardless of the fluid type.
-     */
-    private void refreshFrameFluidCache() {
-        if (level == null) return;
-        long now = level.getGameTime();
-        if (now == frameFluidCacheTick) return;
-        frameFluidCacheTick = now;
-
-        long amount = 0;
-        long capacity = 0;
-        FluidStack fluid = FluidStack.EMPTY;
-        for (IFluidHandler handler : inputFluidManager.getFuildHandlers(level)) {
-            int tanks = handler.getTanks();
-            for (int t = 0; t < tanks; t++) {
-                FluidStack stack = handler.getFluidInTank(t);
-                capacity += handler.getTankCapacity(t);
-                amount += stack.getAmount();
-                if (fluid.isEmpty() && !stack.isEmpty()) fluid = stack.copy();
-            }
-        }
-
-        frameFluidCache = fluid;
-        frameFluidFillRatioCache = capacity > 0 ? Math.min(1f, (float) amount / (float) capacity) : 0f;
-    }
-
-    /** The fluid currently shown in the reactor frame windows (may be empty). */
-    public FluidStack getDisplayedFluid() {
-        refreshFrameFluidCache();
-        return frameFluidCache;
-    }
-
-    /**
-     * How full the reactor's fluid input is, in the range {@code [0, 1]}, used by
-     * the frame renderer to size the visible liquid column.
-     */
-    public float getDisplayedFluidFillRatio() {
-        refreshFrameFluidCache();
-        return frameFluidFillRatioCache;
-    }
-
-    /** Records the lowest and highest frame block-Y of the assembled reactor. */
-    public void setFrameColumn(int minY, int maxY) {
-        if (this.frameColumnMinY == minY && this.frameColumnMaxY == maxY) return;
-        this.frameColumnMinY = minY;
-        this.frameColumnMaxY = maxY;
-        notifyUpdate();
-    }
-
-    /** @return the lowest frame block-Y, or {@link Integer#MAX_VALUE} if unknown. */
-    public int getFrameColumnMinY() {
-        return frameColumnMinY;
-    }
-
-    /** @return the highest frame block-Y, or {@link Integer#MIN_VALUE} if unknown. */
-    public int getFrameColumnMaxY() {
-        return frameColumnMaxY;
-    }
-
-    public boolean hasFrameColumn() {
-        return frameColumnMinY != Integer.MAX_VALUE && frameColumnMaxY != Integer.MIN_VALUE
-                && frameColumnMaxY >= frameColumnMinY;
-    }
-
     public int getMultiblockSize() {
         return this.reactorSize;
     }
@@ -275,8 +195,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     @Override
-    public void
-    setMultiblockFacing(String f) {
+    public void setMultiblockFacing(String f) {
         this.reactorFacing = f;
     }
 
@@ -305,6 +224,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.liquidLife = l;
     }
 
+    public ReactorFrameDisplayManagerI getFrameDisplayManager() {
+        return this.frameDisplayManager;
+    }
+
+    public ReactorInputFluidManagerI getInputFluidManager() {
+        return this.inputFluidManager;
+    }
+
     /**
      * Main constructor allowing dependency injection for testability and DIP
      * compliance.
@@ -318,6 +245,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.outputManager = new ReactorOutputManager();
         this.inputFluidManager = new ReactorInputFluidManager();
         this.alarmManager = new ReactorAlarmManager();
+        this.frameDisplayManager = new ReactorFrameDisplayManager();
 
         this.bigFuelItem = new BigItemStack(ItemStack.EMPTY);
         this.bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
@@ -415,14 +343,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.outputManager.read(compound);
         this.inputFluidManager.read(compound);
         this.alarmManager.read(compound);
+        this.frameDisplayManager.read(compound);
 
         this.persistenceService.readBasicState(this, compound, clientPacket);
         this.needsToResolveEntities = true;
-
-        if (compound.contains("frameColumnMinY")) {
-            this.frameColumnMinY = compound.getInt("frameColumnMinY");
-            this.frameColumnMaxY = compound.getInt("frameColumnMaxY");
-        }
 
         if (clientPacket) {
             clientDisplayItems.clear();
@@ -465,11 +389,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.outputManager.write(compound);
         this.inputFluidManager.write(compound);
         this.alarmManager.write(compound);
+        this.frameDisplayManager.write(compound);
 
         this.persistenceService.writeBasicState(this, compound, clientPacket);
-
-        compound.putInt("frameColumnMinY", frameColumnMinY);
-        compound.putInt("frameColumnMaxY", frameColumnMaxY);
 
         if (clientPacket) {
             ListTag displayItemsTag = new ListTag();
@@ -738,13 +660,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             if (!this.outputManager.getBlocksPosition().isEmpty()) {
                 rotate(getBlockState(), getLevel(), heat);
             }
-        } /*
-           * else {
-           * EventTriggerPacket packet = new EventTriggerPacket(600);
-           * CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
-           * CNPackets.sendToNear(level, getBlockPos(), 32, packet);
-           * }
-           */
+        }
     }
 
     private void triggerNuclearExplosion() {
@@ -803,7 +719,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         }
     }
 
-    public void changeBiome(ResourceKey<Biome> biomeResourceKey, int radius, BlockPos center, ServerLevel serverLevel) {
+    private void changeBiome(ResourceKey<Biome> biomeResourceKey, int radius, BlockPos center, ServerLevel serverLevel) {
         Registry<Biome> biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME);
         Holder<Biome> targetBiomeHolder = biomeRegistry.getHolderOrThrow(biomeResourceKey);
 
