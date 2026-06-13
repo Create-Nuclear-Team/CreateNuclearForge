@@ -18,7 +18,7 @@ public class MultiblockHelpers {
      * invoke provided callbacks to register or remove parts.
      */
     public static void handleOnPlace(BlockPos pos, Level level, BiConsumer<ReactorControllerBlockEntity, BlockPos> register) {
-        handleOnPlace(pos, level);
+        handleOnPlace(pos, level, true);
 
         BlockPos controllerPos = pattern.findControllerPos(pos, level);
         if (controllerPos != null) {
@@ -33,12 +33,13 @@ public class MultiblockHelpers {
      * Called when a multiblock part is placed. Locates the controller and
      * invokes {@code register} with the controller and placed part position.
      */
-    public static void handleOnPlace(BlockPos pos, Level level) {
-        pattern.findController(pos, level, true);
+    public static void handleOnPlace(BlockPos pos, Level level, boolean first) {
+        pattern.findController(pos, level, first);
     }
 
     public static void handleRemoval(BlockPos pos, Level level, BiConsumer<ReactorControllerBlockEntity, BlockPos> remover) {
-        // Désinscrit d'abord cette partie de son controller (si trouvé).
+        handleOnPlace(pos, level, false);
+
         BlockPos controllerPos = pattern.findControllerPos(pos, level);
         if (controllerPos != null) {
             ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
@@ -46,10 +47,6 @@ public class MultiblockHelpers {
                 remover.accept(controllerBlockEntity, pos);
             }
         }
-        // Puis réévalue la structure : on désassemble (false) si elle est maintenant cassée.
-        // NB : il ne faut PAS passer par handleOnPlace ici, qui appelle findController(..., true)
-        // et tenterait donc d'ASSEMBLER au lieu de désassembler.
-        pattern.findController(pos, level, false);
     }
 
     public static ReactorControllerBlockEntity getControllerForPart(Level level, BlockPos pos) {
