@@ -52,13 +52,34 @@ public final class ReactorGoggleTooltipRenderer {
      *                          kept for signature parity with other goggle tooltip providers)
      */
     public static void render(List<Component> tooltip, ReactorDisplayState state, int heat, boolean isPlayerSneaking) {
+        renderHeaderAndHeat(tooltip, heat);
+        renderItemRods(tooltip, state);
+        renderFluidTanks(tooltip, state);
+    }
+
+    /**
+     * Appends the gauge info header and the reactor's current heat level line.
+     *
+     * @param tooltip the tooltip line list to append to
+     * @param heat    the reactor's current heat value
+     */
+    private static void renderHeaderAndHeat(List<Component> tooltip, int heat) {
         CreateLang.translate("gui.gauge.info_header")
                 .style(ChatFormatting.GRAY)
                 .forGoggles(tooltip);
         IHeat.HeatLevel.getName("reactor_controller").style(ChatFormatting.GRAY).forGoggles(tooltip);
 
         IHeat.HeatLevel.getFormattedHeatText(heat).forGoggles(tooltip);
+    }
 
+    /**
+     * Appends one line per loaded item rod with its stacked count, or a placeholder
+     * line showing a count of 0 if no rods are loaded.
+     *
+     * @param tooltip the tooltip line list to append to
+     * @param state   the current display snapshot
+     */
+    private static void renderItemRods(List<Component> tooltip, ReactorDisplayState state) {
         if (state.items().isEmpty()) {
             CreateNuclearLang.builder()
                     .add(Component.translatable("tooltip.item.empty.rod").withStyle(ChatFormatting.GRAY))
@@ -75,7 +96,17 @@ public final class ReactorGoggleTooltipRenderer {
                         .forGoggles(tooltip);
             }
         }
+    }
 
+    /**
+     * Appends one line per loaded fluid with a fill-ratio progress bar relative to
+     * {@link ReactorDisplayState#maxFluidCapacity()}, or a "no fluid" placeholder
+     * with an empty progress bar if no fluids are loaded.
+     *
+     * @param tooltip the tooltip line list to append to
+     * @param state   the current display snapshot
+     */
+    private static void renderFluidTanks(List<Component> tooltip, ReactorDisplayState state) {
         if (state.fluids().isEmpty()) {
             CreateNuclearLang.translate("tooltip.fluid.none")
                     .style(ChatFormatting.GRAY)
