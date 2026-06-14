@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
 
 public class DefaultPersistenceService implements IPersistenceService {
     @Override
@@ -22,6 +23,11 @@ public class DefaultPersistenceService implements IPersistenceService {
 
         if (!clientPacket) {
             owner.deserializeInventory(compound.getCompound("pattern"));
+        } else {
+            owner.setDisplayState(compound.contains("displayState")
+                    ? ReactorDisplayState.deserializeNBT(compound.getCompound("displayState"))
+                    : ReactorDisplayState.EMPTY
+            );
         }
         owner.setConfiguredPattern(ItemStack.of(compound.getCompound("items")));
 
@@ -39,6 +45,8 @@ public class DefaultPersistenceService implements IPersistenceService {
 
         if (!clientPacket) {
             compound.put("pattern", owner.serializeInventory());
+        } else {
+            compound.put("displayState", owner.getDisplayState().serializeNBT());
         }
         compound.put("items", owner.getConfiguredPattern().serializeNBT());
 

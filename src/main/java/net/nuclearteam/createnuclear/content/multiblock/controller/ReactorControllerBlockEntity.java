@@ -38,6 +38,8 @@ import net.nuclearteam.createnuclear.api.multiblock.IMultiblockController;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorGoggleTooltipRenderer;
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.*;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
@@ -111,10 +113,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private final ReactorAlarmManagerI alarmManager;
     private final ReactorFrameDisplayManagerI frameDisplayManager;
 
-    // Client Display Data (Synced via NBT)
-    private Map<Item, Integer> clientDisplayItems = new HashMap<>();
-    private List<BigFluidStack> clientDisplayFluids = new ArrayList<>();
-    private long clientMaxFluidCapacity = 0;
+   private ReactorDisplayState displayState = ReactorDisplayState.EMPTY;
 
     // services (dependencies) - abstracted behind interfaces to follow DIP
     private final IHeatService heatService;
@@ -223,6 +222,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return this.inputFluidManager;
     }
 
+    public void setDisplayState(ReactorDisplayState state) {
+        this.displayState = state;
+    }
+
+    public ReactorDisplayState getDisplayState() {
+        return this.displayState;
+    }
+
     /**
      * Main constructor allowing dependency injection for testability and DIP
      * compliance.
@@ -265,62 +272,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             return false;
         }
 
-        CreateLang.translate("gui.gauge.info_header")
-                .style(ChatFormatting.GRAY)
-                .forGoggles(tooltip);
-        IHeat.HeatLevel.getName("reactor_controller").style(ChatFormatting.GRAY).forGoggles(tooltip);
-
-        IHeat.HeatLevel.getFormattedHeatText(patternTag.getInt("heat")).forGoggles(tooltip);
-
-        if (clientDisplayItems.isEmpty()) {
-            CreateNuclearLang.builder()
-                    .add(Component.translatable("tooltip.item.empty.rod").withStyle(ChatFormatting.GRAY))
-                    .add(CreateNuclearLang.number(0).style(ChatFormatting.GOLD))
-                    .forGoggles(tooltip);
-        } else {
-            for (Map.Entry<Item, Integer> entry : clientDisplayItems.entrySet()) {
-                ItemStack stack = new ItemStack(entry.getKey());
-                int count = entry.getValue();
-                CreateNuclearLang.itemName(stack)
-                        .style(ChatFormatting.GRAY)
-                        .text(": ")
-                        .add(CreateNuclearLang.number(count).style(ChatFormatting.GOLD))
-                        .forGoggles(tooltip);
-            }
-        }
-
-        if (clientDisplayFluids.isEmpty()) {
-            CreateNuclearLang
-                    .translate("tooltip.fluid.none")
-                    .style(ChatFormatting.GRAY)
-                    .forGoggles(tooltip);
-
-            CreateNuclearLang.builder()
-                    .text(TooltipHelper.makeProgressBar(5, 0))
-                    .style(ChatFormatting.BLUE)
-                    .space()
-                    .text("0%")
-                    .forGoggles(tooltip);
-        } else {
-            for (BigFluidStack stack : clientDisplayFluids) {
-                float fillRatio = clientMaxFluidCapacity > 0 ? (float) stack.amount / clientMaxFluidCapacity : 0;
-                if (fillRatio >= 0.99f)
-                    fillRatio = 1.0f;
-                int filledBars = (int) Math.round(fillRatio * 5);
-
-                CreateNuclearLang
-                        .translate("tooltip.fluid", stack.stack.getDisplayName())
-                        .style(ChatFormatting.GRAY)
-                        .forGoggles(tooltip);
-
-                CreateNuclearLang.builder()
-                        .text(TooltipHelper.makeProgressBar(5, filledBars))
-                        .style(ChatFormatting.BLUE)
-                        .space()
-                        .text(Math.round(fillRatio * 100) + "%")
-                        .forGoggles(tooltip);
-            }
-        }
+        ReactorGoggleTooltipRenderer.render(tooltip, displayState, patternTag.getInt("heat"), isPlayerSneaking);
 
         return true;
     }
@@ -340,34 +292,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.persistenceService.readBasicState(this, compound, clientPacket);
         this.needsToResolveEntities = true;
 
-        if (clientPacket) {
-            clientDisplayItems.clear();
-            if (compound.contains("clientDisplayItems")) {
-                ListTag list = compound.getList("clientDisplayItems",
-                        Tag.TAG_COMPOUND);
-                for (int i = 0; i < list.size(); i++) {
-                    CompoundTag tag = list.getCompound(i);
-                    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(tag.getString("Item")));
-                    if (item != null) {
-                        clientDisplayItems.put(item, tag.getInt("Count"));
-                    }
-                }
-            }
-
-            clientDisplayFluids.clear();
-            if (compound.contains("clientDisplayFluids")) {
-                ListTag list = compound.getList("clientDisplayFluids",
-                        Tag.TAG_COMPOUND);
-                for (int i = 0; i < list.size(); i++) {
-                    CompoundTag tag = list.getCompound(i);
-                    FluidStack fstack = FluidStack
-                            .loadFluidStackFromNBT(tag);
-                    clientDisplayFluids.add(new BigFluidStack(fstack, tag.getInt("BigAmount")));
-                }
-            }
-            clientMaxFluidCapacity = compound.getLong("clientMaxFluidCapacity");
-        }
-
         this.cycleManager.clear();
         if (compound.contains("cycleManager")) {
             this.cycleManager.deserializeNBT(compound.getCompound("cycleManager"));
@@ -384,27 +308,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.frameDisplayManager.write(compound);
 
         this.persistenceService.writeBasicState(this, compound, clientPacket);
-
-        if (clientPacket) {
-            ListTag displayItemsTag = new ListTag();
-            for (Map.Entry<Item, Integer> entry : clientDisplayItems.entrySet()) {
-                CompoundTag tag = new CompoundTag();
-                tag.putString("Item", ForgeRegistries.ITEMS.getKey(entry.getKey()).toString());
-                tag.putInt("Count", entry.getValue());
-                displayItemsTag.add(tag);
-            }
-            compound.put("clientDisplayItems", displayItemsTag);
-
-            ListTag displayFluidsTag = new ListTag();
-            for (BigFluidStack stack : clientDisplayFluids) {
-                CompoundTag tag = new CompoundTag();
-                stack.stack.writeToNBT(tag);
-                tag.putInt("BigAmount", stack.amount);
-                displayFluidsTag.add(tag);
-            }
-            compound.put("clientDisplayFluids", displayFluidsTag);
-            compound.putLong("clientMaxFluidCapacity", clientMaxFluidCapacity);
-        }
 
         compound.put("cycleManager", cycleManager.serializeNBT());
     }
@@ -516,33 +419,33 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             return;
 
         // Populate display fields for client sync
-        clientDisplayItems.clear();
+        Map<Item, Integer> items = new HashMap<>();
         List<IItemHandler> itemHandlers = this.inputManager.getItemHandlers(level);
         for (IItemHandler h : itemHandlers) {
             for (int s = 0; s < h.getSlots(); s++) {
                 ItemStack st = h.getStackInSlot(s);
                 if (!st.isEmpty()) {
-                    clientDisplayItems.put(st.getItem(),
-                            clientDisplayItems.getOrDefault(st.getItem(), 0) + st.getCount());
+                    items.merge(st.getItem(), st.getCount(), Integer::sum);
                 }
             }
         }
 
-        clientMaxFluidCapacity = 0;
-        List<IFluidHandler> fhandlers = this.inputFluidManager.getFuildHandlers(level);
-        for (IFluidHandler h : fhandlers) {
+        long maxFluidCapacity = 0;
+        for (IFluidHandler h : this.inputFluidManager.getFuildHandlers(level)) {
             if (h.getTanks() > 0) {
-                clientMaxFluidCapacity += h.getTankCapacity(0);
+                maxFluidCapacity += h.getTankCapacity(0);
             }
         }
 
         VirtualReactorInputsItem virtualReactorInputsItem = inputManager.getInventory(level);
         VirtualReactorInputFluid virtualReactorInputFluid = inputFluidManager.getInventory(level);
-        clientDisplayFluids = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
+        List<BigFluidStack> fluids = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
+
+        this.displayState = new ReactorDisplayState(items, fluids, maxFluidCapacity);
 
         this.bigFuelItem = virtualReactorInputsItem.getBigFuelRod();
         this.bigCoolerItem = virtualReactorInputsItem.getBigCooledRod();
-        this.bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
+        this.bigFluidStack = fluids;
 
         updateReactorStateVisibility();
         handleAssembledState();
