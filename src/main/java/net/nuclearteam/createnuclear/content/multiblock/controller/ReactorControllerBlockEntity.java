@@ -4,22 +4,14 @@ import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.item.TooltipHelper;
-import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -30,9 +22,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.IMultiblockController;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
@@ -41,9 +31,10 @@ import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorGoggleTooltipRenderer;
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.*;
+import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshot;
+import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshotBuilder;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
-import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
@@ -51,23 +42,16 @@ import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehavio
 import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.ConsumptionCycleManager;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
-import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.BiomeIrradiationService;
-import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
-
-import java.util.Map;
 
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
@@ -418,34 +402,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (!isAssembled())
             return;
 
-        // Populate display fields for client sync
-        Map<Item, Integer> items = new HashMap<>();
-        List<IItemHandler> itemHandlers = this.inputManager.getItemHandlers(level);
-        for (IItemHandler h : itemHandlers) {
-            for (int s = 0; s < h.getSlots(); s++) {
-                ItemStack st = h.getStackInSlot(s);
-                if (!st.isEmpty()) {
-                    items.merge(st.getItem(), st.getCount(), Integer::sum);
-                }
-            }
-        }
-
-        long maxFluidCapacity = 0;
-        for (IFluidHandler h : this.inputFluidManager.getFuildHandlers(level)) {
-            if (h.getTanks() > 0) {
-                maxFluidCapacity += h.getTankCapacity(0);
-            }
-        }
-
-        VirtualReactorInputsItem virtualReactorInputsItem = inputManager.getInventory(level);
-        VirtualReactorInputFluid virtualReactorInputFluid = inputFluidManager.getInventory(level);
-        List<BigFluidStack> fluids = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
-
-        this.displayState = new ReactorDisplayState(items, fluids, maxFluidCapacity);
-
-        this.bigFuelItem = virtualReactorInputsItem.getBigFuelRod();
-        this.bigCoolerItem = virtualReactorInputsItem.getBigCooledRod();
-        this.bigFluidStack = fluids;
+        ReactorInputSnapshot snapshot = ReactorInputSnapshotBuilder.build(level, inputManager, inputFluidManager);
+        this.displayState = new ReactorDisplayState(snapshot.items(), snapshot.fluids(), snapshot.maxFluidCapacity());
+        this.bigFuelItem = snapshot.bigFuelItem();
+        this.bigCoolerItem = snapshot.bigCoolerItem();
+        this.bigFluidStack = snapshot.fluids();
 
         updateReactorStateVisibility();
         handleAssembledState();

@@ -46,24 +46,15 @@ public void tick() {
     stateSynchronizer.updateVisibility(...);
 }
 
-#9 + #13 — Tooltip Goggles + sérialisation clientDisplay* → extraction "presque pure" (lecture de champs existants), pas de changement de comportement, prépare le DTO ReactorDisplayState qui servira aux étapes suivantes.
+#10 — Snapshot des intrants (ReactorInputSnapshotBuilder) → consolide la collecte déjà faite dans tick(), réutilisée par #5/#6/#9. C'est le pivot qui débloque le découpage du gros tick().
 
-Tooltip Goggles (affichage joueur)
-Code concerné : addToGoggleTooltip(...) (lignes 266-332).
+Construction de l'état d'affichage client (clientDisplay*)
+Code concerné : tick() lignes 547-575 (remplissage clientDisplayItems, clientDisplayFluids, clientMaxFluidCapacity, bigFuelItem, bigCoolerItem, bigFluidStack).
 
-Pourquoi l'extraire : 65 lignes de construction de Component/CreateLang/barres de progression — pure logique de présentation UI, sans rapport avec la simulation du réacteur. Le BE ne devrait être qu'une source de données (clientDisplayItems, clientDisplayFluids, heat).
-Principe : SRP + séparation présentation/domaine (MVC-like) — le rendu de tooltip doit dépendre d'un état, pas l'inverse.
-Cible : ReactorGoggleTooltipRenderer (helper statique ou petite classe), méthode render(List<Component> tooltip, ReactorDisplayState state, boolean isSneaking).
-Justification : permet de réutiliser/tester le rendu de tooltip indépendamment (et de le faire évoluer — ex. ajouter une ligne — sans toucher au BE). IHaveGoggleInformation.addToGoggleTooltip devient un simple appel délégué.
-Dépendances à injecter : un DTO ReactorDisplayState (heat, clientDisplayItems, clientDisplayFluids, clientMaxFluidCapacity, configuredPatternTag).
-
-Sérialisation NBT de l'affichage client
-Code concerné : read/write lignes 349-413 (blocs clientDisplayItems/clientDisplayFluids/clientMaxFluidCapacity).
-
-Pourquoi l'extraire : ~65 lignes de (dé)sérialisation NBT pour des données qui, avec #10, deviendraient un objet ReactorInputSnapshot/ReactorDisplayState dédié. Actuellement dupliqué inline dans read/write.
-Principe : DRY + cohésion — la sérialisation d'un état doit être co-localisée avec sa définition.
-Cible : méthode serializeNBT()/deserializeNBT(CompoundTag) sur le futur ReactorDisplayState (#9/#10), appelée depuis read/write au même titre que inputManager.read(...).
-Justification : suit exactement le pattern déjà appliqué aux autres managers (inputManager.read/write, etc.) — cohérence architecturale.
-Dépendances à injecter : aucune — auto-contenu dans l'objet d'état.
+Pourquoi l'extraire : c'est une étape de collecte de données (scan des handlers d'items/fluides) totalement séparable de la logique de simulation. Aujourd'hui mélangée au tick principal, elle gonfle tick() et duplique des accès aux managers.
+Principe : SRP + cohésion — "collecter l'état des intrants pour affichage/calcul" est une étape nommée et isolée du pipeline.
+Cible : ReactorInputSnapshotBuilder (service), méthode buildSnapshot(Level, ReactorInputManagerI, ReactorInputFluidManagerI) -> ReactorInputSnapshot (record contenant items, fluides, capacité max, bigFuel/bigCooler/bigFluidStack).
+Justification : le snapshot devient l'unique source utilisée à la fois par le tooltip (#9), le calcul de chaleur (#5) et la consommation (#6/#7) — élimine la dispersion actuelle des mêmes données dans plusieurs champs mutables du BE.
+Dépendances à injecter : Level, ReactorInputManagerI, ReactorInputFluidManagerI.
 
 Avant toute proposition de modification, explique précisément les changements envisagés et les raisons de ces choix. Ne modifie aucun fichier directement et présente uniquement l’analyse, les recommandations et les éventuels exemples de code dans cette discussion.
