@@ -91,7 +91,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
 
         ItemStack heldItem = player.getItemInHand(handIn);
         if (heldItem.is(Items.PAPER)) {
-            withBlockEntityDo(worldIn, pos, ReactorControllerBlockEntity::logReactorConnections);
+            withBlockEntityDo(worldIn, pos, be -> be.logReactorConnections(player));
         }
 
         if (!state.getValue(ASSEMBLED)) {

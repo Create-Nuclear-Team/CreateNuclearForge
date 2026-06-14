@@ -15,6 +15,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
@@ -37,6 +38,7 @@ import net.nuclearteam.createnuclear.api.multiblock.IMultiblockController;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
+import net.nuclearteam.createnuclear.content.multiblock.controller.service.*;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
@@ -62,10 +64,6 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
-import net.nuclearteam.createnuclear.content.multiblock.controller.service.IHeatService;
-import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultHeatService;
-import net.nuclearteam.createnuclear.content.multiblock.controller.service.IPersistenceService;
-import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultPersistenceService;
 
 import java.util.Map;
 
@@ -121,6 +119,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     // services (dependencies) - abstracted behind interfaces to follow DIP
     private final IHeatService heatService;
     private final IPersistenceService persistenceService;
+    private final IExplosionService meltdownExecutor;
 
     // service fields are injected; implementations live in separate classes
 
@@ -245,6 +244,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         this.heatService = new DefaultHeatService(new HeatManager());
         this.persistenceService = new DefaultPersistenceService();
+        this.meltdownExecutor = new ReactorMeltdownExecutor();
     }
 
     @Override
@@ -426,34 +426,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.setChanged();
     }
 
-    public void logReactorConnections() {
-        CreateNuclear.LOGGER.debug("Reactor input count: {}", this.inputManager.size());
-        CreateNuclear.LOGGER.debug("Reactor output count: {}", this.outputManager.size());
-        CreateNuclear.LOGGER.debug("Reactor fluid input count: {}", this.inputFluidManager.size());
-
-        for (BlockPos pos : this.inputManager.getBlocksPosition()) {
-            CreateNuclear.LOGGER.debug("Registered reactor input position: {}", pos);
-        }
-
-        for (BlockPos pos : this.inputManager.getBlocksPosition(level)) {
-            CreateNuclear.LOGGER.debug("Valid reactor input position: {}", pos);
-        }
-
-        for (BlockPos pos : this.outputManager.getBlocksPosition()) {
-            CreateNuclear.LOGGER.debug("Registered reactor output position: {}", pos);
-        }
-
-        for (BlockPos pos : this.outputManager.getBlocksPosition(level)) {
-            CreateNuclear.LOGGER.debug("Valid reactor output position: {}", pos);
-        }
-
-        for (BlockPos pos : this.inputFluidManager.getBlocksPosition()) {
-            CreateNuclear.LOGGER.debug("Registered reactor fluid input position: {}", pos);
-        }
-
-        for (BlockPos pos : this.inputFluidManager.getBlocksPosition(level)) {
-            CreateNuclear.LOGGER.debug("Valid reactor fluid input position: {}", pos);
-        }
+    public void logReactorConnections(Player player) {
+        ReactorDebugDiagnostics.sendReactorConnectionsTo(player, level, inputManager, inputFluidManager, outputManager, alarmManager);
     }
 
     private void updateReactorStateVisibility() {
@@ -516,7 +490,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                         CreateNuclearLang.translate("notification.reactor.imminent_explosion"),
                         ChatFormatting.DARK_RED, configRadius, configWarnAll, 0, 40, 10);
 
-                triggerNuclearExplosion();
+                if (level instanceof ServerLevel serverLevel) {
+                    this.meltdownExecutor.triggerExplosion(serverLevel, getBlockPos(), reactorSize, countUraniumRod);
+                }
+                isExploding = true;
                 return;
             }
         } else {
@@ -652,62 +629,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             if (!this.outputManager.getBlocksPosition().isEmpty()) {
                 rotate(getBlockState(), getLevel(), heat);
             }
-        }
-    }
-
-    private void triggerNuclearExplosion() {
-        if (isExploding)
-            return;
-        isExploding = true;
-
-        BlockPos explosionPos = getBlockPos().above(5);
-        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
-        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
-
-        if (level instanceof ServerLevel serverLevel) {
-            // --- MESSAGE D'EXPLOSION FINALE (TRADUIT) ---
-            NotifyUtil.sendTitle(level, getBlockPos(),
-                    CreateNuclearLang.translate("notification.reactor.destroyed"),
-                    CreateNuclearLang.translate("notification.reactor.meltdown_finished"),
-                    ChatFormatting.DARK_RED, configRadius, configWarnAll, 10, 60, 20);
-
-            NuclearExplosionEntity explosion = new NuclearExplosionEntity(
-                    CNEntityType.NUCLEAR_EXPLOSION.get(),
-                    serverLevel);
-
-            // --- CALCUL D'EXPLOSION ÉQUILIBRÉ ---
-
-            // 1. On définit un modificateur de structure plus progressif
-            // Au lieu de 1, 2, 3, on utilise un ratio basé sur la taille réelle
-            float structureFactor = reactorSize / 5.0F; // 5x5 -> 1.0 | 7x7 -> 1.4 | 9x9 -> 1.8
-
-            /*
-             * 2. Utilisation de la racine carrée (Mth.sqrt)
-             * L'uranium augmente la puissance, mais avec des rendements décroissants.
-             * Plus on ajoute d'uranium, plus chaque barre supplémentaire ajoute "moins" au
-             * rayon.
-             */
-            float fuelImpact = Mth.sqrt(countUraniumRod) * 0.3F;
-
-            // 3. Taille finale : Base constante + (Impact Fuel * Facteur Structure)
-            float size = 1.5F + (fuelImpact * structureFactor);
-
-            size = Mth.clamp(size, 1.0F, 10.0F);
-
-            explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() - 2.0D);
-            explosion.setSize(size);
-
-            // Griefing selon les gamerules
-            boolean griefing = serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
-            explosion.setNoGriefing(!griefing);
-
-            serverLevel.addFreshEntity(explosion);
-
-            // On détruit le bloc après avoir envoyé les messages
-            level.destroyBlock(getBlockPos(), false);
-
-            // Changement de biome vers Irradiated Plain
-            BiomeIrradiationService.circularArea(serverLevel, explosionPos, CNBiomes.Irradiated.PLAIN, (int) (size * 30));
         }
     }
 
