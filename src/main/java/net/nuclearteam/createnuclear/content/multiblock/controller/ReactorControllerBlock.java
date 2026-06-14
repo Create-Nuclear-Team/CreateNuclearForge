@@ -95,7 +95,6 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         }
 
         if (!state.getValue(ASSEMBLED)) {
-            // player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
         }
         else {
             if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty() && heldItem.getTag() != null){
