@@ -61,9 +61,9 @@ public class DefaultHeatCalculator implements IHeatCalculator {
                                 if ("fuel".equals(currentRod)) {
                                     ItemStack stack = ItemStack.of(list.getCompound(l));
                                     if (stack.is(CNTags.CNItemTags.FUEL.tag)) {
-                                        heat += rod.baseRodHeat();
+                                        heat += rod.proximityRodHeat();
                                     } else if (stack.is(CNTags.CNItemTags.COOLER.tag)) {
-                                        heat += rod.baseRodHeat() / Math.max(1, ItemRodTypesValue.getRodType(stack.getItem()).proximityRodHeat());
+                                        heat += rod.baseRodHeat() / ItemRodTypesValue.getRodType(stack.getItem()).proximityRodHeat();
                                     }
                                 }
                             }
