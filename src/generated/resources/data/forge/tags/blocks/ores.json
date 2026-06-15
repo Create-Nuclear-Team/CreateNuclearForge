@@ -7,7 +7,6 @@
     "createnuclear:lead_ore",
     "createnuclear:thorium_ore",
     "createnuclear:nitrate_ore",
-    "createnuclear:deepslate_nitrate_ore",
-    "createnuclear:thorium_block"
+    "createnuclear:deepslate_nitrate_ore"
   ]
 }

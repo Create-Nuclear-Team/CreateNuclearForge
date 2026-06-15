@@ -596,20 +596,9 @@ public class CNBlocks {
         CreateNuclear.REGISTRATE.block("thorium_block", Block::new)
             .initialProperties(SharedProperties::stone)
             .transform(pickaxeOnly())
-            .loot((lt, b) -> lt.add(b,
-                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                        lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                                .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))))))
-            .tag(BlockTags.NEEDS_DIAMOND_TOOL,
-                    BlockTags.NEEDS_IRON_TOOL,
-                    CNTags.forgeBlockTag("ores"),
-                    CNTags.forgeBlockTag("ores_in_ground/stone"),
-                    CNTags.forgeBlockTag("ores/thorium"),
-                    CNBlockTags.THORIUM_ORES.tag)
+            .tag(CNTags.forgeBlockTag("storage_blocks/thorium"))
             .item()
-            .tag(CNItemTags.THORIUM_ORES.tag,
-                CNTags.forgeItemTag("ores/thorium"),
-                CNTags.forgeItemTag("storage_blocks/thorium"))
+            .tag(CNTags.forgeItemTag("storage_blocks/thorium"))
             .build()
             .register();
 

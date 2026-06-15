@@ -22,6 +22,7 @@ public class IrradiatedOverlayRendererVision {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR) return;
         LocalPlayer localPlayer = mc.player;
+        if (localPlayer == null) return;
         RenderSystem.enableBlend();
         if (localPlayer.hasEffect(CNEffects.RADIATION.get())) {
             irradiatedVisionAlpha = Math.min(1.0f, irradiatedVisionAlpha + 0.01f);
