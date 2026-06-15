@@ -1,4 +1,4 @@
-// 1.20.1	2026-06-15T13:51:24.9226141	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-06-15T19:58:10.7629453	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -535,9 +535,6 @@ ded8acf28ec98ddbd5257b9e7a7a4d8f3686d6df data/createnuclear/recipes/smithing/def
 a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/createnuclear/tags/blocks/enriching_fire_base_blocks.json
 509b5baa813ae0dc3345fd97754e4088132359ec data/createnuclear/tags/blocks/fan_processing_catalysts/enriched.json
 bc8701774f57ab000a8f0f1d390702175a6cdbb8 data/createnuclear/tags/blocks/fan_processing_catalysts/snow_powder.json
-925cb97bc13b3122fe17e59ff3ec2fe4d1eaacd5 data/createnuclear/tags/blocks/lead_ores.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/createnuclear/tags/blocks/thorium_ores.json
-bad88bea18fec41c7ad6fa4d396feacc0346a137 data/createnuclear/tags/blocks/uranium_ores.json
 ccbc67cba973a8e1e43d0166ddfa5645f6a82aea data/createnuclear/tags/entity_types/irradiated_immune.json
 410aa6d101788f25baa176741887c6f314006f29 data/createnuclear/tags/fluids/nitrogen.json
 dd07a117bf2a657aba3d776ee718829150a1c0af data/createnuclear/tags/fluids/thorium.json
@@ -547,10 +544,7 @@ bce34f53cb2d00f7dee84683e8fdd429dabbcc1d data/createnuclear/tags/items/anti_radi
 2e4d08932c4a84863f0198eb2845f80d8fda1221 data/createnuclear/tags/items/cloth.json
 8e6598f14a72a61cbe1e5ed2aaea229fb2dd74e6 data/createnuclear/tags/items/cooler.json
 c5587bb72c54f59e9f9a4cd2c3e6bedb78ee198d data/createnuclear/tags/items/fuel.json
-925cb97bc13b3122fe17e59ff3ec2fe4d1eaacd5 data/createnuclear/tags/items/lead_ores.json
 1a438d724641b4899f18b4abeef0b0708c76ea70 data/createnuclear/tags/items/stone_types/autunite.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/createnuclear/tags/items/thorium_ores.json
-bad88bea18fec41c7ad6fa4d396feacc0346a137 data/createnuclear/tags/items/uranium_ores.json
 d8d6ad7a4fc31fd68a98b368207c359fb610f417 data/create/tags/blocks/safe_nbt.json
 75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/forge/tags/blocks/glass.json
 1fd17be1d553e7ddf20494ee1e98084f02137cc8 data/forge/tags/blocks/ores.json
@@ -615,8 +609,8 @@ e84d8e1fa924bec3e226b8917b4973b9629a5f52 data/minecraft/tags/blocks/mineable/axe
 2844dedd4483b2d2ed5abcac2f0eca476c29efa4 data/minecraft/tags/blocks/mineable/pickaxe.json
 a7d4278d8a39649c8b658ad2f3f1d092cb012bdf data/minecraft/tags/blocks/mineable/shovel.json
 8875ba7215b30d75573e3dcfe46e0b690b1d7f2f data/minecraft/tags/blocks/moss_replaceable.json
-f815fd2431b9acf1fdf1f12a1adacaa2d147760f data/minecraft/tags/blocks/needs_diamond_tool.json
-f40b6efca0ad845aeaf0bf4ef3490664d8ebe591 data/minecraft/tags/blocks/needs_iron_tool.json
+c47b0de40f93afb83463f8b3c7be32b613542b5d data/minecraft/tags/blocks/needs_diamond_tool.json
+1fd17be1d553e7ddf20494ee1e98084f02137cc8 data/minecraft/tags/blocks/needs_iron_tool.json
 9b9e13222cf9d971353888483c5f041cbb664dc3 data/minecraft/tags/blocks/slabs.json
 7e5c701218bfbd3b186b102ff52dc79454a39e8f data/minecraft/tags/blocks/stairs.json
 92fe109294976e85a9b9763124896e012a17c98a data/minecraft/tags/blocks/walls.json

@@ -377,11 +377,10 @@ public class CNBlocks {
                 BlockTags.NEEDS_IRON_TOOL,
                 CNTags.forgeBlockTag("ores"),
                 CNTags.forgeBlockTag("ores_in_ground/deepslate"),
-                CNTags.forgeBlockTag("ores/uranium"),
-                CNBlockTags.URANIUM_ORES.tag
+                CNTags.forgeBlockTag("ores/uranium")
             )
             .item((b, p) -> new UraniumOreItem(b, p, 3))
-            .tag(CNItemTags.URANIUM_ORES.tag, CNTags.forgeItemTag("ores/uranium"))
+            .tag(CNTags.forgeItemTag("ores/uranium"))
             .build()
             .register();
 
@@ -397,11 +396,10 @@ public class CNBlocks {
             .tag(BlockTags.NEEDS_IRON_TOOL,
                     CNTags.forgeBlockTag("ores"),
                     CNTags.forgeBlockTag("ores_in_ground/deepslate"),
-                    CNTags.forgeBlockTag("ores/lead"),
-                    CNBlockTags.LEAD_ORES.tag)
+                    CNTags.forgeBlockTag("ores/lead")
+            )
             .item()
-            .tag(CNItemTags.LEAD_ORES.tag,
-                    CNTags.forgeItemTag("ores/lead"))
+            .tag(CNTags.forgeItemTag("ores/lead"))
             .build()
             .register();
     
@@ -417,6 +415,7 @@ public class CNBlocks {
                         .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 5))
             ))))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL,
+                BlockTags.NEEDS_IRON_TOOL,
                 CNTags.forgeBlockTag("ores"),
                 CNTags.forgeBlockTag("ores_in_ground/deepslate"),
                 CNTags.forgeBlockTag("ores/thorium")
@@ -442,11 +441,10 @@ public class CNBlocks {
                 BlockTags.NEEDS_IRON_TOOL,
                 CNTags.forgeBlockTag("ores"),
                 CNTags.forgeBlockTag("ores_in_ground/stone"),
-                CNTags.forgeBlockTag("ores/uranium"),
-                CNBlockTags.URANIUM_ORES.tag
+                CNTags.forgeBlockTag("ores/uranium")
             )
             .item((b, p) -> new UraniumOreItem(b, p, 3))
-            .tag(CNItemTags.URANIUM_ORES.tag, CNTags.forgeItemTag("ores/uranium"))
+            .tag(CNTags.forgeItemTag("ores/uranium"))
             .build()
             .register();
 
@@ -461,11 +459,10 @@ public class CNBlocks {
             .tag(BlockTags.NEEDS_IRON_TOOL,
                     CNTags.forgeBlockTag("ores"),
                     CNTags.forgeBlockTag("ores_in_ground/stone"),
-                    CNTags.forgeBlockTag("ores/lead"),
-                    CNBlockTags.LEAD_ORES.tag)
+                    CNTags.forgeBlockTag("ores/lead")
+            )
             .item()
-            .tag(CNItemTags.LEAD_ORES.tag,
-                    CNTags.forgeItemTag("ores/lead"))
+            .tag(CNTags.forgeItemTag("ores/lead"))
             .build()
             .register();
 
@@ -481,7 +478,8 @@ public class CNBlocks {
                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
                         .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 5))
             ))))
-            .tag(BlockTags.NEEDS_IRON_TOOL,
+            .tag(BlockTags.NEEDS_DIAMOND_TOOL,
+                BlockTags.NEEDS_IRON_TOOL,
                 CNTags.forgeBlockTag("ores"),
                 CNTags.forgeBlockTag("ores_in_ground/stone"),
                 CNTags.forgeBlockTag("ores/thorium")
@@ -569,7 +567,7 @@ public class CNBlocks {
         CreateNuclear.REGISTRATE.block("raw_thorium_block", Block::new)
             .initialProperties(SharedProperties::stone)
             .transform(pickaxeOnly())
-            .tag(CNTags.forgeBlockTag("storage_blocks/raw_thorium"))
+            .tag(BlockTags.NEEDS_DIAMOND_TOOL, CNTags.forgeBlockTag("storage_blocks/raw_thorium"))
             .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, c.get())
                     .unlockedBy("has_raw_materials_thorium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("raw_materials/thorium")))
                     .define('R', CNTags.forgeItemTag("raw_materials/thorium"))
