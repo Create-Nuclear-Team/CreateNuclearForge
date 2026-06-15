@@ -23,11 +23,8 @@ La **grande majorité des bugs** de `AUDIT_V1.md` sont **toujours présents**, e
 | Réf. | Fichier:ligne | État | Détail |
 |---|---|---|---|
 | **B1** | `foundation/events/overlay/EventTextOverlay.java:40` | **Toujours présent** | `return timer > 0 && false;` — overlay jamais actif. `triggerEvent()` confirmé **jamais appelé** (grep global) → la classe entière est morte, enregistrée et rendue chaque frame pour rien. |
-| **B4** | `CNBlocks.java` (~599-618) | **Toujours présent** | `THORIUM_BLOCK` drope `RAW_URANIUM` avec `addOreBonusCount(Enchantments.BLOCK_FORTUNE)` et porte les tags `ores`, `ores/thorium`, `ores_in_ground/stone`, `NEEDS_DIAMOND_TOOL/NEEDS_IRON_TOOL`, `THORIUM_ORES` — un bloc de stockage entièrement tagué/loot comme un minerai. |
-| **B5** | `infrastructure/worldgen/biome/surfacerule/BiomeTagRule.java:20-23` | **Toujours présent** | `apply()` retourne `null` ; la classe interne `Predicate` (logique réelle) n'est jamais instanciée → NPE dès évaluation de `IS_IRRADIATED_PLAIN`. |
 | **B7** | `infrastructure/worldgen/biome/CNNoiseData.java` | **Toujours présent** | `bootstrapRegistries()` reste un corps **vide** ; `EROSION` jamais enregistré dans `Registries.NOISE`, alors que `IrradiatedSurfaceRules` (fusion v1/v2, un seul fichier désormais) fait toujours 3× `noiseCondition(EROSION,...)` → `getOrThrow` lèvera à la génération. |
 | **B8** | `content/multiblock/controller/ReactorControllerBlockEntity.java:646` | **Toujours présent, code réécrit mais bug identique** | `clearLockIfAllInputsEmpty()` fait désormais `CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this).data().getSize()` **sans null-check** sur le résultat de `findStructure`, qui peut retourner `null` si la structure n'est plus formée → NPE serveur. La méthode fait en plus un scan cubique `O(n³)` (`getBlockEntity` + capability lookup) alors que `inputFluidManager.getFuildHandlers(level)` donne déjà la liste exacte. |
-| **B18** | `infrastructure/config/CNCClient.java:8-9` | **Toujours présent** | `screenShaking` réutilise littéralement la clé TOML `"nuclearBombFlash"` (avec un `;;` final en plus). Confirmé : deux options config pointent sur la même entrée. |
 
 ---
 
@@ -38,7 +35,6 @@ La **grande majorité des bugs** de `AUDIT_V1.md` sont **toujours présents**, e
 | **B3** | `content/effects/VicinityEffect.java:32-49` | **Toujours présent, identique** | `int cooldownTicks = 0;` réinitialisé à chaque itération → branche `else` morte, `cooldowns`/`getCooldown`/`setCooldown` toujours jamais appelés (confirmé grep). `RadiationEffect` continue donc à `addEffect` un `MobEffectInstance(RADIATION,300)` toutes les 5 ticks sur chaque entité proche, sans throttling réel. |
 | **B6** | `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java` / `ReactorBluePrintItemPacket.java` | **Toujours présent** | Le 6ᵉ argument du packet duplique le 5ᵉ (uranium perdu) ; `coef=0.1F` envoyé à la place de `heat`. |
 | **B9** | `content/radiation/capability/RadiationCapability.java` (`applyEffects`) | **Toujours présent, identique** | Les deux premières branches (`radiation < level1`, `radiation < level2`) donnent toutes deux `amplifierLevel0` → `radiationLevel2` reste un palier inopérant. |
-| **B10** | `foundation/events/overlay/IrradiatedOverlayRendererVision.java:24-26` | **Toujours présent — Critique** | `LocalPlayer localPlayer = mc.player;` utilisé directement sans null-check, alors que les autres overlays (`HelmetOverlay`, `RadiationOverlay`) le font correctement. NPE au rendu pendant chargement/respawn/déconnexion. |
 | **B12** | `content/contraptions/irradiated/AnimalUtil.java:72-81` | **Toujours présent** | `isFood` ne reconnaît la yellowcake comme aliment **que** si elle porte un tag NBT `"Ingredient"` — incohérent avec `mobInteract` (ligne ~39) qui accepte *toute* yellowcake pour la conversion. Le chemin "food" (élevage/soin) reste cassé pour la yellowcake sans tag. |
 | **B13** | `content/equipment/armor/AntiRadiationArmorClientExtensions.java` (case `CHEST`) | **Toujours présent, identique** | `this.model.rightArm.visible = true; this.model.leftArm.visible = true;` (champs hérités, non rendus par le `renderToBuffer` custom) au lieu de `right_arm`/`left_arm`. Bras toujours invisibles sur l'armure anti-radiation en mode plastron. |
 | **B14** | `content/multiblock/input/fluid/FluidLockManager.java` | **Toujours présent** | `Map<BlockPos,Fluid>` statique, sans clé de dimension, jamais purgée, doublon de `PersistentFluidLocks` ; toujours appelé depuis `clearLockIfAllInputsEmpty()` (B8) et `ReactorFluidInputEntity.FilteredFluidHandler`. |
@@ -102,7 +98,7 @@ Ces points n'apparaissaient pas (ou pas sous cette forme) dans `AUDIT_V1.md` —
    *Recommandation* : router via un helper unique "peut être irradié" partagé par les 3 chemins.
 
 5. **Deux overlays de "vision irradiée" actifs en parallèle**
-   `IrradiatedOverlayRendererVision` (actif, bug B10) et `RadiationOverlay` (commenté dans `HudRenderer` mais toujours alimenté via `HelmetOverlay.setCoverage`) sont **deux implémentations concurrentes du même effet visuel**. `AUDIT_V1.md` mentionnait `RadiationOverlay` comme mort sans relever explicitement la duplication fonctionnelle avec `IrradiatedOverlayRendererVision` — confirmé ici comme une vraie redondance architecturale (deux fichiers, deux mécanismes de fade, un seul réellement rendu).
+   `IrradiatedOverlayRendererVision` (actif) et `RadiationOverlay` (commenté dans `HudRenderer` mais toujours alimenté via `HelmetOverlay.setCoverage`) sont **deux implémentations concurrentes du même effet visuel**. `AUDIT_V1.md` mentionnait `RadiationOverlay` comme mort sans relever explicitement la duplication fonctionnelle avec `IrradiatedOverlayRendererVision` — confirmé ici comme une vraie redondance architecturale (deux fichiers, deux mécanismes de fade, un seul réellement rendu).
 
 6. **`RenderHelper.renderTextureOverlay` — `Math.round(alpha*coverage)` annule le fade**
    `RadiationOverlay.java:49` passe `Math.round(alpha * coverage)` (un `int` 0 ou 1) à un paramètre `float alpha ∈ [0,1]` — le fade progressif de `EasingHudOverlay` est **binarisé** (apparition/disparition instantanée). Non décrit explicitement dans `AUDIT_V1.md` (qui notait juste "RadiationOverlay:49 binarise l'alpha via Math.round" en passant, dans une remarque connexe sur `RenderHelper`) — confirmé ici comme un bug à part entière, mais **actuellement sans impact visible** puisque `RadiationOverlay` n'est pas rendu (cf. point 5).
@@ -124,9 +120,9 @@ Ces points n'apparaissaient pas (ou pas sous cette forme) dans `AUDIT_V1.md` —
     En mode "normal" (mode 0), `HeatDisplaySource` affiche `"500 °C"` alors que `ReactorSummaryDisplaySource` affiche une **jauge** pour le heat dans le même mode (`gaugeOnNormal=true` pour heat uniquement) — incohérence visuelle entre les deux affichages pour un même mode utilisateur, non relevée dans `AUDIT_V1.md`.
 
 12. **`IrradiatedBiomes` — contenu de worldgen visiblement copié d'un autre mod**
-    `addDefaultIrradiatedOres`/`addDefaultSoftDisks` ajoutent `MiscOverworldPlacements.BLUE_ICE`, `Carvers.NETHER_CAVE`, `VOID_START_PLATFORM` — du contenu vanilla sans rapport avec un biome "irradié", et `monsters(...)` est un no-op appelé avec des paramètres `(95, 5, 100)` silencieusement ignorés. Combiné aux bugs B5/B7/B19, le pipeline worldgen "irradié" semble être un **template non terminé/non re-thémé**, plus large que ce que `AUDIT_V1.md` avait documenté (qui se concentrait sur les surface rules).
+    `addDefaultIrradiatedOres`/`addDefaultSoftDisks` ajoutent `MiscOverworldPlacements.BLUE_ICE`, `Carvers.NETHER_CAVE`, `VOID_START_PLATFORM` — du contenu vanilla sans rapport avec un biome "irradié", et `monsters(...)` est un no-op appelé avec des paramètres `(95, 5, 100)` silencieusement ignorés. Combiné aux bugs B7/B19, le pipeline worldgen "irradié" semble être un **template non terminé/non re-thémé**, plus large que ce que `AUDIT_V1.md` avait documenté (qui se concentrait sur les surface rules).
 
-13. **`CNNoiseGeneratorSettings.IRRADIATED`** définit `STEEL_BLOCK` comme bloc de remplissage par défaut du terrain (équivalent "stone"). Si jamais relié à une dimension, génèrerait un terrain massivement en acier — combiné aux surface rules cassées (B5/B7/B19), point d'alerte non couvert par `AUDIT_V1.md`.
+13. **`CNNoiseGeneratorSettings.IRRADIATED`** définit `STEEL_BLOCK` comme bloc de remplissage par défaut du terrain (équivalent "stone"). Si jamais relié à une dimension, génèrerait un terrain massivement en acier — combiné aux surface rules cassées (B7/B19), point d'alerte non couvert par `AUDIT_V1.md`.
 
 ### 🟡 Mineurs
 
@@ -163,7 +159,7 @@ Tous les points perf de `AUDIT_V1.md` §4 restent **non corrigés** :
 
 ## 7. Plan d'action — priorités mises à jour
 
-**Quick wins toujours en attente** (1 ligne, fort impact) : **B1**, **B5**, **B9**, **B18** (toujours triviaux à corriger), **B7** (enregistrer `EROSION`), **B4** (loot/tags Thorium).
+**Quick wins toujours en attente** (1 ligne, fort impact) : **B1** (one-liner mais classe morte — décider câbler/supprimer), **B9** (mapping amplificateurs ambigu — décision produit), **B7** (enregistrer `EROSION`).
 
 **Nouveaux quick wins identifiés** :
 - `AntiRadiationArmorClientExtensions` (B13) : remplacer `rightArm/leftArm` par `right_arm/left_arm` en case `CHEST`.
