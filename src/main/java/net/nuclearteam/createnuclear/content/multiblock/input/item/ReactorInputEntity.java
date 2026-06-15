@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -40,10 +39,6 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) { }
-
-    // Dans ta classe, j'imagine que tu as ces variables :
-    private BlockPos inputPos;
-    private ResourceKey<Level> inputLevelKey; // On stocke la clé, pas l'objet Level directement
 
     @Override
     protected void write(CompoundTag tag, boolean clientPacket) {

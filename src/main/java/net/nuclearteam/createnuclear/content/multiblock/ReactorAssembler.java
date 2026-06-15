@@ -4,12 +4,10 @@ import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.phys.AABB;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
@@ -21,8 +19,6 @@ import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
-
-import java.util.List;
 
 public final class ReactorAssembler {
 
@@ -129,12 +125,6 @@ public final class ReactorAssembler {
             return entity;
         }
         return null;
-    }
-
-    @Deprecated
-    private static List<Player> getPlayersInRadius(Level level, BlockPos center, double radius) {
-        AABB box = new AABB(center).inflate(radius);
-        return level.getEntitiesOfClass(Player.class, box);
     }
 
     private static void sendMessageToPlayer(Level level, BlockPos pos, LangBuilder component, boolean condition) {

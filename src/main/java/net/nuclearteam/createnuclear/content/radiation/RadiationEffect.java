@@ -13,7 +13,7 @@ import net.nuclearteam.createnuclear.content.effects.VicinityEffect;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.nuclearteam.createnuclear.foundation.damageTypes.CreateNuclearDamageSources;
+import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
 import net.nuclearteam.createnuclear.foundation.utility.ConfigValueResolver;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
@@ -91,6 +91,6 @@ public class RadiationEffect extends VicinityEffect {
             return;
         }
 
-        entity.hurt(CreateNuclearDamageSources.radiation(entity.level()), damage);
+        entity.hurt(CNDamageSources.radiation(entity.level()), damage);
     }
 }

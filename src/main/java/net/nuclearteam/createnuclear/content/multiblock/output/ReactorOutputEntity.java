@@ -15,7 +15,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -185,11 +184,6 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
         //     return 0;
         // return speed; //convertToDirection(speed, getBlockState().getValue(ReactorOutput.FACING));
         return Mth.clamp(generatedSpeed, 0, 1500000);
-    }
-
-    @Override
-    protected Block getStressConfigKey() {
-        return super.getStressConfigKey();
     }
 
     class ReactorOutputValue extends ValueBoxTransform.Sided {

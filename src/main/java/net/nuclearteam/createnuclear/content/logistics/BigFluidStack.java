@@ -8,9 +8,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 public class BigFluidStack {
@@ -45,16 +42,8 @@ public class BigFluidStack {
         buffer.writeVarInt(amount);
     }
 
-    public boolean isInfinite() {
-        return amount >= INF;
-    }
-
     public static BigFluidStack receive(FriendlyByteBuf buffer) {
         return new BigFluidStack(buffer.readFluidStack(), buffer.readVarInt());
-    }
-
-    public static Comparator<? super BigFluidStack> comparator() {
-        return (i1, i2) -> Integer.compare(i2.amount, i1.amount);
     }
 
     @Override
@@ -79,13 +68,6 @@ public class BigFluidStack {
     public String toString() {
         return "(" + stack.getDisplayName()
                 .getString() + " x" + amount + ")";
-    }
-
-    public static List<BigFluidStack> duplicateWrappers(List<BigFluidStack> list) {
-        List<BigFluidStack> copy = new ArrayList<>();
-        for (BigFluidStack bigFluidStack : list)
-            copy.add(new BigFluidStack(bigFluidStack.stack, bigFluidStack.amount));
-        return copy;
     }
 
     public ReactorFluidType getFluidtype(@Nullable Level level) {

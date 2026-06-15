@@ -1,7 +1,5 @@
 package net.nuclearteam.createnuclear.content.explosion;
 
-import com.google.common.collect.Maps;
-import java.util.Map;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -10,20 +8,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public abstract class CNAdvancedEntityModel<T extends Entity> extends CNBasicEntityModel<T> {
     private float movementScale = 1.0F;
-    private final Map<String, CNTextureOffset> modelTextureMap = Maps.newHashMap();
     public int texWidth = 32;
     public int texHeight = 32;
 
     public void updateDefaultPose() {
         this.getAllParts().forEach((modelRenderer) -> modelRenderer.updateDefaultPose());
-    }
-
-    protected void setCNTextureOffset(String partName, int x, int y) {
-        this.modelTextureMap.put(partName, new CNTextureOffset(x, y));
-    }
-
-    public CNTextureOffset getCNTextureOffset(String partName) {
-        return (CNTextureOffset)this.modelTextureMap.get(partName);
     }
 
     public void resetToDefaultPose() {
@@ -109,14 +98,6 @@ public abstract class CNAdvancedEntityModel<T extends Entity> extends CNBasicEnt
         model.rotateAngleX = x;
         model.rotateAngleY = y;
         model.rotateAngleZ = z;
-    }
-
-    public void rotate(CNModelAnimator animator, CNAdvancedModelBox model, float x, float y, float z) {
-        animator.rotate(model, (float)Math.toRadians((double)x), (float)Math.toRadians((double)y), (float)Math.toRadians((double)z));
-    }
-
-    public void rotateMinus(CNModelAnimator animator, CNAdvancedModelBox model, float x, float y, float z) {
-        animator.rotate(model, (float)Math.toRadians((double)x) - model.defaultRotationX, (float)Math.toRadians((double)y) - model.defaultRotationY, (float)Math.toRadians((double)z) - model.defaultRotationZ);
     }
 
     public void progressRotation(CNAdvancedModelBox model, float progress, float rotX, float rotY, float rotZ, float divisor) {

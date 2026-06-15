@@ -22,7 +22,7 @@ import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.EnrichedRecipe.EnrichedWrapper;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.SnowPowderRecipe.SnowPowderWrapper;
-import net.nuclearteam.createnuclear.foundation.damageTypes.CreateNuclearDamageSources;
+import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -119,7 +119,7 @@ public class CNFanProcessingTypes {
         public void affectEntity(Entity entity, Level level) {
             if (entity instanceof LivingEntity livingEntity) {
                 livingEntity.addEffect(new MobEffectInstance(CNEffects.RADIATION.get(), 10, -1, true, true));
-                livingEntity.hurt(CreateNuclearDamageSources.fanRadiation(level), 1);
+                livingEntity.hurt(CNDamageSources.fanRadiation(level), 1);
             }
         }
     }

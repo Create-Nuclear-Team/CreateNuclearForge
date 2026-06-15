@@ -1,9 +1,7 @@
 package net.nuclearteam.createnuclear.content.multiblock.pattern;
 
-import lib.multiblock.SimpleMultiBlockAislePatternBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -14,11 +12,9 @@ import net.nuclearteam.createnuclear.content.multiblock.ReactorAssembler;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.function.Predicate;
 
 public class ReactorPattern {
-    //public BlockPos VerifyPattern(char character) {}
 
     private static final Predicate<BlockInWorld> blockInWorldAPredicate = state ->
         stateIs(CNBlocks.REACTOR_CASING.get()).test(state)
@@ -33,66 +29,6 @@ public class ReactorPattern {
             BlockState state = a.getState();
             return state != null && state.is(block);
         };
-    }
-
-    public BlockPos VerifyPattern5x5(char character) {
-        return SimpleMultiBlockAislePatternBuilder.start()
-                .aisle("OOOOO", "OAAAO", "OAAAO", "OAAAO", "OOOOO")
-                .aisle("OABAO", "ODDDO", "BDCDB", "ODDDO", "OABAO")
-                .aisle("OABAO", "ODDDO", "BDCDB", "ODDDO", "OABAO")
-                .aisle("OABAO", "ODDDO", "BDCDB", "ODDDO", "OA*AO")
-                .aisle("OABAO", "ODDDO", "BDCDB", "ODDDO", "OABAO")
-                .aisle("OABAO", "ODDDO", "BDCDB", "ODDDO", "OABAO")
-                .aisle("OOOOO", "OAAAO", "OAAAO", "OAAAO", "OOOOO")
-                .where('A', blockInWorldAPredicate)
-                .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
-                .where('C', a -> a.getState().is(CNBlocks.REACTOR_CORE.get()))
-                .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
-                .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
-                .where('O', a -> a.getState().is(CNBlocks.REACTOR_CASING.get()))
-                .getDistanceController(character);
-    }
-
-    public BlockPos VerifyPattern7x7(char character) {
-        return SimpleMultiBlockAislePatternBuilder.start()
-            .aisle("OOOOOOO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OOOOOOO")
-            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OAB*BAO")
-            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-            .aisle("OOOOOOO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OOOOOOO")
-            .where('A', blockInWorldAPredicate)
-            .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
-            .where('C', a -> a.getState().is(CNBlocks.REACTOR_CORE.get()))
-            .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
-            .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
-            .where('O', a -> a.getState().is(CNBlocks.REACTOR_CASING.get()))
-            .getDistanceController(character);
-    }
-
-    public BlockPos VerifyPattern9x9(char character) {
-        return SimpleMultiBlockAislePatternBuilder.start()
-            .aisle("OOOOOOOOO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OOOOOOOOO")
-            .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-            .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-            .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-            .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-            .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAA*AABO")
-            .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-            .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-            .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-            .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-            .aisle("OOOOOOOOO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OOOOOOOOO")
-            .where('A', blockInWorldAPredicate)
-            .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
-            .where('C', a -> a.getState().is(CNBlocks.REACTOR_CORE.get()))
-            .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
-            .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
-            .where('O', a -> a.getState().is(CNBlocks.REACTOR_CASING.get()))
-            .getDistanceController(character);
     }
 
     public void findController(BlockPos blockPos, Level level, boolean first){
