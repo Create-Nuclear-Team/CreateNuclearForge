@@ -11,7 +11,6 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler.FluidAction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 
@@ -92,7 +91,6 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         List<BlockPos> positions = new ArrayList<>();
 
         for (BlockPos p : this.getBlocksPosition()) {
-            CreateNuclear.LOGGER.warn("getBlocksPosition: {} {}", level.getBlockEntity(p), level.getBlockEntity(p) instanceof ReactorFluidInputEntity);
             if (level.getBlockEntity(p) instanceof ReactorFluidInputEntity) positions.add(p);
         }
         return List.copyOf(positions);

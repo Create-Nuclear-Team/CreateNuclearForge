@@ -647,8 +647,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (level == null || level.isClientSide)
             return;
 
-        final int SCAN_RADIUS = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this).data()
-                .getSize(); // adapte selon la taille max du multiblock
+        var structure = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this);
+        // findStructure renvoie null si la structure n'est plus formée : on retombe
+        // alors sur la dernière taille assemblée (reactorSize) pour éviter un NPE serveur.
+        final int SCAN_RADIUS = structure != null ? structure.data().getSize() : reactorSize;
         BlockPos center = getBlockPos();
         boolean anyNonEmpty = false;
 

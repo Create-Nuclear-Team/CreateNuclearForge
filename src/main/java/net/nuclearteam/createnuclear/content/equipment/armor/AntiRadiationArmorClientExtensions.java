@@ -36,8 +36,8 @@ public final class AntiRadiationArmorClientExtensions implements IClientItemExte
             }
             case CHEST -> {
                 this.model.body.visible = true;
-                this.model.rightArm.visible = true;
-                this.model.leftArm.visible = true;
+                this.model.right_arm.visible = true;
+                this.model.left_arm.visible = true;
             }
             default -> {
                 this.model.getHead().visible = false;

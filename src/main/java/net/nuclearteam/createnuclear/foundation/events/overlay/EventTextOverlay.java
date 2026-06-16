@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.nuclearteam.createnuclear.CreateNuclear;
 
 /**
  * HUD overlay for displaying localized text when a specific event occurs.
@@ -44,7 +43,6 @@ public class EventTextOverlay implements HudOverlay {
     public void render(ForgeGui gui, GuiGraphics graphics, float partialTicks, int width, int height) {
         if (!isActive()) return;
         if (timer-- <= 0) return;
-        CreateNuclear.LOGGER.warn("hum EventTextOverlay: {}", timer);
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
         Component text = Component.translatable("overlay.event_message", timer).withStyle(ChatFormatting.RED);
