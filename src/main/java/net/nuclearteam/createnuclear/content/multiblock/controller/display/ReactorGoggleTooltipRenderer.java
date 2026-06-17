@@ -51,8 +51,8 @@ public final class ReactorGoggleTooltipRenderer {
      * @param isPlayerSneaking whether the viewing player is sneaking (currently unused,
      *                          kept for signature parity with other goggle tooltip providers)
      */
-    public static void render(List<Component> tooltip, ReactorDisplayState state, int heat, boolean isPlayerSneaking) {
-        renderHeaderAndHeat(tooltip, heat);
+    public static void render(List<Component> tooltip, ReactorDisplayState state, int heat, boolean isPlayerSneaking, int reactorSize) {
+        renderHeaderAndHeat(tooltip, heat, reactorSize);
         renderItemRods(tooltip, state);
         renderFluidTanks(tooltip, state);
     }
@@ -63,13 +63,13 @@ public final class ReactorGoggleTooltipRenderer {
      * @param tooltip the tooltip line list to append to
      * @param heat    the reactor's current heat value
      */
-    private static void renderHeaderAndHeat(List<Component> tooltip, int heat) {
+    private static void renderHeaderAndHeat(List<Component> tooltip, int heat, int reactorSize) {
         CreateLang.translate("gui.gauge.info_header")
                 .style(ChatFormatting.GRAY)
                 .forGoggles(tooltip);
         IHeat.HeatLevel.getName("reactor_controller").style(ChatFormatting.GRAY).forGoggles(tooltip);
 
-        IHeat.HeatLevel.getFormattedHeatText(heat).forGoggles(tooltip);
+        IHeat.HeatLevel.getFormattedHeatText(heat, reactorSize).forGoggles(tooltip);
     }
 
     /**

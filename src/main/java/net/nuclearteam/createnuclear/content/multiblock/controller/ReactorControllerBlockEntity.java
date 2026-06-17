@@ -256,7 +256,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             return false;
         }
 
-        ReactorGoggleTooltipRenderer.render(tooltip, displayState, patternTag.getInt("heat"), isPlayerSneaking);
+        ReactorGoggleTooltipRenderer.render(tooltip, displayState, patternTag.getInt("heat"), isPlayerSneaking, reactorSize);
 
         return true;
     }
