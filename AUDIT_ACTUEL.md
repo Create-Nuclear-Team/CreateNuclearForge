@@ -20,9 +20,7 @@ La **grande majorité des bugs** de `AUDIT_V1.md` sont **toujours présents**, e
 
 ## 1. 🐛 Bugs critiques toujours présents
 
-| Réf. | Fichier:ligne | État | Détail |
-|---|---|---|---|
-| **B7** | `infrastructure/worldgen/biome/CNNoiseData.java` | **Toujours présent** | `bootstrapRegistries()` reste un corps **vide** ; `EROSION` jamais enregistré dans `Registries.NOISE`, alors que `IrradiatedSurfaceRules` (fusion v1/v2, un seul fichier désormais) fait toujours 3× `noiseCondition(EROSION,...)` → `getOrThrow` lèvera à la génération. |
+_Aucun. Tous les bugs critiques recensés ont été corrigés._
 
 ---
 
@@ -191,7 +189,7 @@ Tous les points perf de `AUDIT_V1.md` §4 restent **non corrigés** :
 
 ## 7. Plan d'action — priorités mises à jour
 
-**Quick wins toujours en attente** (1 ligne, fort impact) : **B9** (mapping amplificateurs ambigu — décision produit), **B7** (enregistrer `EROSION`).
+**Quick wins toujours en attente** (1 ligne, fort impact) : **B9** (mapping amplificateurs ambigu — décision produit).
 
 **Nouveaux quick wins identifiés** :
 - `RadiationEffectHandler` : ajouter les mêmes gardes (config/immunité/résistance) que les deux autres chemins.

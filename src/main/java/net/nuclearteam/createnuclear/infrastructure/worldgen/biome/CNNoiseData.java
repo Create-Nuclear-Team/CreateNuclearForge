@@ -14,6 +14,7 @@ public class CNNoiseData {
     }
 
     public static void bootstrapRegistries(BootstapContext<NoiseParameters> context) {
+        register(context, EROSION, -9, 1.0, 1.0, 0.0, 1.0, 1.0);
     }
 
     private static void register(
