@@ -19,7 +19,7 @@ public record BiomeTagRule(@NotNull TagKey<Biome> tag) implements SurfaceRules.C
 
     @Override
     public SurfaceRules.Condition apply(SurfaceRules.Context context) {
-        return null;
+        return new Predicate(context);
     }
 
     private class Predicate extends SurfaceRules.LazyYCondition {

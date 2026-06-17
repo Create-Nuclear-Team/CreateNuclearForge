@@ -1,7 +1,6 @@
 {
   "values": [
     "createnuclear:deepslate_thorium_ore",
-    "createnuclear:thorium_ore",
-    "createnuclear:thorium_block"
+    "createnuclear:thorium_ore"
   ]
 }

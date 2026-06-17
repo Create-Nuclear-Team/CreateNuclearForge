@@ -4,50 +4,37 @@ import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.item.TooltipHelper;
-import com.simibubi.create.foundation.utility.CreateLang;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.SectionPos;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.ForgeRegistries;
 
-import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.multiblock.IMultiblockController;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorGoggleTooltipRenderer;
+import net.nuclearteam.createnuclear.content.multiblock.controller.service.*;
+import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshot;
+import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshotBuilder;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
-import net.nuclearteam.createnuclear.content.explosion.NuclearExplosionEntity;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
@@ -55,32 +42,22 @@ import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehavio
 import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.ConsumptionCycleManager;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
-import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReactorInputFluid;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
-import net.nuclearteam.createnuclear.content.multiblock.controller.service.IHeatService;
-import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultHeatService;
-import net.nuclearteam.createnuclear.content.multiblock.controller.service.IPersistenceService;
-import net.nuclearteam.createnuclear.content.multiblock.controller.service.DefaultPersistenceService;
-
-import java.util.Map;
 
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
 @SuppressWarnings({ "unused" })
 public class ReactorControllerBlockEntity extends SmartBlockEntity
-        implements IInteractionChecker, IHaveGoggleInformation {
+        implements IInteractionChecker, IHaveGoggleInformation, IMultiblockController {
     /**
      * The assembled state is stored in the block state
      * (`ReactorControllerBlock.ASSEMBLED`).
@@ -104,19 +81,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private List<BigFluidStack> bigFluidStack;
 
     private int reactorSize = 0;
-    private String reactorFacing = "null";
+    private Direction reactorFacing = null;
     // les pos sont [xMin, xMax, yMin, yMax, zMin, zMax]
-    private int[] reactorPos;
-    // Vertical span (block Y) of the reactor frame columns, used to map the
-    // fluid fill ratio onto the liquid actually drawn in the frame windows.
-    private int frameColumnMinY = Integer.MAX_VALUE;
-    private int frameColumnMaxY = Integer.MIN_VALUE;
-    // Per-tick cache for the fluid drawn in the frame windows. Recomputed from the
-    // live (synced) input tanks so the displayed fluid and its fill ratio always
-    // come from the same source and stay consistent for every fluid type.
-    private long frameFluidCacheTick = -1;
-    private FluidStack frameFluidCache = FluidStack.EMPTY;
-    private float frameFluidFillRatioCache = 0f;
+    private BoundingBox reactorPos;
+
+
     private boolean needsToResolveEntities = false;
     private double fluidBuffer = 0.0;
 
@@ -126,15 +95,14 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private final ReactorOutputManagerI outputManager;
     private final ReactorInputFluidManagerI inputFluidManager;
     private final ReactorAlarmManagerI alarmManager;
+    private final ReactorFrameDisplayManagerI frameDisplayManager;
 
-    // Client Display Data (Synced via NBT)
-    private Map<Item, Integer> clientDisplayItems = new HashMap<>();
-    private List<BigFluidStack> clientDisplayFluids = new ArrayList<>();
-    private long clientMaxFluidCapacity = 0;
+   private ReactorDisplayState displayState = ReactorDisplayState.EMPTY;
 
     // services (dependencies) - abstracted behind interfaces to follow DIP
     private final IHeatService heatService;
     private final IPersistenceService persistenceService;
+    private final IExplosionService meltdownExecutor;
 
     // service fields are injected; implementations live in separate classes
 
@@ -187,79 +155,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.bigFluidStack = b;
     }
 
-    /**
-     * Returns the fluid currently held by the reactor, used by the frame
-     * renderer to draw the matching liquid in the window. On the client this
-     * reads the synced {@link #clientDisplayFluids}; on the server it reads the
-     * aggregated {@link #bigFluidStack}. Returns {@link FluidStack#EMPTY} when
-     * the reactor holds no fluid.
-     *
-     * Recomputes, at most once per game tick, the fluid shown in the frame
-     * windows and how full the input is. Both values are read from the same live
-     * input tanks (whose contents are synced to the client), so they always agree
-     * regardless of the fluid type.
-     */
-    private void refreshFrameFluidCache() {
-        if (level == null) return;
-        long now = level.getGameTime();
-        if (now == frameFluidCacheTick) return;
-        frameFluidCacheTick = now;
-
-        long amount = 0;
-        long capacity = 0;
-        FluidStack fluid = FluidStack.EMPTY;
-        for (IFluidHandler handler : inputFluidManager.getFuildHandlers(level)) {
-            int tanks = handler.getTanks();
-            for (int t = 0; t < tanks; t++) {
-                FluidStack stack = handler.getFluidInTank(t);
-                capacity += handler.getTankCapacity(t);
-                amount += stack.getAmount();
-                if (fluid.isEmpty() && !stack.isEmpty()) fluid = stack.copy();
-            }
-        }
-
-        frameFluidCache = fluid;
-        frameFluidFillRatioCache = capacity > 0 ? Math.min(1f, (float) amount / (float) capacity) : 0f;
-    }
-
-    /** The fluid currently shown in the reactor frame windows (may be empty). */
-    public FluidStack getDisplayedFluid() {
-        refreshFrameFluidCache();
-        return frameFluidCache;
-    }
-
-    /**
-     * How full the reactor's fluid input is, in the range {@code [0, 1]}, used by
-     * the frame renderer to size the visible liquid column.
-     */
-    public float getDisplayedFluidFillRatio() {
-        refreshFrameFluidCache();
-        return frameFluidFillRatioCache;
-    }
-
-    /** Records the lowest and highest frame block-Y of the assembled reactor. */
-    public void setFrameColumn(int minY, int maxY) {
-        if (this.frameColumnMinY == minY && this.frameColumnMaxY == maxY) return;
-        this.frameColumnMinY = minY;
-        this.frameColumnMaxY = maxY;
-        notifyUpdate();
-    }
-
-    /** @return the lowest frame block-Y, or {@link Integer#MAX_VALUE} if unknown. */
-    public int getFrameColumnMinY() {
-        return frameColumnMinY;
-    }
-
-    /** @return the highest frame block-Y, or {@link Integer#MIN_VALUE} if unknown. */
-    public int getFrameColumnMaxY() {
-        return frameColumnMaxY;
-    }
-
-    public boolean hasFrameColumn() {
-        return frameColumnMinY != Integer.MAX_VALUE && frameColumnMaxY != Integer.MIN_VALUE
-                && frameColumnMaxY >= frameColumnMinY;
-    }
-
     public int getMultiblockSize() {
         return this.reactorSize;
     }
@@ -268,11 +163,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.reactorSize = s;
     }
 
-    public String getMultiblockFacing() {
+    @Override
+    public Direction getMultiblockFacing() {
         return this.reactorFacing;
     }
 
-    public void setMultiblockFacing(String f) {
+    @Override
+    public void setMultiblockFacing(Direction f) {
         this.reactorFacing = f;
     }
 
@@ -281,11 +178,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     /** Main constructor allowing dependency injection for testability and DIP compliance. */
-    public int[] getMultiblockPos() {
+    public BoundingBox getMultiblockPos() {
         return this.reactorPos;
     }
 
-    public void setMultiblockStructure(int[] p) {
+    public void setMultiblockStructure(BoundingBox p) {
         this.reactorPos = p;
     }
 
@@ -301,6 +198,22 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.liquidLife = l;
     }
 
+    public ReactorFrameDisplayManagerI getFrameDisplayManager() {
+        return this.frameDisplayManager;
+    }
+
+    public ReactorInputFluidManagerI getInputFluidManager() {
+        return this.inputFluidManager;
+    }
+
+    public void setDisplayState(ReactorDisplayState state) {
+        this.displayState = state;
+    }
+
+    public ReactorDisplayState getDisplayState() {
+        return this.displayState;
+    }
+
     /**
      * Main constructor allowing dependency injection for testability and DIP
      * compliance.
@@ -314,6 +227,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.outputManager = new ReactorOutputManager();
         this.inputFluidManager = new ReactorInputFluidManager();
         this.alarmManager = new ReactorAlarmManager();
+        this.frameDisplayManager = new ReactorFrameDisplayManager();
 
         this.bigFuelItem = new BigItemStack(ItemStack.EMPTY);
         this.bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
@@ -321,6 +235,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         this.heatService = new DefaultHeatService(new HeatManager());
         this.persistenceService = new DefaultPersistenceService();
+        this.meltdownExecutor = new ReactorMeltdownExecutor();
     }
 
     @Override
@@ -341,62 +256,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             return false;
         }
 
-        CreateLang.translate("gui.gauge.info_header")
-                .style(ChatFormatting.GRAY)
-                .forGoggles(tooltip);
-        IHeat.HeatLevel.getName("reactor_controller").style(ChatFormatting.GRAY).forGoggles(tooltip);
-
-        IHeat.HeatLevel.getFormattedHeatText(patternTag.getInt("heat"), this.getMultiblockSize()).forGoggles(tooltip);
-
-        if (clientDisplayItems.isEmpty()) {
-            CreateNuclearLang.builder()
-                    .add(Component.translatable("tooltip.item.empty.rod").withStyle(ChatFormatting.GRAY))
-                    .add(CreateNuclearLang.number(0).style(ChatFormatting.GOLD))
-                    .forGoggles(tooltip);
-        } else {
-            for (Map.Entry<Item, Integer> entry : clientDisplayItems.entrySet()) {
-                ItemStack stack = new ItemStack(entry.getKey());
-                int count = entry.getValue();
-                CreateNuclearLang.itemName(stack)
-                        .style(ChatFormatting.GRAY)
-                        .text(": ")
-                        .add(CreateNuclearLang.number(count).style(ChatFormatting.GOLD))
-                        .forGoggles(tooltip);
-            }
-        }
-
-        if (clientDisplayFluids.isEmpty()) {
-            CreateNuclearLang
-                    .translate("tooltip.fluid.none")
-                    .style(ChatFormatting.GRAY)
-                    .forGoggles(tooltip);
-
-            CreateNuclearLang.builder()
-                    .text(TooltipHelper.makeProgressBar(5, 0))
-                    .style(ChatFormatting.BLUE)
-                    .space()
-                    .text("0%")
-                    .forGoggles(tooltip);
-        } else {
-            for (BigFluidStack stack : clientDisplayFluids) {
-                float fillRatio = clientMaxFluidCapacity > 0 ? (float) stack.amount / clientMaxFluidCapacity : 0;
-                if (fillRatio >= 0.99f)
-                    fillRatio = 1.0f;
-                int filledBars = (int) Math.round(fillRatio * 5);
-
-                CreateNuclearLang
-                        .translate("tooltip.fluid", stack.stack.getDisplayName())
-                        .style(ChatFormatting.GRAY)
-                        .forGoggles(tooltip);
-
-                CreateNuclearLang.builder()
-                        .text(TooltipHelper.makeProgressBar(5, filledBars))
-                        .style(ChatFormatting.BLUE)
-                        .space()
-                        .text(Math.round(fillRatio * 100) + "%")
-                        .forGoggles(tooltip);
-            }
-        }
+        ReactorGoggleTooltipRenderer.render(tooltip, displayState, patternTag.getInt("heat"), isPlayerSneaking);
 
         return true;
     }
@@ -411,42 +271,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.outputManager.read(compound);
         this.inputFluidManager.read(compound);
         this.alarmManager.read(compound);
+        this.frameDisplayManager.read(compound);
 
         this.persistenceService.readBasicState(this, compound, clientPacket);
         this.needsToResolveEntities = true;
-
-        if (compound.contains("frameColumnMinY")) {
-            this.frameColumnMinY = compound.getInt("frameColumnMinY");
-            this.frameColumnMaxY = compound.getInt("frameColumnMaxY");
-        }
-
-        if (clientPacket) {
-            clientDisplayItems.clear();
-            if (compound.contains("clientDisplayItems")) {
-                ListTag list = compound.getList("clientDisplayItems",
-                        Tag.TAG_COMPOUND);
-                for (int i = 0; i < list.size(); i++) {
-                    CompoundTag tag = list.getCompound(i);
-                    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(tag.getString("Item")));
-                    if (item != null) {
-                        clientDisplayItems.put(item, tag.getInt("Count"));
-                    }
-                }
-            }
-
-            clientDisplayFluids.clear();
-            if (compound.contains("clientDisplayFluids")) {
-                ListTag list = compound.getList("clientDisplayFluids",
-                        Tag.TAG_COMPOUND);
-                for (int i = 0; i < list.size(); i++) {
-                    CompoundTag tag = list.getCompound(i);
-                    FluidStack fstack = FluidStack
-                            .loadFluidStackFromNBT(tag);
-                    clientDisplayFluids.add(new BigFluidStack(fstack, tag.getInt("BigAmount")));
-                }
-            }
-            clientMaxFluidCapacity = compound.getLong("clientMaxFluidCapacity");
-        }
 
         this.cycleManager.clear();
         if (compound.contains("cycleManager")) {
@@ -461,32 +289,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.outputManager.write(compound);
         this.inputFluidManager.write(compound);
         this.alarmManager.write(compound);
+        this.frameDisplayManager.write(compound);
 
         this.persistenceService.writeBasicState(this, compound, clientPacket);
-
-        compound.putInt("frameColumnMinY", frameColumnMinY);
-        compound.putInt("frameColumnMaxY", frameColumnMaxY);
-
-        if (clientPacket) {
-            ListTag displayItemsTag = new ListTag();
-            for (Map.Entry<Item, Integer> entry : clientDisplayItems.entrySet()) {
-                CompoundTag tag = new CompoundTag();
-                tag.putString("Item", ForgeRegistries.ITEMS.getKey(entry.getKey()).toString());
-                tag.putInt("Count", entry.getValue());
-                displayItemsTag.add(tag);
-            }
-            compound.put("clientDisplayItems", displayItemsTag);
-
-            ListTag displayFluidsTag = new ListTag();
-            for (BigFluidStack stack : clientDisplayFluids) {
-                CompoundTag tag = new CompoundTag();
-                stack.stack.writeToNBT(tag);
-                tag.putInt("BigAmount", stack.amount);
-                displayFluidsTag.add(tag);
-            }
-            compound.put("clientDisplayFluids", displayFluidsTag);
-            compound.putLong("clientMaxFluidCapacity", clientMaxFluidCapacity);
-        }
 
         compound.put("cycleManager", cycleManager.serializeNBT());
     }
@@ -508,34 +313,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.setChanged();
     }
 
-    public void logReactorConnections() {
-        CreateNuclear.LOGGER.debug("Reactor input count: {}", this.inputManager.size());
-        CreateNuclear.LOGGER.debug("Reactor output count: {}", this.outputManager.size());
-        CreateNuclear.LOGGER.debug("Reactor fluid input count: {}", this.inputFluidManager.size());
-
-        for (BlockPos pos : this.inputManager.getBlocksPosition()) {
-            CreateNuclear.LOGGER.debug("Registered reactor input position: {}", pos);
-        }
-
-        for (BlockPos pos : this.inputManager.getBlocksPosition(level)) {
-            CreateNuclear.LOGGER.debug("Valid reactor input position: {}", pos);
-        }
-
-        for (BlockPos pos : this.outputManager.getBlocksPosition()) {
-            CreateNuclear.LOGGER.debug("Registered reactor output position: {}", pos);
-        }
-
-        for (BlockPos pos : this.outputManager.getBlocksPosition(level)) {
-            CreateNuclear.LOGGER.debug("Valid reactor output position: {}", pos);
-        }
-
-        for (BlockPos pos : this.inputFluidManager.getBlocksPosition()) {
-            CreateNuclear.LOGGER.debug("Registered reactor fluid input position: {}", pos);
-        }
-
-        for (BlockPos pos : this.inputFluidManager.getBlocksPosition(level)) {
-            CreateNuclear.LOGGER.debug("Valid reactor fluid input position: {}", pos);
-        }
+    public void logReactorConnections(Player player) {
+        ReactorDebugDiagnostics.sendReactorConnectionsTo(player, level, inputManager, inputFluidManager, outputManager, alarmManager);
     }
 
     private void updateReactorStateVisibility() {
@@ -598,7 +377,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                         CreateNuclearLang.translate("notification.reactor.imminent_explosion"),
                         ChatFormatting.DARK_RED, configRadius, configWarnAll, 0, 40, 10);
 
-                triggerNuclearExplosion();
+                if (level instanceof ServerLevel serverLevel) {
+                    this.meltdownExecutor.triggerExplosion(serverLevel, getBlockPos(), reactorSize, countUraniumRod);
+                }
+                isExploding = true;
                 return;
             }
         } else {
@@ -620,34 +402,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (!isAssembled())
             return;
 
-        // Populate display fields for client sync
-        clientDisplayItems.clear();
-        List<IItemHandler> itemHandlers = this.inputManager.getItemHandlers(level);
-        for (IItemHandler h : itemHandlers) {
-            for (int s = 0; s < h.getSlots(); s++) {
-                ItemStack st = h.getStackInSlot(s);
-                if (!st.isEmpty()) {
-                    clientDisplayItems.put(st.getItem(),
-                            clientDisplayItems.getOrDefault(st.getItem(), 0) + st.getCount());
-                }
-            }
-        }
-
-        clientMaxFluidCapacity = 0;
-        List<IFluidHandler> fhandlers = this.inputFluidManager.getFuildHandlers(level);
-        for (IFluidHandler h : fhandlers) {
-            if (h.getTanks() > 0) {
-                clientMaxFluidCapacity += h.getTankCapacity(0);
-            }
-        }
-
-        VirtualReactorInputsItem virtualReactorInputsItem = inputManager.getInventory(level);
-        VirtualReactorInputFluid virtualReactorInputFluid = inputFluidManager.getInventory(level);
-        clientDisplayFluids = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
-
-        this.bigFuelItem = virtualReactorInputsItem.getBigFuelRod();
-        this.bigCoolerItem = virtualReactorInputsItem.getBigCooledRod();
-        this.bigFluidStack = VirtualReactorInputFluid.toBigList(virtualReactorInputFluid.fluids());
+        ReactorInputSnapshot snapshot = ReactorInputSnapshotBuilder.build(level, inputManager, inputFluidManager);
+        this.displayState = new ReactorDisplayState(snapshot.items(), snapshot.fluids(), snapshot.maxFluidCapacity());
+        this.bigFuelItem = snapshot.bigFuelItem();
+        this.bigCoolerItem = snapshot.bigCoolerItem();
+        this.bigFluidStack = snapshot.fluids();
 
         updateReactorStateVisibility();
         handleAssembledState();
@@ -734,131 +493,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             if (!this.outputManager.getBlocksPosition().isEmpty()) {
                 rotate(getBlockState(), getLevel(), heat);
             }
-        } /*
-           * else {
-           * EventTriggerPacket packet = new EventTriggerPacket(600);
-           * CreateNuclear.LOGGER.warn("hum EventTriggerBlock ? {}", packet);
-           * CNPackets.sendToNear(level, getBlockPos(), 32, packet);
-           * }
-           */
-    }
-
-    private void triggerNuclearExplosion() {
-        if (isExploding)
-            return;
-        isExploding = true;
-
-        BlockPos explosionPos = getBlockPos().above(5);
-        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
-        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
-
-        if (level instanceof ServerLevel serverLevel) {
-            // --- MESSAGE D'EXPLOSION FINALE (TRADUIT) ---
-            NotifyUtil.sendTitle(level, getBlockPos(),
-                    CreateNuclearLang.translate("notification.reactor.destroyed"),
-                    CreateNuclearLang.translate("notification.reactor.meltdown_finished"),
-                    ChatFormatting.DARK_RED, configRadius, configWarnAll, 10, 60, 20);
-
-            NuclearExplosionEntity explosion = new NuclearExplosionEntity(
-                    CNEntityType.NUCLEAR_EXPLOSION.get(),
-                    serverLevel);
-
-            // --- CALCUL D'EXPLOSION ÉQUILIBRÉ ---
-
-            // 1. On définit un modificateur de structure plus progressif
-            // Au lieu de 1, 2, 3, on utilise un ratio basé sur la taille réelle
-            float structureFactor = reactorSize / 5.0F; // 5x5 -> 1.0 | 7x7 -> 1.4 | 9x9 -> 1.8
-
-            /*
-             * 2. Utilisation de la racine carrée (Mth.sqrt)
-             * L'uranium augmente la puissance, mais avec des rendements décroissants.
-             * Plus on ajoute d'uranium, plus chaque barre supplémentaire ajoute "moins" au
-             * rayon.
-             */
-            float fuelImpact = Mth.sqrt(countUraniumRod) * 0.3F;
-
-            // 3. Taille finale : Base constante + (Impact Fuel * Facteur Structure)
-            float size = 1.5F + (fuelImpact * structureFactor);
-
-            size = Mth.clamp(size, 1.0F, 10.0F);
-
-            explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() - 2.0D);
-            explosion.setSize(size);
-
-            // Griefing selon les gamerules
-            boolean griefing = serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
-            explosion.setNoGriefing(!griefing);
-
-            serverLevel.addFreshEntity(explosion);
-
-            // On détruit le bloc après avoir envoyé les messages
-            level.destroyBlock(getBlockPos(), false);
-
-            // Changement de biome vers Irradiated Plain
-            changeBiome(CNBiomes.Irradiated.PLAIN, (int) size * 30, explosionPos, serverLevel);
         }
-    }
-
-    public void changeBiome(ResourceKey<Biome> biomeResourceKey, int radius, BlockPos center, ServerLevel serverLevel) {
-        Registry<Biome> biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registries.BIOME);
-        Holder<Biome> targetBiomeHolder = biomeRegistry.getHolderOrThrow(biomeResourceKey);
-
-        // Vérification rapide du centre
-        Holder<Biome> current = serverLevel.getBiome(center);
-        if (current.is(biomeResourceKey)) {
-            return;
-        }
-
-        // Définition de la zone de recherche (Bounding Box carrée qui contient le
-        // cercle)
-        int minX = center.getX() - radius;
-        int maxX = center.getX() + radius;
-        int minZ = center.getZ() - radius;
-        int maxZ = center.getZ() + radius;
-
-        double radiusSq = (double) radius * radius;
-        ArrayList<ChunkAccess> chunks = new ArrayList<>();
-
-        // On parcourt les chunks impactés
-        for (int cz = SectionPos.blockToSectionCoord(minZ); cz <= SectionPos.blockToSectionCoord(maxZ); ++cz) {
-            for (int cx = SectionPos.blockToSectionCoord(minX); cx <= SectionPos.blockToSectionCoord(maxX); ++cx) {
-                ChunkAccess chunkAccess = serverLevel.getChunk(cx, cz, ChunkStatus.FULL, false);
-                if (chunkAccess != null) {
-                    // On utilise un resolver personnalisé qui vérifie la distance
-                    chunkAccess.fillBiomesFromNoise(
-                            createCircularResolver(targetBiomeHolder, center, radiusSq, serverLevel),
-                            serverLevel.getChunkSource().randomState().sampler());
-                    chunkAccess.setUnsaved(true);
-                    chunks.add(chunkAccess);
-                }
-            }
-        }
-
-        // Notification aux clients
-        serverLevel.getChunkSource().chunkMap.resendBiomesForChunks(chunks);
-    }
-
-    // Le resolver magique pour la forme circulaire
-    private BiomeResolver createCircularResolver(Holder<Biome> targetBiome, BlockPos center, double radiusSq,
-            ServerLevel level) {
-        return (x, y, z, noise) -> {
-            // x, y, z ici sont en "biome coordinates" (1 unité = 4 blocs)
-            // On les multiplie par 4 pour revenir à une échelle de blocs
-            int blockX = x << 2;
-            int blockZ = z << 2;
-
-            double distX = blockX - center.getX();
-            double distZ = blockZ - center.getZ();
-
-            // Equation du cercle : x² + z² <= r²
-            if ((distX * distX) + (distZ * distZ) <= radiusSq) {
-                return targetBiome;
-            }
-
-            // Si hors du cercle, on garde le biome d'origine (ou on laisse le bruit faire)
-            // Note : Ici on demande au niveau le biome actuel à cette position
-            return level.getBiome(new BlockPos(blockX, y << 2, blockZ));
-        };
     }
 
     private boolean isReadyToRun() {
@@ -890,30 +525,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private boolean updateLiquidTimers() {
         liquidLife -= 1;
         return liquidLife <= 0;
-    }
-
-    @Deprecated
-    private BlockPos getBlockPosForReactor(char character) {
-        BlockPos pos = pattern.VerifyPattern5x5(character);
-        BlockPos posController = getBlockPos();
-        BlockPos posInput = new BlockPos(posController.getX(), posController.getY(), posController.getZ());
-
-        int[][] directions = {
-                { 0, 0, pos.getX() }, // NORTH
-                { 0, 0, -pos.getX() }, // SOUTH
-                { -pos.getX(), 0, 0 }, // EAST
-                { pos.getX(), 0, 0 } // WEST
-        };
-
-        for (int[] direction : directions) {
-            BlockPos newPos = posController.offset(direction[0], direction[1], direction[2]);
-            if (level.getBlockState(newPos).is(CNBlocks.REACTOR_INPUT.get())) {
-                posInput = newPos;
-                break;
-            }
-        }
-
-        return posInput;
     }
 
     public void rotate(BlockState state, Level level, int rotation) {
@@ -954,75 +565,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                 }
             }
         }
-    }
-
-    @Deprecated
-    public int[] getStructureBounds(BlockPos startPos, int structureSize, String facing) {
-        int[] northOffsets5x5 = new int[] { -2, 2, -3, 3, 0, 4 };
-        int[] northOffsets7x7 = new int[] { -3, 3, -4, 4, 0, 6 };
-        int[] northOffsets9x9 = new int[] { -4, 4, -5, 5, 0, 8 };
-
-        int[] eastOffsets5x5 = new int[] { -4, 0, -3, 3, -2, 2 };
-        int[] eastOffsets7x7 = new int[] { -6, 0, -4, 4, -3, 3 };
-        int[] eastOffsets9x9 = new int[] { -8, 0, -5, 5, -4, 4 };
-
-        int[] southOffsets5x5 = new int[] { -2, 2, -3, 3, -4, 0 };
-        int[] southOffsets7x7 = new int[] { -3, 3, -4, 4, -6, 0 };
-        int[] southOffsets9x9 = new int[] { -4, 4, -5, 5, -8, 0 };
-
-        int[] westOffsets5x5 = new int[] { 0, 4, -3, 3, -2, 2 };
-        int[] westOffsets7x7 = new int[] { 0, 6, -4, 4, -3, 3 };
-        int[] westOffsets9x9 = new int[] { 0, 8, -5, 5, -4, 4 };
-
-        switch (facing) {
-            case "north":
-                switch (structureSize) {
-                    case 5:
-                        return applyOffset(startPos, northOffsets5x5);
-                    case 7:
-                        return applyOffset(startPos, northOffsets7x7);
-                    case 9:
-                        return applyOffset(startPos, northOffsets9x9);
-                }
-            case "east":
-                switch (structureSize) {
-                    case 5:
-                        return applyOffset(startPos, eastOffsets5x5);
-                    case 7:
-                        return applyOffset(startPos, eastOffsets7x7);
-                    case 9:
-                        return applyOffset(startPos, eastOffsets9x9);
-                }
-            case "south":
-                switch (structureSize) {
-                    case 5:
-                        return applyOffset(startPos, southOffsets5x5);
-                    case 7:
-                        return applyOffset(startPos, southOffsets7x7);
-                    case 9:
-                        return applyOffset(startPos, southOffsets9x9);
-                }
-            case "west":
-                switch (structureSize) {
-                    case 5:
-                        return applyOffset(startPos, westOffsets5x5);
-                    case 7:
-                        return applyOffset(startPos, westOffsets7x7);
-                    case 9:
-                        return applyOffset(startPos, westOffsets9x9);
-                }
-            default:
-                return new int[] { 0, 0, 0, 0, 0, 0 };
-        }
-    }
-
-    @Deprecated
-    private int[] applyOffset(BlockPos pos, int[] offset) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
-        return new int[] { x + offset[0], x + offset[1], y + offset[2], y + offset[3], z + offset[4], z + offset[5] };
     }
 
     public void addInput(BlockPos inputPos) {
@@ -1109,8 +651,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (level == null || level.isClientSide)
             return;
 
-        final int SCAN_RADIUS = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this).data()
-                .getSize(); // adapte selon la taille max du multiblock
+        var structure = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this);
+        // findStructure renvoie null si la structure n'est plus formée : on retombe
+        // alors sur la dernière taille assemblée (reactorSize) pour éviter un NPE serveur.
+        final int SCAN_RADIUS = structure != null ? structure.data().getSize() : reactorSize;
         BlockPos center = getBlockPos();
         boolean anyNonEmpty = false;
 

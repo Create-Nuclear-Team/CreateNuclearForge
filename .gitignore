@@ -45,3 +45,6 @@ run/.mixin.out
 run/gametest
 run/logs
 run/server
+
+# LLM
+.claude/*

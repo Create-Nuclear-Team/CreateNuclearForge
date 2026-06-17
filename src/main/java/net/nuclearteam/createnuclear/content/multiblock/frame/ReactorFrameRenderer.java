@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraftforge.fluids.FluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorFrameDisplayManagerI;
 
 /**
  * Renders the reactor fluid dynamically inside the {@link ReactorFrame} window.
@@ -30,7 +31,9 @@ public class ReactorFrameRenderer extends SafeBlockEntityRenderer<ReactorFrameEn
         ReactorControllerBlockEntity controller = be.getControllerEntity();
         if (controller == null) return;
 
-        FluidStack fluid = controller.getDisplayedFluid();
+        ReactorFrameDisplayManagerI frameDisplay = controller.getFrameDisplayManager();
+
+        FluidStack fluid = frameDisplay.getDisplayedFluid(controller.getLevel(), controller.getInputFluidManager());
         if (fluid == null || fluid.isEmpty()) return;
 
         // Local vertical bounds of the liquid volume inside this block, matching
@@ -51,10 +54,10 @@ public class ReactorFrameRenderer extends SafeBlockEntityRenderer<ReactorFrameEn
         // from the bottom frame's lip (frameMinY + 4/16) to the top frame's cap
         // (frameMaxY + 9/16), so even a nearly-empty reactor still shows a sliver.
         float yMax = boxYMax;
-        if (controller.hasFrameColumn()) {
-            float ratio = controller.getDisplayedFluidFillRatio();
-            double liquidBottomWorldY = controller.getFrameColumnMinY() + 4.0 / 16.0;
-            double liquidTopWorldY = controller.getFrameColumnMaxY() + 9.0 / 16.0;
+        if (frameDisplay.hasFrameColumn()) {
+            float ratio = frameDisplay.getDisplayedFluidFillRatio(controller.getLevel(), controller.getInputFluidManager());
+            double liquidBottomWorldY = frameDisplay.getFrameColumnMinY() + 4.0 / 16.0;
+            double liquidTopWorldY = frameDisplay.getFrameColumnMaxY() + 9.0 / 16.0;
             double surfaceWorldY = liquidBottomWorldY + ratio * (liquidTopWorldY - liquidBottomWorldY);
             double localSurface = surfaceWorldY - be.getBlockPos().getY();
             if (localSurface <= boxYMin) return; // liquid level is below this block

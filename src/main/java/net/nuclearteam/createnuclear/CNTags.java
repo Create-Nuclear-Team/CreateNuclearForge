@@ -73,9 +73,6 @@ public class CNTags {
         FAN_PROCESSING_CATALYSTS_SNOW_POWDER(MOD, "fan_processing_catalysts/snow_powder"),
         ENRICHING_FIRE_BASE_BLOCKS,
         ALL_CAMPFIRES(MINECRAFT, "all/campfires"),
-        URANIUM_ORES,
-        LEAD_ORES,
-        THORIUM_ORES
         ;
 
         public final TagKey<Block> tag;
@@ -126,12 +123,9 @@ public class CNTags {
         CLOTH,
         FUEL,
         COOLER,
-        URANIUM_ORES,
-        LEAD_ORES,
         ANTI_RADIATION_ARMOR,
         COMPOSTABLE(FORGE),
-        THORIUM_ORES,
-        ALL_ANTI_RADIATION_ARMORS,
+        ALL_ANTI_RADIATION_ARMORS
         ;
 
         public final TagKey<Item> tag;

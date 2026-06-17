@@ -3,12 +3,10 @@ package net.nuclearteam.createnuclear.infrastructure.worldgen.biome;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.worldgen.Carvers;
 import net.minecraft.data.worldgen.placement.MiscOverworldPlacements;
-import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.content.particles.IrradiatedParticlesData;
 
 public class IrradiatedBiomes {
@@ -17,13 +15,7 @@ public class IrradiatedBiomes {
     }
 
     public static void monsters(MobSpawnSettings.Builder builder, int zombieWeight, int zombieVillagerWeight, int skeletonWeight) {
-
-        // builder.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(CNEntityType.IRRADIATED_CAT.get(), 100, 2, 4));
-        // builder.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(CNEntityType.IRRADIATED_CHICKEN.get(), 100, 1, 4));
-        // builder.addSpawn(MobCategory.MONSTER, new MobSpawnSettings.SpawnerData(CNEntityType.IRRADIATED_WOLF.get(), 100, 2, 4));
     }
-
-
 
     public static void addDefaultIrradiatedOres(BiomeGenerationSettings.Builder builder) {
         builder.addFeature(GenerationStep.Decoration.UNDERGROUND_STRUCTURES, MiscOverworldPlacements.BLUE_ICE);

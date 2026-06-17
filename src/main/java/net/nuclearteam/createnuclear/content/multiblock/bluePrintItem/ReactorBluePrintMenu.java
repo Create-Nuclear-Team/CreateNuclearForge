@@ -14,7 +14,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.nuclearteam.createnuclear.CNMenus;
-import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
@@ -155,27 +154,6 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
         }
 
         contentHolder.getOrCreateTag().put("patternAll", ghostInventory.serializeNBT());
-    }
-
-    protected void saveData2(ItemStack contentHolder) {
-        for (int i = 0; i < ghostInventory.getSlots(); i++) {
-            if (ghostInventory.getStackInSlot(i).isEmpty() || ghostInventory.getStackInSlot(i) == null) ghostInventory.setStackInSlot(i, ItemStack.EMPTY);
-            if (!(ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.FUEL.tag) || ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.COOLER.tag))&& !ghostInventory.getStackInSlot(i).isEmpty()) ghostInventory.setStackInSlot(i, ItemStack.EMPTY);
-            if (ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.COOLER.tag)) countCooledRod += 1;
-            if (ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.FUEL.tag)) countFuelRod += 1;
-        }
-
-        contentHolder.getOrCreateTag().put("pattern", ghostInventory.serializeNBT());
-        contentHolder.getOrCreateTag().putInt("countGraphiteRod", countCooledRod);
-        contentHolder.getOrCreateTag().putInt("countUraniumRod", countFuelRod);
-
-        for (int i = 0; i < ghostInventory.getSlots(); i++) {
-            if (ghostInventory.getStackInSlot(i).isEmpty() || ghostInventory.getStackInSlot(i) == null) ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));
-            if (!(ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.FUEL.tag) || ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.COOLER.tag))&& !ghostInventory.getStackInSlot(i).isEmpty()) ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));
-        }
-
-        contentHolder.getOrCreateTag().put("patternAll", ghostInventory.serializeNBT());
-
     }
 
     protected int getPlayerInventoryXOffset() {

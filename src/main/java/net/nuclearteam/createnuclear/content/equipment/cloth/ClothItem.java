@@ -1,13 +1,9 @@
 package net.nuclearteam.createnuclear.content.equipment.cloth;
 
 import com.tterrag.registrate.util.entry.ItemEntry;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.armortrim.TrimMaterial;
 import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.CreateNuclear;
 
 import java.util.*;
 

@@ -3,7 +3,6 @@ package net.nuclearteam.createnuclear.content.multiblock.rod;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Items;
-import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
@@ -11,8 +10,6 @@ import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import static net.nuclearteam.createnuclear.api.ItemRodTypesValue.DEFAULT_ROD_TYPE;
 
 public class CNRodTypes {
-    public static final ResourceKey<RodType> FALLBACK = ResourceKey.create(CreateNuclearRegistries.ROD_TYPE, CreateNuclear.asResource("fallback"));
-
     /**
      * Static registry of rod types ({@code RodType}) for the CreateNuclear mod.
      *

@@ -15,16 +15,10 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 
-import net.minecraft.Util;
-import net.minecraft.network.chat.Component;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.*;
 import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
-import net.nuclearteam.createnuclear.foundation.util.ClothTagHelper;
+import net.nuclearteam.createnuclear.foundation.utility.ClothTagHelper;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import javax.annotation.Nullable;

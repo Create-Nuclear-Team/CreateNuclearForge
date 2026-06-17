@@ -6,7 +6,7 @@ import net.nuclearteam.createnuclear.CNParticleTypes;
 
 public class CNCClient extends ConfigBase {
     public final ConfigBool nuclearBombFlash = b(true, "nuclearBombFlash", Comments.nuclearBombFlash);
-    public ConfigBool screenShaking = b(true, "nuclearBombFlash", Comments.screenShaking);;
+    public ConfigBool screenShaking = b(true, "screenShaking", Comments.screenShaking);
 
     @Override
     public String getName() { return "Client"; }

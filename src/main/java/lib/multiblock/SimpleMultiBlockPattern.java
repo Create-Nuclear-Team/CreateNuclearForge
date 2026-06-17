@@ -31,7 +31,7 @@ public record SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffset
 
     public boolean matches(Level level, BlockPos blockPos, Rotation rotation) {
         for (MultiBlockOffsetPos multiBlockOffsetPos : multiBlockOffsetPosList) {
-            char character = multiBlockOffsetPos.caracter();
+            char character = multiBlockOffsetPos.character();
             Predicate<BlockInWorld> predicate = predicateHashMap.get(character);
 
             BlockInWorld block = new BlockInWorld(level, blockPos.offset(multiBlockOffsetPos.pos().rotate(rotation)), false);
@@ -43,7 +43,7 @@ public record SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffset
     public MultiblockMatchResult matchesWithResult(Level level, BlockPos blockPos, Rotation rotation) {
         List<BlockInWorld> result = new ArrayList<>();
         for (MultiBlockOffsetPos multiBlockOffsetPos : multiBlockOffsetPosList) {
-            char character = multiBlockOffsetPos.caracter();
+            char character = multiBlockOffsetPos.character();
             Predicate<BlockInWorld> predicate = predicateHashMap.get(character);
             BlockInWorld block = new BlockInWorld(level, blockPos.offset(multiBlockOffsetPos.pos().rotate(rotation)), false);
             if (predicate == null || !predicate.test(block)) return null;
@@ -58,7 +58,7 @@ public record SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffset
         if (level.isClientSide) return;
         if (level.getServer() == null) return;
         for (MultiBlockOffsetPos multiBlockOffsetPos : multiBlockOffsetPosList) {
-            char character = multiBlockOffsetPos.caracter();
+            char character = multiBlockOffsetPos.character();
             Supplier<BlockState> stateSupplier = blockProvider.get(character);
             if (stateSupplier != null) {
                 var pos = blockPos.offset(multiBlockOffsetPos.pos().rotate(Rotation.NONE));

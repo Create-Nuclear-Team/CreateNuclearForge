@@ -4,7 +4,6 @@ import net.createmod.catnip.config.ConfigBase;
 
 public class CNCServer extends ConfigBase {
     public final CRods rods = nested(0, CRods::new, Comments.rods);
-//    public final CExplode explode = nested(0, CExplode::new, Comments.explode);
     public final CNotify notify = nested(0, CNotify::new,Comments.ratio);
     public final CRadiation radiation = nested(0, CRadiation::new, Comments.radiation);
     public final CReactorHeat reactorHeat = nested(0, CReactorHeat::new, Comments.reactorHeat);
@@ -15,7 +14,6 @@ public class CNCServer extends ConfigBase {
 
     private static class Comments {
         static String rods = "Modify the duration and configuration of rods.";
-        static String explode = "[WIP] Modify the parameters of the explosion";
         static String radiation = "Enable or disable radiation effects emitted by mod items. ";
         static String ratio = "Ratio";
         static String reactorHeat = "Heat thresholds for different reactor sizes";

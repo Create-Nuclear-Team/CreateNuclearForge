@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear;
 
-import com.simibubi.create.AllTags;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.simibubi.create.AllBlocks;
@@ -9,8 +8,6 @@ import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.data.recipes.SmithingTransformRecipeBuilder;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -23,7 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
-import net.nuclearteam.createnuclear.foundation.item.radiation.RadiationItem;
+import net.nuclearteam.createnuclear.content.radiation.RadiationItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;

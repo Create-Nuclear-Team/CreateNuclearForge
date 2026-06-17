@@ -24,7 +24,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.nuclearteam.createnuclear.content.explosion.CNAnimation;
 
 public class Maths {
     public static final Direction[] HORIZONTAL_DIRECTIONS;
@@ -38,16 +37,6 @@ public class Maths {
     public static float smin(float a, float b, float k) {
         float h = Math.max(k - Math.abs(a - b), 0.0F) / k;
         return Math.min(a, b) - h * h * k * 0.25F;
-    }
-
-    public static float cullAnimationTick(int tick, float amplitude, CNAnimation animation, float partialTick, int startOffset) {
-        return cullAnimationTick(tick, amplitude, animation, partialTick, startOffset, animation.getDuration() - startOffset);
-    }
-
-    public static float cullAnimationTick(int tick, float amplitude, CNAnimation animation, float partialTick, int startOffset, int endAt) {
-        float i = Mth.clamp((float)tick + partialTick - (float)startOffset, 0.0F, (float)endAt);
-        float f = (float)Math.sin((double)(i / (float)endAt) * Math.PI) * amplitude;
-        return smin(f, 1.0F, 0.1F);
     }
 
     public static float sampleNoise2D(int x, int z, float simplexSampleRate) {

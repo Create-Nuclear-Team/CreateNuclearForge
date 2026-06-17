@@ -90,12 +90,11 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         if (!(blockEntity instanceof ReactorControllerBlockEntity controllerBlockEntity)) return InteractionResult.PASS;
 
         ItemStack heldItem = player.getItemInHand(handIn);
-        if (heldItem.is(Items.PAPER)) {
-            withBlockEntityDo(worldIn, pos, ReactorControllerBlockEntity::logReactorConnections);
+        if (heldItem.is(Items.DEBUG_STICK)) {
+            withBlockEntityDo(worldIn, pos, be -> be.logReactorConnections(player));
         }
 
         if (!state.getValue(ASSEMBLED)) {
-            // player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
         }
         else {
             if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty() && heldItem.getTag() != null){

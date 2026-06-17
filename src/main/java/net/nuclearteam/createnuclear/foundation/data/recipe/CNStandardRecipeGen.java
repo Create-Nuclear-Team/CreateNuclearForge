@@ -70,8 +70,8 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
 
     private final String BLAST_FURNACE = enterFolder("blast_furnace");
     GeneratedRecipe
-        URANIUM_ORE_TO_URANIUM_POWDER = blastFurnaceRecipeTags(() -> CNItems.RAW_URANIUM::get, () -> CNItemTags.URANIUM_ORES.tag, "_for_uranium_ore", 4),
-        RAW_LEAD_ORES = blastFurnaceRecipeTags(() -> CNItems.LEAD_INGOT::get, () -> CNItemTags.LEAD_ORES.tag, "_for_lead_ore", 1),
+        URANIUM_ORE_TO_URANIUM_POWDER = blastFurnaceRecipeTags(() -> CNItems.RAW_URANIUM::get, () -> CNTags.forgeItemTag("ores/uranium"), "_for_uranium_ore", 4),
+        RAW_LEAD_ORES = blastFurnaceRecipeTags(() -> CNItems.LEAD_INGOT::get, () -> CNTags.forgeItemTag("ores/lead"), "_for_lead_ore", 1),
         RAW_LEAD = blastFurnaceRecipeTags(CNItems.LEAD_INGOT::get, () -> CNTags.forgeItemTag("raw_materials/lead"), "_for_raw_lead", 1),
         CRUSHED_RAW_LEAD_TO_LEAD_BLAST_FURNACE = blastFurnaceRecipe(CNItems.LEAD_INGOT::get, AllItems.CRUSHED_LEAD::get, "_for_lead", 1),
             NITROGEN_CONCENTRATE = blastFurnaceRecipe(CNItems.NITROGEN_CONCENTRATE::get, CNItems.NITRATE::get, "_for_nitrogen_concentrate", 1)

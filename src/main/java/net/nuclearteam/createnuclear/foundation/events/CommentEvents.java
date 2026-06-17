@@ -6,11 +6,10 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
-import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.nuclearteam.createnuclear.*;
-import net.nuclearteam.createnuclear.content.effects.capability.RadiationCapability;
+import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 
 @Mod.EventBusSubscriber
 public class CommentEvents {

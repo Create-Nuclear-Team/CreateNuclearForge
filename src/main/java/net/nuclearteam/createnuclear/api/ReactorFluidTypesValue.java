@@ -4,13 +4,8 @@ import com.simibubi.create.api.registry.SimpleRegistry;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import net.minecraft.core.HolderSet;
 import net.minecraft.world.level.material.Fluid;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.util.Map;
-import net.minecraftforge.registries.ForgeRegistries;
 import java.util.Collections;
 
 /**

@@ -16,7 +16,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ReactorFluidTypesValue;
-import net.nuclearteam.createnuclear.content.multiblock.fluid.CNReactorFluidTypes;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -82,7 +81,7 @@ public record ReactorFluidType(HolderSet<Fluid> fluids, int maxHeat, int efficie
                         ? fromFluid
                         : world.registryAccess()
                             .registryOrThrow(CreateNuclearRegistries.FLUID_TYPE)
-                            .getHolderOrThrow(CNReactorFluidTypes.FALLBACK)
+                            .getHolderOrThrow(CreateNuclearRegistries.FALLBACK_FLUID)
                             .value();
                 });
     }

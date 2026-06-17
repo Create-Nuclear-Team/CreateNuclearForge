@@ -78,6 +78,8 @@ public class RadiationRegistry {
 
         public void build() {
             if (item != null) {
+                if (item instanceof IRadiationSource)
+                    throw new IllegalStateException("Item " + item + " implements IRadiationSource and should not also be registered in RadiationRegistry (would cause double counting).");
                 ITEM_VALUE.put(item, value);
             }
 

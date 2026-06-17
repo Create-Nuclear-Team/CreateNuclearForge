@@ -12,6 +12,7 @@ import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.content.radiation.client.RadiationOverlay;
 import net.nuclearteam.createnuclear.foundation.utility.RenderHelper;
 
 /**
