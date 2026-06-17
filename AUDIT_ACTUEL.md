@@ -86,10 +86,53 @@ Ces points n'apparaissaient pas (ou pas sous cette forme) dans `AUDIT_V1.md` —
    *Recommandation* : implémenter la sélection de texture colorée dans `AntiRadiationArmorClientExtensions`/`AntiRadiationArmorModel`, ou retirer `getArmorTexture` + `ClothTagHelper.getArmorTexturePath` (et documenter que la teinture de tissu est cosmétiquement inerte).
 
 4. **`RadiationEffectHandler` — 3ᵉ chemin d'application de la radiation, sans aucune garde**
-   `RadiationEffectHandler.apply` (fuite de tuyau) applique `MobEffectInstance(RADIATION,3,2,...)` à **tout** `LivingEntity` à proximité, sans vérifier `CNConfigs.server().radiation.enabledItemRadiation`, sans vérifier `CNTags.CNEntityTags.IRRADIATED_IMMUNE`, sans vérifier le spectateur, et **sans tenir compte de la résistance anti-radiation**. C'est un chemin indépendant des deux autres (`RadiationCapability`/`RadiationEffect`), qui eux respectent ces gardes.
+   `RadiationEffectHandler.apply` (fuite de tuyau) applique `MobEffectInstance(RADIATION,3,2,...)` à **tout** `LivingEntity` à proximité, sans vérifier `CNConfigs.server().radiation.enabledItemRadiation`, sans vérifier `CNTags.CNEntityTags.IRRADIATED_IMMUNE`, sans vérifier le spectateur, et **sans tenir compte de la résistance anti-radiation**. C'est un chemin indépendant des deux autres (`RadiationCapability`/`RadiationEffect`), qui eux respectent ces gardes — mais selon deux sémantiques *différentes*, à ne pas fusionner :
+
+   - `RadiationEffect` (filtre de contagion de proximité, constructeur lignes 32-52) applique un **gate binaire** (immune tag, config, blacklist, spectateur, `résistance ≥ 1`) — mais ce gate est enfermé dans un lambda non réutilisable, et **reconstruit un `HashSet` + reparse les `ResourceLocation` de la blacklist à chaque appel** (cf. §5 point 5 / §6) — perf non corrigée en plus du problème de duplication.
+   - `RadiationCapability.applyEffects` applique une **atténuation continue de dose** (`totalRadiation = totalRaw * (1 - resistance)`), pas un gate — cette logique est correcte et ne doit *pas* être déplacée dans un helper commun, elle reste propre à ce chemin (calcul de magnitude, pas d'éligibilité).
+
    *Conséquence* : une fuite de fluide irradiant un joueur en armure anti-radiation complète, ou un mob immunisé, même avec `enabledItemRadiation=false`.
    *Lien AUDIT_V1.md* : prolonge directement le constat §1.4 ("contrat IRadiationSource vs RadiationRegistry dupliqué sans règle de priorité") — ici un **troisième** mécanisme d'application apparaît, renforçant l'absence de propriétaire unique pour la feature radiation.
-   *Recommandation* : router via un helper unique "peut être irradié" partagé par les 3 chemins.
+   *Recommandation* : extraire **uniquement le gate binaire** (pas l'atténuation continue) dans `RadiationCapability.canBeIrradiated(LivingEntity)`, avec la blacklist mise en cache statique au lieu d'être reconstruite par appel :
+
+   ```java
+    private static Set<EntityType<?>> entityBlacklistCache; // construit une fois, invalidé sur reload config/datapack
+
+    public static boolean canBeIrradiated(LivingEntity entity) {
+       if (entity.isSpectator()) return false;
+       if (entity.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)) return false;
+       if (!CNConfigs.server().radiation.enabledItemRadiation.get()) return false;
+       if (getEntityBlacklist().contains(entity.getType())) return false;
+       return getRadiationResistance(entity) < 1.0;
+    }
+
+    private static Set<EntityType<?>> getEntityBlacklist() {
+      if (entityBlacklistCache == null) {
+        entityBlacklistCache = new HashSet<>();
+        ConfigValueResolver.loadValuesInSet(CNConfigs.server().radiation.configuredLists.getEntityBlackList(), entityBlacklistCache, ...);
+      }
+      return entityBlacklistCache;
+    }
+   ```
+
+   ```java
+    // RadiationEffectHandler.apply
+    for (LivingEntity entity : entities) {
+      if (!RadiationCapability.canBeIrradiated(entity)) continue;
+      entity.addEffect(new MobEffectInstance(CNEffects.RADIATION.get(), 3, 2, false, false, false));
+    }
+    
+    // RadiationEffect.RadiationEffect
+    public RadiationEffect() {
+      super(MobEffectCategory.HARMFUL, 15453236,
+        amplifier -> 10,
+        RadiationCapability::canBeIrradiated,   // au lieu de 20 lignes inline + HashSet reconstruit à chaque appel
+        timer -> {},
+        () -> new MobEffectInstance(CNEffects.RADIATION.get(), 300));
+    }
+   ```
+
+   Utilisé en garde dans `RadiationEffectHandler.apply` (corrige le bug) et comme `filter` de `RadiationEffect` (remplace le lambda dupliqué, supprime la reconstruction de `HashSet` par tick/entité). `RadiationCapability.applyEffects` garde son atténuation continue propre, mais gagne un garde-fou minimal absent aujourd'hui : `if (player.isSpectator()) return;`.
 
 5. **Deux overlays de "vision irradiée" actifs en parallèle**
    `IrradiatedOverlayRendererVision` (actif) et `RadiationOverlay` (commenté dans `HudRenderer` mais toujours alimenté via `HelmetOverlay.setCoverage`) sont **deux implémentations concurrentes du même effet visuel**. `AUDIT_V1.md` mentionnait `RadiationOverlay` comme mort sans relever explicitement la duplication fonctionnelle avec `IrradiatedOverlayRendererVision` — confirmé ici comme une vraie redondance architecturale (deux fichiers, deux mécanismes de fade, un seul réellement rendu).
