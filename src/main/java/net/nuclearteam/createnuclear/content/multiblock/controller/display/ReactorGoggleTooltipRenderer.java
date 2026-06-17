@@ -82,7 +82,7 @@ public final class ReactorGoggleTooltipRenderer {
     private static void renderItemRods(List<Component> tooltip, ReactorDisplayState state) {
         if (state.items().isEmpty()) {
             CreateNuclearLang.builder()
-                    .add(Component.translatable("tooltip.item.empty.rod").withStyle(ChatFormatting.GRAY))
+                    .add(Component.translatable("createnuclear.tooltip.item.empty.rod").withStyle(ChatFormatting.GRAY))
                     .add(CreateNuclearLang.number(0).style(ChatFormatting.GOLD))
                     .forGoggles(tooltip);
         } else {

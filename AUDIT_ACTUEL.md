@@ -16,7 +16,6 @@ Le code est en **refactor V2 actif** (extraction en cours de `ReactorInputSnapsh
 
 | Réf. | Fichier:ligne | État | Détail |
 |---|---|---|---|
-| **B3** | `content/effects/VicinityEffect.java:32-49` | **Toujours présent, identique** | `int cooldownTicks = 0;` réinitialisé à chaque itération → branche `else` morte, `cooldowns`/`getCooldown`/`setCooldown` toujours jamais appelés (confirmé grep). `RadiationEffect` continue donc à `addEffect` un `MobEffectInstance(RADIATION,300)` toutes les 5 ticks sur chaque entité proche, sans throttling réel. |
 | **B6** | `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java` / `ReactorBluePrintItemPacket.java` | **Toujours présent** | Le 6ᵉ argument du packet duplique le 5ᵉ (uranium perdu) ; `coef=0.1F` envoyé à la place de `heat`. |
 | **B9** | `content/radiation/capability/RadiationCapability.java` (`applyEffects`) | **Toujours présent, identique** | Les deux premières branches (`radiation < level1`, `radiation < level2`) donnent toutes deux `amplifierLevel0` → `radiationLevel2` reste un palier inopérant. |
 | **B12** | `content/contraptions/irradiated/AnimalUtil.java:72-81` | **Toujours présent** | `isFood` ne reconnaît la yellowcake comme aliment **que** si elle porte un tag NBT `"Ingredient"` — incohérent avec `mobInteract` (ligne ~39) qui accepte *toute* yellowcake pour la conversion. Le chemin "food" (élevage/soin) reste cassé pour la yellowcake sans tag. |
