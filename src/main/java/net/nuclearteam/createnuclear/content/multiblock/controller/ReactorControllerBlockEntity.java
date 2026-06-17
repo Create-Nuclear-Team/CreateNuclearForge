@@ -919,9 +919,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     public void rotate(BlockState state, Level level, int rotation) {
         if (this.outputManager.getBlocksPosition().isEmpty())
             return;
-        int remainingRotation = rotation % this.outputManager.getBlocksPosition().size();
+        
+        int RPMDivider = 32;
+        int totalRpm = rotation / RPMDivider;
+
+        int remainingRotation = totalRpm % this.outputManager.getBlocksPosition().size();
         for (int i = 0; i < this.outputManager.getBlocksPosition().size(); i++) {
-            int dividedRotation = (rotation / this.outputManager.getBlocksPosition().size())
+            int dividedRotation = (totalRpm / this.outputManager.getBlocksPosition().size())
                     + (i < remainingRotation ? 1 : 0);
             BlockPos pos = this.outputManager.getBlocksPosition().get(i);
 
