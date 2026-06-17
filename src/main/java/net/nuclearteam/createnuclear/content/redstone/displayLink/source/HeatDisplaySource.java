@@ -30,17 +30,17 @@ public class HeatDisplaySource extends NumericSingleLineDisplaySource {
 
         return label.append(switch (mode) {
             case 1 -> Component.literal((heat * 100 / maxHeat) + "%")
-                    .withStyle(IHeat.HeatLevel.of(heat).getTextColor());
+                    .withStyle(IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor());
 
             case 2 -> {
                 // Largeur réduite pour laisser de la place au label
                 int gaugeWidth = 6;
-                yield drawGauge(heat, maxHeat, IHeat.HeatLevel.of(heat).getTextColor(), gaugeWidth);
+                yield drawGauge(heat, maxHeat, IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor(), gaugeWidth);
             }
 
             default -> Component.literal(String.valueOf(heat))
                     .append(CreateNuclearLang.translateDirect("generic.unit.heat.value"))
-                    .withStyle(IHeat.HeatLevel.of(heat).getTextColor());
+                    .withStyle(IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor());
         });
     }
 
