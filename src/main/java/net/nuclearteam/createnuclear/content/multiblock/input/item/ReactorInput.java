@@ -63,7 +63,7 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
         if (worldIn.isClientSide()) {return InteractionResult.SUCCESS;}
 
         withBlockEntityDo(worldIn, pos, be -> NetworkHooks.openScreen((ServerPlayer) player, be, be::sendToMenu));
-        return InteractionResult.PASS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override

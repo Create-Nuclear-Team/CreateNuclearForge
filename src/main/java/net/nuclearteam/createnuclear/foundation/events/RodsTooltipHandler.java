@@ -23,6 +23,10 @@ public class RodsTooltipHandler {
         if (player == null) return;
 
         ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
+        // Mod items already get their rod tooltip via Registrate's setTooltipModifierFactory
+        // (CreateNuclear.java:48). This handler only serves EXTERNAL items (other mods or
+        // datapack-defined RodTypes resolved at runtime via RodType.resolveRodType), which
+        // setTooltipModifierFactory cannot cover. Do NOT remove/invert: doing so double-tooltips mod rods.
         if (id != null && CreateNuclear.MOD_ID.equals(id.getNamespace())) return;
 
         RodsStats rodsStats = RodsStats.create(item);

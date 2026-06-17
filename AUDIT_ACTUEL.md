@@ -21,17 +21,12 @@ Le code est en **refactor V2 actif** (extraction en cours de `ReactorInputSnapsh
 | **B12** | `content/contraptions/irradiated/AnimalUtil.java:72-81` | **Toujours présent** | `isFood` ne reconnaît la yellowcake comme aliment **que** si elle porte un tag NBT `"Ingredient"` — incohérent avec `mobInteract` (ligne ~39) qui accepte *toute* yellowcake pour la conversion. Le chemin "food" (élevage/soin) reste cassé pour la yellowcake sans tag. |
 | **B14** | `content/multiblock/input/fluid/FluidLockManager.java` | **Toujours présent** | `Map<BlockPos,Fluid>` statique, sans clé de dimension, jamais purgée, doublon de `PersistentFluidLocks` ; toujours appelé depuis `clearLockIfAllInputsEmpty()` et `ReactorFluidInputEntity.FilteredFluidHandler`. |
 | **B15** | `content/explosion/NuclearExplosionEntity.java` (~224) | **Toujours présent** | `try { onBlockExploded } catch(Exception){ destroyBlock(...,true) }` — exception comme branchement, avale les vrais bugs, sémantiques de drop différentes entre les deux branches. |
-| **B16** | `foundation/data/recipe/CNStandardRecipeGen.java:351/391` | **Toujours présent (latent)** | `new ModdedCookingRecipeResult(result, compatDatagenOutput, null)` puis `serializeRecipeData` fait `conditions.forEach(...)` sur ce `null` → NPE si une recette `isOtherMod` est un jour sérialisée. |
-| **B17** | `foundation/events/RodsTooltipHandler.java:25-26` | **Reclassé — comportement intentionnel, risque de lisibilité uniquement** | La condition `if (id != null && CreateNuclear.MOD_ID.equals(id.getNamespace())) return;` est **volontaire** : les items du mod disposent déjà de leur tooltip via `setTooltipModifierFactory` dans `CreateNuclear.java:48` (chemin Registrate). Ce handler sert exclusivement aux items **externes** (autres mods ou items définis via datapack), car `RodType.resolveRodType` interroge `world.registryAccess()` au runtime — seul mécanisme capable de lire les `RodType` injectés par datapack, que `setTooltipModifierFactory` ne peut pas couvrir (les datapacks ne sont pas connus à l'enregistrement). **Ce n'est donc pas un bug.** Le vrai risque est la lisibilité : la condition semble inversée sans contexte, et un contributeur naïf qui la retire ou l'inverse provoquera un double tooltip sur les rods du mod. **Correction recommandée** : ajouter un commentaire explicite sur la ligne de garde — `// mod items already handled by Registrate's setTooltipModifierFactory (CreateNuclear.java:48)` — pour verrouiller l'intention et prévenir toute régression future. |
 | **B19** | `infrastructure/worldgen/biome/surfacerule/IrradiatedSurfaceRules.java` (fusion v1/v2) | **Toujours présent** | `IS_HIGHLANDS = biome()` (varargs vide) → toujours faux ; branches `MOON_DIRT`/`LEAD_TURF` mortes. Les constantes `MOON_DIRT`/`LEAD_ROCK`/`LEAD_TURF`/`RAW_LEAD_BASALT` pointent vers `STEEL_BLOCK`/`LEAD_BLOCK`/`LEAD_ORE`/`RAW_LEAD_BLOCK` — noms totalement déconnectés des blocs réels, signe d'un template non ré-thémé. |
 
 ### Bugs mineurs confirmés toujours présents (liste condensée)
 - `ReactorInputFluidManager.extractFluids/getBlocksPosition` : toujours `getFluidInTank(getTanks())` (off-by-one), `fluidNeeded` jamais décrémenté, `toExtract>1` ignore les extractions de 1 unité.
-- `ReactorInput.use()` : retourne toujours `PASS` côté serveur après `NetworkHooks.openScreen`, vs `SUCCESS` côté client → désync.
 - `InventoryHashUtil` : toujours `h = 31*h + stack.getDamageValue()` → resync radiation à chaque variation de durabilité.
 - `ReactorSizeDisplaySource` : toujours `tier*100/3` comme "%" — désormais creusé en détail (voir §3, nouveau finding lié).
-- `ReactorFluidType.getTypeForFluid` : `ForgeRegistries.FLUIDS.getKey(fluid)` toujours recalculé dans la boucle interne pour une valeur invariante.
-- `ReactorOutput.use()` : toujours `Objects.requireNonNull(...)` + `assert entity != null` (no-op en prod) au lieu d'une garde gracieuse.
 
 ---
 
@@ -166,7 +161,6 @@ Les 5 problèmes structurels de `AUDIT_V1.md` §1 restent **tous valides** :
 Tous les points perf de `AUDIT_V1.md` §4 restent **non corrigés** :
 - `ReactorPattern.findController`/`findControllerPos` : scan ~3971 blocs ×2 par placement/casse, sans garde client — confirmé, **aggravé** par `MultiBlockManagerBeta.findStructure` qui peut ajouter jusqu'à 4×3×729 lookups supplémentaires.
 - `RadiationEffect` : `HashSet<EntityType>` + parsing reconstruits à chaque entité/tick — confirmé.
-- `ReactorFluidType.getTypeForFluid` : `ForgeRegistries.FLUIDS.getKey(fluid)` recalculé en boucle interne — confirmé.
 - `HelmetOverlay.renderHotbar` + 3× `getArmor(HEAD)`/frame — confirmé.
 - `ReactorControllerBlockEntity.clearLockIfAllInputsEmpty` : scan cubique `O(n³)` (`getBlockEntity` + capability lookup par cellule) alors que `inputFluidManager.getFuildHandlers(level)` donne déjà la liste exacte (le NPE de `findStructure`, lui, a été corrigé).
 - **Nouveau** : `DefaultHeatCalculator.computeHeat` (package `reactorLogic`, non couvert par `AUDIT_V1.md`) — boucle imbriquée ~`57×81×4×57` avec désérialisation NBT répétée par cellule, exécutée à chaque tick de calcul de chaleur ; branche de proximité "cooler" manquante (asymétrie fuel/cooler).

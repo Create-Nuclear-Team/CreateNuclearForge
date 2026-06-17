@@ -348,7 +348,7 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
 
                     b.save(result -> {
                         consumer.accept(
-                                isOtherMod ? new ModdedCookingRecipeResult(result, compatDatagenOutput, null )
+                                isOtherMod ? new ModdedCookingRecipeResult(result, compatDatagenOutput, List.of())
                                         : result);
                     }, createSimpleLocation(CatnipServices.REGISTRIES.getKeyOrThrow(serializer)
                             .getPath()));
@@ -387,9 +387,11 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
             wrapped.serializeRecipeData(object);
             object.addProperty("result", outputOverride.toString());
 
-            JsonArray conds = new JsonArray();
-            conditions.forEach(c -> conds.add(CraftingHelper.serialize(c)));
-            object.add("conditions", conds);
+            if (conditions != null && !conditions.isEmpty()) {
+                JsonArray conds = new JsonArray();
+                conditions.forEach(c -> conds.add(CraftingHelper.serialize(c)));
+                object.add("conditions", conds);
+            }
         }
     }
 

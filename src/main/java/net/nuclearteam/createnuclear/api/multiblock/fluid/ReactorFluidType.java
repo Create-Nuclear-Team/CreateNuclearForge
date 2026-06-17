@@ -52,11 +52,14 @@ public record ReactorFluidType(HolderSet<Fluid> fluids, int maxHeat, int efficie
      *         {@code ReactorFluidType} if found, otherwise {@link Optional#empty()}
      */
     public static Optional<Reference<ReactorFluidType>> getTypeForFluid(RegistryAccess registryAccess, Fluid fluid) {
+        ResourceLocation fluidKey = ForgeRegistries.FLUIDS.getKey(fluid);
+        if (fluidKey == null) return Optional.empty();
+
         return registryAccess.lookupOrThrow(CreateNuclearRegistries.FLUID_TYPE)
                 .listElements()
                 .filter(ref -> ref.value().fluids.stream()
                     .anyMatch(h -> h.unwrapKey()
-                        .map(k -> Optional.ofNullable(ForgeRegistries.FLUIDS.getKey(fluid)).map(k.location()::equals).orElse(false))
+                        .map(k -> k.location().equals(fluidKey))
                         .orElse(false)))
                 .findFirst();
     }

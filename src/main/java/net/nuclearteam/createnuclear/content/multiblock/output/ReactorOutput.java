@@ -37,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 
 
 public class ReactorOutput extends DirectionalKineticBlock implements IWrenchable, IBE<ReactorOutputEntity> {
@@ -60,15 +59,16 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
         if (level.isClientSide)
             return InteractionResult.SUCCESS;
         else {
-            ReactorControllerBlock controller = Objects.requireNonNull(this.getBlockEntity(level, pos)).controller;
+            ReactorOutputEntity outputEntity = getBlockEntity(level, pos);
+            if (outputEntity == null) return InteractionResult.PASS;
+
+            ReactorControllerBlock controller = outputEntity.controller;
             if (controller != null){
                 ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos.above(3));
-                assert entity != null;
-                if (entity.getAssembled()){
-                    ReactorOutputEntity control = Objects.requireNonNull(getBlockEntity(level, pos));
-                    if (control.getDir() == 0)
-                        control.setDir(1, level, pos);
-                    else control.setDir(0, level, pos);
+                if (entity != null && entity.getAssembled()){
+                    if (outputEntity.getDir() == 0)
+                        outputEntity.setDir(1, level, pos);
+                    else outputEntity.setDir(0, level, pos);
                 }
             }
             return InteractionResult.CONSUME;
