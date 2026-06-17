@@ -17,7 +17,8 @@ public class VicinityEffect extends MobEffect {
     private final Predicate<LivingEntity> filter;
     private final Supplier<MobEffectInstance>[] effects;
 
-    private final Map<UUID, Integer> cooldowns = new HashMap<>();
+    // Stores the GameTime tick when the cooldown expires for each entity
+    private final Map<UUID, Long> cooldowns = new HashMap<>();
 
     @SafeVarargs
     protected VicinityEffect(MobEffectCategory category, int color, UnaryOperator<Integer> areaSize, Predicate<LivingEntity> filter, Consumer<Integer> timer, Supplier<MobEffectInstance>... effects) {
@@ -30,30 +31,29 @@ public class VicinityEffect extends MobEffect {
 
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
-        List<Entity> nearbyEntities = entity.level().getEntities(entity, entity.getBoundingBox().inflate(areaSize.apply(amplifier)), e -> e instanceof LivingEntity target && filter.test(target));
+        long currentTime = entity.level().getGameTime();
+
+        List<Entity> nearbyEntities = entity.level().getEntities(
+                entity,
+                entity.getBoundingBox().inflate(areaSize.apply(amplifier)),
+                e -> e instanceof LivingEntity target && filter.test(target)
+        );
 
         for (Entity nearbyEntity : nearbyEntities) {
             LivingEntity nearby = (LivingEntity) nearbyEntity;
+            UUID entityUuid = nearby.getUUID();
 
-            for (Supplier<MobEffectInstance> effect : effects) {
-                int cooldownTicks = 0;
-                if (cooldownTicks == 0) {
-                        nearby.addEffect(effect.get());
-                    cooldownTicks = 500;
-                } else {
-                    cooldownTicks--;
-                    //CreateNuclear.LOGGER.warn("Test Duree: {}, entity: {}", cooldownTicks, nearby.getUUID());
+            // Check if the cooldown has expired
+            if (currentTime >= cooldowns.getOrDefault(entityUuid, 0L)) {
+
+                for (Supplier<MobEffectInstance> effect : effects) {
+                    nearby.addEffect(effect.get());
                 }
+
+                // Set a 100-tick (5 seconds) cooldown before refreshing the effect again
+                cooldowns.put(entityUuid, currentTime + 100);
             }
         }
-    }
-
-    private int getCooldown(LivingEntity entity) {
-        return cooldowns.getOrDefault(entity.getUUID(), 0);
-    }
-
-    private void setCooldown(LivingEntity entity, int ticks) {
-        cooldowns.put(entity.getUUID(), ticks);
     }
 
     @Override
@@ -61,32 +61,3 @@ public class VicinityEffect extends MobEffect {
         return duration % 5 == 0;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
