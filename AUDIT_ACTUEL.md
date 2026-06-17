@@ -2,29 +2,17 @@
 
 **Méthodologie** : 7 audits indépendants couvrant la totalité de `src/main/java` (hors `src/generated` et `src/main/resources`), réalisés à partir de l'état actuel du code uniquement, puis recoupés avec `AUDIT_V1.md` et vérifiés par greps ciblés.
 
+> Ce document ne liste plus que **ce qui reste à corriger**. Les bugs déjà résolus en sont retirés.
+
 ---
 
 ## 0. Constat global
 
-Le code est toujours en **refactor V2 actif** (cohérent avec les commits récents : extraction `ReactorInputSnapshotBuilder`, `ReactorGoggleTooltipRenderer`, `ReactorDisplayState`). Quelques nettoyages annoncés par `AUDIT_V1.md` ont bien eu lieu :
-
-- ✅ `lib.multiblock.manager.*` (`MultiBlockManager`, `MultiBlockCache`, `RegisteredMultiBlockPattern`) + `IBetterPattern` + `SimpleMultiBlockPatternBuilder` (non-aisle) **ont disparu** du dépôt.
-- ✅ `ReactorAlarmEntity.tick()` distingue maintenant proprement `tickAudio()` (client) / `tickServer()` (serveur) — **corrigé**.
-- ✅ `B11` (LOGGER avant null-check dans `SimpleMultiBlockAislePatternBuilder`) — **corrigé**, le message d'erreur utilise désormais un ternaire sûr.
-- ✅ La feature radiation a été regroupée sous `content/radiation/**` (capability/client) — déplacement, pas (encore) une consolidation des deux contrats (`IRadiationSource` vs `RadiationRegistry`, toujours dupliqués).
-- ⚠️ `B2` (RadiationSyncPacket no-op) est **obsolète** : `RadiationSyncPacket`/`ClientRadiationData` n'existent plus du tout — le mécanisme décrit a disparu (probablement remplacé par la capability resync via `RadiationCapability`/`InventoryHashUtil`, qui elle fonctionne).
-
-La **grande majorité des bugs** de `AUDIT_V1.md` sont **toujours présents**, et plusieurs **nouveaux problèmes** ont émergé dans les zones où les refactors V2 sont en cours (managers `controller/`, displaySources, radiation). Le dead code a été en grande partie nettoyé ; il ne reste qu'un résidu non trivial (voir §3).
+Le code est en **refactor V2 actif** (extraction en cours de `ReactorInputSnapshotBuilder`, `ReactorGoggleTooltipRenderer`, `ReactorDisplayState`). La **grande majorité des bugs** de `AUDIT_V1.md` restent **présents**, et plusieurs **nouveaux problèmes** ont émergé dans les zones où les refactors V2 sont en cours (managers `controller/`, displaySources, radiation). Le dead code a été en grande partie nettoyé ; il reste un résidu non trivial (voir §2).
 
 ---
 
-## 1. 🐛 Bugs critiques toujours présents
-
-_Aucun. Tous les bugs critiques recensés ont été corrigés._
-
----
-
-## 2. 🐛 Bugs importants toujours présents
+## 1. 🐛 Bugs importants toujours présents
 
 | Réf. | Fichier:ligne | État | Détail |
 |---|---|---|---|
@@ -42,28 +30,28 @@ _Aucun. Tous les bugs critiques recensés ont été corrigés._
 - `ReactorInputFluidManager.extractFluids/getBlocksPosition` : toujours `getFluidInTank(getTanks())` (off-by-one), `fluidNeeded` jamais décrémenté, `toExtract>1` ignore les extractions de 1 unité.
 - `ReactorInput.use()` : retourne toujours `PASS` côté serveur après `NetworkHooks.openScreen`, vs `SUCCESS` côté client → désync.
 - `InventoryHashUtil` : toujours `h = 31*h + stack.getDamageValue()` → resync radiation à chaque variation de durabilité.
-- `ReactorSizeDisplaySource` : toujours `tier*100/3` comme "%" — désormais creusé en détail (voir §4, nouveau finding lié).
+- `ReactorSizeDisplaySource` : toujours `tier*100/3` comme "%" — désormais creusé en détail (voir §3, nouveau finding lié).
 - `ReactorFluidType.getTypeForFluid` : `ForgeRegistries.FLUIDS.getKey(fluid)` toujours recalculé dans la boucle interne pour une valeur invariante.
 - `ReactorOutput.use()` : toujours `Objects.requireNonNull(...)` + `assert entity != null` (no-op en prod) au lieu d'une garde gracieuse.
 
 ---
 
-## 3. 🧹 Dead code — reste à faire
+## 2. 🧹 Dead code — reste à faire
 
-> **⚠️ Corrections de l'audit V1/V2** (ne pas supprimer ces éléments — code vivant) :
+> **⚠️ Ne pas supprimer ces éléments — code vivant** (faux positifs écartés) :
 > - `CNTabulaModelRenderUtils` **n'est PAS du dead code** : il est utilisé par `CNAdvancedModelBox.cubeList`/`doRender`, sur le chemin de rendu **vivant** du champignon atomique (`NuclearMushroomCloudModel`). Conservé. La duplication `ModelBox` reste une opportunité de *refactor*, pas une suppression.
 > - `ReactorOutputEntity.outputPos` **n'est PAS mort** : il est lu/écrit dans `read()`/`write()` (sérialisation NBT). Laissé en place.
 
 Restant (grep global, zéro référence externe sauf mention) :
 
 - **Méthodes d'animation mortes restantes** dans `CNAdvancedEntityModel`/`CNAdvancedModelBox` : `chainSwing`, `chainWave`, `chainFlap`, `faceTarget`, `walk`, `flap`, `swing`, `bob`, `moveBox`, `setRotateAngle`, `progressRotation*`, `progressPosition*`, `getMovementScale`/`setMovementScale`/`movementScale`, `transitionTo`, `calculateChain*`, `displayList`/`compiled`. Mortes mais **non triviales** : leur retrait déclenche une cascade dans des classes **vivantes** (ex. `CNAdvancedModelBox.calculateRotation`/`bob` appellent `model.getMovementScale()`). À traiter en nettoyage dédié + dédup `ModelBox`.
-- **`RadiationOverlay` + `EasingHudOverlay`** : toujours commenté dans `HudRenderer.overlays` ; **`HelmetOverlay.setCoverage(...)` écrit dans le champ statique de `RadiationOverlay`, qui n'est lu par personne** — no-op silencieux (lié au §4 points 5 & 6 : décider entre supprimer `RadiationOverlay` ou réactiver et corriger le fade).
+- **`RadiationOverlay` + `EasingHudOverlay`** : toujours commenté dans `HudRenderer.overlays` ; **`HelmetOverlay.setCoverage(...)` écrit dans le champ statique de `RadiationOverlay`, qui n'est lu par personne** — no-op silencieux (lié au §3 points 5 & 6 : décider entre supprimer `RadiationOverlay` ou réactiver et corriger le fade).
 - **`SimpleMultiBlockPattern.test()`** : à vérifier — la classe ne semble plus exister (à confirmer/retirer si résidu).
-- **`IrradiatedBiomes.monsters()`** : no-op appelé avec `(95, 5, 100)` silencieusement ignorés — à retirer ou implémenter (lié au §4 point 10, worldgen "irradié" template non terminé).
+- **`IrradiatedBiomes.monsters()`** : no-op appelé avec `(95, 5, 100)` silencieusement ignorés — à retirer ou implémenter (lié au §3 point 10, worldgen "irradié" template non terminé).
 
 ---
 
-## 4. 🆕 Nouveaux problèmes / régressions apparus depuis l'audit
+## 3. 🆕 Nouveaux problèmes / régressions apparus depuis l'audit
 
 Ces points n'apparaissaient pas (ou pas sous cette forme) dans `AUDIT_V1.md` — ils résultent soit de zones non couvertes par l'audit précédent (cat/wolf/cow, displaySources détaillés), soit de refactors V2 en cours.
 
@@ -85,7 +73,7 @@ Ces points n'apparaissaient pas (ou pas sous cette forme) dans `AUDIT_V1.md` —
 4. **`RadiationEffectHandler` — 3ᵉ chemin d'application de la radiation, sans aucune garde**
    `RadiationEffectHandler.apply` (fuite de tuyau) applique `MobEffectInstance(RADIATION,3,2,...)` à **tout** `LivingEntity` à proximité, sans vérifier `CNConfigs.server().radiation.enabledItemRadiation`, sans vérifier `CNTags.CNEntityTags.IRRADIATED_IMMUNE`, sans vérifier le spectateur, et **sans tenir compte de la résistance anti-radiation**. C'est un chemin indépendant des deux autres (`RadiationCapability`/`RadiationEffect`), qui eux respectent ces gardes — mais selon deux sémantiques *différentes*, à ne pas fusionner :
 
-   - `RadiationEffect` (filtre de contagion de proximité, constructeur lignes 32-52) applique un **gate binaire** (immune tag, config, blacklist, spectateur, `résistance ≥ 1`) — mais ce gate est enfermé dans un lambda non réutilisable, et **reconstruit un `HashSet` + reparse les `ResourceLocation` de la blacklist à chaque appel** (cf. §5 point 5 / §6) — perf non corrigée en plus du problème de duplication.
+   - `RadiationEffect` (filtre de contagion de proximité, constructeur lignes 32-52) applique un **gate binaire** (immune tag, config, blacklist, spectateur, `résistance ≥ 1`) — mais ce gate est enfermé dans un lambda non réutilisable, et **reconstruit un `HashSet` + reparse les `ResourceLocation` de la blacklist à chaque appel** (cf. §4 point 5 / §5) — perf non corrigée en plus du problème de duplication.
    - `RadiationCapability.applyEffects` applique une **atténuation continue de dose** (`totalRadiation = totalRaw * (1 - resistance)`), pas un gate — cette logique est correcte et ne doit *pas* être déplacée dans un helper commun, elle reste propre à ce chemin (calcul de magnitude, pas d'éligibilité).
 
    *Conséquence* : une fuite de fluide irradiant un joueur en armure anti-radiation complète, ou un mob immunisé, même avec `enabledItemRadiation=false`.
@@ -139,8 +127,8 @@ Ces points n'apparaissaient pas (ou pas sous cette forme) dans `AUDIT_V1.md` —
 
 ### 🟠 Importants
 
-7. **`RadiationCapability.lastBiomeLocation` — non persisté (correction : PAS du dead code)**
-   ⚠️ Correction de l'audit : contrairement à ce qui était écrit, `lastBiomeLocation` **est bien lu pour une décision** (`RadiationCapability:89`, comparaison `!Objects.equals(biomeLoc, cap.getLastBiomeLocation())`). Ce n'est donc **pas** du dead code et il n'a pas été supprimé. Le seul point restant : `RadiationProvider.serializeNBT` ne le persiste pas → l'état est perdu au save/déconnexion (bug mineur, à corriger ou assumer).
+7. **`RadiationCapability.lastBiomeLocation` — non persisté**
+   `lastBiomeLocation` **est bien lu pour une décision** (`RadiationCapability:89`, comparaison `!Objects.equals(biomeLoc, cap.getLastBiomeLocation())`) — ce n'est donc **pas** du dead code. Le point restant : `RadiationProvider.serializeNBT` ne le persiste pas → l'état est perdu au save/déconnexion (bug mineur, à corriger ou assumer).
 
 8. **`ReactorSummaryDisplaySource` — sentinelle de taille de liste fragile + accès positionnel**
    `getComponents()` retourne une liste de taille **1** (pas de contrôleur) ou **6** (normal) ; les appelants testent `components.size() < 6` pour détecter le cas "pas de contrôleur", et `components.get(2).get(1)` accède positionnellement à la ligne "fuel". Tout ajout/réordonnancement futur de ligne casse silencieusement ces deux contrats implicites. `AUDIT_V1.md` ne détaillait pas `ReactorSummaryDisplaySource` à ce niveau.
@@ -149,9 +137,9 @@ Ces points n'apparaissaient pas (ou pas sous cette forme) dans `AUDIT_V1.md` —
    En mode "normal" (mode 0), `HeatDisplaySource` affiche `"500 °C"` alors que `ReactorSummaryDisplaySource` affiche une **jauge** pour le heat dans le même mode (`gaugeOnNormal=true` pour heat uniquement) — incohérence visuelle entre les deux affichages pour un même mode utilisateur, non relevée dans `AUDIT_V1.md`.
 
 10. **`IrradiatedBiomes` — contenu de worldgen visiblement copié d'un autre mod**
-    `addDefaultIrradiatedOres`/`addDefaultSoftDisks` ajoutent `MiscOverworldPlacements.BLUE_ICE`, `Carvers.NETHER_CAVE`, `VOID_START_PLATFORM` — du contenu vanilla sans rapport avec un biome "irradié", et `monsters(...)` est un no-op appelé avec des paramètres `(95, 5, 100)` silencieusement ignorés. Combiné aux bugs B7/B19, le pipeline worldgen "irradié" semble être un **template non terminé/non re-thémé**, plus large que ce que `AUDIT_V1.md` avait documenté (qui se concentrait sur les surface rules).
+    `addDefaultIrradiatedOres`/`addDefaultSoftDisks` ajoutent `MiscOverworldPlacements.BLUE_ICE`, `Carvers.NETHER_CAVE`, `VOID_START_PLATFORM` — du contenu vanilla sans rapport avec un biome "irradié", et `monsters(...)` est un no-op appelé avec des paramètres `(95, 5, 100)` silencieusement ignorés. Combiné au bug B19, le pipeline worldgen "irradié" semble être un **template non terminé/non re-thémé**, plus large que ce que `AUDIT_V1.md` avait documenté (qui se concentrait sur les surface rules).
 
-11. **`CNNoiseGeneratorSettings.IRRADIATED`** définit `STEEL_BLOCK` comme bloc de remplissage par défaut du terrain (équivalent "stone"). Si jamais relié à une dimension, génèrerait un terrain massivement en acier — combiné aux surface rules cassées (B7/B19), point d'alerte non couvert par `AUDIT_V1.md`.
+11. **`CNNoiseGeneratorSettings.IRRADIATED`** définit `STEEL_BLOCK` comme bloc de remplissage par défaut du terrain (équivalent "stone"). Si jamais relié à une dimension, génèrerait un terrain massivement en acier — combiné aux surface rules cassées (B19), point d'alerte non couvert par `AUDIT_V1.md`.
 
 ### 🟡 Mineurs
 
@@ -162,19 +150,19 @@ Ces points n'apparaissaient pas (ou pas sous cette forme) dans `AUDIT_V1.md` —
 
 ---
 
-## 5. 🏗️ Architecture — état actuel (synthèse)
+## 4. 🏗️ Architecture — état actuel (synthèse)
 
 Les 5 problèmes structurels de `AUDIT_V1.md` §1 restent **tous valides** :
 
 1. **Inversion `api/`** : `api.multiblock.MultiBlockManagerBeta`/`RodType`/`ReactorFluidType` dépendent toujours de `content.*` — confirmé.
 2. **God class `ReactorControllerBlockEntity`** : toujours ~680 lignes, hub pour 5 managers, verrous fluides (`tryLockFluid`/`canAcceptFluid`/`clearLock`/`clearLockIfAllInputsEmpty`, ~65 lignes), rotation/output (`rotate`, ~35 lignes), tooltips. La décomposition progresse (managers/services/snapshot extraits) mais la BE reste le hub central — **non terminé**, conforme au plan d'action §8.5 de `AUDIT_V1.md`.
 3. **Deux frameworks multiblock concurrents** : le ménage a réduit `lib/multiblock` (suppression de `MultiBlockManager`/`MultiBlockCache`/`IBetterPattern`), mais **trois couches coexistent toujours** pour la détection de contrôleur — `lib/multiblock` (matching générique), `api.multiblock.MultiBlockManagerBeta` (vérification de structure), et `content.multiblock.pattern.ReactorPattern`/`MultiblockHelpers` (scan géométrique brut, ~3971 blocs, **toujours** appelé en double — `findController` + `findControllerPos` — à chaque pose/casse, y compris côté client sans garde `isClientSide`). C'est le point de performance/architecture le plus critique et **entièrement non corrigé**.
-4. **Radiation sur 4+ couches** : toujours vrai, et **aggravé** par le 3ᵉ chemin `RadiationEffectHandler` (point 4 ci-dessus) découvert dans cette analyse.
-5. **Couplage hub + accès infra direct** : `ConfigValueResolver` existe toujours dans `foundation/utility` mais reste sous-utilisé (ex: `RadiationEffect` l'utilise pour la blacklist mais reconstruit un `HashSet` + reparse les `ResourceLocation` à **chaque tick par entité** — perf non corrigée, AUDIT §4 ligne 2).
+4. **Radiation sur 4+ couches** : toujours vrai, et **aggravé** par le 3ᵉ chemin `RadiationEffectHandler` (§3 point 4) découvert dans cette analyse.
+5. **Couplage hub + accès infra direct** : `ConfigValueResolver` existe toujours dans `foundation/utility` mais reste sous-utilisé (ex: `RadiationEffect` l'utilise pour la blacklist mais reconstruit un `HashSet` + reparse les `ResourceLocation` à **chaque tick par entité** — perf non corrigée, `AUDIT_V1.md` §4 ligne 2).
 
 ---
 
-## 6. ⚡ Performance — état actuel
+## 5. ⚡ Performance — état actuel
 
 Tous les points perf de `AUDIT_V1.md` §4 restent **non corrigés** :
 - `ReactorPattern.findController`/`findControllerPos` : scan ~3971 blocs ×2 par placement/casse, sans garde client — confirmé, **aggravé** par `MultiBlockManagerBeta.findStructure` qui peut ajouter jusqu'à 4×3×729 lookups supplémentaires.
@@ -187,7 +175,7 @@ Tous les points perf de `AUDIT_V1.md` §4 restent **non corrigés** :
 
 ---
 
-## 7. Plan d'action — priorités mises à jour
+## 6. Plan d'action — priorités mises à jour
 
 **Quick wins toujours en attente** (1 ligne, fort impact) : **B9** (mapping amplificateurs ambigu — décision produit).
 
@@ -196,10 +184,10 @@ Tous les points perf de `AUDIT_V1.md` §4 restent **non corrigés** :
 - Enregistrer `IrradiatedCatCollarLayer` / implémenter `IrradiatedWoldCollarLayer.render`, ou retirer la mécanique de teinture de collier.
 - Retirer `RenderHelper.renderTextureOverlay(..., Math.round(...))` → passer `alpha*coverage` brut (si `RadiationOverlay` est un jour réactivé).
 
-**Priorité structurelle inchangée** : le scan géométrique `ReactorPattern`/`MultiblockHelpers` (point architecture #3) reste le risque de performance serveur le plus sérieux et n'a reçu **aucune** correction — c'est le chantier le plus rentable avant de poursuivre la décomposition de `ReactorControllerBlockEntity`.
+**Priorité structurelle inchangée** : le scan géométrique `ReactorPattern`/`MultiblockHelpers` (point architecture §4.3) reste le risque de performance serveur le plus sérieux et n'a reçu **aucune** correction — c'est le chantier le plus rentable avant de poursuivre la décomposition de `ReactorControllerBlockEntity`.
 
 **Nettoyage dead-code restant** :
 - Méthodes d'animation mortes restantes dans `CNAdvancedEntityModel`/`CNAdvancedModelBox` + dédup `ModelBox` (cascade dans classes vivantes — nettoyage dédié).
-- `RadiationOverlay`/`EasingHudOverlay` + `HelmetOverlay.setCoverage` no-op (décider : supprimer ou réactiver+corriger le fade — §4 points 5 & 6).
+- `RadiationOverlay`/`EasingHudOverlay` + `HelmetOverlay.setCoverage` no-op (décider : supprimer ou réactiver+corriger le fade — §3 points 5 & 6).
 - `IrradiatedBiomes.monsters()` no-op et reliquat éventuel `SimpleMultiBlockPattern.test()`.
 - Features à finir ou supprimer (pas du pur dead code, décision produit) : `IrradiatedWoldCollarLayer`/`IrradiatedCatCollarLayer`, `AntiRadiationArmorItem.getArmorTexture`/`ClothTagHelper.getArmorTexturePath`.
