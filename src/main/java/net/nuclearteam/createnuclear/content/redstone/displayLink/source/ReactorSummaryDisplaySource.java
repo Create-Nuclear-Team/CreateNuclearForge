@@ -147,7 +147,7 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
                 List.of(lFuel,   formatValue(fuel, 64, mode, false, ChatFormatting.GREEN, gaugeWidth)),
                 List.of(lCooler, formatValue(cooler, 64, mode, false, ChatFormatting.AQUA, gaugeWidth)),
                 List.of(lFluid,  formatFluid(fluid, 16000, mode, ChatFormatting.BLUE, gaugeWidth)),
-                List.of(lHeat,   formatValue(heat, 1000, mode, true, IHeat.HeatLevel.of(heat).getTextColor(), gaugeWidth))
+                List.of(lHeat,   formatValue(heat, 1000, mode, true, IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor(), gaugeWidth))
         );
     }
 

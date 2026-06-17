@@ -346,7 +346,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                 .forGoggles(tooltip);
         IHeat.HeatLevel.getName("reactor_controller").style(ChatFormatting.GRAY).forGoggles(tooltip);
 
-        IHeat.HeatLevel.getFormattedHeatText(patternTag.getInt("heat")).forGoggles(tooltip);
+        IHeat.HeatLevel.getFormattedHeatText(patternTag.getInt("heat"), this.getMultiblockSize()).forGoggles(tooltip);
 
         if (clientDisplayItems.isEmpty()) {
             CreateNuclearLang.builder()
@@ -560,7 +560,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (level.isClientSide || isExploding)
             return;
         int currentHeat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-        boolean isDanger = IHeat.HeatLevel.of(currentHeat) == IHeat.HeatLevel.DANGER;
+        boolean isDanger = IHeat.HeatLevel.of(currentHeat, this.getMultiblockSize()) == IHeat.HeatLevel.DANGER;
 
         activateAlarms(isDanger);
 
@@ -729,7 +729,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             }
             cycleManager.tick(inputManager, level);
         }
-        if (IHeat.HeatLevel.isNotDanger(heat)) {
+        if (IHeat.HeatLevel.isNotDanger(heat, this.getMultiblockSize())) {
             // normal
             if (!this.outputManager.getBlocksPosition().isEmpty()) {
                 rotate(getBlockState(), getLevel(), heat);

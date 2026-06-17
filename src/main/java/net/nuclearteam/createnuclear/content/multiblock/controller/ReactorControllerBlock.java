@@ -110,7 +110,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
             }
             else if (heldItem.isEmpty() && !controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()) {
                 withBlockEntityDo(worldIn, pos, be -> {
-                    if (IHeat.HeatLevel.of(be.getInventoryObject().getItem(0).getOrCreateTag().getInt("heat")) == IHeat.HeatLevel.DANGER) {
+                    if (IHeat.HeatLevel.of(be.getInventoryObject().getItem(0).getOrCreateTag().getInt("heat"), be.getMultiblockSize()) == IHeat.HeatLevel.DANGER) {
                         be.getAdvancement().setPlayer(player.getUUID());
                         be.getAdvancement().awardPlayer(CNAdvancement.NO_TIME_TO_DIE);
                     }

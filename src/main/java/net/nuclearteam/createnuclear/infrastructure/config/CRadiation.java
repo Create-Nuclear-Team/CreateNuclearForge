@@ -73,8 +73,6 @@ public class CRadiation extends ConfigBase {
                             ),
                             obj -> obj instanceof String
                     );
-
-            builder.pop();
         }
 
         @Override

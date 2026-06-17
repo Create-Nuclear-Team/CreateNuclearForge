@@ -14,6 +14,8 @@ import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
+import net.nuclearteam.createnuclear.infrastructure.config.CReactorHeat;
 
 public interface IHeat extends IWrenchable {
     enum HeatLevel {
@@ -57,25 +59,38 @@ public interface IHeat extends IWrenchable {
             };
         }
 
-        public static HeatLevel of(int heat) {
+        public static HeatLevel of(int heat, int reactorSize) {
             if (heat < 0) return NONE;
 
             heat = Math.abs(heat);
 
-            if (heat > 0 && heat < 500) return SAFETY;
-            if (heat >= 501 && heat <= 800) return CAUTION;
-            if (heat >= 801 && heat <= 1000) return WARNING;
-            if (heat >= 1001) return DANGER;
+            CReactorHeat config = CNConfigs.server().reactorHeat;
+            int danger = 1000;
+
+            switch (reactorSize) {
+                case 5 -> danger = config.size5Danger.get();
+                case 7 -> danger = config.size7Danger.get();
+                case 9 -> danger = config.size9Danger.get();
+                default -> danger = config.size5Danger.get();
+            }
+
+            int caution = (int) (danger * 0.75);
+            int warning = (int) (danger * 0.90);
+
+            if (heat > 0 && heat < caution) return SAFETY;
+            if (heat >= caution && heat < warning) return CAUTION;
+            if (heat >= warning && heat <= danger) return WARNING;
+            if (heat > danger) return DANGER;
 
             return NONE;
         }
 
-        public static boolean isNotDanger(int heat) {
-            return of(heat) != DANGER || of(heat) != NONE;
+        public static boolean isNotDanger(int heat, int reactorSize) {
+            return of(heat, reactorSize) != DANGER || of(heat, reactorSize) != NONE;
         }
 
-        public static LangBuilder getFormattedHeatText(int heat) {
-            HeatLevel heatLevel = of(heat);
+        public static LangBuilder getFormattedHeatText(int heat, int reactorSize) {
+            HeatLevel heatLevel = of(heat, reactorSize);
             LangBuilder builder = CreateLang.builder(CreateNuclear.MOD_ID).text(TooltipHelper.makeProgressBar(5, heatLevel.ordinal()+1));
 
             builder.translate("tooltip.heatLevel." + Lang.asId(heatLevel.name()))
