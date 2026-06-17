@@ -248,7 +248,6 @@
   "item.minecraft.tipped_arrow.effect.potion_of_radiation_augment_1": "Sugárzás Nyila",
   "itemGroup.createnuclear.main": "Create: Nukleáris",
   "itemgroup.uranium": "Uránium Csoport",
-  "overlay.event_message": "⚠ Veszély ⚠ %s időzítő",
   "reactor.info.assembled.creator": "A reaktor összeállt",
   "reactor.info.assembled.destroyer": "A reaktor szét lett szedve",
   "reactor.info.assembled.none": "A reaktor nincs összeállítva",
