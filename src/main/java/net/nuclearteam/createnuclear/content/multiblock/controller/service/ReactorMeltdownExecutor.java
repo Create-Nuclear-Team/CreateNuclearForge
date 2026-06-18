@@ -14,7 +14,7 @@ import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.CNBiomes;
 
 public class ReactorMeltdownExecutor implements IExplosionService {
     @Override
-    public void triggerExplosion(ServerLevel level, BlockPos controllerPos, int reactorSize, int uraniumRodCount, int notifyRadius, boolean notifyWarnAll) {
+    public void triggerExplosion(ServerLevel level, BlockPos controllerPos, int reactorSize, int countFuelRod, int notifyRadius, boolean notifyWarnAll) {
         BlockPos explosionPos = controllerPos.above(5);
 
         NotifyUtil.sendTitle(level, controllerPos,
@@ -23,7 +23,7 @@ public class ReactorMeltdownExecutor implements IExplosionService {
                 ChatFormatting.DARK_RED, notifyRadius, notifyWarnAll, 10, 60, 20
         );
 
-        float size = computeExplosionSize(reactorSize, uraniumRodCount);
+        float size = computeExplosionSize(reactorSize, countFuelRod);
 
         NuclearExplosionEntity explosion = new NuclearExplosionEntity(CNEntityType.NUCLEAR_EXPLOSION.get(), level);
         explosion.setPos(explosionPos.getX() + 0.5D, explosionPos.getY() + 10.0D, explosionPos.getZ() - 2.0D);
@@ -37,13 +37,13 @@ public class ReactorMeltdownExecutor implements IExplosionService {
 
     }
 
-    private static float computeExplosionSize(int reactorSize, int countUraniumRod) {
+    private static float computeExplosionSize(int reactorSize, int countFuelRod) {
         // Scales with reactor footprint: 5x5 -> 1.0, 7x7 -> 1.4, 9x9 -> 1.8
         float structureFactor = reactorSize / 5f;
 
         // Square root gives diminishing returns: each extra uranium rod adds less
         // to the radius than the previous one.
-        float fuelImpact = Mth.sqrt(countUraniumRod) * .3f;
+        float fuelImpact = Mth.sqrt(countFuelRod) * .3f;
 
         // Final size: constant base + (fuel impact scaled by structure factor)
         return Mth.clamp(1.5f + (fuelImpact * structureFactor), 1f, 10f);

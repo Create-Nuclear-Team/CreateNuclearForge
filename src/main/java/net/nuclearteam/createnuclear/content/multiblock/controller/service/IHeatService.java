@@ -7,12 +7,7 @@ import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
 
 public interface IHeatService {
-    int getGraphiteTimer();
-
-    int getUraniumTimer();
-
     int getLiquidTimer();
 
-    double calculateHeat(BigItemStack fuel, BigItemStack cooler, BigFluidStack bigFluidStack, int graphiteCount,
-            int uraniumCount, int totalHeatRatio, ReactorControllerInventory inventory, Level level);
+    double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, ReactorControllerInventory inventory, Level level);
 }

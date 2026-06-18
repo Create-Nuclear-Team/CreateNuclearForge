@@ -24,13 +24,13 @@ import static net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.Rea
 
 public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
-    public float heat = 0F;
-    public int graphiteTime = 5000;
-    public int uraniumTime = 3600;
-    public int countCooledRod = 0;
     public int countFuelRod = 0;
+    public int countCooledRod = 0;
+    public int fuelTime = 0;
+    public int coolerTime = 0;
     public double progress = 0;
-
+    public float heat = 0;
+    public double totalInit = 0;
     public boolean sendUpdate = false;
 
     public ReactorBluePrintMenu(MenuType<?> type, int id, Inventory inv, FriendlyByteBuf extraData) {
@@ -63,10 +63,10 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
             }
         }
 
-        contentHolder.getOrCreateTag().putInt("uraniumTime", CNConfigs.server().rods.uraniumRodLifetime.get());
-        contentHolder.getOrCreateTag().putInt("graphiteTime", CNConfigs.server().rods.graphiteRodLifetime.get());
-        contentHolder.getOrCreateTag().putInt("countGraphiteRod", 0);
-        contentHolder.getOrCreateTag().putInt("countUraniumRod", 0);
+        contentHolder.getOrCreateTag().putInt("fuelTime", 0);
+        contentHolder.getOrCreateTag().putInt("coolerTime", 0);
+        contentHolder.getOrCreateTag().putInt("countCoolerRod", 0);
+        contentHolder.getOrCreateTag().putInt("countFuelRod", 0);
         contentHolder.getOrCreateTag().putInt("totalHeatRatio", 0);
 
         ghostInventory.deserializeNBT(tag.getCompound("pattern"));
@@ -117,6 +117,8 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
         countFuelRod = 0;
         countCooledRod = 0;
         int totalHeatRatio = 0;
+        int totalFuelTime = 0;
+        int totalCoolerTime = 0;
 
         for (int i = 0; i < ghostInventory.getSlots(); i++) {
             ItemStack stack = ghostInventory.getStackInSlot(i);
@@ -130,8 +132,14 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
             boolean isFuel = stack.is(CNItemTags.FUEL.tag) || typeRod.type() == TypeRod.FUEL;
             boolean isCooler = stack.is(CNItemTags.COOLER.tag) || typeRod.type() == TypeRod.COOLER;
 
-            if (isCooler) countCooledRod++;
-            if (isFuel) countFuelRod++;
+            if (isCooler) {
+                countCooledRod++;
+                totalCoolerTime += typeRod.rodTimer();
+            }
+            if (isFuel) {
+                countFuelRod++;
+                totalFuelTime += typeRod.rodTimer();
+            }
             
             if (isCooler || isFuel) {
                 totalHeatRatio += typeRod.heatRatio();
@@ -139,9 +147,11 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
         }
 
         contentHolder.getOrCreateTag().put("pattern", ghostInventory.serializeNBT());
-        contentHolder.getOrCreateTag().putInt("countGraphiteRod", countCooledRod);
-        contentHolder.getOrCreateTag().putInt("countUraniumRod", countFuelRod);
+        contentHolder.getOrCreateTag().putInt("countCoolerRod", countCooledRod);
+        contentHolder.getOrCreateTag().putInt("countFuelRod", countFuelRod);
         contentHolder.getOrCreateTag().putInt("totalHeatRatio", totalHeatRatio);
+        contentHolder.getOrCreateTag().putInt("fuelTime", countFuelRod > 0 ? totalFuelTime / countFuelRod : 0);
+        contentHolder.getOrCreateTag().putInt("coolerTime", countCooledRod > 0 ? totalCoolerTime / countCooledRod : 0);
 
         for (int i = 0; i < ghostInventory.getSlots(); i++) {
             ItemStack stack = ghostInventory.getStackInSlot(i);

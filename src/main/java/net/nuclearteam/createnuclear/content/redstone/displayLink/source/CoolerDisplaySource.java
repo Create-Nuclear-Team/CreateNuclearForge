@@ -25,8 +25,14 @@ public class CoolerDisplaySource extends NumericSingleLineDisplaySource {
         MutableComponent label = CreateNuclearLang.translateDirect("display_source.reactor.cooler").append(" ");
 
         int mode = context.sourceConfig().getInt("display_mode");
-        var coolerStack = controller.getBigCoolerItem();
-        int cooler = (coolerStack != null) ? coolerStack.count : 0;
+        int cooler = 0;
+        if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
+            for (var entry : controller.getDisplayState().items().entrySet()) {
+                if (net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate.IS_COOLED.test(entry.getKey().getDefaultInstance())) {
+                    cooler += entry.getValue();
+                }
+            }
+        }
         int maxCooler = 64;
 
         return label.append(switch (mode) {

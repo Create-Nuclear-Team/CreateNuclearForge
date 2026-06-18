@@ -44,6 +44,6 @@ public class ReactorInputSnapshotBuilder {
 
 
 
-        return new ReactorInputSnapshot(items, fluids, maxFluidCapacity, virtualItems.getBigFuelRod(), virtualItems.getBigCooledRod());
+        return new ReactorInputSnapshot(items, fluids, maxFluidCapacity);
     }
 }

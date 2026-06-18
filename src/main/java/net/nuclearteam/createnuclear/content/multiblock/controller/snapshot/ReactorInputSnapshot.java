@@ -22,9 +22,9 @@ import java.util.Map;
  * list/map structure, not of their contents.
  */
 
-public record ReactorInputSnapshot(Map<Item, Integer> items, List<BigFluidStack> fluids, long maxFluidCapacity, BigItemStack bigFuelItem, BigItemStack bigCoolerItem) {
+public record ReactorInputSnapshot(Map<Item, Integer> items, List<BigFluidStack> fluids, long maxFluidCapacity) {
     public static final ReactorInputSnapshot EMPTY = new ReactorInputSnapshot(
-            Map.of(), List.of(), 0, new BigItemStack(ItemStack.EMPTY), new BigItemStack(ItemStack.EMPTY)
+            Map.of(), List.of(), 0
     );
 
     public ReactorInputSnapshot {

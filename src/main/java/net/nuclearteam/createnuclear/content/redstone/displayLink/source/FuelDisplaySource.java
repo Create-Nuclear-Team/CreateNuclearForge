@@ -25,8 +25,14 @@ public class FuelDisplaySource extends NumericSingleLineDisplaySource {
         MutableComponent label = CreateNuclearLang.translateDirect("display_source.reactor.fuel").append(" ");
 
         int mode = context.sourceConfig().getInt("display_mode");
-        var fuelStack = controller.getBigFuelItem();
-        int fuel = (fuelStack != null) ? fuelStack.count : 0;
+        int fuel = 0;
+        if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
+            for (var entry : controller.getDisplayState().items().entrySet()) {
+                if (net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate.IS_FUEL.test(entry.getKey().getDefaultInstance())) {
+                    fuel += entry.getValue();
+                }
+            }
+        }
         int maxFuel = 64;
 
         return label.append(switch (mode) {

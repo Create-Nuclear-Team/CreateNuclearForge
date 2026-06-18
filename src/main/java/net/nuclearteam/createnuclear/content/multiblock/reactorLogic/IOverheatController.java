@@ -6,7 +6,5 @@ import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 public interface IOverheatController {
     void updateState(int totalHeatRatio, BigFluidStack bigFluidStack, ReactorFluidType type);
     double getOverHeat();
-    int getGraphiteTimer();
-    int getUraniumTimer();
     int getLiquidTimer();
 }

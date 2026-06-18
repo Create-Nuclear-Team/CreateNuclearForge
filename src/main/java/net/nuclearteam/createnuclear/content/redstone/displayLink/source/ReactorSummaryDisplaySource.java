@@ -122,10 +122,17 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
         int mode = context.sourceConfig().getInt("display_mode");
 
         int heat = (int) controller.getConfiguredPattern().getOrCreateTag().getDouble("heat");
-        var fuelStack = controller.getBigFuelItem();
-        int fuel = (fuelStack != null) ? fuelStack.count : 0;
-        var coolerStack = controller.getBigCoolerItem();
-        int cooler = (coolerStack != null) ? coolerStack.count : 0;
+        int fuel = 0;
+        int cooler = 0;
+        if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
+            for (var entry : controller.getDisplayState().items().entrySet()) {
+                if (net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate.IS_FUEL.test(entry.getKey().getDefaultInstance())) {
+                    fuel += entry.getValue();
+                } else if (net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate.IS_COOLED.test(entry.getKey().getDefaultInstance())) {
+                    cooler += entry.getValue();
+                }
+            }
+        }
         int size = controller.getMultiblockSize();
         var fluidList = controller.getBigFluidStack();
         int fluid = (fluidList != null && !fluidList.isEmpty() && fluidList.get(0) != null) ? (int) fluidList.get(0).amount : 0;
