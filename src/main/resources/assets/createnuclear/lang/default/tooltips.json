@@ -29,9 +29,11 @@
   "block.createnuclear.reactor_frame.tooltip.summary": "_Block_ used to build the _reactor_",
 
 
-  "item.createnuclear.graphite_rod.tooltip.summary": "_Stick_ to be used in the _reactor input_ to operate it.",
+  "item.createnuclear.graphite_rod.tooltip.summary": "_Rod_ to be used in the _reactor input_ to operate it.",
 
-  "item.createnuclear.uranium_rod.tooltip.summary": "_Stick_ to be used in the _reactor input_ to operate it.",
+  "item.createnuclear.uranium_rod.tooltip.summary": "_Rod_ to be used in the _reactor input_ to operate it.",
+
+  "item.createnuclear.thorium_rod.tooltip.summary": "_Rod_ to be used in the _reactor input_ to operate it.",
 
   "item.createnuclear.thorium_rod.tooltip.summary": "_Stick_ to be used in the _reactor input_ to operate it.",
 
