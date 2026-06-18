@@ -17,8 +17,7 @@ Le code est en **refactor V2 actif** (extraction en cours de `ReactorInputSnapsh
 | Réf. | Fichier:ligne | État | Détail |
 |---|---|---|---|
 | **B6** | `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java` / `ReactorBluePrintItemPacket.java` | **Toujours présent** | Le 6ᵉ argument du packet duplique le 5ᵉ (uranium perdu) ; `coef=0.1F` envoyé à la place de `heat`. |
-| **B12** | `content/contraptions/irradiated/AnimalUtil.java:72-81` | **Toujours présent** | `isFood` ne reconnaît la yellowcake comme aliment **que** si elle porte un tag NBT `"Ingredient"` — incohérent avec `mobInteract` (ligne ~39) qui accepte *toute* yellowcake pour la conversion. Le chemin "food" (élevage/soin) reste cassé pour la yellowcake sans tag. |
-| ~~**B14**~~ | `content/multiblock/input/fluid/` | **✅ Corrigé** | `FluidLockManager` (map statique sans clé de dimension, jamais purgée, doublon de `PersistentFluidLocks`) supprimé. Toute la logique de verrou passe désormais par `PersistentFluidLocks` (par-niveau, persistant) côté serveur ; le client est permissif. Bug lié corrigé : casser un input fluide réévalue le verrou via `clearLockIfAllInputsEmpty()`, ce qui permet de changer de fluide après remplacement de l'input. |
+| **B14** | `content/multiblock/input/fluid/FluidLockManager.java` | **Toujours présent** | `Map<BlockPos,Fluid>` statique, sans clé de dimension, jamais purgée, doublon de `PersistentFluidLocks` ; toujours appelé depuis `clearLockIfAllInputsEmpty()` et `ReactorFluidInputEntity.FilteredFluidHandler`. |
 | **B15** | `content/explosion/NuclearExplosionEntity.java` (~224) | **Toujours présent** | `try { onBlockExploded } catch(Exception){ destroyBlock(...,true) }` — exception comme branchement, avale les vrais bugs, sémantiques de drop différentes entre les deux branches. |
 
 ### Bugs mineurs confirmés toujours présents (liste condensée)

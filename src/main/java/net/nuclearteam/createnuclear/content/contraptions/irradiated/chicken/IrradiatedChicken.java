@@ -30,6 +30,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.CNEntityType;
+import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.AnimalUtil;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +43,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
     private static final Ingredient FOOD_ITEMS = Ingredient.of(
             Items.WHEAT_SEEDS, Items.MELON_SEEDS, Items.PUMPKIN_SEEDS,
-            Items.BEETROOT_SEEDS, Items.TORCHFLOWER_SEEDS, Items.PITCHER_POD
+            Items.BEETROOT_SEEDS, Items.TORCHFLOWER_SEEDS, Items.PITCHER_POD,
+            CNItems.YELLOWCAKE
     );
     public float flap;
     public float flapSpeed;
@@ -154,6 +156,7 @@ public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
 
     @Override
     public boolean isFood(ItemStack stack) {
+        // Check if the stack is a valid Yellowcake or the base food
         return AnimalUtil.isFood(stack, FOOD_ITEMS);
     }
 
