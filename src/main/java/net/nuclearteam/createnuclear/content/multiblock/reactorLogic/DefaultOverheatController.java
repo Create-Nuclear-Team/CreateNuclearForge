@@ -8,9 +8,6 @@ class DefaultOverheatController implements IOverheatController {
     private int overFlowLimiter = 30;
     private double overHeat = 0;
 
-    private final int maxUraniumPerGraphite = 3;
-    private final int graphiteTimer = 3600;
-    private final int uraniumTimer = 3600;
     private final int liquidTimer = 3600;
 
     @Override
@@ -35,11 +32,6 @@ class DefaultOverheatController implements IOverheatController {
     @Override
     public double getOverHeat() { return overHeat; }
 
-    @Override
-    public int getGraphiteTimer() { return graphiteTimer; }
-
-    @Override
-    public int getUraniumTimer() { return uraniumTimer; }
 
     @Override
     public int getLiquidTimer()  { return liquidTimer; }

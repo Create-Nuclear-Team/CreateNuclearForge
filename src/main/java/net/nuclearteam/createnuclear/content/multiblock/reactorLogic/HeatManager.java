@@ -33,7 +33,5 @@ public class HeatManager {
         return calculator.computeHeat(bigFluidStack, type, inventory, overheatController.getOverHeat());
     }
 
-    public int getGraphiteTimer() { return overheatController.getGraphiteTimer(); }
-    public int getUraniumTimer() { return overheatController.getUraniumTimer(); }
     public int getLiquidTimer() { return  overheatController.getLiquidTimer();}
 }

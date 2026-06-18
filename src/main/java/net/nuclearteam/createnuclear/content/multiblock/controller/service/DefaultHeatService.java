@@ -15,16 +15,6 @@ public class DefaultHeatService implements IHeatService {
     }
     
     @Override
-    public int getGraphiteTimer() {
-        return impl.getGraphiteTimer();
-    }
-    
-    @Override
-    public int getUraniumTimer() {
-        return impl.getUraniumTimer();
-    }
-
-    @Override
     public  int getLiquidTimer() {
         return impl.getLiquidTimer();
     }
