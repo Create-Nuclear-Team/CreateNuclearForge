@@ -53,6 +53,9 @@ public record RodsStats(Item item) implements TooltipModifier {
                 .add(CreateNuclearLang.translate("tooltip.rodTimer", rodType.rodTimer()))
                 .addTo(components);
             CreateNuclearLang.builder()
+                .add(CreateNuclearLang.translate("tooltip.heatRatio", rodType.heatRatio()))
+                .addTo(components);
+            CreateNuclearLang.builder()
                 .add(CreateNuclearLang.translate("tooltip.typeRod", rodType.type().name()))
                 .style(rodType.type().equals(RodType.TypeRod.FUEL) ? ChatFormatting.GREEN : ChatFormatting.AQUA)
                 .addTo(components);

@@ -288,6 +288,7 @@
   "createnuclear.tooltip.heatLevel.none": "None",
   "createnuclear.tooltip.heatLevel.safety": "Safety",
   "createnuclear.tooltip.heatLevel.warning": "Warning",
+  "createnuclear.tooltip.heatRatio": "Heat Ratio: %d",
   "createnuclear.tooltip.item.cooled.rod": "Cooler Rod: ",
   "createnuclear.tooltip.item.empty.rod": "Input Items: ",
   "createnuclear.tooltip.item.fuel.rod": "Fuel Rod: ",
