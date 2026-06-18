@@ -31,8 +31,6 @@ public class DefaultPersistenceService implements IPersistenceService {
         }
         owner.setConfiguredPattern(ItemStack.of(compound.getCompound("items")));
 
-        owner.setBigFuelItem(BigItemStack.read(compound.getCompound("bigFuel")));
-        owner.setBigCoolerItem(BigItemStack.read(compound.getCompound("bigCooler")));
     }
 
     @Override
@@ -50,7 +48,5 @@ public class DefaultPersistenceService implements IPersistenceService {
         }
         compound.put("items", owner.getConfiguredPattern().serializeNBT());
 
-        compound.put("bigFuel", owner.getBigFuelItem().write());
-        compound.put("bigCooler", owner.getBigCoolerItem().write());
     }
 }

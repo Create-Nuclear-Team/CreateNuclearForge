@@ -71,8 +71,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
      */
     private final ReactorPattern pattern = new ReactorPattern();
     private final ReactorControllerInventory inventory;
-    private int countUraniumRod;
-    private int countGraphiteRod;
+    private int countFuelRod;
+    private int countCoolerRod;
     private int totalHeatRatio;
     private int heat;
     private int explosionCountdown = 0;
@@ -82,8 +82,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private double liquidLife;
     private ItemStack configuredPattern;
 
-    private BigItemStack bigFuelItem;
-    private BigItemStack bigCoolerItem;
     private List<BigFluidStack> bigFluidStack;
 
     private int reactorSize = 0;
@@ -137,21 +135,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return this.configuredPattern.getTag();
     }
 
-    public BigItemStack getBigFuelItem() {
-        return this.bigFuelItem;
-    }
 
-    public void setBigFuelItem(BigItemStack b) {
-        this.bigFuelItem = b;
-    }
-
-    public BigItemStack getBigCoolerItem() {
-        return this.bigCoolerItem;
-    }
-
-    public void setBigCoolerItem(BigItemStack b) {
-        this.bigCoolerItem = b;
-    }
 
     public List<BigFluidStack> getBigFluidStack() {
         return this.bigFluidStack;
@@ -235,8 +219,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.alarmManager = new ReactorAlarmManager();
         this.frameDisplayManager = new ReactorFrameDisplayManager();
 
-        this.bigFuelItem = new BigItemStack(ItemStack.EMPTY);
-        this.bigCoolerItem = new BigItemStack(ItemStack.EMPTY);
         this.bigFluidStack = new ArrayList<>();
 
         this.heatService = new DefaultHeatService(new HeatManager());
@@ -384,7 +366,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
                         ChatFormatting.DARK_RED, configRadius, configWarnAll, 0, 40, 10);
 
                 if (level instanceof ServerLevel serverLevel) {
-                    this.meltdownExecutor.triggerExplosion(serverLevel, getBlockPos(), reactorSize, countUraniumRod);
+                    this.meltdownExecutor.triggerExplosion(serverLevel, getBlockPos(), reactorSize, countFuelRod);
                 }
                 isExploding = true;
                 return;
@@ -401,8 +383,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         if (!isEmptyConfiguredPattern()) {
             int heat = (int) this.getConfiguredPatternTag().getDouble("heat");
-            countGraphiteRod = this.getConfiguredPatternTag().getInt("countGraphiteRod");
-            countUraniumRod = this.getConfiguredPatternTag().getInt("countUraniumRod");
+            countCoolerRod = this.getConfiguredPatternTag().getInt("countCoolerRod");
+            countFuelRod = this.getConfiguredPatternTag().getInt("countFuelRod");
             totalHeatRatio = this.getConfiguredPatternTag().getInt("totalHeatRatio");
         }
         resolveEntitiesIfNeeded();
@@ -411,8 +393,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         ReactorInputSnapshot snapshot = ReactorInputSnapshotBuilder.build(level, inputManager, inputFluidManager);
         this.displayState = new ReactorDisplayState(snapshot.items(), snapshot.fluids(), snapshot.maxFluidCapacity());
-        this.bigFuelItem = snapshot.bigFuelItem();
-        this.bigCoolerItem = snapshot.bigCoolerItem();
         this.bigFluidStack = snapshot.fluids();
 
         updateReactorStateVisibility();
@@ -456,8 +436,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.setChanged();
         this.notifyUpdate();
         BigFluidStack fluidStack = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
-        heat = (int) heatService.calculateHeat(bigFuelItem, bigCoolerItem, fluidStack, countGraphiteRod,
-                countUraniumRod, totalHeatRatio, inventory, level);
+        heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, inventory, level);
         this.getConfiguredPatternTag().putDouble("heat", heat);
 
         if (fluidStack != null) {
@@ -534,13 +513,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private void updateHeatOnly() {
         // Guard against empty fluid list — HeatManager accepts null for empty/no-fluid
         // case
-        BigItemStack fuel = bigFuelItem;
-        BigItemStack cooler = bigCoolerItem;
         BigFluidStack fluid = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
         double heat = 0;
 
         if (!isEmptyConfiguredPattern()) {
-            heat = heatService.calculateHeat(fuel, cooler, fluid, countGraphiteRod, countUraniumRod, totalHeatRatio, inventory, level);
+            heat = heatService.calculateHeat(fluid, totalHeatRatio, inventory, level);
             this.getConfiguredPatternTag().putDouble("heat", heat);
         }
     }

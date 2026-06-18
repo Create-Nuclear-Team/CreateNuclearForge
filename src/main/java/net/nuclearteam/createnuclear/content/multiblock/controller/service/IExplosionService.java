@@ -5,12 +5,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 public interface IExplosionService {
-    void triggerExplosion(ServerLevel level, BlockPos controllerPos, int reactorSize, int uraniumRodCount,
+    void triggerExplosion(ServerLevel level, BlockPos controllerPos, int reactorSize, int countFuelRod,
                           int notifyRadius, boolean notifyWarnAll);
 
-    default void triggerExplosion(ServerLevel level, BlockPos controllerPos, int reactorSize, int uraniumRodCount) {
+    default void triggerExplosion(ServerLevel level, BlockPos controllerPos, int reactorSize, int countFuelRod) {
         triggerExplosion(level, controllerPos, reactorSize,
-                            uraniumRodCount, CNConfigs.server().notify.distanceOfWarning.get(),
+                            countFuelRod, CNConfigs.server().notify.distanceOfWarning.get(),
                             CNConfigs.server().notify.warnAllPlayers.get()
         );
     }
