@@ -45,6 +45,9 @@ import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Collections;
+import net.minecraft.world.item.Item;
 
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
@@ -52,6 +55,8 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
+import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.PatternReader;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
@@ -499,11 +504,31 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     private boolean isReadyToRun() {
-        return !isEmptyConfiguredPattern()
-                && bigFuelItem.count > 0
-                && bigCoolerItem.count > 0
-                && this.inputManager.size() > 0
-                && this.inputFluidManager.size() > 0;
+        if (isEmptyConfiguredPattern() || this.inputFluidManager.size() == 0) {
+            return false;
+        }
+
+        Map<Item, Integer> patternCounts = PatternReader.readItemCounts(configuredPattern);
+        Map<Item, Integer> currentItems = this.displayState != null && this.displayState.items() != null 
+                ? this.displayState.items() : Collections.emptyMap();
+        
+        boolean hasAnyFuel = false;
+        
+        for (Map.Entry<Item, Integer> entry : patternCounts.entrySet()) {
+            Item requiredItem = entry.getKey();
+            int requiredCount = entry.getValue();
+            
+            RodType rodType = RodType.resolveRodType(requiredItem, level);
+            if (rodType.isNotEmptyItem() && rodType.type() == RodType.TypeRod.FUEL) {
+                hasAnyFuel = true;
+                int availableCount = currentItems.getOrDefault(requiredItem, 0);
+                if (availableCount <= 0) {
+                    return false;
+                }
+            }
+        }
+
+        return hasAnyFuel;
     }
 
     private void updateHeatOnly() {
