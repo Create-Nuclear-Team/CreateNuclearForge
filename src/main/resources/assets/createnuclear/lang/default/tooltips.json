@@ -35,8 +35,6 @@
 
   "item.createnuclear.thorium_rod.tooltip.summary": "_Rod_ to be used in the _reactor input_ to operate it.",
 
-  "item.createnuclear.thorium_rod.tooltip.summary": "_Stick_ to be used in the _reactor input_ to operate it.",
-
   "item.createnuclear.reactor_blueprint_item.tooltip.summary": "It allows you to configure your own pattern.",
   "item.createnuclear.reactor_blueprint_item.tooltip.condition1": "Filled with cooling and fuel rods",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "_Right_ click to fill it.",

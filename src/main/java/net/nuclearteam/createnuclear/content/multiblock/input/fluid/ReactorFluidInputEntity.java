@@ -177,20 +177,16 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
             ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(level, worldPosition);
             BlockPos controllerPos = controller != null ? controller.getBlockPos() : null;
 
-            if (controllerPos != null && level instanceof ServerLevel serverLevel) {
-                PersistentFluidLocks lock = PersistentFluidLocks.get(serverLevel);
-                if (!lock.canAccept(controllerPos, resource.getFluid())) return 0;
-            } else if (controllerPos != null) {
-                if (!FluidLockManager.canAccept(controllerPos, resource)) return 0;
+            // Fluid locks are server-authoritative (persisted per-level via PersistentFluidLocks).
+            // The client stays permissive; the server syncs the real tank state back.
+            if (controllerPos != null && level instanceof ServerLevel serverLevel
+                    && !PersistentFluidLocks.get(serverLevel).canAccept(controllerPos, resource.getFluid())) {
+                return 0;
             }
 
             int filled = delegate.fill(resource, action);
-            if (filled > 0 && action.execute() && controllerPos != null ){
-                if (level instanceof ServerLevel serverLevel) {
-                    PersistentFluidLocks.get(serverLevel).tryLock(controllerPos, resource.getFluid());
-                } else {
-                    FluidLockManager.tryLock(controllerPos, resource.getFluid());
-                }
+            if (filled > 0 && action.execute() && controllerPos != null && level instanceof ServerLevel serverLevel) {
+                PersistentFluidLocks.get(serverLevel).tryLock(controllerPos, resource.getFluid());
             }
             return filled;
         }
@@ -198,39 +194,31 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
         @Override
         public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
             FluidStack drained = delegate.drain(resource, action);
-            if (!drained.isEmpty() && action.execute()) {
-                ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(level, worldPosition);
-                if (controller != null) {
-                    BlockPos controllerPos = controller.getBlockPos();
-                    if (delegate.getFluidInTank(0).isEmpty()) {
-                        if (level instanceof ServerLevel serverLevel) {
-                            PersistentFluidLocks.get(serverLevel).clearLock(controllerPos);
-                        } else {
-                            FluidLockManager.clearLock(controllerPos);
-                        }
-                    }
-                }
-            }
+            clearLockIfEmptied(drained, action);
             return drained;
         }
 
         @Override
         public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
             FluidStack drained = delegate.drain(maxDrain, action);
-            if (!drained.isEmpty() && action.execute()) {
-                ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(level, worldPosition);
-                if (controller != null) {
-                    BlockPos controllerPos = controller.getBlockPos();
-                    if (delegate.getFluidInTank(0).isEmpty()) {
-                        if (level instanceof ServerLevel serverLevel) {
-                            PersistentFluidLocks.get(serverLevel).clearLock(controllerPos);
-                        } else {
-                            FluidLockManager.clearLock(controllerPos);
-                        }
-                    }
-                }
-            }
+            clearLockIfEmptied(drained, action);
             return drained;
+        }
+
+        /**
+         * Releases the controller's fluid lock once this input has been fully drained.
+         * Server-authoritative: the lock lives in {@link PersistentFluidLocks}, so this is
+         * a no-op on the client.
+         */
+        private void clearLockIfEmptied(FluidStack drained, FluidAction action) {
+            if (drained.isEmpty() || !action.execute() || !(level instanceof ServerLevel serverLevel))
+                return;
+            if (!delegate.getFluidInTank(0).isEmpty())
+                return;
+
+            ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(level, worldPosition);
+            if (controller != null)
+                PersistentFluidLocks.get(serverLevel).clearLock(controller.getBlockPos());
         }
     }
 }

@@ -33,7 +33,6 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.display.React
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.*;
 import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshot;
 import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshotBuilder;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
@@ -625,34 +624,31 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
     /** Try to lock this controller to the given Fluid. Returns true if allowed. */
     public boolean tryLockFluid(Fluid fluid) {
-        // server-persistent approach (preferred): use PersistentFluidLocks when on
-        // server
-        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+        // Fluid locks are server-authoritative and persisted per-level via PersistentFluidLocks.
+        // On the client there is no lock to enforce, so stay permissive.
+        if (level instanceof ServerLevel serverLevel) {
             return PersistentFluidLocks.get(serverLevel).tryLock(getBlockPos(), fluid);
         }
-        // fallback to in-memory manager (single-server-run)
-        return FluidLockManager.tryLock(getBlockPos(), fluid);
+        return true;
     }
 
     /** Returns whether the given FluidStack is acceptable for this controller. */
     public boolean canAcceptFluid(FluidStack stack) {
         if (stack == null || stack.isEmpty())
             return true;
-        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+        if (level instanceof ServerLevel serverLevel) {
             return PersistentFluidLocks.get(serverLevel).canAccept(getBlockPos(), stack.getFluid());
         }
-        return FluidLockManager.canAccept(getBlockPos(), stack);
+        return true;
     }
 
     /** Force-clear the lock on this controller. */
     public void clearLock() {
-        if (level != null && !level.isClientSide && level instanceof ServerLevel serverLevel) {
+        if (level instanceof ServerLevel serverLevel) {
             PersistentFluidLocks.get(serverLevel).clearLock(getBlockPos());
-        } else {
-            FluidLockManager.clearLock(getBlockPos());
+            setChanged();
+            sendData();
         }
-        setChanged();
-        sendData();
     }
 
     public void clearLockIfAllInputsEmpty() {

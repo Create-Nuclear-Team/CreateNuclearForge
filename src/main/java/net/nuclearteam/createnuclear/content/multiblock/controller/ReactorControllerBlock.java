@@ -26,7 +26,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.ReactorAssembler;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
@@ -139,9 +138,9 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         withBlockEntityDo(worldIn, pos, be -> ItemHelper.dropContents(worldIn, pos, be.getInventoryObject()));
         worldIn.removeBlockEntity(pos);
 
-        if (!worldIn.isClientSide && worldIn instanceof ServerLevel serverLevel) {
+        if (worldIn instanceof ServerLevel serverLevel) {
             PersistentFluidLocks.get(serverLevel).clearLock(pos);
-        } else FluidLockManager.clearLock(pos);
+        }
 
           if (!state.getValue(ASSEMBLED))
             return;
