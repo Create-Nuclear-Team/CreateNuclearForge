@@ -1,4 +1,4 @@
-// 1.20.1	2026-06-17T10:47:26.0685347	CreateNuclear Generated Registry Entries
+// 1.20.1	2026-06-18T14:21:52.171348	CreateNuclear Generated Registry Entries
 aa1897ff27a6aa83e2efbee29e12ad6dab2f6a0a data/createnuclear/createnuclear/fluids/type/fallback.json
 d7c754aa51cea393a10bce85986c1c0c641150d5 data/createnuclear/createnuclear/fluids/type/nitrogen.json
 afee3d8f15bf8285e175f73befba7b46fdc94b19 data/createnuclear/createnuclear/fluids/type/water.json
@@ -19,7 +19,7 @@ b0e1ee7314412507fd7346cb48b29d105f6186ad data/createnuclear/worldgen/configured_
 59d61c02881d710b0426a0955f6945b7a12d219f data/createnuclear/worldgen/density_function/irradiated/erosion.json
 59d61c02881d710b0426a0955f6945b7a12d219f data/createnuclear/worldgen/density_function/irradiated/final_density.json
 7f5f110a211b82bc22627b2f901c5f3c6a1265dd data/createnuclear/worldgen/noise/irradiated/erosion.json
-98ef3576a3760c63b2667d4b648bb67ff37f3bd2 data/createnuclear/worldgen/noise_settings/irradiated_noise.json
+da4ba44d949615000ebce13f04cb97dec24cf192 data/createnuclear/worldgen/noise_settings/irradiated_noise.json
 055203794153b01a2ebc956d13b7900e5d3851ca data/createnuclear/worldgen/placed_feature/lead_ore.json
 e69f61cbb4bf2c50a6123ddc87c024c801bb78d1 data/createnuclear/worldgen/placed_feature/nitrate_ore.json
 cc85909071cab20eacbe2c34887c6ed6a02dc51e data/createnuclear/worldgen/placed_feature/striated_ores_overworld.json
