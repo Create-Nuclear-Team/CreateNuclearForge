@@ -17,7 +17,6 @@ Le code est en **refactor V2 actif** (extraction en cours de `ReactorInputSnapsh
 | Réf. | Fichier:ligne | État | Détail |
 |---|---|---|---|
 | **B6** | `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java` / `ReactorBluePrintItemPacket.java` | **Toujours présent** | Le 6ᵉ argument du packet duplique le 5ᵉ (uranium perdu) ; `coef=0.1F` envoyé à la place de `heat`. |
-| **B14** | `content/multiblock/input/fluid/FluidLockManager.java` | **Toujours présent** | `Map<BlockPos,Fluid>` statique, sans clé de dimension, jamais purgée, doublon de `PersistentFluidLocks` ; toujours appelé depuis `clearLockIfAllInputsEmpty()` et `ReactorFluidInputEntity.FilteredFluidHandler`. |
 | **B15** | `content/explosion/NuclearExplosionEntity.java` (~224) | **Toujours présent** | `try { onBlockExploded } catch(Exception){ destroyBlock(...,true) }` — exception comme branchement, avale les vrais bugs, sémantiques de drop différentes entre les deux branches. |
 
 ### Bugs mineurs confirmés toujours présents (liste condensée)
