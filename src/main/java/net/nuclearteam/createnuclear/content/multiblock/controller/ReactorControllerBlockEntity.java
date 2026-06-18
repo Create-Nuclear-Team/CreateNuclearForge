@@ -68,6 +68,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private final ReactorControllerInventory inventory;
     private int countUraniumRod;
     private int countGraphiteRod;
+    private int totalHeatRatio;
     private int heat;
     private int explosionCountdown = 0;
     private boolean isExploding = false;
@@ -397,6 +398,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             int heat = (int) this.getConfiguredPatternTag().getDouble("heat");
             countGraphiteRod = this.getConfiguredPatternTag().getInt("countGraphiteRod");
             countUraniumRod = this.getConfiguredPatternTag().getInt("countUraniumRod");
+            totalHeatRatio = this.getConfiguredPatternTag().getInt("totalHeatRatio");
         }
         resolveEntitiesIfNeeded();
         if (!isAssembled())
@@ -450,7 +452,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.notifyUpdate();
         BigFluidStack fluidStack = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
         heat = (int) heatService.calculateHeat(bigFuelItem, bigCoolerItem, fluidStack, countGraphiteRod,
-                countUraniumRod, inventory, level);
+                countUraniumRod, totalHeatRatio, inventory, level);
         this.getConfiguredPatternTag().putDouble("heat", heat);
 
         if (fluidStack != null) {
@@ -513,7 +515,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         double heat = 0;
 
         if (!isEmptyConfiguredPattern()) {
-            heat = heatService.calculateHeat(fuel, cooler, fluid, countGraphiteRod, countUraniumRod, inventory, level);
+            heat = heatService.calculateHeat(fuel, cooler, fluid, countGraphiteRod, countUraniumRod, totalHeatRatio, inventory, level);
             this.getConfiguredPatternTag().putDouble("heat", heat);
         }
     }

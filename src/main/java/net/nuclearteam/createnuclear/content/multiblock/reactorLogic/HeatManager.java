@@ -26,12 +26,12 @@ public class HeatManager {
         this(new DefaultHeatCalculator(), new DefaultOverheatController());
     }
 
-    public double calculateHeat(BigItemStack fuel, BigItemStack cooler, BigFluidStack bigFluidStack, int graphiteCount, int uraniumCount, ReactorControllerInventory inventory, Level level) {
+    public double calculateHeat(BigItemStack fuel, BigItemStack cooler, BigFluidStack bigFluidStack, int graphiteCount, int uraniumCount, int totalHeatRatio, ReactorControllerInventory inventory, Level level) {
         if (fuel == null || cooler == null) return 0;
         if (fuel.count <= 0 || cooler.count <= 0) return 0;
 
         ReactorFluidType type = bigFluidStack == null ? null : bigFluidStack.getFluidtype(level);
-        overheatController.updateState(graphiteCount, uraniumCount, bigFluidStack, type);
+        overheatController.updateState(totalHeatRatio, bigFluidStack, type);
 
         return calculator.computeHeat(fuel, cooler, bigFluidStack, type, graphiteCount, uraniumCount, inventory, overheatController.getOverHeat());
     }

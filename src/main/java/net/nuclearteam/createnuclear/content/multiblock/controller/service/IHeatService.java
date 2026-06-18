@@ -14,5 +14,5 @@ public interface IHeatService {
     int getLiquidTimer();
 
     double calculateHeat(BigItemStack fuel, BigItemStack cooler, BigFluidStack bigFluidStack, int graphiteCount,
-            int uraniumCount, ReactorControllerInventory inventory, Level level);
+            int uraniumCount, int totalHeatRatio, ReactorControllerInventory inventory, Level level);
 }

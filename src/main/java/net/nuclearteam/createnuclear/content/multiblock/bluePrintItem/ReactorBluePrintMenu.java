@@ -67,6 +67,7 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
         contentHolder.getOrCreateTag().putInt("graphiteTime", CNConfigs.server().rods.graphiteRodLifetime.get());
         contentHolder.getOrCreateTag().putInt("countGraphiteRod", 0);
         contentHolder.getOrCreateTag().putInt("countUraniumRod", 0);
+        contentHolder.getOrCreateTag().putInt("totalHeatRatio", 0);
 
         ghostInventory.deserializeNBT(tag.getCompound("pattern"));
     }
@@ -115,6 +116,7 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
     protected void saveData(ItemStack contentHolder) {
         countFuelRod = 0;
         countCooledRod = 0;
+        int totalHeatRatio = 0;
 
         for (int i = 0; i < ghostInventory.getSlots(); i++) {
             ItemStack stack = ghostInventory.getStackInSlot(i);
@@ -130,11 +132,16 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
             if (isCooler) countCooledRod++;
             if (isFuel) countFuelRod++;
+            
+            if (isCooler || isFuel) {
+                totalHeatRatio += typeRod.heatRatio();
+            }
         }
 
         contentHolder.getOrCreateTag().put("pattern", ghostInventory.serializeNBT());
         contentHolder.getOrCreateTag().putInt("countGraphiteRod", countCooledRod);
         contentHolder.getOrCreateTag().putInt("countUraniumRod", countFuelRod);
+        contentHolder.getOrCreateTag().putInt("totalHeatRatio", totalHeatRatio);
 
         for (int i = 0; i < ghostInventory.getSlots(); i++) {
             ItemStack stack = ghostInventory.getStackInSlot(i);
