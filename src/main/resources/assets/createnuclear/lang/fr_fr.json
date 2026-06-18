@@ -220,6 +220,8 @@
   "item.createnuclear.red_cloth": "Tissu rouge",
   "item.createnuclear.steel_ingot": "Lingot d'acier",
   "item.createnuclear.steel_nugget": "Pépite d'acier",
+  "item.createnuclear.thorium_rod": "Barre de thorium",
+  "item.createnuclear.thorium_rod.tooltip.summary": "_Barre_ pour être utilisé dans _l'entrée du réacteur_ pour l'utiliser.",
   "item.createnuclear.uranium_bucket": "Seau d'uranium",
   "item.createnuclear.uranium_powder": "Poudre d'uranium",
   "item.createnuclear.uranium_rod": "Barre d'uranium",

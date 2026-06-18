@@ -599,6 +599,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     public void removeInputFluid(BlockPos outputPos) {
         this.inputFluidManager.removeBlock(outputPos);
         this.setChanged();
+        // Breaking a fluid input discards its tank contents along with the block entity.
+        // Re-evaluate the fluid lock so a different fluid can be accepted once no remaining
+        // input still holds liquid — otherwise the controller stays locked to the old fluid.
+        clearLockIfAllInputsEmpty();
     }
 
     public void addAlarm(BlockPos alarmPos) {
