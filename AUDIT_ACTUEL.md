@@ -17,11 +17,10 @@ Le code est en **refactor V2 actif** (extraction en cours de `ReactorInputSnapsh
 | Réf. | Fichier:ligne | État | Détail |
 |---|---|---|---|
 | **B6** | `content/multiblock/bluePrintItem/ReactorBluePrintItemScreen.java` / `ReactorBluePrintItemPacket.java` | **Toujours présent** | Le 6ᵉ argument du packet duplique le 5ᵉ (uranium perdu) ; `coef=0.1F` envoyé à la place de `heat`. |
-| **B9** | `content/radiation/capability/RadiationCapability.java` (`applyEffects`) | **Toujours présent, identique** | Les deux premières branches (`radiation < level1`, `radiation < level2`) donnent toutes deux `amplifierLevel0` → `radiationLevel2` reste un palier inopérant. |
 | **B12** | `content/contraptions/irradiated/AnimalUtil.java:72-81` | **Toujours présent** | `isFood` ne reconnaît la yellowcake comme aliment **que** si elle porte un tag NBT `"Ingredient"` — incohérent avec `mobInteract` (ligne ~39) qui accepte *toute* yellowcake pour la conversion. Le chemin "food" (élevage/soin) reste cassé pour la yellowcake sans tag. |
 | **B14** | `content/multiblock/input/fluid/FluidLockManager.java` | **Toujours présent** | `Map<BlockPos,Fluid>` statique, sans clé de dimension, jamais purgée, doublon de `PersistentFluidLocks` ; toujours appelé depuis `clearLockIfAllInputsEmpty()` et `ReactorFluidInputEntity.FilteredFluidHandler`. |
 | **B15** | `content/explosion/NuclearExplosionEntity.java` (~224) | **Toujours présent** | `try { onBlockExploded } catch(Exception){ destroyBlock(...,true) }` — exception comme branchement, avale les vrais bugs, sémantiques de drop différentes entre les deux branches. |
-| **B19** | `infrastructure/worldgen/biome/surfacerule/IrradiatedSurfaceRules.java` (fusion v1/v2) | **Toujours présent** | `IS_HIGHLANDS = biome()` (varargs vide) → toujours faux ; branches `MOON_DIRT`/`LEAD_TURF` mortes. Les constantes `MOON_DIRT`/`LEAD_ROCK`/`LEAD_TURF`/`RAW_LEAD_BASALT` pointent vers `STEEL_BLOCK`/`LEAD_BLOCK`/`LEAD_ORE`/`RAW_LEAD_BLOCK` — noms totalement déconnectés des blocs réels, signe d'un template non ré-thémé. |
+| ~~**B19**~~ | `infrastructure/worldgen/biome/surfacerule/IrradiatedSurfaceRules.java` | **✅ Corrigé** | Condition morte `IS_HIGHLANDS = biome()` (toujours faux) et ses branches mortes supprimées ; constante inutilisée `MOON_DIRT` retirée ; constantes `LEAD_ROCK`/`LEAD_TURF`/`RAW_LEAD_BASALT` renommées en `LEAD_BLOCK`/`LEAD_ORE`/`RAW_LEAD_BLOCK` (alignées sur les blocs réels). Sans changement de comportement sur le seul biome existant (`Irradiated.PLAIN`). |
 
 ### Bugs mineurs confirmés toujours présents (liste condensée)
 - `ReactorInputFluidManager.extractFluids/getBlocksPosition` : toujours `getFluidInTank(getTanks())` (off-by-one), `fluidNeeded` jamais décrémenté, `toExtract>1` ignore les extractions de 1 unité.
@@ -131,9 +130,9 @@ Ces points n'apparaissaient pas (ou pas sous cette forme) dans `AUDIT_V1.md` —
    En mode "normal" (mode 0), `HeatDisplaySource` affiche `"500 °C"` alors que `ReactorSummaryDisplaySource` affiche une **jauge** pour le heat dans le même mode (`gaugeOnNormal=true` pour heat uniquement) — incohérence visuelle entre les deux affichages pour un même mode utilisateur, non relevée dans `AUDIT_V1.md`.
 
 10. **`IrradiatedBiomes` — contenu de worldgen visiblement copié d'un autre mod**
-    `addDefaultIrradiatedOres`/`addDefaultSoftDisks` ajoutent `MiscOverworldPlacements.BLUE_ICE`, `Carvers.NETHER_CAVE`, `VOID_START_PLATFORM` — du contenu vanilla sans rapport avec un biome "irradié", et `monsters(...)` est un no-op appelé avec des paramètres `(95, 5, 100)` silencieusement ignorés. Combiné au bug B19, le pipeline worldgen "irradié" semble être un **template non terminé/non re-thémé**, plus large que ce que `AUDIT_V1.md` avait documenté (qui se concentrait sur les surface rules).
+    `addDefaultIrradiatedOres`/`addDefaultSoftDisks` ajoutent `MiscOverworldPlacements.BLUE_ICE`, `Carvers.NETHER_CAVE`, `VOID_START_PLATFORM` — du contenu vanilla sans rapport avec un biome "irradié", et `monsters(...)` est un no-op appelé avec des paramètres `(95, 5, 100)` silencieusement ignorés. Même si les surface rules (B19) sont désormais corrigées, le pipeline worldgen "irradié" reste un **template non terminé/non re-thémé** sur ces autres points, plus large que ce que `AUDIT_V1.md` avait documenté (qui se concentrait sur les surface rules).
 
-11. **`CNNoiseGeneratorSettings.IRRADIATED`** définit `STEEL_BLOCK` comme bloc de remplissage par défaut du terrain (équivalent "stone"). Si jamais relié à une dimension, génèrerait un terrain massivement en acier — combiné aux surface rules cassées (B19), point d'alerte non couvert par `AUDIT_V1.md`.
+11. **`CNNoiseGeneratorSettings.IRRADIATED`** définit `STEEL_BLOCK` comme bloc de remplissage par défaut du terrain (équivalent "stone"). Si jamais relié à une dimension, génèrerait un terrain massivement en acier — point d'alerte non couvert par `AUDIT_V1.md`, indépendant des surface rules (B19, désormais corrigées).
 
 ### 🟡 Mineurs
 
@@ -169,8 +168,6 @@ Tous les points perf de `AUDIT_V1.md` §4 restent **non corrigés** :
 ---
 
 ## 6. Plan d'action — priorités mises à jour
-
-**Quick wins toujours en attente** (1 ligne, fort impact) : **B9** (mapping amplificateurs ambigu — décision produit).
 
 **Nouveaux quick wins identifiés** :
 - `RadiationEffectHandler` : ajouter les mêmes gardes (config/immunité/résistance) que les deux autres chemins.
