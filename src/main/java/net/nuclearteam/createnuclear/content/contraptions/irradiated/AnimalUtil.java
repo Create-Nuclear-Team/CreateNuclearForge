@@ -37,6 +37,7 @@ public class AnimalUtil {
         ItemStack stack = player.getItemInHand(hand);
 
         if (stack.is(CNItems.YELLOWCAKE.get())) {
+            // Case 1: Animal is weak -> Start the cure/conversion
             if (me.hasEffect(MobEffects.WEAKNESS)) {
                 if (!player.getAbilities().instabuild)
                     stack.shrink(1);
@@ -48,7 +49,9 @@ public class AnimalUtil {
                 return InteractionResult.SUCCESS;
             }
 
-            return InteractionResult.CONSUME;
+            // --- FIX HERE ---
+            // Case 2: Animal is NOT weak -> Pass to vanilla breeding/feeding logic
+            return InteractionResult.PASS;
         }
 
         return InteractionResult.PASS;
@@ -70,11 +73,14 @@ public class AnimalUtil {
     }
 
     public static boolean isFood(ItemStack stack, Ingredient foodItems, Predicate<ItemStack> extraTest) {
-        if (stack.is(CNItems.YELLOWCAKE.get()) && stack.hasTag() && stack.getTag().contains("Ingredient")) {
-            CompoundTag ingredientTag = stack.getTag().getCompound("Ingredient");
-            ItemStack ingredient = ItemStack.of(ingredientTag);
+        if (stack.is(CNItems.YELLOWCAKE.get())) {
+            if (stack.hasTag() && stack.getTag().contains("Ingredient")) {
+                CompoundTag ingredientTag = stack.getTag().getCompound("Ingredient");
+                ItemStack ingredient = ItemStack.of(ingredientTag);
 
-            return foodItems.test(ingredient) || extraTest.test(ingredient);
+                return foodItems.test(ingredient) || extraTest.test(ingredient);
+            }
+            return true;
         }
 
         return false;

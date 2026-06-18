@@ -38,6 +38,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
+import net.nuclearteam.createnuclear.CNItems;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -393,7 +394,7 @@ public class IrradiatedCat extends TamableAnimal {
     }
 
     static {
-        TEMPT_INGREDIENT = Ingredient.of(new ItemLike[]{Items.COD, Items.SALMON});
+        TEMPT_INGREDIENT = Ingredient.of(new ItemLike[]{Items.COD, Items.SALMON, CNItems.YELLOWCAKE});
         IS_LYING = SynchedEntityData.defineId(IrradiatedCat.class, EntityDataSerializers.BOOLEAN);
         RELAX_STATE_ONE = SynchedEntityData.defineId(IrradiatedCat.class, EntityDataSerializers.BOOLEAN);
         DATA_COLLAR_COLOR = SynchedEntityData.defineId(IrradiatedCat.class, EntityDataSerializers.INT);

@@ -364,7 +364,7 @@
   "item.createnuclear.thorium_ingot": "Thorium Ingot",
   "item.createnuclear.thorium_nugget": "Thorium Nugget",
   "item.createnuclear.thorium_rod": "Thorium Rod",
-  "item.createnuclear.thorium_rod.tooltip.summary": "_Rod_ to be used in the _reactor input_ to operate it.",
+  "item.createnuclear.thorium_rod.tooltip.summary": "_Stick_ to be used in the _reactor input_ to operate it.",
   "item.createnuclear.uranium_bucket": "Uranium Bucket",
   "item.createnuclear.uranium_powder": "Uranium Powder",
   "item.createnuclear.uranium_rod": "Uranium Rod",
