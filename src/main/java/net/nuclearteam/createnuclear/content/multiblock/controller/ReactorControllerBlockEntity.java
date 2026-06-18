@@ -387,8 +387,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             totalHeatRatio = this.getConfiguredPatternTag().getInt("totalHeatRatio");
         }
         resolveEntitiesIfNeeded();
-        if (!isAssembled())
-            return;
 
         ReactorInputSnapshot snapshot = ReactorInputSnapshotBuilder.build(level, inputManager, inputFluidManager);
         this.displayState = new ReactorDisplayState(snapshot.items(), snapshot.fluids(), snapshot.maxFluidCapacity());
@@ -482,7 +480,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     private boolean isReadyToRun() {
-        if (isEmptyConfiguredPattern() || this.inputFluidManager.size() == 0) {
+        if (isEmptyConfiguredPattern() || this.inputFluidManager.size() == 0 || !isAssembled()) {
             return false;
         }
 
@@ -513,12 +511,12 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         // Guard against empty fluid list — HeatManager accepts null for empty/no-fluid
         // case
         BigFluidStack fluid = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
-        double heat = 0;
+        heat = 0;
 
-        if (!isEmptyConfiguredPattern()) {
-            heat = heatService.calculateHeat(fluid, totalHeatRatio, inventory, level);
-            this.getConfiguredPatternTag().putDouble("heat", heat);
+        if (!isEmptyConfiguredPattern() && isAssembled()) {
+            heat = (int) heatService.calculateHeat(fluid, totalHeatRatio, inventory, level);
         }
+        this.getConfiguredPatternTag().putDouble("heat", heat);
     }
 
     private boolean isEmptyConfiguredPattern() {
