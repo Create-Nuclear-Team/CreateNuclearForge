@@ -18,6 +18,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
@@ -53,15 +54,11 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
         }
 
         if (context.getTargetBlockEntity() instanceof LecternBlockEntity) {
-            Stream<MutableComponent> componentList = components.stream().map(list -> {
-                return list.stream().reduce(MutableComponent::append).orElse(EMPTY_LINE);
-            });
+            Stream<MutableComponent> componentList = components.stream().map(list -> list.stream().reduce(MutableComponent::append).orElse(EMPTY_LINE));
             return List.of(componentList.reduce((c1, c2) -> c1.append(Component.literal("\n")).append(c2)).orElse(EMPTY_LINE));
         }
 
-        return components.stream().map(list -> {
-            return list.stream().reduce(MutableComponent::append).orElse(EMPTY_LINE);
-        }).toList();
+        return components.stream().map(list -> list.stream().reduce(MutableComponent::append).orElse(EMPTY_LINE)).toList();
     }
 
     @Override
@@ -126,9 +123,9 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
         int cooler = 0;
         if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
             for (var entry : controller.getDisplayState().items().entrySet()) {
-                if (net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate.IS_FUEL.test(entry.getKey().getDefaultInstance())) {
+                if (TypeRodPredicate.IS_FUEL.test(entry.getKey().getDefaultInstance())) {
                     fuel += entry.getValue();
-                } else if (net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate.IS_COOLED.test(entry.getKey().getDefaultInstance())) {
+                } else if (TypeRodPredicate.IS_COOLED.test(entry.getKey().getDefaultInstance())) {
                     cooler += entry.getValue();
                 }
             }

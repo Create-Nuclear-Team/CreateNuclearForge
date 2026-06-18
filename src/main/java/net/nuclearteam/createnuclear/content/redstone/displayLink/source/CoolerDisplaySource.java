@@ -8,11 +8,15 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+
+import java.util.Map.Entry;
 
 public class CoolerDisplaySource extends NumericSingleLineDisplaySource {
 
@@ -27,8 +31,8 @@ public class CoolerDisplaySource extends NumericSingleLineDisplaySource {
         int mode = context.sourceConfig().getInt("display_mode");
         int cooler = 0;
         if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
-            for (var entry : controller.getDisplayState().items().entrySet()) {
-                if (net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate.IS_COOLED.test(entry.getKey().getDefaultInstance())) {
+            for (Entry<Item, Integer> entry : controller.getDisplayState().items().entrySet()) {
+                if (TypeRodPredicate.IS_COOLED.test(entry.getKey().getDefaultInstance())) {
                     cooler += entry.getValue();
                 }
             }

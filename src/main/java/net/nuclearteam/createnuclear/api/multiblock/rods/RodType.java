@@ -17,13 +17,13 @@ import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
-import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Represents a rod type used by the mod's multiblock.
@@ -36,11 +36,11 @@ import java.util.function.Predicate;
 public record RodType(HolderSet<Item> items,
                       int baseRodHeatStatic, float proximityRodHeatStatic,
                       int rodTimerStatic, TypeRod type,
-                      java.util.function.Supplier<Integer> baseRodHeatSupplier,
-                      java.util.function.Supplier<Float> proximityRodHeatSupplier,
-                      java.util.function.Supplier<Integer> rodTimerSupplier,
+                      Supplier<Integer> baseRodHeatSupplier,
+                      Supplier<Float> proximityRodHeatSupplier,
+                      Supplier<Integer> rodTimerSupplier,
                       int heatRatioStatic,
-                      java.util.function.Supplier<Integer> heatRatioSupplier) {
+                      Supplier<Integer> heatRatioSupplier) {
 
     public RodType(HolderSet<Item> items,
                    int baseRodHeat, float proximityRodHeat,
@@ -128,10 +128,10 @@ public record RodType(HolderSet<Item> items,
         private int heatRatio = 1;
         private TypeRod type = TypeRod.FUEL;
         
-        private java.util.function.Supplier<Integer> baseRodHeatSupplier = null;
-        private java.util.function.Supplier<Float> proximityRodHeatSupplier = null;
-        private java.util.function.Supplier<Integer> rodTimerSupplier = null;
-        private java.util.function.Supplier<Integer> heatRatioSupplier = null;
+        private Supplier<Integer> baseRodHeatSupplier = null;
+        private Supplier<Float> proximityRodHeatSupplier = null;
+        private Supplier<Integer> rodTimerSupplier = null;
+        private Supplier<Integer> heatRatioSupplier = null;
 
         private boolean itemsSet = false;
         private boolean baseRodHeatSet = false;
@@ -182,22 +182,22 @@ public record RodType(HolderSet<Item> items,
             return this;
         }
 
-        public Builder dynamicBaseRodHeat(java.util.function.Supplier<Integer> supplier) {
+        public Builder dynamicBaseRodHeat(Supplier<Integer> supplier) {
             this.baseRodHeatSupplier = supplier;
             return this;
         }
 
-        public Builder dynamicProximityRodHeat(java.util.function.Supplier<Float> supplier) {
+        public Builder dynamicProximityRodHeat(Supplier<Float> supplier) {
             this.proximityRodHeatSupplier = supplier;
             return this;
         }
 
-        public Builder dynamicRodTimer(java.util.function.Supplier<Integer> supplier) {
+        public Builder dynamicRodTimer(Supplier<Integer> supplier) {
             this.rodTimerSupplier = supplier;
             return this;
         }
 
-        public Builder dynamicHeatRatio(java.util.function.Supplier<Integer> supplier) {
+        public Builder dynamicHeatRatio(Supplier<Integer> supplier) {
             this.heatRatioSupplier = supplier;
             return this;
         }

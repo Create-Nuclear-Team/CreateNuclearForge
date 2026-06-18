@@ -123,10 +123,10 @@ public class CNItems {
         GRAPHITE_ROD = CreateNuclear.REGISTRATE
             .item("graphite_rod", Item::new)
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .dynamicBaseRodHeat(() -> CNConfigs.server().rods.baseValueGraphite.get())
+                .dynamicBaseRodHeat(CNConfigs.server().rods.baseValueGraphite::get)
                 .dynamicProximityRodHeat(() -> CNConfigs.server().rods.graphiteProxyMalus.getF())
-                .dynamicRodTimer(() -> CNConfigs.server().rods.graphiteRodLifetime.get())
-                .dynamicHeatRatio(() -> CNConfigs.server().rods.graphiteHeatRatio.get())
+                .dynamicRodTimer(CNConfigs.server().rods.graphiteRodLifetime::get)
+                .dynamicHeatRatio(CNConfigs.server().rods.graphiteHeatRatio::get)
                 .coolerRodType()))
             .tag(CNTags.forgeItemTag("rods"), CNItemTags.COOLER.tag)
             .register(),
@@ -166,10 +166,10 @@ public class CNItems {
         URANIUM_ROD = CreateNuclear.REGISTRATE
             .item("uranium_rod", p -> new RadiationItem(p, 100))
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .dynamicBaseRodHeat(() -> CNConfigs.server().rods.baseValueUranium.get())
-                .dynamicProximityRodHeat(() -> (float) CNConfigs.server().rods.uraniumProxyBonus.get())
-                .dynamicRodTimer(() -> CNConfigs.server().rods.uraniumRodLifetime.get())
-                .dynamicHeatRatio(() -> CNConfigs.server().rods.uraniumHeatRatio.get())
+                .dynamicBaseRodHeat(CNConfigs.server().rods.baseValueUranium::get)
+                .dynamicProximityRodHeat(() ->(float) CNConfigs.server().rods.uraniumProxyBonus.get())
+                .dynamicRodTimer(CNConfigs.server().rods.uraniumRodLifetime::get)
+                .dynamicHeatRatio(CNConfigs.server().rods.uraniumHeatRatio::get)
                 .fuelRodType()))
             .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register(),
@@ -213,10 +213,10 @@ public class CNItems {
         THORIUM_ROD = CreateNuclear.REGISTRATE
             .item("thorium_rod", Item::new)
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .dynamicBaseRodHeat(() -> CNConfigs.server().rods.baseValueThorium.get())
+                .dynamicBaseRodHeat(CNConfigs.server().rods.baseValueThorium::get)
                 .dynamicProximityRodHeat(() -> (float) CNConfigs.server().rods.thoriumProxyBonus.get())
-                .dynamicRodTimer(() -> CNConfigs.server().rods.thoriumRodLifetime.get())
-                .dynamicHeatRatio(() -> CNConfigs.server().rods.thoriumHeatRatio.get())
+                .dynamicRodTimer(CNConfigs.server().rods.thoriumRodLifetime::get)
+                .dynamicHeatRatio(CNConfigs.server().rods.thoriumHeatRatio::get)
                 .fuelRodType()))
             .tag(CNTags.forgeItemTag("rods"))
             .register()
