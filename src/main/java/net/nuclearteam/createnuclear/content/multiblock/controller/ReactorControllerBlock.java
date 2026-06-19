@@ -116,7 +116,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     be.getInventoryObject().setStackInSlot(0, ItemStack.EMPTY);
                     be.setConfiguredPattern(ItemStack.EMPTY);
                     //be.clearTimers(); // retirer le commentaire si on veux que le timer se reset quand le reacteur s'arrete
-                    be.rotate(be.getBlockState(), be.getLevel(), 0);
+                    be.getOutputManager().rotateOutputs(be.getLevel(), be.getAssembled(), 0);
                     be.notifyUpdate();
                 });
                 state.setValue(ASSEMBLED, false);

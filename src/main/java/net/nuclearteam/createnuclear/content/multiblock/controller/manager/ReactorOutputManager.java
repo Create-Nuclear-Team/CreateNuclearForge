@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 public class ReactorOutputManager extends AbstractReactorIOManager implements ReactorOutputManagerI {
     private static final String NBT_KEY = "ReactorOutputs";
+    private static final int RPM_DIVIDER = 32;
 
     @Override
     public void write(CompoundTag compound) {
@@ -61,5 +63,34 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
             if (level.getBlockEntity(p) instanceof ReactorOutputEntity) positions.add(p);
         }
         return List.copyOf(positions);
+    }
+
+    @Override
+    public void rotateOutputs(Level level, boolean assembled, int rotation) {
+        if (positions.isEmpty()) return;
+
+        int totalRpm = rotation / RPM_DIVIDER;
+        int size = positions.size();
+        int remainingRotation = totalRpm % size;
+
+        for (int i = 0; i < size; i++) {
+            int dividedRotation = (totalRpm / size) + (i < remainingRotation ? 1 : 0);
+            BlockPos pos = positions.get(i);
+
+            if (!(level.getBlockState(pos).getBlock() instanceof ReactorOutput block)) continue;
+            ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
+            if (entity == null) continue;
+
+            if (dividedRotation > 0) {
+                entity.speed = assembled ? dividedRotation : 0;
+                entity.updateSpeed = true;
+                entity.setSpeedAndUpdate(dividedRotation);
+                entity.updateGeneratedRotation();
+            } else {
+                entity.setSpeedAndUpdate(0);
+                entity.updateSpeed = true;
+                entity.updateGeneratedRotation();
+            }
+        }
     }
 }

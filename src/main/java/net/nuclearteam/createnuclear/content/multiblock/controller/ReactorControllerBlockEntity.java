@@ -195,6 +195,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return this.inputFluidManager;
     }
 
+    public ReactorOutputManagerI getOutputManager() {
+        return this.outputManager;
+    }
+
     public void setDisplayState(ReactorDisplayState state) {
         this.displayState = state;
     }
@@ -424,7 +428,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (!isReadyToRun()) {
             updateHeatOnly();
             if (!this.outputManager.getBlocksPosition().isEmpty())
-                rotate(getBlockState(), getLevel(), 0);
+                this.outputManager.rotateOutputs(getLevel(), getAssembled(), 0);
             this.setChanged();
             this.notifyUpdate();
             return;
@@ -474,7 +478,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (IHeat.HeatLevel.isNotDanger(heat, this.getMultiblockSize())) {
             // normal
             if (!this.outputManager.getBlocksPosition().isEmpty()) {
-                rotate(getBlockState(), getLevel(), heat);
+                this.outputManager.rotateOutputs(getLevel(), getAssembled(), heat);
             }
         }
     }
