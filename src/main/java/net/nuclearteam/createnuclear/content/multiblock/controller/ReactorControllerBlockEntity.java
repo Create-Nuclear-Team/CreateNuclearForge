@@ -514,6 +514,21 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         heat = 0;
 
         if (!isEmptyConfiguredPattern() && isAssembled()) {
+            Map<Item, Integer> patternCounts = PatternReader.readItemCounts(configuredPattern);
+            Map<Item, Integer> currentItems = this.displayState != null && this.displayState.items() != null 
+                    ? this.displayState.items() : Collections.emptyMap();
+            
+            for (Map.Entry<Item, Integer> entry : patternCounts.entrySet()) {
+                Item requiredItem = entry.getKey();
+                int requiredCount = entry.getValue();
+                
+                int availableCount = currentItems.getOrDefault(requiredItem, 0);
+                if (availableCount < requiredCount) {
+                    this.getConfiguredPatternTag().putDouble("heat", heat);
+                    return;
+                }
+            }
+
             heat = (int) heatService.calculateHeat(fluid, totalHeatRatio, inventory, level);
         }
         this.getConfiguredPatternTag().putDouble("heat", heat);
