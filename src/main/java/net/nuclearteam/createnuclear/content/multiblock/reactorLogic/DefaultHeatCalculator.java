@@ -60,10 +60,11 @@ public class DefaultHeatCalculator implements IHeatCalculator {
                             if (list.getCompound(l).getInt("Slot") == neighborSlot) {
                                 if ("fuel".equals(currentRod)) {
                                     ItemStack stack = ItemStack.of(list.getCompound(l));
-                                    if (stack.is(CNTags.CNItemTags.FUEL.tag)) {
+                                    RodType neighborRod = ItemRodTypesValue.getRodType(stack.getItem());
+                                    if (stack.is(CNTags.CNItemTags.FUEL.tag) || (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.FUEL)) {
                                         heat += rod.proximityRodHeat();
-                                    } else if (stack.is(CNTags.CNItemTags.COOLER.tag)) {
-                                        heat += rod.baseRodHeat() / ItemRodTypesValue.getRodType(stack.getItem()).proximityRodHeat();
+                                    } else if (stack.is(CNTags.CNItemTags.COOLER.tag) || (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.COOLER)) {
+                                        heat += rod.baseRodHeat() / neighborRod.proximityRodHeat();
                                     }
                                 }
                             }
