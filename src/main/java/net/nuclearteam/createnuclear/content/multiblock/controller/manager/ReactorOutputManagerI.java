@@ -15,8 +15,8 @@ public interface ReactorOutputManagerI extends ReactorIOManager {
     List<BlockPos> getBlocksPosition(Level level);
 
     /**
-     * Répartit la rotation totale entre les sorties suivies et applique
-     * la vitesse/l'arrêt correspondant à chaque `ReactorOutputEntity`.
+     * Distributes the total rotation across the tracked outputs and applies
+     * the corresponding speed/stop to each {@code ReactorOutputEntity}.
      */
     void rotateOutputs(Level level, boolean assembled, int rotation);
 }

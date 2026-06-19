@@ -1,7 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller;
 
 import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
-import com.simibubi.create.content.logistics.BigItemStack;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
@@ -12,7 +11,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,8 +32,6 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.service.*;
 import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshot;
 import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshotBuilder;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
-import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
-import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.ConsumptionCycleManager;
@@ -44,9 +40,6 @@ import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Collections;
-import net.minecraft.world.item.Item;
 
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
@@ -54,8 +47,6 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
-import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.PatternReader;
-import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
@@ -106,6 +97,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private final IHeatService heatService;
     private final IPersistenceService persistenceService;
     private final IExplosionService meltdownExecutor;
+    private final IReactorHeatUpdateCoordinator heatCoordinator;
+    private final IFluidConsumptionRateCalculator fluidRateCalculator;
 
     // service fields are injected; implementations live in separate classes
 
@@ -134,7 +127,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return this.configuredPattern.getTag();
     }
 
-
+    /** @return the first loaded fluid, or {@code null} if no fluid is present. */
+    private BigFluidStack currentFluidStack() {
+        return bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
+    }
 
     public List<BigFluidStack> getBigFluidStack() {
         return this.bigFluidStack;
@@ -227,6 +223,8 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.heatService = new DefaultHeatService(new HeatManager());
         this.persistenceService = new DefaultPersistenceService();
         this.meltdownExecutor = new ReactorMeltdownExecutor();
+        this.heatCoordinator = new ReactorHeatUpdateCoordinator(this.heatService);
+        this.fluidRateCalculator = new FluidConsumptionRateCalculator(this.heatService);
     }
 
     @Override
@@ -317,7 +315,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         boolean currentActive = state.getValue(ReactorControllerBlock.ACTIVE);
 
         // Le réacteur est "ACTIVE" (ON) seulement s'il est assemblé ET qu'il a ses ressources
-        boolean targetActive = isAssembled() && isReadyToRun();
+        boolean targetActive = isAssembled() && heatCoordinator.canRun(getConfiguredPattern(), getDisplayState(), getInputFluidManager(), level, getAssembled());
 
         if (currentActive != targetActive) {
             level.setBlock(worldPosition, state.setValue(ReactorControllerBlock.ACTIVE, targetActive), 3);
@@ -424,118 +422,36 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.setChanged();
     }
 
+    /**
+     * Tick logic applied while the reactor is assembled: if it doesn't have
+     * enough fuel ({@link IReactorHeatUpdateCoordinator#canRun}), only the
+     * displayed heat is updated (and outputs stopped); otherwise the actual
+     * heat is calculated, fluid consumed, the item consumption cycle advanced,
+     * and outputs rotated according to the heat.
+     */
     private void handleAssembledState() {
-        if (!isReadyToRun()) {
-            updateHeatOnly();
-            if (!this.outputManager.getBlocksPosition().isEmpty())
-                this.outputManager.rotateOutputs(getLevel(), getAssembled(), 0);
-            this.setChanged();
-            this.notifyUpdate();
+        if (!heatCoordinator.canRun(configuredPattern, displayState, inputFluidManager, level, isAssembled())) {
+            heatCoordinator.updateHeatOnly(configuredPattern, displayState, currentFluidStack(), totalHeatRatio, inventory, level, isAssembled());
+            if (!outputManager.getBlocksPosition(getLevel()).isEmpty()) {
+                outputManager.rotateOutputs(getLevel(), getAssembled(), 0);
+            }
+
+            setChanged();
+            notifyUpdate();
             return;
         }
-        // ready to run
-        this.setChanged();
-        this.notifyUpdate();
-        BigFluidStack fluidStack = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
-        heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, inventory, level);
-        this.getConfiguredPatternTag().putDouble("heat", heat);
 
-        if (fluidStack != null) {
-            if (fluidStack.amount > 1) {
-                double amountPerCycle = (double) fluidStack.getFluidtype(level).efficiency();
-                switch (reactorSize) {
-                    case 5 -> amountPerCycle /= (double) heatService.getLiquidTimer() / 40;
-                    case 7 -> amountPerCycle /= (double) heatService.getLiquidTimer() / 147;
-                    case 9 -> amountPerCycle /= (double) heatService.getLiquidTimer() / 360;
-                }
+        setChanged();
+        notifyUpdate();
 
-                fluidBuffer += amountPerCycle;
+        BigFluidStack fluidStack = currentFluidStack();
+        heat = heatCoordinator.calculateAndWriteHeat(configuredPattern, fluidStack, totalHeatRatio, inventory, level);
+        fluidBuffer = fluidRateCalculator.tick(fluidStack, reactorSize, level, inputFluidManager, fluidBuffer);
+        cycleManager.update(configuredPattern, level, inputManager, level.getGameTime() % 20 == 0);
 
-                if (fluidBuffer >= 1.0) {
-                    int toExtract = (int) Math.floor(fluidBuffer);
-
-                    boolean extracted = inputFluidManager.extractFluids(level, toExtract);
-
-                    if (extracted) {
-                        fluidBuffer -= toExtract;
-                        // this.liquidLife = calculateLiquidProgress();
-                    }
-                }
-            }
+        if (IHeat.HeatLevel.isNotDanger(heat, getMultiblockSize()) && !outputManager.getBlocksPosition(level).isEmpty()) {
+            outputManager.rotateOutputs(getLevel(), getAssembled(), heat);
         }
-
-        if (cycleManager.isEmpty() && !isEmptyConfiguredPattern()) {
-            cycleManager.startCycle(configuredPattern, level);
-        }
-
-        if (!cycleManager.isEmpty()) {
-            if (level.getGameTime() % 20 == 0
-                    && cycleManager.hasPatternChanged(configuredPattern, level)) {
-                cycleManager.resetCycle(configuredPattern, level, inputManager);
-            }
-            cycleManager.tick(inputManager, level);
-        }
-        if (IHeat.HeatLevel.isNotDanger(heat, this.getMultiblockSize())) {
-            // normal
-            if (!this.outputManager.getBlocksPosition().isEmpty()) {
-                this.outputManager.rotateOutputs(getLevel(), getAssembled(), heat);
-            }
-        }
-    }
-
-    private boolean isReadyToRun() {
-        if (isEmptyConfiguredPattern() || this.inputFluidManager.size() == 0 || !isAssembled()) {
-            return false;
-        }
-
-        Map<Item, Integer> patternCounts = PatternReader.readItemCounts(configuredPattern);
-        Map<Item, Integer> currentItems = this.displayState != null && this.displayState.items() != null 
-                ? this.displayState.items() : Collections.emptyMap();
-        
-        boolean hasAnyFuel = false;
-        
-        for (Map.Entry<Item, Integer> entry : patternCounts.entrySet()) {
-            Item requiredItem = entry.getKey();
-            int requiredCount = entry.getValue();
-            
-            RodType rodType = RodType.resolveRodType(requiredItem, level);
-            if (rodType.isNotEmptyItem() && rodType.type() == RodType.TypeRod.FUEL) {
-                hasAnyFuel = true;
-                int availableCount = currentItems.getOrDefault(requiredItem, 0);
-                if (availableCount <= 0) {
-                    return false;
-                }
-            }
-        }
-
-        return hasAnyFuel;
-    }
-
-    private void updateHeatOnly() {
-        // Guard against empty fluid list — HeatManager accepts null for empty/no-fluid
-        // case
-        BigFluidStack fluid = bigFluidStack.isEmpty() ? null : bigFluidStack.get(0);
-        heat = 0;
-
-        if (!isEmptyConfiguredPattern() && isAssembled()) {
-            Map<Item, Integer> patternCounts = PatternReader.readItemCounts(configuredPattern);
-            Map<Item, Integer> currentItems = this.displayState != null && this.displayState.items() != null 
-                    ? this.displayState.items() : Collections.emptyMap();
-            
-            for (Map.Entry<Item, Integer> entry : patternCounts.entrySet()) {
-                Item requiredItem = entry.getKey();
-                int requiredCount = entry.getValue();
-                
-                int availableCount = currentItems.getOrDefault(requiredItem, 0);
-                if (availableCount < requiredCount) {
-                    this.getConfiguredPatternTag().putDouble("heat", heat);
-                    return;
-                }
-            }
-
-            heat = (int) heatService.calculateHeat(fluid, totalHeatRatio, inventory, level);
-        }
-        this.getConfiguredPatternTag().putDouble("heat", heat);
     }
 
     private boolean isEmptyConfiguredPattern() {
@@ -545,46 +461,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private boolean updateLiquidTimers() {
         liquidLife -= 1;
         return liquidLife <= 0;
-    }
-
-    public void rotate(BlockState state, Level level, int rotation) {
-        if (this.outputManager.getBlocksPosition().isEmpty())
-            return;
-        
-        int RPMDivider = 32;
-        int totalRpm = rotation / RPMDivider;
-
-        int remainingRotation = totalRpm % this.outputManager.getBlocksPosition().size();
-        for (int i = 0; i < this.outputManager.getBlocksPosition().size(); i++) {
-            int dividedRotation = (totalRpm / this.outputManager.getBlocksPosition().size())
-                    + (i < remainingRotation ? 1 : 0);
-            BlockPos pos = this.outputManager.getBlocksPosition().get(i);
-
-            if (dividedRotation > 0) {
-                if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
-                    ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
-                    if (state.getValue(ASSEMBLED)) { // Starting the energy
-                        entity.speed = dividedRotation;
-                        entity.heat = dividedRotation;
-                    } else { // stopping the energy
-                        entity.speed = 0;
-                        entity.heat = 0;
-                    }
-                    entity.updateSpeed = true;
-                    entity.setSpeedAndUpdate(dividedRotation);
-                    entity.updateGeneratedRotation();
-
-                }
-            } else {
-                if (level.getBlockState(pos).getBlock() instanceof ReactorOutput block) {
-                    ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
-                    entity.setSpeedAndUpdate(0);
-                    entity.heat = 0;
-                    entity.updateSpeed = true;
-                    entity.updateGeneratedRotation();
-                }
-            }
-        }
     }
 
     public void addInput(BlockPos inputPos) {

@@ -135,4 +135,27 @@ public class ConsumptionCycleManager {
         });
         return result;
     }
+
+    /**
+     * Advances the consumption cycle by one tick: starts a cycle if none is
+     * running and the pattern isn't empty, resets it if the pattern changed
+     * (only checked when {@code checkPatternChange} is true), then ticks the
+     * current cycle.
+     *
+     * @param checkPatternChange if {@code false}, the pattern change isn't
+     *                           checked this tick (used to throttle the check's frequency)
+     */
+    public void update(ItemStack pattern, Level level, ReactorInputManagerI inputManager, boolean checkPatternChange) {
+        boolean emptyPattern = pattern.isEmpty() || pattern.getOrCreateTag().isEmpty();
+        if (isEmpty() && !emptyPattern) {
+            startCycle(pattern, level);
+        }
+
+        if (!isEmpty()) {
+            if (checkPatternChange && hasPatternChanged(pattern, level)) {
+                resetCycle(pattern, level, inputManager);
+            }
+            tick(inputManager, level);
+        }
+    }
 }

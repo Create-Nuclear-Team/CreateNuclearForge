@@ -41,6 +41,11 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * A tracked position is dropped if its chunk isn't loaded or the block
+     * entity at that position is no longer a {@link ReactorOutputEntity}.
+     */
     @Override
     public void clearInvalid(Level level) {
         List<BlockPos> toRemove = new ArrayList<>();
@@ -55,6 +60,11 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
         positions.removeAll(toRemove);
     }
 
+    /**
+     * {@inheritDoc}
+     * Filters the tracked positions down to those currently backed by a
+     * loaded {@link ReactorOutputEntity}.
+     */
     @Override
     public List<BlockPos> getBlocksPosition(Level level) {
         List<BlockPos> positions = new ArrayList<>();
@@ -65,6 +75,14 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
         return List.copyOf(positions);
     }
 
+    /**
+     * {@inheritDoc}
+     * The total rotation (in RPM, divided down by {@link #RPM_DIVIDER}) is
+     * split as evenly as possible across the tracked outputs, with the
+     * remainder distributed to the first outputs. Each output is set to its
+     * share of the rotation speed if the reactor is assembled, otherwise
+     * stopped.
+     */
     @Override
     public void rotateOutputs(Level level, boolean assembled, int rotation) {
         if (positions.isEmpty()) return;
