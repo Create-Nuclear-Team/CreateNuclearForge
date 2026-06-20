@@ -1,8 +1,6 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.snapshot;
 
-import com.simibubi.create.content.logistics.BigItemStack;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 
 import java.util.List;

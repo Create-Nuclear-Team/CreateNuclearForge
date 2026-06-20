@@ -4,7 +4,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import org.jetbrains.annotations.Nullable;
 
 public class ReactorFrameDisplayManager implements ReactorFrameDisplayManagerI {
@@ -25,18 +24,18 @@ public class ReactorFrameDisplayManager implements ReactorFrameDisplayManagerI {
 
     private FluidStack frameFluidCache = FluidStack.EMPTY;
 
-//    /**
-//     * Returns the fluid currently held by the reactor, used by the frame
-//     * renderer to draw the matching liquid in the window. On the client this
-//     * reads the synced {@link #clientDisplayFluids}; on the server it reads the
-//     * aggregated {@link #bigFluidStack}. Returns {@link FluidStack#EMPTY} when
-//     * the reactor holds no fluid.
-//     * <p>
-//     * Recomputes, at most once per game tick, the fluid shown in the frame
-//     * windows and how full the input is. Both values are read from the same live
-//     * input tanks (whose contents are synced to the client), so they always agree
-//     * regardless of the fluid type.
-//     */
+    /**
+     * Returns the fluid currently held by the reactor, used by the frame
+     * renderer to draw the matching liquid in the window. On the client this
+     * reads the synced ; on the server it reads the
+     * aggregated . Returns {@link FluidStack#EMPTY} when
+     * the reactor holds no fluid.
+     * <p>
+     * Recomputes, at most once per game tick, the fluid shown in the frame
+     * windows and how full the input is. Both values are read from the same live
+     * input tanks (whose contents are synced to the client), so they always agree
+     * regardless of the fluid type.
+     */
     private void refreshFrameFluidCache(@Nullable Level level, ReactorInputFluidManagerI handlers) {
         if (level == null) return;
         long now = level.getGameTime();
@@ -50,7 +49,6 @@ public class ReactorFrameDisplayManager implements ReactorFrameDisplayManagerI {
         for (IFluidHandler handler : handlers.getFuildHandlers(level)) {
             int tanks = handler.getTanks();
             for (int t = 0; t < tanks; t++) {
-//            CreateNuclear.LOGGER.warn("tank: {}, stack: {}, capacity: {}, amount: {}", tanks, handler.getFluidInTank(t), handler.getTankCapacity(t), handler.getFluidInTank(t).getAmount());
                 FluidStack stack = handler.getFluidInTank(t);
                 capacity += handler.getTankCapacity(t);
                 amount += stack.getAmount();

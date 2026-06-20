@@ -7,12 +7,12 @@ import net.nuclearteam.createnuclear.content.multiblock.input.fluid.VirtualReact
 
 import java.util.List;
 
+/**
+ * Interface for managing reactor input fluids.
+ * Implementations track input fluid sources and provide
+ * accessors and extraction methods for reactor consumption.
+ */
 public interface ReactorInputFluidManagerI extends ReactorIOManager {
-    /**
-     * Interface for managing reactor input fluids.
-     * Implementations track input fluid sources and provide
-     * accessors and extraction methods for reactor consumption.
-     */
     /** Returns an immutable copy of tracked positions. */
     List<BlockPos> getBlocksPosition(Level level);
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Interface exposing operations specific to reactor inputs.
- * Currently provides access to `IItemHandler` instances at resolved input positions.
+ * Currently, provides access to `IItemHandler` instances at resolved input positions.
  */
 public interface ReactorInputManagerI extends ReactorIOManager {
     /**

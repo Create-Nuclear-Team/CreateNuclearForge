@@ -2,10 +2,8 @@ package net.nuclearteam.createnuclear.content.multiblock.controller.manager;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
 /**
  * Interface exposing operations specific to reactor outputs.
