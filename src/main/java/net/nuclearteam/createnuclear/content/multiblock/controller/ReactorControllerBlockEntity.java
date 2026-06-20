@@ -4,7 +4,6 @@ import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -27,7 +26,6 @@ import net.nuclearteam.createnuclear.api.multiblock.IMultiblockController;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
-import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorGoggleTooltipRenderer;
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.*;
@@ -37,8 +35,6 @@ import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.ConsumptionCycleManager;
-import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
-import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +42,6 @@ import java.util.List;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
-import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
 
@@ -67,7 +62,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private int countCoolerRod;
     private int totalHeatRatio;
     private int heat;
-    private int explosionCountdown = 0;
     private boolean isExploding = false;
 
     private final ConsumptionCycleManager cycleManager = new ConsumptionCycleManager();
@@ -101,6 +95,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private final IExplosionService meltdownExecutor;
     private final IReactorHeatUpdateCoordinator heatCoordinator;
     private final IFluidConsumptionRateCalculator fluidRateCalculator;
+    /** Counts down to the next explosion once in danger; keeps the original 1-tick lag against the heat recalculated later this tick. */
+    private final IReactorMeltdownMonitor meltdownMonitor;
+    /** Drives the alarm blocks based on the danger flag; built in {@link #addBehaviours} since it depends on {@link #advancement}. */
+    private IReactorAlarmCoordinator alarmCoordinator;
 
     // service fields are injected; implementations live in separate classes
 
@@ -227,11 +225,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.meltdownExecutor = new ReactorMeltdownExecutor();
         this.heatCoordinator = new ReactorHeatUpdateCoordinator(this.heatService);
         this.fluidRateCalculator = new FluidConsumptionRateCalculator(this.heatService);
+        this.meltdownMonitor = new ReactorMeltdownMonitor();
     }
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         behaviours.add(advancement = new CNAdvancementBehaviour(this, CNAdvancement.T1_REACTOR, CNAdvancement.T2_REACTOR, CNAdvancement.T3_REACTOR, CNAdvancement.NO_TIME_TO_DIE, CNAdvancement.SILENCE_THE_CORE));
+        this.alarmCoordinator = new ReactorAlarmCoordinator(advancement);
     }
 
     public boolean getAssembled() { // permet de savoir si le réacteur est formé ou pas.
@@ -329,59 +329,21 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         super.tick();
         if (level.isClientSide || isExploding)
             return;
+        // Heat value written by the previous tick's handleAssembledState(); this tick's recalculated
+        // heat is not visible here yet, so the alarm/meltdown danger flag is intentionally 1 tick behind.
         int currentHeat = (int) configuredPattern.getOrCreateTag().getDouble("heat");
-        boolean isDanger = IHeat.HeatLevel.of(currentHeat, this.getMultiblockSize()) == IHeat.HeatLevel.DANGER;
+        boolean isDanger = alarmCoordinator.computeDanger(currentHeat, this.getMultiblockSize());
 
-        activateAlarms(isDanger);
+        alarmCoordinator.update(level, alarmManager, isDanger);
 
-        currentHeat = isEmptyConfiguredPattern() ? 0 : (int) this.getConfiguredPatternTag().getDouble("heat");
+        IReactorMeltdownMonitor.MeltdownState meltdownState = meltdownMonitor.tick(level, getBlockPos(), isDanger);
 
-        // Récupération des configs pour l'utilitaire
-        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
-        boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
-
-        if (isDanger) {
-            explosionCountdown++;
-            int secondsLeft = (300 - explosionCountdown) / 20;
-
-            // --- AFFICHAGE ALERTES ACTION BAR (TRADUITES) ---
-            if (secondsLeft <= 10 && secondsLeft > 0) {
-                boolean isWhite = (level.getGameTime() / 5) % 2 == 0;
-                ChatFormatting flashColor = isWhite ? ChatFormatting.WHITE : ChatFormatting.RED;
-
-                NotifyUtil.sendActionBar(level, getBlockPos(),
-                        CreateNuclearLang.translate("notification.reactor.meltdown_in")
-                                .add(CreateNuclearLang.number(secondsLeft))
-                                .add(CreateNuclearLang.translate("generic.unit.seconds")),
-                        flashColor, configRadius, configWarnAll);
-
-            } else if (secondsLeft > 10 && explosionCountdown % 20 == 0) {
-                NotifyUtil.sendActionBar(level, getBlockPos(),
-                        CreateNuclearLang.translate("notification.reactor.overheating"),
-                        ChatFormatting.DARK_RED, configRadius, configWarnAll);
+        if (meltdownState == IReactorMeltdownMonitor.MeltdownState.EXPLODE) {
+            if (level instanceof ServerLevel serverLevel) {
+                this.meltdownExecutor.triggerExplosion(serverLevel, getBlockPos(), reactorSize, countFuelRod);
             }
-
-            // --- MOMENT DE L'EXPLOSION ---
-            if (explosionCountdown >= 300) {
-                NotifyUtil.sendTitle(level, getBlockPos(),
-                        CreateNuclearLang.translate("notification.reactor.critical_failure"),
-                        CreateNuclearLang.translate("notification.reactor.imminent_explosion"),
-                        ChatFormatting.DARK_RED, configRadius, configWarnAll, 0, 40, 10);
-
-                if (level instanceof ServerLevel serverLevel) {
-                    this.meltdownExecutor.triggerExplosion(serverLevel, getBlockPos(), reactorSize, countFuelRod);
-                }
-                isExploding = true;
-                return;
-            }
-        } else {
-            // --- CŒUR STABILISÉ ---
-            if (explosionCountdown > 0) {
-                NotifyUtil.sendActionBar(level, getBlockPos(),
-                        CreateNuclearLang.translate("notification.reactor.stabilized"),
-                        ChatFormatting.GREEN, configRadius, configWarnAll);
-            }
-            explosionCountdown = 0;
+            isExploding = true;
+            return;
         }
 
         if (!isEmptyConfiguredPattern()) {
@@ -398,20 +360,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         updateReactorStateVisibility();
         handleAssembledState();
-    }
-
-    private void activateAlarms(boolean activate) {
-        if (alarmManager == null)
-            return;
-        for (BlockPos pos : alarmManager.getBlocksPosition(level)) {
-            if (level.isLoaded(pos)) {
-                BlockState state = level.getBlockState(pos);
-                if (state.getBlock() instanceof ReactorAlarm && state.getValue(ReactorAlarm.POWERED) != activate) {
-                    level.setBlock(pos, state.setValue(ReactorAlarm.POWERED, activate), 3);
-                    if (activate) this.advancement.awardPlayer(CNAdvancement.SILENCE_THE_CORE);
-                }
-            }
-        }
     }
 
     // --- extracted sub-steps to keep single responsibility per method ---

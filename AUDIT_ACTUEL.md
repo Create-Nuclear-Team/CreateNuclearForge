@@ -126,11 +126,26 @@ Ces points n'apparaissaient pas (ou pas sous cette forme) dans `AUDIT_V1.md` —
 
 10. **`CNNoiseGeneratorSettings.IRRADIATED`** définit `STEEL_BLOCK` comme bloc de remplissage par défaut du terrain (équivalent "stone"). Si jamais relié à une dimension, génèrerait un terrain massivement en acier — point d'alerte non couvert par `AUDIT_V1.md`, indépendant des surface rules (B19, désormais corrigées).
 
+11. **`IHeat.HeatLevel.isNotDanger` — condition tautologique, toujours `true`**
+    `IHeat.java:88-90` :
+    ```java
+    public static boolean isNotDanger(int heat, int reactorSize) {
+        return of(heat, reactorSize) != DANGER || of(heat, reactorSize) != NONE;
+    }
+    ```
+    `X != DANGER || X != NONE` est une tautologie : un `HeatLevel` ne peut pas être simultanément égal à `DANGER` et à `NONE`, donc l'une des deux comparaisons est toujours vraie — la méthode retourne **toujours `true`**, quel que soit `heat`. Conséquence concrète dans son unique appelant, `ReactorControllerBlockEntity.handleAssembledState()` (ligne 454) :
+    ```java
+    if (IHeat.HeatLevel.isNotDanger(heat, getMultiblockSize()) && !outputManager.getBlocksPosition(level).isEmpty()) {
+        outputManager.rotateOutputs(getLevel(), getAssembled(), heat);
+    }
+    ```
+    la garde "ne pas faire tourner les sorties si le réacteur est en `DANGER`" est **inopérante** : les sorties continuent de tourner même en `HeatLevel.DANGER`. Non détecté dans `AUDIT_V1.md` (ni le fichier ni la méthode n'y sont mentionnés). **Aucun correctif appliqué pour l'instant — documentation uniquement**, à corriger dans un commit dédié (probablement `!= DANGER` seul, à confirmer avec le comportement voulu).
+
 ### 🟡 Mineurs
 
-11. **`CreateNuclearJEI` — champ statique mutable `Categories` (nom non conventionnel)**, vidé/reconstruit à chaque appel de `registerCategories` — risque si JEI ré-appelle ce cycle (reload de ressources).
-12. **`CNPonderReactorScenes.showReactorStructure`** — boucle triple (jusqu'à 11×13×13 ≈ 1859 itérations) avec 6 comparaisons positionnelles séquentielles par cellule ; remplaçable par une `Map` précalculée. Coût ponctuel (ouverture de ponder) mais signe de code à clarifier.
-13. **`ReactorFrameDisplayManager.write`** persiste systématiquement les sentinelles `Integer.MAX_VALUE`/`MIN_VALUE` même quand `hasFrameColumn()` est faux — pollution NBT mineure.
+12. **`CreateNuclearJEI` — champ statique mutable `Categories` (nom non conventionnel)**, vidé/reconstruit à chaque appel de `registerCategories` — risque si JEI ré-appelle ce cycle (reload de ressources).
+13. **`CNPonderReactorScenes.showReactorStructure`** — boucle triple (jusqu'à 11×13×13 ≈ 1859 itérations) avec 6 comparaisons positionnelles séquentielles par cellule ; remplaçable par une `Map` précalculée. Coût ponctuel (ouverture de ponder) mais signe de code à clarifier.
+14. **`ReactorFrameDisplayManager.write`** persiste systématiquement les sentinelles `Integer.MAX_VALUE`/`MIN_VALUE` même quand `hasFrameColumn()` est faux — pollution NBT mineure.
 
 ---
 
