@@ -31,14 +31,14 @@ public class ReactorAlarm extends Block implements IBE<ReactorAlarmEntity> {
         this.registerDefaultState(this.defaultBlockState().setValue(POWERED, false));
     }
 
-    // AJOUT : Inscription au multiblock lors de la pose
+    // Registers this alarm with the multiblock controller when placed
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
         MultiblockHelpers.handleOnPlace(pos, level, ReactorControllerBlockEntity::addAlarm);
     }
 
-    // AJOUT : Désinscription au multiblock lors de la destruction par un joueur
+    // Unregisters this alarm from the multiblock controller when destroyed by a player
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
@@ -51,7 +51,7 @@ public class ReactorAlarm extends Block implements IBE<ReactorAlarmEntity> {
         CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
     }
 
-    // CORRECTION : Désinscription au multiblock lors du retrait (piston, explosion, etc.)
+    // Unregisters this alarm from the multiblock controller on removal (piston, explosion, etc.)
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {

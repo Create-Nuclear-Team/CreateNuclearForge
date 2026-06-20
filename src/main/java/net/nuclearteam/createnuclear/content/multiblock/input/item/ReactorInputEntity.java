@@ -42,7 +42,7 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
 
     @Override
     protected void write(CompoundTag tag, boolean clientPacket) {
-        super.write(tag, clientPacket); // Toujours appeler le super
+        super.write(tag, clientPacket); // Always call super first
 
         if (!clientPacket) {
             tag.put("Inventory", inventory.serializeNBT());

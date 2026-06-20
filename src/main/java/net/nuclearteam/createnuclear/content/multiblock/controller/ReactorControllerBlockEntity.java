@@ -223,7 +223,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.alarmCoordinator = new ReactorAlarmCoordinator(advancement);
     }
 
-    public boolean getAssembled() { // permet de savoir si le réacteur est formé ou pas.
+    public boolean getAssembled() { // returns whether the reactor structure is currently assembled
         BlockState state = getBlockState();
         return state.getValue(ASSEMBLED);
     }
@@ -241,11 +241,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return true;
     }
 
-    // (Si les methode read et write ne sont pas implémenté alors lorsque l'on
-    // relance le monde minecraft les items dans le composant auront disparu !)
+    // (If read/write are not implemented, the items stored in this block entity's
+    // inventory will be lost when the world is reloaded!)
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
-        super.read(compound, clientPacket); // Toujours en premier pour les coordonnées de base
+        super.read(compound, clientPacket); // Always call first to restore the base coordinates
         // delegate managers and persistence
         this.inputManager.read(compound);
         this.outputManager.read(compound);
@@ -305,7 +305,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         boolean currentActive = state.getValue(ReactorControllerBlock.ACTIVE);
 
-        // Le réacteur est "ACTIVE" (ON) seulement s'il est assemblé ET qu'il a ses ressources
+        // The reactor is "ACTIVE" (ON) only if it is assembled AND has the resources required to run
         boolean targetActive = isAssembled() && heatCoordinator.canRun(getConfiguredPattern(), getDisplayState(), getInputFluidManager(), level, getAssembled());
 
         if (currentActive != targetActive) {

@@ -81,17 +81,17 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 		setChanged();
     }
 
-    // Assure-toi d'avoir cette variable définie dans ta classe
+    // Tracks the output's linked block position for persistence across reloads.
     private BlockPos outputPos;
 
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket);
 
-        // On récupère la vitesse
+        // Restore the generated rotation speed
         generatedSpeed = compound.getFloat("generatedSpeed");
 
-        // On récupère la position (seulement si elle existe dans le tag)
+        // Restore the output position, if present in the tag
         if (compound.contains("outputPos")) {
             this.outputPos = BlockPos.of(compound.getLong("outputPos"));
         }
@@ -101,10 +101,10 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     public void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
 
-        // On enregistre la vitesse
+        // Persist the generated rotation speed
         compound.putFloat("generatedSpeed", generatedSpeed);
 
-        // On enregistre la position si elle n'est pas nulle
+        // Persist the output position, if set
         if (this.outputPos != null) {
             compound.putLong("outputPos", this.outputPos.asLong());
         }

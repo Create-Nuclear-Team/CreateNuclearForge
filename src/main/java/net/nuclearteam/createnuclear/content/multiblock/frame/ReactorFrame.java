@@ -127,9 +127,9 @@ public class ReactorFrame extends Block implements IWrenchable, IBE<ReactorFrame
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         super.onRemove(state, level, pos, newState, movedByPiston);
-        // playerDestroy n'est PAS appelé en créatif : on doit aussi réévaluer ici.
-        // On ne réagit qu'à une vraie suppression/remplacement du bloc (type différent),
-        // pas à un simple changement de la propriété PART (même bloc, via setBlock).
+        // playerDestroy is NOT called in creative mode, so the structure must also be
+        // re-evaluated here. Only react to an actual block removal/replacement (different
+        // block type), not to a simple PART property change (same block, via setBlock).
         if (!state.is(newState.getBlock())) {
             pattern.findController(pos, level, false);
         }

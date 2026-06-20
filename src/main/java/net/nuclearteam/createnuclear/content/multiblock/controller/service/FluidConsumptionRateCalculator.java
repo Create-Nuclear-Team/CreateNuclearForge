@@ -39,7 +39,7 @@ public class FluidConsumptionRateCalculator implements IFluidConsumptionRateCalc
 
         if (fluidBuffer >= 1.0) {
             int toExtract = (int) Math.floor(fluidBuffer);
-            if (inputFluidManager.extractFluids(level, toExtract)) { // bug existant volontairement non touché
+            if (inputFluidManager.extractFluids(level, toExtract)) { // pre-existing bug, intentionally left untouched
                 fluidBuffer -= toExtract;
             }
         }

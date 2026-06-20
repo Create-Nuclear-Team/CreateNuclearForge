@@ -28,7 +28,7 @@ import java.util.List;
 
 public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGoggleInformation {
 
-    /** Capacité par défaut tant que l'input n'est rattaché à aucun réacteur assemblé. */
+    /** Default tank capacity while this input is not attached to any assembled reactor. */
     public static final int DEFAULT_CAPACITY = 16000;
 
     private final FluidTank internalTank;
@@ -44,7 +44,7 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
     }
 
     /**
-     * Capacité du tank en fonction de la taille du réacteur (tier).
+     * Returns the tank capacity for the given reactor size (tier).
      * 5x5 -> tier 1, 7x7 -> tier 2, 9x9 -> tier 3.
      */
     public static int getCapacityForReactorSize(int reactorSize) {
@@ -56,7 +56,7 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
         };
     }
 
-    /** Applique la capacité correspondant à la taille du réacteur à laquelle cet input appartient. */
+    /** Applies the tank capacity matching the size of the reactor this input belongs to. */
     public void applyReactorTierCapacity(int reactorSize) {
         int capacity = getCapacityForReactorSize(reactorSize);
         if (internalTank.getCapacity() == capacity) return;

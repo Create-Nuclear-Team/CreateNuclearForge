@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
@@ -133,15 +134,15 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
                 ItemStack stack = handler.getStackInSlot(s);
                 if (stack.isEmpty()) continue;
 
-                // On récupère le nom de l'item (ex: "uranium_rod")
-                String registryPath = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).getPath();
+                // Resolve the item's registry name (e.g. "uranium_rod")
+                String registryPath = ForgeRegistries.ITEMS.getKey(stack.getItem()).getPath();
 
-                // Comparaison intelligente : on ignore la casse et les underscores (_)
+                // Lenient comparison: ignores case and underscores (_)
                 if (isMatching(registryPath, itemName)) {
-                    // On tente d'extraire 1 unité
+                    // Attempt to extract 1 unit
                     ItemStack extracted = handler.extractItem(s, 1, false);
 
-                    // Si l'extraction a réussi, on s'arrête là et on renvoie true
+                    // If extraction succeeded, stop here and return true
                     if (!extracted.isEmpty()) {
                         return true;
                     }
@@ -149,11 +150,12 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
             }
         }
 
-        return false; // On n'a pas trouvé l'item demandé
+        return false; // The requested item was not found
     }
 
     /**
-     * Helper pour comparer "GraphiteRod" avec "graphite_rod"
+     * Helper to compare names like "GraphiteRod" against "graphite_rod"
+     * (case-insensitive, underscore-insensitive).
      */
     private boolean isMatching(String registryPath, String configName) {
         String cleanPath = registryPath.replace("_", "").toLowerCase();

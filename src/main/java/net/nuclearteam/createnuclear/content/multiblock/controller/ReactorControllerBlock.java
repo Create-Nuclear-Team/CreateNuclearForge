@@ -6,6 +6,7 @@ import com.simibubi.create.foundation.item.ItemHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -47,9 +48,9 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     public ReactorControllerBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()
-                .setValue(FACING, net.minecraft.core.Direction.NORTH)
+                .setValue(FACING, Direction.NORTH)
                 .setValue(ASSEMBLED, false)
-                .setValue(ACTIVE, false) // Par défaut inactif
+                .setValue(ACTIVE, false) // Inactive by default
         );
     }
 
@@ -71,11 +72,11 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                                 boolean isMoving) {
         if (worldIn.isClientSide)
             return;
-        // Un voisin direct du controller a changé. On ne désassemble PAS aveuglément :
-        // on ne le fait que si la structure est réellement cassée. Sinon, poser/remplacer
-        // un bloc adjacent au controller (frame au-dessus/en-dessous, input/alarm sur les
-        // côtés, cooler derrière) annulerait l'assemblage qui vient juste d'être validé.
-        // disassemble() vérifie findStructure et ne fait rien si la structure est complète.
+        // A direct neighbor of the controller has changed. Do NOT blindly disassemble:
+        // only do so if the structure is actually broken. Otherwise, placing/replacing a
+        // block adjacent to the controller (frame above/below, input/alarm on the sides,
+        // cooler behind) would invalidate the assembly that was just validated.
+        // disassemble() checks findStructure and does nothing if the structure is complete.
         if (state.getValue(ASSEMBLED))
             ReactorAssembler.disassemble(pos, worldIn);
     }
@@ -115,7 +116,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     player.setItemInHand(handIn, be.getInventoryObject().getItem(0));
                     be.getInventoryObject().setStackInSlot(0, ItemStack.EMPTY);
                     be.setConfiguredPattern(ItemStack.EMPTY);
-                    //be.clearTimers(); // retirer le commentaire si on veux que le timer se reset quand le reacteur s'arrete
+                    //be.clearTimers(); // uncomment if the timer should reset when the reactor stops
                     be.getOutputManager().rotateOutputs(be.getLevel(), be.getAssembled(), 0);
                     be.notifyUpdate();
                 });

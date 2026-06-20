@@ -37,17 +37,17 @@ public class ReactorInputMenu extends MenuBase<ReactorInputEntity> {
             ItemStack stackInSlot = slot.getItem();
             result = stackInSlot.copy();
 
-            int playerInventorySize = player.getInventory().items.size(); // normalement 36
+            int playerInventorySize = player.getInventory().items.size(); // normally 36
             int containerStart = playerInventorySize;
-            int containerEnd = containerStart + 1; // 1 slot de machine
+            int containerEnd = containerStart + 1; // 1 machine slot
 
-            // Si on a cliqué un slot de machine (après les slots joueurs)
+            // Clicked a machine slot (after the player slots)
             if (index >= containerStart && index < containerEnd) {
                 if (!this.moveItemStackTo(stackInSlot, 0, playerInventorySize, true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
-                // On a cliqué un slot joueur — essayer d'aller dans le container (machine)
+                // Clicked a player slot — try moving the stack into the machine container
                 if (!this.moveItemStackTo(stackInSlot, containerStart, containerEnd, false)) {
                     return ItemStack.EMPTY;
                 }
