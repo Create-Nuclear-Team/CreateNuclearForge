@@ -10,22 +10,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.IMultiblockController;
-import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
-import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorGoggleTooltipRenderer;
 import net.nuclearteam.createnuclear.content.multiblock.controller.service.*;
@@ -40,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
@@ -498,34 +491,13 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (level == null || level.isClientSide)
             return;
 
-        BlockPattern<TypeMultiblock> structure = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this);
-        // findStructure renvoie null si la structure n'est plus formée : on retombe
-        // alors sur la dernière taille assemblée (reactorSize) pour éviter un NPE serveur.
-        final int SCAN_RADIUS = structure != null ? structure.data().getSize() : reactorSize;
-        BlockPos center = getBlockPos();
-        boolean anyNonEmpty = false;
-
-        for (int dx = -SCAN_RADIUS; dx <= SCAN_RADIUS && !anyNonEmpty; dx++) {
-            for (int dy = -SCAN_RADIUS; dy <= SCAN_RADIUS && !anyNonEmpty; dy++) {
-                for (int dz = -SCAN_RADIUS; dz <= SCAN_RADIUS && !anyNonEmpty; dz++) {
-                    BlockPos p = center.offset(dx, dy, dz);
-                    BlockEntity be = level.getBlockEntity(p);
-                    if (!(be instanceof ReactorFluidInputEntity))
-                        continue;
-
-                    IFluidHandler handler = be.getCapability(ForgeCapabilities.FLUID_HANDLER).orElse(null);
-                    if (handler == null)
-                        continue;
-
-                    for (int t = 0; t < handler.getTanks(); t++) {
-                        if (!handler.getFluidInTank(t).isEmpty()) {
-                            anyNonEmpty = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        boolean anyNonEmpty = getInputFluidManager().getFuildHandlers(level).stream()
+            .anyMatch(handler -> {
+                for (int t = 0; t < handler.getTanks(); t++)
+                    if (!handler.getFluidInTank(t).isEmpty())
+                        return true;
+                return false;
+            });
 
         if (!anyNonEmpty)
             clearLock();
