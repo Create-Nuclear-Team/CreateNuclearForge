@@ -168,14 +168,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         this.cycleManager.clear();
     }
 
-    public double getLiquidLife() {
-        return this.liquidLife;
-    }
-
-    public void setLiquidLife(double l) {
-        this.liquidLife = l;
-    }
-
     public ReactorFrameDisplayManagerI getFrameDisplayManager() {
         return this.frameDisplayManager;
     }
@@ -194,6 +186,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
     public ReactorDisplayState getDisplayState() {
         return this.displayState;
+    }
+
+    private List<ReactorIOManager> allManagers() {
+        return List.of(inputManager, inputFluidManager, outputManager, alarmManager);
     }
 
     /**
@@ -401,11 +397,6 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return configuredPattern.isEmpty() || this.getConfiguredPatternTag().isEmpty();
     }
 
-    private boolean updateLiquidTimers() {
-        liquidLife -= 1;
-        return liquidLife <= 0;
-    }
-
     public void addInput(BlockPos inputPos) {
         this.inputManager.addBlock(inputPos);
         this.setChanged();
@@ -451,10 +442,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     }
 
     public void removeIOAll() {
-        this.inputManager.clearInvalid(level);
-        this.outputManager.clearInvalid(level);
-        this.inputFluidManager.clearInvalid(level);
-        this.alarmManager.clearInvalid(level);
+        allManagers().forEach(m -> m.clearInvalid(level));
         this.setChanged();
     }
 

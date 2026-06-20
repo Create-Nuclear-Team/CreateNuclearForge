@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear.content.multiblock.controller.service;
 
-import com.simibubi.create.content.logistics.BigItemStack;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
@@ -19,7 +18,6 @@ public class DefaultPersistenceService implements IPersistenceService {
             ? BoundingBox.CODEC.parse(NbtOps.INSTANCE, compound.get("reactorPose")).result().orElse(null)
             : null
         );
-        owner.setLiquidLife(compound.getDouble("liquidLife"));
 
         if (!clientPacket) {
             owner.deserializeInventory(compound.getCompound("pattern"));
