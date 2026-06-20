@@ -22,7 +22,9 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import net.nuclearteam.createnuclear.CreateNuclear;
+import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.IMultiblockController;
+import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.CNMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
@@ -548,7 +550,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         if (level == null || level.isClientSide)
             return;
 
-        var structure = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this);
+        BlockPattern<TypeMultiblock> structure = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, getBlockPos(), this);
         // findStructure renvoie null si la structure n'est plus formée : on retombe
         // alors sur la dernière taille assemblée (reactorSize) pour éviter un NPE serveur.
         final int SCAN_RADIUS = structure != null ? structure.data().getSize() : reactorSize;

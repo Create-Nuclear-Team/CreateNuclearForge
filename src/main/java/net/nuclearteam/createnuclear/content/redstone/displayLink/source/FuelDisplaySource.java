@@ -10,6 +10,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
@@ -28,7 +29,7 @@ public class FuelDisplaySource extends NumericSingleLineDisplaySource {
         int fuel = 0;
         if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
             for (var entry : controller.getDisplayState().items().entrySet()) {
-                if (net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate.IS_FUEL.test(entry.getKey().getDefaultInstance())) {
+                if (TypeRodPredicate.IS_FUEL.test(entry.getKey().getDefaultInstance())) {
                     fuel += entry.getValue();
                 }
             }
