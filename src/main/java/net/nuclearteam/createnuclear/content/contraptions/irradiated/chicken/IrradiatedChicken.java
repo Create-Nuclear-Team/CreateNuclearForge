@@ -86,12 +86,6 @@ public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
         return this.isBaby() ? dimensions.height * 0.85F : dimensions.height * 0.92F;
     }
 
-    @Override
-    public void tick() {
-        AnimalUtil.tick(this);
-        super.tick();
-    }
-
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 4.0)
@@ -166,22 +160,6 @@ public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
     }
 
     @Override
-    public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
-        InteractionResult returnValue = AnimalUtil.mobInteract(this, pPlayer, pHand);
-
-        if (returnValue != InteractionResult.PASS)
-            return returnValue;
-
-        return super.mobInteract(pPlayer, pHand);
-    }
-
-    @Override
-    public void handleEntityEvent(byte pId) {
-        if (!AnimalUtil.handleEntityEvent(this, pId))
-            super.handleEntityEvent(pId);
-    }
-
-    @Override
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
         this.isChickenJockey = compound.getBoolean("IsChickenJockey");
@@ -191,7 +169,6 @@ public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
 
         if (compound.contains("ConversionTime", Tag.TAG_ANY_NUMERIC) && compound.getInt("ConversionTime") > -1)
             startConverting(compound.getInt("ConversionTime"));
-
     }
 
     @Override

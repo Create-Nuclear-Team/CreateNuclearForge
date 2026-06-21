@@ -16,7 +16,7 @@ En contrepartie, deux affirmations structurelles d'`AUDIT_V1.md`, reprises sans 
 - L'« inversion de dépendance dans `api/` » n'existe pas (vérifié par lecture directe des imports).
 - Les « deux/trois frameworks multiblock concurrents » ne sont pas concurrents : c'est un pipeline séquentiel (scan géométrique → matcher formel → données datapack), dont seule la première étape pose un vrai problème.
 
-À l'inverse, des bugs très simples et jamais mis en doute (`B12`, `B15`) sont **toujours présents** alors qu'ils sont triviaux à corriger — signe que le nettoyage a suivi les zones où les audits insistaient (radiation, dead code, controller) plutôt qu'une revue systématique de toutes les lignes signalées.
+À l'inverse, un bug très simple et jamais mis en doute (`B15`) est **toujours présent** alors qu'il est trivial à corriger — signe que le nettoyage a suivi les zones où les audits insistaient (radiation, dead code, controller) plutôt qu'une revue systématique de toutes les lignes signalées. `B12` a été corrigé pendant la rédaction de ce document (voir §2.2).
 
 ---
 
@@ -26,7 +26,6 @@ En contrepartie, deux affirmations structurelles d'`AUDIT_V1.md`, reprises sans 
 
 | Réf. | Constat | Pourquoi ça tient toujours |
 |---|---|---|
-| B12 | `AnimalUtil.isFood` teste un tag NBT `"Ingredient"` jamais écrit au lieu du stack tenu | Vérifié ligne ~77, toujours faux — élevage/apprivoisement du poulet irradié via `isFood` reste cassé |
 | B15 | `NuclearExplosionEntity` (~l.224-228) utilise `try{...}catch(Exception){destroyBlock(...,true)}` comme branchement de contrôle, avec sémantique de drop différente entre les deux branches | Toujours présent, anti-pattern réel (avale les vrais bugs) |
 | ReactorInputFluidManager | `getFluidInTank(getTanks())` (off-by-one, viole le contrat `IFluidHandler`) ; `extractFluids` ne décrémente jamais `fluidNeeded` ; ignore l'extraction quand `toExtract>1` | Confirmé toujours présent (l.127, l.146-157). Toléré aujourd'hui parce que `SmartFluidTank` est mono-tank et ignore l'index, mais reste un vrai bug de contrat, pas une légende d'audit |
 | Aucun test | `src/test` toujours vide (0 fichier) | Confirmé. Pour un mod avec une logique métier non triviale (calcul de chaleur, pattern matching, verrouillage fluide), c'est la dette la plus structurelle du projet — bien plus que la forme des classes |
@@ -47,6 +46,7 @@ En contrepartie, deux affirmations structurelles d'`AUDIT_V1.md`, reprises sans 
 | AUDIT_V1 §1.5 | `run/` à versionner dans `.gitignore` | **Déjà fait** : `.gitignore` contient bien les règles `run/*`. Reste un résidu mineur — voir §4.7 |
 | B3, B4, B5, B6, B8, B9, B11, B13, B16, B19 | Bugs détaillés dans `AUDIT_V1.md` §2 | Tous vérifiés **corrigés** dans le code actuel (cooldown via `Map<UUID,Long>`, loot/tag du bloc de thorium normalisés, `BiomeTagRule.apply()` retourne une `Condition`, packet blueprint envoie les deux valeurs distinctes, plus de scan null-unsafe dans `clearLockIfAllInputsEmpty`, paliers de radiation à 4 niveaux distincts, logger après null-check, bras de l'armure anti-radiation sur les bons membres, garde `conditions` non-null dans le datagen, `IrradiatedSurfaceRules` v1 disparu). Rien à reprendre ici |
 | B14 / `FluidLockManager` | Map statique sans dimension, jamais purgée, doublon de `PersistentFluidLocks` | Fichier **supprimé** du repo, remplacé par `PersistentFluidLocks` seul. Le double-système n'existe plus |
+| B12 | `AnimalUtil.isFood` teste un tag NBT `"Ingredient"` jamais écrit au lieu du stack tenu | **Corrigé** pendant la rédaction de ce document : `isFood` teste désormais directement `foodItems.test(stack)` / `extraTest.test(stack)` (le yellowcake reste un cas spécial toujours accepté). Le poulet irradié reconnaît maintenant les graines comme nourriture, plus seulement le yellowcake |
 | B2 | `RadiationSyncPacket` jette l'instance sans la stocker | Ce packet **n'existe plus** ; la synchro radiation passe par la capability Forge + `PlayerTickEvent`. Point obsolète |
 | AUDIT_ACTUEL §3.3 (partie double-comptage) | `IRadiationSource` vs `RadiationRegistry` : risque de double comptage actif | À nuancer plutôt qu'à supprimer : le code appelle bien les deux mécanismes sans court-circuit (`RadiationCapability` l.106-113), **mais** `RadiationRegistry` lève une `IllegalStateException` à l'enregistrement si un item implémente déjà `IRadiationSource` (l.81-82) — ce qui empêche structurellement qu'un item soit compté deux fois. Le risque n'est donc pas "actif", il est "architecturalement bloqué mais maladroit" : deux mécanismes pour un seul concept, sans qu'aucun item ne cumule les deux aujourd'hui. La duplication de design reste valide à signaler (voir §3.2), mais "double comptage" comme bug concret est à retirer |
 
@@ -130,7 +130,7 @@ Je n'applique pas de règle automatique ("classe > N lignes → découper", "ajo
 2. Retirer l'appel redondant à `findController` dans `ReactorCasing.playerDestroy` (garder `onRemove`) ; vérifier `ReactorCooler`/`ReactorFrame` pour le même schéma à la pose.
 3. `ReactorAssembler` : `LOGGER.warn` → `LOGGER.debug` (l.37).
 4. `IHeat.HeatLevel.isNotDanger` : corriger la tautologie (`!= DANGER` seul), après confirmation du comportement voulu.
-5. `AnimalUtil.isFood` (B12) : tester le stack tenu, pas le tag NBT mort.
+5. ~~`AnimalUtil.isFood` (B12) : tester le stack tenu, pas le tag NBT mort.~~ **Fait.**
 6. `NuclearExplosionEntity` (B15) : remplacer le try/catch de contrôle par une vérification explicite.
 7. `git rm --cached` sur les 6 fichiers de debug suivis sous `run/` (§3.5).
 

@@ -128,7 +128,7 @@ minecraft {
         // The gametest system is also enabled by default for other run configs under the /test command.
         gameTestServer {
             workingDirectory project.file('run/gametest')
-            //property 'forge.enabledGameTestNamespaces', mod_id
+            property 'forge.enabledGameTestNamespaces', mod_id
         }
 
         data {
@@ -212,6 +212,14 @@ dependencies {
         annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     }*/
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
+
+    /** Tests **/
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
