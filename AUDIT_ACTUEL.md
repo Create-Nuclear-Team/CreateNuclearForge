@@ -19,7 +19,7 @@ Le code est en **refactor V2 actif** (extraction en cours de `ReactorInputSnapsh
 | **B15** | `content/explosion/NuclearExplosionEntity.java` (~224) | **Toujours présent** | `try { onBlockExploded } catch(Exception){ destroyBlock(...,true) }` — exception comme branchement, avale les vrais bugs, sémantiques de drop différentes entre les deux branches. |
 
 ### Bugs mineurs confirmés toujours présents (liste condensée)
-- `ReactorInputFluidManager.extractFluids/getBlocksPosition` : toujours `getFluidInTank(getTanks())` (off-by-one), `fluidNeeded` jamais décrémenté, `toExtract>1` ignore les extractions de 1 unité.
+- `ReactorInputFluidManager.extractFluids/getInventory` : **✅ off-by-one corrigé** (`getFluidInTank(getTanks())` → `getFluidInTank(0)`, contrat `IFluidHandler` respecté). Restent intentionnellement non corrigés : `fluidNeeded` jamais décrémenté entre handlers tracés (sur-extraction possible si plusieurs inputs), `toExtract>1` ignore toujours les extractions de 1 unité. Ces deux points sont désormais documentés explicitement en commentaire dans `FluidConsumptionRateCalculator.java` (hors scope assumé pour ce calculateur).
 - `InventoryHashUtil` : toujours `h = 31*h + stack.getDamageValue()` → resync radiation à chaque variation de durabilité.
 - `ReactorSizeDisplaySource` : toujours `tier*100/3` comme "%" — désormais creusé en détail (voir §3, nouveau finding lié).
 

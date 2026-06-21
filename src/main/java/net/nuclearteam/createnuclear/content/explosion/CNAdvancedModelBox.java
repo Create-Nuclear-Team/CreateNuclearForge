@@ -19,9 +19,6 @@ public class CNAdvancedModelBox extends CNBasicModelPart {
     public float defaultRotationX;
     public float defaultRotationY;
     public float defaultRotationZ;
-    public float defaultOffsetX;
-    public float defaultOffsetY;
-    public float defaultOffsetZ;
     public float defaultPositionX;
     public float defaultPositionY;
     public float defaultPositionZ;
@@ -33,15 +30,10 @@ public class CNAdvancedModelBox extends CNBasicModelPart {
     public boolean scaleChildren;
     private CNAdvancedEntityModel model;
     private CNAdvancedModelBox parent;
-    private int displayList;
-    private boolean compiled;
     public ObjectList<CNTabulaModelRenderUtils.ModelBox> cubeList;
     public ObjectList<CNBasicModelPart> childModels;
     private float textureWidth;
     private float textureHeight;
-    public float offsetX;
-    public float offsetY;
-    public float offsetZ;
     public String boxName;
 
     public CNAdvancedModelBox(CNAdvancedEntityModel model, String name) {
@@ -59,26 +51,11 @@ public class CNAdvancedModelBox extends CNBasicModelPart {
     }
 
     public CNAdvancedModelBox(CNAdvancedEntityModel model) {
-        this(model, (String)null);
+        this(model, null);
         this.textureWidth = (float)model.texWidth;
         this.textureHeight = (float)model.texHeight;
         this.cubeList = new ObjectArrayList();
         this.childModels = new ObjectArrayList();
-    }
-
-    public CNAdvancedModelBox(CNAdvancedEntityModel model, int textureOffsetX, int textureOffsetY) {
-        this(model);
-        this.textureWidth = (float)model.texWidth;
-        this.textureHeight = (float)model.texHeight;
-        this.setTextureOffset(textureOffsetX, textureOffsetY);
-        this.cubeList = new ObjectArrayList();
-        this.childModels = new ObjectArrayList();
-    }
-
-    public CNBasicModelPart setTexSize(int p_78787_1_, int p_78787_2_) {
-        this.textureWidth = (float)p_78787_1_;
-        this.textureHeight = (float)p_78787_2_;
-        return this;
     }
 
     public CNBasicModelPart addBox(String p_217178_1_, float p_217178_2_, float p_217178_3_, float p_217178_4_, int p_217178_5_, int p_217178_6_, int p_217178_7_, float p_217178_8_, int p_217178_9_, int p_217178_10_) {
@@ -113,25 +90,9 @@ public class CNAdvancedModelBox extends CNBasicModelPart {
         this.cubeList.add(new CNTabulaModelRenderUtils.ModelBox(p_228305_1_, p_228305_2_, p_228305_3_, p_228305_4_, p_228305_5_, p_228305_6_, p_228305_7_, p_228305_8_, p_228305_9_, p_228305_10_, p_228305_11_, p_228305_12_, this.textureWidth, this.textureHeight));
     }
 
-    public void setShouldScaleChildren(boolean scaleChildren) {
-        this.scaleChildren = scaleChildren;
-    }
-
     public void setScale(float scaleX, float scaleY, float scaleZ) {
         this.scaleX = scaleX;
         this.scaleY = scaleY;
-        this.scaleZ = scaleZ;
-    }
-
-    public void setScaleX(float scaleX) {
-        this.scaleX = scaleX;
-    }
-
-    public void setScaleY(float scaleY) {
-        this.scaleY = scaleY;
-    }
-
-    public void setScaleZ(float scaleZ) {
         this.scaleZ = scaleZ;
     }
 
@@ -142,12 +103,6 @@ public class CNAdvancedModelBox extends CNBasicModelPart {
         this.defaultPositionX = this.rotationPointX;
         this.defaultPositionY = this.rotationPointY;
         this.defaultPositionZ = this.rotationPointZ;
-    }
-
-    public void setPos(float xIn, float yIn, float zIn) {
-        this.rotationPointX = xIn;
-        this.rotationPointY = yIn;
-        this.rotationPointZ = zIn;
     }
 
     public void resetToDefaultPose() {
@@ -165,7 +120,6 @@ public class CNAdvancedModelBox extends CNBasicModelPart {
         if (child instanceof CNAdvancedModelBox advancedChild) {
             advancedChild.setParent(this);
         }
-
     }
 
     public CNAdvancedModelBox getParent() {
@@ -176,22 +130,8 @@ public class CNAdvancedModelBox extends CNBasicModelPart {
         this.parent = parent;
     }
 
-    public void parentedPostRender(float scale) {
-        if (this.parent != null) {
-            this.parent.parentedPostRender(scale);
-        }
-
-    }
-
-    public void renderWithParents(float scale) {
-        if (this.parent != null) {
-            this.parent.renderWithParents(scale);
-        }
-
-    }
-
     public void translateAndRotate(PoseStack matrixStackIn) {
-        matrixStackIn.translate((double)(this.rotationPointX / 16.0F), (double)(this.rotationPointY / 16.0F), (double)(this.rotationPointZ / 16.0F));
+        matrixStackIn.translate(this.rotationPointX / 16.0F, this.rotationPointY / 16.0F, (double)(this.rotationPointZ / 16.0F));
         if (this.rotateAngleZ != 0.0F) {
             matrixStackIn.mulPose(Axis.ZP.rotation(this.rotateAngleZ));
         }
@@ -260,51 +200,9 @@ public class CNAdvancedModelBox extends CNBasicModelPart {
         return this.model;
     }
 
-    private float calculateRotation(float speed, float degree, boolean invert, float offset, float weight, float f, float f1) {
-        float movementScale = this.model.getMovementScale();
-        float rotation = Mth.cos(f * speed * movementScale + offset) * degree * movementScale * f1 + weight * f1;
-        return invert ? -rotation : rotation;
-    }
-
-    public void walk(float speed, float degree, boolean invert, float offset, float weight, float walk, float walkAmount) {
-        this.rotateAngleX += this.calculateRotation(speed, degree, invert, offset, weight, walk, walkAmount);
-    }
-
-    public void flap(float speed, float degree, boolean invert, float offset, float weight, float flap, float flapAmount) {
-        this.rotateAngleZ += this.calculateRotation(speed, degree, invert, offset, weight, flap, flapAmount);
-    }
-
-    public void swing(float speed, float degree, boolean invert, float offset, float weight, float swing, float swingAmount) {
-        this.rotateAngleY += this.calculateRotation(speed, degree, invert, offset, weight, swing, swingAmount);
-    }
-
-    public void bob(float speed, float degree, boolean bounce, float f, float f1) {
-        float movementScale = this.model.getMovementScale();
-        degree *= movementScale;
-        speed *= movementScale;
-        float bob = (float)(Math.sin((double)(f * speed)) * (double)f1 * (double)degree - (double)(f1 * degree));
-        if (bounce) {
-            bob = (float)(-Math.abs(Math.sin((double)(f * speed)) * (double)f1 * (double)degree));
-        }
-
-        this.rotationPointY += bob;
-    }
-
     public CNAdvancedModelBox setTextureOffset(int textureOffsetX, int textureOffsetY) {
         this.textureOffsetX = textureOffsetX;
         this.textureOffsetY = textureOffsetY;
         return this;
-    }
-
-    public void transitionTo(CNAdvancedModelBox to, float timer, float maxTime) {
-        this.rotateAngleX += (to.rotateAngleX - this.rotateAngleX) / maxTime * timer;
-        this.rotateAngleY += (to.rotateAngleY - this.rotateAngleY) / maxTime * timer;
-        this.rotateAngleZ += (to.rotateAngleZ - this.rotateAngleZ) / maxTime * timer;
-        this.rotationPointX += (to.rotationPointX - this.rotationPointX) / maxTime * timer;
-        this.rotationPointY += (to.rotationPointY - this.rotationPointY) / maxTime * timer;
-        this.rotationPointZ += (to.rotationPointZ - this.rotationPointZ) / maxTime * timer;
-        this.offsetX += (to.offsetX - this.offsetX) / maxTime * timer;
-        this.offsetY += (to.offsetY - this.offsetY) / maxTime * timer;
-        this.offsetZ += (to.offsetZ - this.offsetZ) / maxTime * timer;
     }
 }
