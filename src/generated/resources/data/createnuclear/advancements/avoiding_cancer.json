@@ -1,5 +1,5 @@
 {
-  "parent": "createnuclear:root",
+  "parent": "createnuclear:anti_radiation_armor",
   "criteria": {
     "0": {
       "conditions": {

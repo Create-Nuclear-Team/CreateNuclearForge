@@ -1,4 +1,4 @@
-// 1.20.1	2026-06-12T10:26:06.6469655	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-06-21T16:13:55.3075927	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -48,8 +48,8 @@ a2fc21fa320e677fe7690b260ee3f57ebdbd50b6 assets/createnuclear/blockstates/small_
 643a4d44b491a84d0d26e1a8944dffc40e83ce14 assets/createnuclear/blockstates/thorium_ore.json
 de2884054a21315d8b167f64b206be331d388420 assets/createnuclear/blockstates/uranium.json
 4557f548df100ae1d05e3b5711797225f6a39673 assets/createnuclear/blockstates/uranium_ore.json
-7bb5dcd5152f4dd85c6b52537d63759082bd0f93 assets/createnuclear/lang/en_ud.json
-6954d485a4fbc88f8ad2ad8600a2f0bf3488af48 assets/createnuclear/lang/en_us.json
+5ca7680451918fad7c1cf3098b8e110fdbf3965e assets/createnuclear/lang/en_ud.json
+2f2b0d22ad4263ba1c17b42bd4b7ec6ec56ccff1 assets/createnuclear/lang/en_us.json
 a8495d2cd5e38213683becaf1c84b2852f8b06f5 assets/createnuclear/models/block/autunite_natural_0.json
 29394a22ee8655dc22ea51563411505fbcfd2dab assets/createnuclear/models/block/autunite_natural_1.json
 9e4f83de1ca7a9ab5363f43fc7c3f7f4ec6164d5 assets/createnuclear/models/block/autunite_natural_2.json
@@ -356,7 +356,7 @@ db666ffaca36edc9e246e225f225c1e87604dd88 data/createnuclear/loot_tables/blocks/c
 10aff7424eefd85e50269c66e60ae343043193cd data/createnuclear/loot_tables/blocks/cut_autunite_slab.json
 e6e624e978fdacfa3cdd123d23d021f504308149 data/createnuclear/loot_tables/blocks/cut_autunite_stairs.json
 f28efa9fb383b86c770b8c7344fc30f6ab9200d3 data/createnuclear/loot_tables/blocks/cut_autunite_wall.json
-113d87359e902ec9112e063f87adf5646cd01dbc data/createnuclear/loot_tables/blocks/deepslate_lead_ore.json
+463869981259ac3b7087139c283e38178b629b6a data/createnuclear/loot_tables/blocks/deepslate_lead_ore.json
 ab2a2b6038a5f6d841ec21a28db2e5e693d7ee82 data/createnuclear/loot_tables/blocks/deepslate_nitrate_ore.json
 06f3370110396372b9bef4d6c0805affbe70cec4 data/createnuclear/loot_tables/blocks/deepslate_thorium_ore.json
 063436e2539f1d04b6a96427801ea0fa70c03be5 data/createnuclear/loot_tables/blocks/deepslate_uranium_ore.json
@@ -365,7 +365,7 @@ ab2a2b6038a5f6d841ec21a28db2e5e693d7ee82 data/createnuclear/loot_tables/blocks/d
 aa8efeb48b11261953f7d90e6d7db38411550694 data/createnuclear/loot_tables/blocks/enriching_fire.json
 297b7824fc2eea67ef47760da549f73e93424b60 data/createnuclear/loot_tables/blocks/layered_autunite.json
 efe2ad634ad8b801a8fa69f45516b30157b46771 data/createnuclear/loot_tables/blocks/lead_block.json
-9db8f06cd9b1d7a9c2d94e652f00a7588398571c data/createnuclear/loot_tables/blocks/lead_ore.json
+3fedfbd217847c7102f049501a00929cb03d25de data/createnuclear/loot_tables/blocks/lead_ore.json
 1e942f7a1aaf752424e39a61d094b4736834ec30 data/createnuclear/loot_tables/blocks/nitrate_ore.json
 7ad41810138d7b55a5d9d0db0956cd255e879632 data/createnuclear/loot_tables/blocks/polished_cut_autunite.json
 d5fb5ebfe991980abfd6f1932575363d026d8859 data/createnuclear/loot_tables/blocks/polished_cut_autunite_slab.json

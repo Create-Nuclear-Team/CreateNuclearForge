@@ -1,5 +1,5 @@
 {
-  "parent": "createnuclear:root",
+  "parent": "createnuclear:absolute_zero",
   "criteria": {
     "0": {
       "conditions": {},

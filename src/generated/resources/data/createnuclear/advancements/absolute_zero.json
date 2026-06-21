@@ -1,12 +1,12 @@
 {
-  "parent": "createnuclear:thorium_ingot",
+  "parent": "createnuclear:chill_out",
   "criteria": {
     "0": {
       "conditions": {
         "items": [
           {
             "items": [
-              "createnuclear:thorium_rod"
+              "createnuclear:nitrogen_bucket"
             ]
           }
         ]
@@ -18,16 +18,16 @@
     "announce_to_chat": false,
     "description": {
       "color": "#DBA213",
-      "translate": "advancement.createnuclear.thorium_rod.desc"
+      "translate": "advancement.createnuclear.absolute_zero.desc"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "createnuclear:thorium_rod"
+      "item": "createnuclear:nitrogen_bucket"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancement.createnuclear.thorium_rod"
+      "translate": "advancement.createnuclear.absolute_zero"
     }
   },
   "requirements": [

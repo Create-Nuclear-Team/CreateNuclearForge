@@ -11,9 +11,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
@@ -94,6 +96,15 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new AntiRadiationArmorClientExtensions());
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+        if (level.isClientSide || !(entity instanceof Player player)) return;
+        if (!stack.hasTag() || !stack.getTag().contains(ClothTagHelper.COLOR)) return;
+        if (CNAdvancement.DYE_ANTI_RADIATION_ARMOR.isAlreadyAwardedTo(player)) return;
+        CNAdvancement.DYE_ANTI_RADIATION_ARMOR.awardTo(player);
     }
   
     public static class Helmet extends AntiRadiationArmorItem implements IGoggleHelmet {

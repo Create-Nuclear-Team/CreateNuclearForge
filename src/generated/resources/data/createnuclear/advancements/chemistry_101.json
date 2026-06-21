@@ -1,12 +1,12 @@
 {
-  "parent": "createnuclear:thorium_ingot",
+  "parent": "createnuclear:root",
   "criteria": {
     "0": {
       "conditions": {
         "items": [
           {
             "items": [
-              "createnuclear:thorium_rod"
+              "createnuclear:nitrate"
             ]
           }
         ]
@@ -18,16 +18,16 @@
     "announce_to_chat": false,
     "description": {
       "color": "#DBA213",
-      "translate": "advancement.createnuclear.thorium_rod.desc"
+      "translate": "advancement.createnuclear.chemistry_101.desc"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "createnuclear:thorium_rod"
+      "item": "createnuclear:nitrate"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancement.createnuclear.thorium_rod"
+      "translate": "advancement.createnuclear.chemistry_101"
     }
   },
   "requirements": [

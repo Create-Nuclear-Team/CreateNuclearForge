@@ -1,12 +1,12 @@
 {
-  "parent": "createnuclear:thorium_ingot",
+  "parent": "createnuclear:thorium_dust",
   "criteria": {
     "0": {
       "conditions": {
         "items": [
           {
             "items": [
-              "createnuclear:thorium_rod"
+              "createnuclear:thorium_bucket"
             ]
           }
         ]
@@ -18,16 +18,16 @@
     "announce_to_chat": false,
     "description": {
       "color": "#DBA213",
-      "translate": "advancement.createnuclear.thorium_rod.desc"
+      "translate": "advancement.createnuclear.thorium_liquid.desc"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "createnuclear:thorium_rod"
+      "item": "createnuclear:thorium_bucket"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancement.createnuclear.thorium_rod"
+      "translate": "advancement.createnuclear.thorium_liquid"
     }
   },
   "requirements": [
