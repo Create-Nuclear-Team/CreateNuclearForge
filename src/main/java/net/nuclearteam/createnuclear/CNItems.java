@@ -4,7 +4,11 @@ import com.simibubi.create.foundation.data.AssetLookup;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
+import com.tterrag.registrate.providers.DataGenContext;
+import com.tterrag.registrate.providers.RegistrateItemModelProvider;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
+import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
+import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
@@ -43,6 +47,40 @@ import java.util.List;
 
 @SuppressWarnings({"unused", "deprecation"})
 public class CNItems {
+
+    /**
+     * Generates the item model for a dyeable anti-radiation armor piece.
+     * <p>
+     * Replicates {@link AssetLookup#itemModelWithPartials()} (outer model parenting the
+     * Blockbench {@code item/<name>/item} model) and adds one model override per {@link DyeColor},
+     * driven by the client-side {@code createnuclear:cloth_color} item property
+     * (see {@code CreateNuclearClient}). Each per-color child model reuses the same geometry but
+     * re-textures it with the matching {@code item/armors/<color>_anti_radiation_suit} sheet.
+     * <p>
+     * The texture keys differ per slot: the helmet geometry uses {@code layer0}/{@code particle},
+     * the other pieces use {@code 14} — hence {@code textureKeys} is passed explicitly.
+     */
+    private static <T extends Item> NonNullBiConsumer<DataGenContext<Item, T>, RegistrateItemModelProvider> coloredArmorModel(String slot, String... textureKeys) {
+        return (c, p) -> {
+            ResourceLocation baseParent = p.modLoc("item/" + c.getName() + "/item");
+            ItemModelBuilder outer = p.withExistingParent(c.getName(), baseParent);
+            // DyeColor.values() is ordered by id (0..15); overrides must be ascending by predicate
+            // value so vanilla override resolution selects the exact color (returns last match <= value).
+            // The cloth_color property is clamped to [0,1] (see CreateNuclearClient), hence the
+            // (id+1)/16 normalization here must match the value returned there exactly.
+            for (DyeColor color : DyeColor.values()) {
+                String colorName = color.getSerializedName();
+                ItemModelBuilder child = p.withExistingParent("item/colored/" + colorName + "_anti_radiation_" + slot, baseParent);
+                for (String key : textureKeys) {
+                    child.texture(key, "item/armors/" + colorName + "_anti_radiation_suit");
+                }
+                outer.override()
+                    .predicate(CreateNuclear.asResource("cloth_color"), (color.getId() + 1) / 16f)
+                    .model(child)
+                    .end();
+            }
+        };
+    }
 
     public static final ItemEntry<? extends Item>
         YELLOWCAKE = CreateNuclear.REGISTRATE
@@ -253,7 +291,7 @@ public class CNItems {
             }
         })
         .lang("Anti Radiation Helmet")
-        .model(AssetLookup.itemModelWithPartials())
+        .model(coloredArmorModel("helmet", "layer0", "particle"))
         .register();
 
     public static final ItemEntry<Chestplate> ANTI_RADIATION_CHESTPLATES = CreateNuclear.REGISTRATE
@@ -287,7 +325,7 @@ public class CNItems {
             }
         })
         .lang("Anti Radiation Chestplate")
-        .model(AssetLookup.itemModelWithPartials())
+        .model(coloredArmorModel("chestplate", "14"))
         .register();
 
     public static final ItemEntry<Leggings> ANTI_RADIATION_LEGGINGS = CreateNuclear.REGISTRATE
@@ -321,7 +359,7 @@ public class CNItems {
             }
         })
         .lang("Anti Radiation Leggings")
-        .model(AssetLookup.itemModelWithPartials())
+        .model(coloredArmorModel("leggings", "14"))
         .register();
 
     public static final ItemEntry<Boot> ANTI_RADIATION_BOOTS = CreateNuclear.REGISTRATE
@@ -354,7 +392,7 @@ public class CNItems {
             }
         })
         .lang("Anti Radiation Boots")
-        .model(AssetLookup.itemModelWithPartials())
+        .model(coloredArmorModel("boots", "14"))
         .register();
 
     public static final DyedItemsList<ClothItem> CLOTHS = new DyedItemsList<>(color -> {

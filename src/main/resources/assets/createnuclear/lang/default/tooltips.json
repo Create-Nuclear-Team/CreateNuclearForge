@@ -54,7 +54,6 @@
   "createnuclear.tooltip.rodTimer": "Rod Duration: %d tick",
   "createnuclear.tooltip.heatRatio": "Heat Ratio: %d",
   "createnuclear.tooltip.typeRod": "Rod Type: %s",
-  "createnuclear.tooltip.cloth.color": "Color of armor piece: %s",
 
 
   "tag.item.c.coal_dusts": "Coal Dusts",

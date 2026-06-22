@@ -294,7 +294,6 @@
   "createnuclear.subtitle.reacteur/casing_place": "Place Reactor Casing",
   "createnuclear.subtitle.reacteur/casing_step": "Step on Reactor Casing",
   "createnuclear.tooltip.baseRodHeat": "Base Rod Heat: %d Q",
-  "createnuclear.tooltip.cloth.color": "Color of armor piece: %s",
   "createnuclear.tooltip.fluid": "Fluid: %s ",
   "createnuclear.tooltip.fluid.amount": "%d mb",
   "createnuclear.tooltip.fluid.none": "Fluid: None ",
