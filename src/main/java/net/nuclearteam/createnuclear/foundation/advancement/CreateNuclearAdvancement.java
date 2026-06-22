@@ -23,7 +23,7 @@ import java.util.function.UnaryOperator;
 @SuppressWarnings("unused")
 public class CreateNuclearAdvancement {
 
-    static final ResourceLocation BACKGROUND = CreateNuclear.asResource("textures/block/steel_block.png");
+    static final ResourceLocation BACKGROUND = CreateNuclear.asResource("textures/gui/advancements/backgrounds/background_advancement.png");
     static final String LANG = "advancement." + CreateNuclear.MOD_ID + ".";
     static final String SECRET_SUFFIX = "\n\u00A77(Hidden Advancement)";
 
