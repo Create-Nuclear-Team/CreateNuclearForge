@@ -4,6 +4,7 @@ import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.utility.IInteractionChecker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -14,9 +15,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.items.IItemHandler;
 
+import net.nuclearteam.createnuclear.CNSoundEvents;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.IMultiblockController;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
@@ -56,6 +60,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private int totalHeatRatio;
     private int heat;
     private boolean isExploding = false;
+
+    /** Client-only looping "running" sound instance; never accessed server-side. */
+    @OnlyIn(Dist.CLIENT)
+    private ReactorRunningSoundInstance runningSound;
 
     private final ConsumptionCycleManager cycleManager = new ConsumptionCycleManager();
     private double liquidLife;
@@ -316,7 +324,11 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     @Override
     public void tick() {
         super.tick();
-        if (level.isClientSide || isExploding)
+        if (level.isClientSide) {
+            tickRunningSound();
+            return;
+        }
+        if (isExploding)
             return;
         // Heat value written by the previous tick's handleAssembledState(); this tick's recalculated
         // heat is not visible here yet, so the alarm/meltdown danger flag is intentionally 1 tick behind.
@@ -349,6 +361,31 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
 
         updateReactorStateVisibility();
         handleAssembledState();
+    }
+
+    /**
+     * Client-side: keep the looping "running" sound alive while the reactor is producing energy.
+     * Driven by the {@code ACTIVE} blockstate property, which the server recomputes every tick in
+     * {@link #updateReactorStateVisibility()} and vanilla syncs to the client automatically.
+     */
+    @OnlyIn(Dist.CLIENT)
+    private void tickRunningSound() {
+        BlockState state = getBlockState();
+        boolean active = state.hasProperty(ReactorControllerBlock.ACTIVE)
+                && state.getValue(ReactorControllerBlock.ACTIVE);
+
+        if (!active) {
+            if (runningSound != null) {
+                runningSound.stopSound();
+                runningSound = null;
+            }
+            return;
+        }
+
+        if (runningSound == null || runningSound.isStopped()) {
+            runningSound = new ReactorRunningSoundInstance(level, worldPosition, CNSoundEvents.REACTOR_RUNNING.getMainEvent());
+            Minecraft.getInstance().getSoundManager().play(runningSound);
+        }
     }
 
     // --- extracted sub-steps to keep single responsibility per method ---

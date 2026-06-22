@@ -107,6 +107,15 @@
     ],
     "subtitle": "createnuclear.subtitle.geiger/medium"
   },
+  "reacteur/activation": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reacteur/activation"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reacteur/activation"
+  },
   "reacteur/casing_break": {
     "sounds": [
       {
@@ -151,5 +160,23 @@
       }
     ],
     "subtitle": "createnuclear.subtitle.reacteur/casing_step"
+  },
+  "reacteur/running": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reacteur/running"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reacteur/running"
+  },
+  "reacteur/shut_off": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reacteur/shut_off"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reacteur/shut_off"
   }
 }

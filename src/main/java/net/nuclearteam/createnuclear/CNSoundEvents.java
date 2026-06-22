@@ -60,6 +60,21 @@ public class CNSoundEvents {
             .category(SoundSource.BLOCKS)
             .build(),
 
+        REACTOR_ACTIVATION = create("reacteur/activation")
+            .subtitle("Reactor Activation")
+            .category(SoundSource.BLOCKS)
+            .build(),
+
+        REACTOR_RUNNING = create("reacteur/running")
+            .subtitle("Reactor Running")
+            .category(SoundSource.BLOCKS)
+            .build(),
+
+        REACTOR_SHUT_OFF = create("reacteur/shut_off")
+            .subtitle("Reactor Shut Off")
+            .category(SoundSource.BLOCKS)
+            .build(),
+
         REACTOR_ALARM = create("alarm/reactor", "alarm")
             .subtitle("Reactor Alarm")
             .category(SoundSource.BLOCKS)

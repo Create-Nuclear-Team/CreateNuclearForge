@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -104,6 +105,8 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
 
                     player.setItemInHand(handIn, ItemStack.EMPTY);
                 });
+                // One-shot played server-side (null player) so it broadcasts to nearby clients.
+                worldIn.playSound(null, pos, CNSoundEvents.REACTOR_ACTIVATION.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
                 return InteractionResult.SUCCESS;
 
             }
@@ -120,6 +123,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     be.getOutputManager().rotateOutputs(be.getLevel(), be.getAssembled(), 0);
                     be.notifyUpdate();
                 });
+                worldIn.playSound(null, pos, CNSoundEvents.REACTOR_SHUT_OFF.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
                 state.setValue(ASSEMBLED, false);
                 return InteractionResult.SUCCESS;
 
