@@ -210,21 +210,25 @@ public class NuclearExplosionEntity extends Entity {
                             carveBelow.set(carve.getX(), carve.getY() - 1, carve.getZ());
                             canSetToFire = true;
 
-                            // GESTION SPAWN MOBS / compat Alex's Caves
+                            // ALEX'S CAVES compatibility handling
                             boolean handledByAlex = false;
                             if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null){
                                 handledByAlex = ((AlexscaveCompat) alexscaveHandler).MobSpawn(state, level(), carve, itemDropModifier, dummyExplosion);
                             }
 
-                            // Si Alex a géré (oeuf éclot), on skip
                             if (handledByAlex) continue;
 
-                            // Nouveau : destruction standard quand Alex's Caves n'est pas présent
-                            // On essaye d'abord d'appeler le comportement d'explosion du block, sinon fallback sur destroyBlock
-                            try {
-                                state.onBlockExploded(level(), carve, dummyExplosion);
-                            } catch (Exception e) {
-                                level().destroyBlock(carve, true);
+                            // 1. Create an immutable copy of the position
+                            BlockPos immutablePos = carve.immutable();
+
+                            // 2. Call the explosion behavior
+                            state.onBlockExploded(level(), immutablePos, dummyExplosion);
+
+                            // 3. FIX: If the block is still there (vanilla blocks like Stone/Dirt), force removal
+                            if (level().getBlockState(immutablePos).is(state.getBlock())) {
+                                // false = do not drop standard mining items, let the explosion logic handle drops if needed
+                                // or set to true if you want items to drop like before
+                                level().destroyBlock(immutablePos, true);
                             }
                         }
                     }
