@@ -392,7 +392,9 @@ public class CNBlocks {
             .loot((lt, b) -> lt.add(b,
                     RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
                             lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
-                                    .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))))))
+                                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F)))
+                                    .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 4))
+                            ))))
             .tag(BlockTags.NEEDS_IRON_TOOL,
                     CNTags.forgeBlockTag("ores"),
                     CNTags.forgeBlockTag("ores_in_ground/deepslate"),
@@ -453,9 +455,11 @@ public class CNBlocks {
             .simpleItem()
             .transform(pickaxeOnly())
             .loot((lt, b) -> lt.add(b,
-                    RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                            lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
-                                    .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))))))
+                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                        lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
+                                .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F)))
+                                .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 4))
+                        ))))
             .tag(BlockTags.NEEDS_IRON_TOOL,
                     CNTags.forgeBlockTag("ores"),
                     CNTags.forgeBlockTag("ores_in_ground/stone"),

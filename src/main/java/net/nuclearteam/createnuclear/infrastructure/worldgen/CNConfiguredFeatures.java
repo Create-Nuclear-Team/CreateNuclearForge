@@ -46,7 +46,7 @@ public class CNConfiguredFeatures {
                 OreConfiguration.target(stoneOreReplaceable, CNBlocks.LEAD_ORE.getDefaultState()),
                 OreConfiguration.target(deepslateOreReplaceable, CNBlocks.DEEPSLATE_LEAD_ORE.getDefaultState())
         );
-        register(ctx, LEAD_ORE, Feature.ORE, new OreConfiguration(leadTargetStates, 7));
+        register(ctx, LEAD_ORE, Feature.ORE, new OreConfiguration(leadTargetStates, 10));
 
         List<TargetBlockState> thoriumTargetStates = List.of(
                 OreConfiguration.target(stoneOreReplaceable, CNBlocks.THORIUM_ORE.getDefaultState()),

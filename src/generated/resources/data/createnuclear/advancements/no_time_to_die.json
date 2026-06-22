@@ -1,5 +1,5 @@
 {
-  "parent": "createnuclear:root",
+  "parent": "createnuclear:reactor_controller",
   "criteria": {
     "0": {
       "conditions": {},
