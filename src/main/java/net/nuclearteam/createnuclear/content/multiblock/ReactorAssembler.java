@@ -20,6 +20,9 @@ import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class ReactorAssembler {
 
     public static final int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
@@ -81,6 +84,10 @@ public final class ReactorAssembler {
         int frameMinY = Integer.MAX_VALUE;
         int frameMaxY = Integer.MIN_VALUE;
 
+        // Collected here and assigned their capacity after the scan: the reactor-size capacity is a
+        // single TOTAL shared across every fluid input, so we split it once we know how many there are.
+        List<ReactorFluidInputEntity> fluidInputs = new ArrayList<>();
+
         for (int y = yMin; y <= yMax; y++) {
             boolean isYBoundary = (y == yMin || y == yMax);
             for (int x = xMin; x <= xMax; x++) {
@@ -100,7 +107,7 @@ public final class ReactorAssembler {
                     } else if (blockState.is(reactorInputFluidBlock)) {
                         entity.addInputFluid(mutablePos.immutable());
                         if (level.getBlockEntity(mutablePos) instanceof ReactorFluidInputEntity fluidInput) {
-                            fluidInput.applyReactorTierCapacity(entity.getMultiblockSize());
+                            fluidInputs.add(fluidInput);
                         }
                     } else if (blockState.is(reactorAlarmBlock)) {
                         entity.addAlarm(mutablePos.immutable());
@@ -117,6 +124,26 @@ public final class ReactorAssembler {
 
         if (frameMinY != Integer.MAX_VALUE) {
             entity.getFrameDisplayManager().setFrameColumn(frameMinY, frameMaxY, entity::notifyUpdate);
+        }
+
+        distributeFluidInputCapacity(fluidInputs, entity.getMultiblockSize());
+    }
+
+    /**
+     * Splits the reactor-size total fluid capacity evenly across all fluid inputs so the combined
+     * max capacity always equals the configured value, regardless of how many inputs were placed.
+     * The integer remainder is spread one unit at a time over the first inputs so the sum stays exact.
+     */
+    private static void distributeFluidInputCapacity(List<ReactorFluidInputEntity> fluidInputs, int reactorSize) {
+        int count = fluidInputs.size();
+        if (count == 0) return;
+
+        int total = ReactorFluidInputEntity.getCapacityForReactorSize(reactorSize);
+        int base = total / count;
+        int remainder = total % count;
+
+        for (int i = 0; i < count; i++) {
+            fluidInputs.get(i).applyCapacity(base + (i < remainder ? 1 : 0));
         }
     }
 

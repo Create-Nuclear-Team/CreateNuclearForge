@@ -56,9 +56,15 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
         };
     }
 
-    /** Applies the tank capacity matching the size of the reactor this input belongs to. */
-    public void applyReactorTierCapacity(int reactorSize) {
-        int capacity = getCapacityForReactorSize(reactorSize);
+    /**
+     * Applies an explicit tank capacity to this input.
+     * <p>
+     * The per-reactor-size capacity ({@link #getCapacityForReactorSize(int)}) is the TOTAL the
+     * reactor should hold, split across all fluid inputs by {@code ReactorAssembler}, so the sum
+     * of every input's capacity stays equal to the configured value no matter how many inputs the
+     * player places.
+     */
+    public void applyCapacity(int capacity) {
         if (internalTank.getCapacity() == capacity) return;
         internalTank.setCapacity(capacity);
         if (level != null && !level.isClientSide) {
