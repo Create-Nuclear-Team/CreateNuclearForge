@@ -59,6 +59,7 @@ public class ReactorPattern {
                     newBlock = new BlockPos(x, y, z);
                     if (level.getBlockState(newBlock).is(CNBlocks.REACTOR_CONTROLLER.get())) {
                         if (level.getBlockEntity(newBlock) instanceof ReactorControllerBlockEntity entity) {
+                            ReactorAssembler.assemble(newBlock, level);
                             if (isInReactorRange(entity.getMultiblockPos(), blockPos)) {
                                 return newBlock;
                             }

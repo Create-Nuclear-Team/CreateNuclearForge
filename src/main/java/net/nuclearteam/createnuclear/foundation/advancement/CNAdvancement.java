@@ -65,20 +65,6 @@ public class CNAdvancement implements DataProvider {
         .after(ROOT)
     ),
 
-    FIRST_THORIUM = create("first_thorium", b -> b.icon(CNItems.RAW_THORIUM.asItem())
-        .title("First Thorium")
-        .description("Drop a raw thorium for the first time")
-        .whenIconCollected()
-        .after(ROOT)
-    ),
-
-    FIRST_NITRATE = create("first_nitrate", b -> b.icon(CNItems.NITRATE.asItem())
-        .title("First Nitrate")
-        .description("Drop Nitrate for the first time")
-        .whenIconCollected()
-        .after(ROOT)
-    ),
-
     RAW_URANIUM = create("raw_uranium", b -> b.icon(CNItems.RAW_URANIUM)
         .title("The Raw Power")
         .description("Mine uranium ore to obtain raw uranium for further processing")
@@ -203,6 +189,7 @@ public class CNAdvancement implements DataProvider {
         .title("I can't feel my feet anymore")
         .description("Swim in the liquid nitrogen for the first time")
         .after(ABSOLUTE_ZERO)
+        .special(SECRET)
     ),
 
     COAL_DUST = create("coal_dust", b -> b.icon(CNItems.COAL_DUST)
@@ -330,20 +317,6 @@ public class CNAdvancement implements DataProvider {
         .whenIconCollected()
     ),
 
-    REACTOR_COOLER = create("reactor_cooler", b -> b.icon(CNBlocks.REACTOR_COOLER)
-        .title("Cooling The Reactor")
-        .description("Craft a reactor cooler to cool your reactor")
-        .after(REACTOR_CASING)
-        .whenIconCollected()
-    ),
-
-    REACTOR_FRAME = create("reactor_frame", b -> b.icon(CNBlocks.REACTOR_FRAME)
-        .title("Reactor Frame")
-        .description("Craft a reactor frame to build your nuclear reactor")
-        .after(REACTOR_CASING)
-        .whenIconCollected()
-    ),
-
     REACTOR_INPUT = create("reactor_input", b -> b.icon(CNBlocks.REACTOR_INPUT)
         .title("Fueling The Reactor")
         .description("Craft a reactor input to feed uranium and graphite rods into your reactor")
@@ -354,22 +327,39 @@ public class CNAdvancement implements DataProvider {
     REACTOR_LIQUID_INPUT = create("reactor_liquid_input", b -> b.icon(CNBlocks.REACTOR_LIQUID_INPUT)
         .title("Liquid Fuel")
         .description("Craft a reactor liquid input to feed liquid coolant into your reactor")
-        .after(REACTOR_CASING)
+        .after(REACTOR_INPUT)
         .whenIconCollected()
     ),
 
     REACTOR_OUTPUT = create("reactor_output", b -> b.icon(CNBlocks.REACTOR_OUTPUT)
         .title("Power Output")
         .description("Craft a reactor output to transfer the energy produced by your reactor")
-        .after(REACTOR_CASING)
+        .after(REACTOR_LIQUID_INPUT)
         .whenIconCollected()
     ),
+
     REACTOR_CORE = create("reactor_core", b -> b.icon(CNBlocks.REACTOR_CORE)
         .title("Core Of Power")
         .description("Craft the reactor core to harness the full energy of your nuclear reactor")
         .after(REACTOR_CASING)
         .whenIconCollected()
-    );
+    ),
+
+    REACTOR_COOLER = create("reactor_cooler", b -> b.icon(CNBlocks.REACTOR_COOLER)
+        .title("Cooling The Reactor")
+        .description("Craft a reactor cooler to cool your reactor")
+        .after(REACTOR_CORE)
+        .whenIconCollected()
+    ),
+
+    REACTOR_FRAME = create("reactor_frame", b -> b.icon(CNBlocks.REACTOR_FRAME)
+        .title("Reactor Frame")
+        .description("Craft a reactor frame to build your nuclear reactor")
+        .after(REACTOR_COOLER)
+        .whenIconCollected()
+    )
+
+    ;
 
     private final PackOutput output;
 
