@@ -95,6 +95,19 @@ public class CNMechanicalCraftingRecipeGen extends MechanicalCraftingRecipeGen {
             .patternLine("CSBSC")
             .patternLine("CPSPC")
             .patternLine("CCCCC")
+    ),
+
+    REACTOR_ALARM = create(CNBlocks.REACTOR_ALARM::get)
+        .recipe(b -> b
+            .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
+            .key('N', Ingredient.of(Blocks.NOTE_BLOCK))
+            .key('R', Ingredient.of(Blocks.REPEATER))
+            .key('L', Ingredient.of(Items.CLOCK))
+            .patternLine("CCCCC")
+            .patternLine("CNRNC")
+            .patternLine("CRLRC")
+            .patternLine("CNRNC")
+            .patternLine("CCCCC")
     );
 
 
