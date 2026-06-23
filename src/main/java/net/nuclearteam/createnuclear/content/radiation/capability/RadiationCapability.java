@@ -1,11 +1,13 @@
 package net.nuclearteam.createnuclear.content.radiation.capability;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
@@ -17,16 +19,21 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNEffects;
+import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.radiation.IRadiationSource;
 import net.nuclearteam.createnuclear.api.radiation.RadiationRegistry;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
+import net.nuclearteam.createnuclear.foundation.utility.ConfigValueResolver;
 import net.nuclearteam.createnuclear.foundation.utility.InventoryHashUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.RADIATION_VALUE;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class RadiationCapability implements IRadiationCapability {
     private double radiation;
@@ -90,7 +97,7 @@ public class RadiationCapability implements IRadiationCapability {
                 cap.setLastBiomeLocation(biomeLoc);
             }
 
-            if (!CNConfigs.server().radiation.enabledItemRadiation.get()) return;
+            if (!canBeIrradiated(player)) return;
 
             double totalRaw = cap.getRadiation() + getRawBiomeRadiation(biomeKey);
             double resistance = getRadiationResistance(player);
@@ -118,6 +125,36 @@ public class RadiationCapability implements IRadiationCapability {
     private static double getRawBiomeRadiation(ResourceKey<Biome> biomeKey) {
         if (biomeKey == null) return 0;
         return RadiationRegistry.get(biomeKey);
+    }
+
+    /**
+     * Single source of truth for radiation eligibility, shared by every application path
+     * (item/biome tick, vicinity effect, open-pipe leak). Covers <em>eligibility</em> only —
+     * the continuous attenuation by resistance lives in {@link #applyEffects} / the effect tick.
+     */
+    public static boolean canBeIrradiated(LivingEntity entity) {
+        if (entity.isSpectator()) return false;
+        if (entity.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)) return false;
+        if (!CNConfigs.server().radiation.enabledItemRadiation.get()) return false;
+        if (getEntityBlacklist().contains(entity.getType())) return false;
+        return getRadiationResistance(entity) < 1.0;
+    }
+
+    // Cached, parsed entity blacklist. Rebuilt only when the underlying config list instance
+    // changes (ForgeConfigSpec returns a fresh list on reload), so no per-tick parsing.
+    private static List<? extends String> cachedBlacklistSource;
+    private static Set<EntityType<?>> cachedBlacklist = Set.of();
+
+    private static Set<EntityType<?>> getEntityBlacklist() {
+        List<? extends String> source = CNConfigs.server().radiation.configuredLists.getEntityBlackList();
+        if (source != cachedBlacklistSource) {
+            Set<EntityType<?>> resolved = new HashSet<>();
+            ConfigValueResolver.loadValuesInSet(source, resolved,
+                    entry -> BuiltInRegistries.ENTITY_TYPE.get(ResourceLocation.tryParse(entry)));
+            cachedBlacklist = resolved;
+            cachedBlacklistSource = source;
+        }
+        return cachedBlacklist;
     }
 
     public static double getRadiationResistance(LivingEntity entity) {

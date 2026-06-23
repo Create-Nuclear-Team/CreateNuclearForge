@@ -1,24 +1,15 @@
 package net.nuclearteam.createnuclear.content.radiation;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 
 import net.nuclearteam.createnuclear.CNEffects;
-import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.content.effects.VicinityEffect;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
-import net.nuclearteam.createnuclear.foundation.utility.ConfigValueResolver;
-import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class RadiationEffect extends VicinityEffect {
 
@@ -29,27 +20,7 @@ public class RadiationEffect extends VicinityEffect {
     public RadiationEffect() {
         super(MobEffectCategory.HARMFUL, 15453236,
                 amplifier -> 10,
-                e -> {
-                    boolean isWearingAntiRadiationArmor = false;
-
-                    double resistance = RadiationCapability.getRadiationResistance(e);
-                    if (resistance >= 1) isWearingAntiRadiationArmor = true;
-
-                    Set<EntityType<?>> target = new HashSet<>();
-
-                    ConfigValueResolver.loadValuesInSet(CNConfigs.server().radiation.configuredLists.getEntityBlackList(), target, entity -> {
-                        ResourceLocation location = ResourceLocation.tryParse(entity);
-                        return BuiltInRegistries.ENTITY_TYPE.get(location);
-                    });
-
-                    return !e.getType().is(CNTags.CNEntityTags.IRRADIATED_IMMUNE.tag)
-                        && !e.hasEffect(CNEffects.RADIATION.get())
-                        && !isWearingAntiRadiationArmor
-                        && CNConfigs.server().radiation.enabledItemRadiation.get()
-                        && !target.contains(e.getType())
-                        && !e.isSpectator()
-                    ;
-                },
+                e -> RadiationCapability.canBeIrradiated(e) && !e.hasEffect(CNEffects.RADIATION.get()),
                 timer -> {},
                 () -> new MobEffectInstance(CNEffects.RADIATION.get(), 300)); // Custom color (hex value)
 

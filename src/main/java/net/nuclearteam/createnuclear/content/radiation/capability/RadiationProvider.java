@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear.content.radiation.capability;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -25,6 +26,9 @@ public class RadiationProvider implements ICapabilitySerializable<CompoundTag> {
         CompoundTag tag = new CompoundTag();
         tag.putDouble("radiation", instance.getRadiation());
         tag.putLong("hash", instance.getInventoryHash());
+        if (instance.getLastBiomeLocation() != null) {
+            tag.putString("lastBiome", instance.getLastBiomeLocation().toString());
+        }
         return tag;
     }
 
@@ -32,5 +36,8 @@ public class RadiationProvider implements ICapabilitySerializable<CompoundTag> {
     public void deserializeNBT(CompoundTag nbt) {
         instance.setRadiation(nbt.getDouble("radiation"));
         instance.setInventoryHash(nbt.getLong("hash"));
+        instance.setLastBiomeLocation(nbt.contains("lastBiome")
+                ? ResourceLocation.tryParse(nbt.getString("lastBiome"))
+                : null);
     }
 }

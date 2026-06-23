@@ -10,7 +10,6 @@ import java.util.List;
 public class HudRenderer {
     private static final List<HudOverlay> overlays = List.of(
             new HelmetOverlay()
-            //new RadiationOverlay(),
     );
 
     public void onHudRender(RegisterGuiOverlaysEvent event) {
