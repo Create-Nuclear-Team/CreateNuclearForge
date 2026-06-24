@@ -4,6 +4,7 @@ import com.simibubi.create.content.logistics.BigItemStack;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
@@ -11,6 +12,10 @@ import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DefaultHeatCalculator implements IHeatCalculator {
     private final int[][] formattedPattern = new int[][]{
@@ -27,13 +32,30 @@ public class DefaultHeatCalculator implements IHeatCalculator {
     private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
     @Override
-    public double computeHeat(BigFluidStack bigFluidStack, ReactorFluidType type, ReactorControllerInventory inventory, double overHeat) {
+    public double computeHeat(BigFluidStack bigFluidStack, ReactorFluidType type, ReactorControllerInventory inventory, double overHeat, ReactorDisplayState displayState) {
         double heat = 0;
 
         ListTag list = inventory.getStackInSlot(0).getOrCreateTag().getCompound("pattern").getList("Items", Tag.TAG_COMPOUND);
+        
+        Map<Item, Integer> availableItems = displayState != null && displayState.items() != null 
+                ? new HashMap<>(displayState.items()) 
+                : new HashMap<>();
+
+        Map<Integer, ItemStack> actualRods = new HashMap<>();
 
         for (int i = 0; i < list.size(); i++) {
             ItemStack currentStack = ItemStack.of(list.getCompound(i));
+            Item rodItem = currentStack.getItem();
+            
+            if (availableItems.getOrDefault(rodItem, 0) > 0) {
+                availableItems.put(rodItem, availableItems.get(rodItem) - 1);
+                actualRods.put(list.getCompound(i).getInt("Slot"), currentStack);
+            }
+        }
+
+        for (Map.Entry<Integer, ItemStack> entry : actualRods.entrySet()) {
+            int slot = entry.getKey();
+            ItemStack currentStack = entry.getValue();
             RodType rod = ItemRodTypesValue.getRodType(currentStack.getItem());
             String currentRod = "";
             if (currentStack.is(CNTags.CNItemTags.FUEL.tag) || (rod.items().size() > 0 && rod.type() == RodType.TypeRod.FUEL)) {
@@ -48,7 +70,7 @@ public class DefaultHeatCalculator implements IHeatCalculator {
             for (int j = 0; j < formattedPattern.length; j++) {
                 for (int k = 0; k < formattedPattern[j].length; k++) {
                     if (formattedPattern[j][k] == 99) continue;
-                    if (list.getCompound(i).getInt("Slot") != formattedPattern[j][k]) continue;
+                    if (slot != formattedPattern[j][k]) continue;
 
                     for (int[] offset : offsets) {
                         int nj = j + offset[0];
@@ -56,16 +78,14 @@ public class DefaultHeatCalculator implements IHeatCalculator {
                         if (nj < 0 || nj >= formattedPattern.length || nk < 0 || nk >= formattedPattern[j].length) continue;
 
                         int neighborSlot = formattedPattern[nj][nk];
-                        for (int l = 0; l < list.size(); l++) {
-                            if (list.getCompound(l).getInt("Slot") == neighborSlot) {
-                                if ("fuel".equals(currentRod)) {
-                                    ItemStack stack = ItemStack.of(list.getCompound(l));
-                                    RodType neighborRod = ItemRodTypesValue.getRodType(stack.getItem());
-                                    if (stack.is(CNTags.CNItemTags.FUEL.tag) || (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.FUEL)) {
-                                        heat += rod.proximityRodHeat();
-                                    } else if (stack.is(CNTags.CNItemTags.COOLER.tag) || (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.COOLER)) {
-                                        heat += rod.baseRodHeat() / neighborRod.proximityRodHeat();
-                                    }
+                        if (actualRods.containsKey(neighborSlot)) {
+                            if ("fuel".equals(currentRod)) {
+                                ItemStack stack = actualRods.get(neighborSlot);
+                                RodType neighborRod = ItemRodTypesValue.getRodType(stack.getItem());
+                                if (stack.is(CNTags.CNItemTags.FUEL.tag) || (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.FUEL)) {
+                                    heat += rod.proximityRodHeat();
+                                } else if (stack.is(CNTags.CNItemTags.COOLER.tag) || (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.COOLER)) {
+                                    heat += rod.baseRodHeat() / neighborRod.proximityRodHeat();
                                 }
                             }
                         }

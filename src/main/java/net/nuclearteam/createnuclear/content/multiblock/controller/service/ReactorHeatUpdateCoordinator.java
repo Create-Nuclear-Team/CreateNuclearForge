@@ -86,7 +86,7 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
             boolean allAvailable = checkPatternAvailability(configuredPattern, displayState,
                     (item, requiredCount, availableCount) -> availableCount >= requiredCount);
             if (allAvailable) {
-                heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, inventory, level);
+                heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, inventory, level, displayState);
             }
         }
         configuredPattern.getOrCreateTag().putDouble("heat", heat);
@@ -95,8 +95,8 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
 
     @Override
     public int calculateAndWriteHeat(ItemStack configuredPattern, BigFluidStack fluidStack, int totalHeatRatio,
-                                     ReactorControllerInventory inventory, Level level) {
-        int heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, inventory, level);
+                                     ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
+        int heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, inventory, level, displayState);
         configuredPattern.getOrCreateTag().putDouble("heat", heat);
         return heat;
     }

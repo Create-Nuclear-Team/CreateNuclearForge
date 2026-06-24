@@ -8,6 +8,7 @@ import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 /**
@@ -26,11 +27,11 @@ public class HeatManager {
         this(new DefaultHeatCalculator(), new DefaultOverheatController());
     }
 
-    public double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, ReactorControllerInventory inventory, Level level) {
+    public double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
         ReactorFluidType type = bigFluidStack == null ? null : bigFluidStack.getFluidtype(level);
         overheatController.updateState(totalHeatRatio, bigFluidStack, type);
 
-        return calculator.computeHeat(bigFluidStack, type, inventory, overheatController.getOverHeat());
+        return calculator.computeHeat(bigFluidStack, type, inventory, overheatController.getOverHeat(), displayState);
     }
 
     public int getLiquidTimer() { return  overheatController.getLiquidTimer();}

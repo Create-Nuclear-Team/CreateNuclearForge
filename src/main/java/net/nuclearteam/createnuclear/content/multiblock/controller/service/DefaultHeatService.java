@@ -3,6 +3,7 @@ package net.nuclearteam.createnuclear.content.multiblock.controller.service;
 import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
 
 public class DefaultHeatService implements IHeatService {
@@ -18,7 +19,7 @@ public class DefaultHeatService implements IHeatService {
     }
 
     @Override
-    public double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, ReactorControllerInventory inventory, Level level) {
-        return impl.calculateHeat(bigFluidStack, totalHeatRatio, inventory, level);
+    public double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
+        return impl.calculateHeat(bigFluidStack, totalHeatRatio, inventory, level, displayState);
     }
 }

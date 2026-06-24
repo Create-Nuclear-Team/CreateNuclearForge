@@ -40,5 +40,5 @@ public interface IReactorHeatUpdateCoordinator {
      * @return the calculated heat
      */
     int calculateAndWriteHeat(ItemStack configuredPattern, BigFluidStack fluidStack, int totalHeatRatio,
-                              ReactorControllerInventory inventory, Level level);
+                              ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState);
 }

@@ -421,7 +421,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         notifyUpdate();
 
         BigFluidStack fluidStack = currentFluidStack();
-        heat = heatCoordinator.calculateAndWriteHeat(configuredPattern, fluidStack, totalHeatRatio, inventory, level);
+        heat = heatCoordinator.calculateAndWriteHeat(configuredPattern, fluidStack, totalHeatRatio, inventory, level, displayState);
         fluidBuffer = fluidRateCalculator.tick(fluidStack, reactorSize, level, inputFluidManager, fluidBuffer);
         cycleManager.update(configuredPattern, level, inputManager, level.getGameTime() % 20 == 0);
 
