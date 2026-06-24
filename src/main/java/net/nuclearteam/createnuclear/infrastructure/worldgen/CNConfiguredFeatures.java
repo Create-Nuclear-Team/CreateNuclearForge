@@ -52,7 +52,7 @@ public class CNConfiguredFeatures {
                 OreConfiguration.target(stoneOreReplaceable, CNBlocks.THORIUM_ORE.getDefaultState()),
                 OreConfiguration.target(deepslateOreReplaceable, CNBlocks.DEEPSLATE_THORIUM_ORE.getDefaultState())
         );
-        register(ctx, THORIUM_ORE, Feature.ORE, new OreConfiguration(thoriumTargetStates, 16));
+        register(ctx, THORIUM_ORE, Feature.ORE, new OreConfiguration(thoriumTargetStates, 12));
 
         List<TargetBlockState> nitrateTargetStates = List.of(
                 OreConfiguration.target(stoneOreReplaceable, CNBlocks.NITRATE_ORE.getDefaultState()),

@@ -35,11 +35,11 @@ public class CNPlacedFeatures {
         Holder<ConfiguredFeature<?, ?>> nitrateOre = featureLookup.getOrThrow(CNConfiguredFeatures.NITRATE_ORE);
         Holder<ConfiguredFeature<?, ?>> striatedOresOverworld = featureLookup.getOrThrow(CNConfiguredFeatures.STRIATED_ORES_OVERWORLD);
 
-        register(ctx, URANIUM_ORE, uraniumOre, placementOres(CountPlacement.of(7), -63, 16));
+        register(ctx, URANIUM_ORE, uraniumOre, placementOres(CountPlacement.of(5), -63, 16));
         register(ctx, LEAD_ORE, leadOre, placementOres(CountPlacement.of(10), -16, 60));
         register(ctx, THORIUM_ORE, thoriumOre, placementOres(CountPlacement.of(8), -16, 55));
         register(ctx, NITRATE_ORE, nitrateOre, placementOres(CountPlacement.of(6), -63, 64));
-        register(ctx, STRIATED_ORES_OVERWORLD, striatedOresOverworld, placement(RarityFilter.onAverageOnceEvery(5), -63, 16));
+        register(ctx, STRIATED_ORES_OVERWORLD, striatedOresOverworld, placement(RarityFilter.onAverageOnceEvery(1), -63, 16));
 
     }
 
