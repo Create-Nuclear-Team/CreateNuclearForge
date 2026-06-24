@@ -403,7 +403,12 @@ public class CNItems {
             .tag(CNItemTags.CLOTH.tag)
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get())
                     .unlockedBy("has_white_cloth", RegistrateRecipeProvider.has(ClothItem.Cloths.WHITE_CLOTH.getItem()))
-                    .requires(CNItemTags.CLOTH.tag)
+                    // Accept any cloth EXCEPT one already of the target colour, otherwise the
+                    // recipe would let you "dye" a cloth into the colour it already is.
+                    .requires(Ingredient.of(Arrays.stream(DyeColor.values())
+                            .filter(other -> other != color)
+                            .map(other -> ClothItem.Cloths.getByColor(other).get())
+                            .toArray(ClothItem[]::new)))
                     .requires(ingredients.get(color.ordinal()))
                     .save(p, CreateNuclear.asResource("shapeless/cloth/" + c.getName()))
             )
