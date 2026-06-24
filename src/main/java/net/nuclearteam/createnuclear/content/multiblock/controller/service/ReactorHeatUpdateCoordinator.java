@@ -25,6 +25,28 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
         this.heatService = heatService;
     }
 
+    public static int calculateActualTotalHeatRatio(ItemStack configuredPattern, ReactorDisplayState displayState, Level level) {
+        Map<Item, Integer> patternCounts = PatternReader.readItemCounts(configuredPattern);
+        Map<Item, Integer> currentItems = displayState != null && displayState.items() != null
+                ? displayState.items() : Collections.emptyMap();
+
+        int totalHeatRatio = 0;
+        for (Map.Entry<Item, Integer> entry : patternCounts.entrySet()) {
+            Item item = entry.getKey();
+            int requiredCount = entry.getValue();
+            int availableCount = currentItems.getOrDefault(item, 0);
+            int countToUse = Math.min(requiredCount, availableCount);
+
+            if (countToUse > 0) {
+                RodType rodType = RodType.resolveRodType(item, level);
+                if (rodType != null && rodType.isNotEmptyItem()) {
+                    totalHeatRatio += rodType.heatRatio() * countToUse;
+                }
+            }
+        }
+        return totalHeatRatio;
+    }
+
     /** Predicate applied to each pattern entry when checking availability. */
     @FunctionalInterface
     private interface  PatternEntryCheck {
