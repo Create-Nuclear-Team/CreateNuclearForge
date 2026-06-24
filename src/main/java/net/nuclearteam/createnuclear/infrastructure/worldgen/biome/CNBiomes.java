@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class CNBiomes {
     public static final class Irradiated {
-        public static final ResourceKey<Biome> PLAIN = key("irradiated_plain");
+        public static final ResourceKey<Biome> PLAIN = key("irradiated_land");
     }
 
     public static void bootstrapRegistries(BootstapContext<Biome> context) {

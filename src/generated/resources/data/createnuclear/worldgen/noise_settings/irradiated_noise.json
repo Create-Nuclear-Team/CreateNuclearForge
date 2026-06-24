@@ -169,7 +169,7 @@
         "if_true": {
           "type": "minecraft:biome",
           "biome_is": [
-            "createnuclear:irradiated_plain"
+            "createnuclear:irradiated_land"
           ]
         },
         "then_run": {
@@ -264,7 +264,7 @@
                 "if_true": {
                   "type": "minecraft:biome",
                   "biome_is": [
-                    "createnuclear:irradiated_plain"
+                    "createnuclear:irradiated_land"
                   ]
                 },
                 "then_run": {
@@ -289,7 +289,7 @@
                 "if_true": {
                   "type": "minecraft:biome",
                   "biome_is": [
-                    "createnuclear:irradiated_plain"
+                    "createnuclear:irradiated_land"
                   ]
                 },
                 "then_run": {
