@@ -88,6 +88,7 @@
   "advancement.createnuclear.yellowcake": "The Yellowcake Process",
   "advancement.createnuclear.yellowcake.desc": "Compact uranium liquid to create yellowcake",
   "attribute.name.createnuclear.generic.irradiated_resistance": "Radiation Resistance",
+  "biome.createnuclear.irradiated_land": "Irradiated Land",
   "block.createnuclear.autunite": "Autunite",
   "block.createnuclear.autunite_pillar": "Autunite Pillar",
   "block.createnuclear.cut_autunite": "Cut Autunite",

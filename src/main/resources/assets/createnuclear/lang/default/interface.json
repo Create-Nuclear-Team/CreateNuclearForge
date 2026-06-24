@@ -1,6 +1,7 @@
 {
   "itemGroup.createnuclear.main": "Create Nuclear",
   "itemgroup.uranium": "Uranium Group",
+  "biome.createnuclear.irradiated_land": "Irradiated Land",
 
   "createnuclear.enriched.fan.recipe": "Bulk Enriching",
   "emi.category.createnuclear.fan_enriched": "Bulk Enriching",
