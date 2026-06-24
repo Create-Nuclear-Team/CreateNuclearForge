@@ -115,7 +115,7 @@ public class CNPonderReactorScenes {
         Positions pos = positionsFor(S, H);
 
         for (int y = 1; y <= H; y++) {
-            scene.overlay().showText(8)
+            scene.overlay().showText(bySections ? 25 : 8)
                     .text("Floor " + y)
                     .attachKeyFrame()
                     .placeNearTarget();
@@ -123,7 +123,10 @@ public class CNPonderReactorScenes {
             if (bySections) {
                 // One section for the whole floor: same visual build-up, a fraction of the draws.
                 scene.world().showSection(util.select().layer(y), Direction.NORTH);
-                scene.idle(4);
+                // Block-by-block got its per-floor pacing from plate^2 * idle(4). With a single
+                // section per floor we must idle explicitly, otherwise callout-free floors flash
+                // by instantly and their "Floor N" labels overlap each other.
+                scene.idle(30);
                 for (BlockPos sp : pos.specials()) {
                     if (sp.getY() == y) {
                         tryShowCallout(scene, util, pos, sp.getX(), sp.getY(), sp.getZ());
