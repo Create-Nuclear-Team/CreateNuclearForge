@@ -207,7 +207,7 @@ public class CNPonderReactorScenes {
         }
         if (x == controller.getX() && y == controller.getY() && z == controller.getZ()) {
             scene.overlay().showText(reduced ? 94 : 110)
-                    .text("Controller: brain  of the reactor, and the place where the blueprint goes to start it")
+                    .text("Controller: brain of the reactor, and the place where the blueprint goes to start it")
                     .pointAt(util.vector().blockSurface(controller, Direction.DOWN))
                     .attachKeyFrame()
                     .placeNearTarget();
