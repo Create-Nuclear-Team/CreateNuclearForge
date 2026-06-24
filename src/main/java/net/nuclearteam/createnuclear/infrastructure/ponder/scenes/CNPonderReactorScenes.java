@@ -38,6 +38,11 @@ public class CNPonderReactorScenes {
             this.alarm = alarm;
             this.output = output;
         }
+
+        /** All blocks that carry an explanatory callout, so a section-based reveal can show them per layer. */
+        BlockPos[] specials() {
+            return new BlockPos[] { controller, input1, input2, liquidInput, alarm, output };
+        }
     }
 
     /** * Map statique – remplis/ajuste les coordonnées ici pour chaque taille (multiblockSize). * Exemple : clef = 5 pour S_T1 (5x5), 7 pour S_T2, 9 pour S_T3. * * Règle : x/z en 0..plate-1, y en 1..H ; adapte ces valeurs exactement comme dans ton NBT. */
@@ -97,13 +102,17 @@ public class CNPonderReactorScenes {
     }
 
     private static void showReactorStructure(SceneBuilder scene, SceneBuildingUtil util, int S, int H, int plate) {
+        showReactorStructure(scene, util, S, H, plate, false);
+    }
+
+    /**
+     * @param bySections when true, each floor is revealed as a single render section instead of
+     *        block-by-block. Block-by-block creates one {@code WorldSectionElement} per cell
+     *        ({@code H * plate^2}, e.g. 1859 for T3) and they all keep rendering every frame, which
+     *        is what makes the larger tiers lag past ~2/3 of the scene. T1/T2 stay block-by-block.
+     */
+    private static void showReactorStructure(SceneBuilder scene, SceneBuildingUtil util, int S, int H, int plate, boolean bySections) {
         Positions pos = positionsFor(S, H);
-        BlockPos controller = pos.controller;
-        BlockPos output = pos.output;
-        BlockPos input1 = pos.input1;
-        BlockPos input2 = pos.input2;
-        BlockPos liquidInput = pos.liquidInput;
-        BlockPos alarm = pos.alarm;
 
         for (int y = 1; y <= H; y++) {
             scene.overlay().showText(8)
@@ -111,59 +120,21 @@ public class CNPonderReactorScenes {
                     .attachKeyFrame()
                     .placeNearTarget();
 
-            for (int x = 0; x < plate; x++) {
-                for (int z = 0; z < plate; z++) {
-                    scene.world().showSection(util.select().position(x, y, z), Direction.NORTH);
-                    scene.idle(4);
-
-                    if (x == input1.getX() && y == input1.getY() && z == input1.getZ()) {
-                        scene.overlay().showText(90)
-                                .text("Input: stores one stack of rod (free placing : can replace any casing not in the edge)")
-                                .pointAt(util.vector().blockSurface(input1, Direction.UP))
-                                .attachKeyFrame()
-                                .placeNearTarget();
-                        scene.idle(80);
+            if (bySections) {
+                // One section for the whole floor: same visual build-up, a fraction of the draws.
+                scene.world().showSection(util.select().layer(y), Direction.NORTH);
+                scene.idle(4);
+                for (BlockPos sp : pos.specials()) {
+                    if (sp.getY() == y) {
+                        tryShowCallout(scene, util, pos, sp.getX(), sp.getY(), sp.getZ());
                     }
-                    if (x == input2.getX() && y == input2.getY() && z == input2.getZ()) {
-                        scene.overlay().showText(110)
-                                .text("Second input: needed because you will likely have one input " +
-                                        "of fuel rod and one for coolant (free placing)")
-                                .pointAt(util.vector().blockSurface(input2, Direction.UP))
-                                .attachKeyFrame()
-                                .placeNearTarget();
-                        scene.idle(80);
-                    }
-                    if (x == liquidInput.getX() && y == liquidInput.getY() && z == liquidInput.getZ()) {
-                        scene.overlay().showText(90)
-                                .text("Liquid Input: cooling fluid inlet (free placing)")
-                                .pointAt(util.vector().blockSurface(liquidInput, Direction.UP))
-                                .attachKeyFrame()
-                                .placeNearTarget();
-                        scene.idle(80);
-                    }
-                    if (x == alarm.getX() && y == alarm.getY() && z == alarm.getZ()) {
-                        scene.overlay().showText(90)
-                                .text("Alarm: will sound if reactor overheats (free placing)")
-                                .pointAt(util.vector().blockSurface(alarm, Direction.UP))
-                                .attachKeyFrame()
-                                .placeNearTarget();
-                        scene.idle(80);
-                    }
-                    if (x == output.getX() && y == output.getY() && z == output.getZ()) {
-                        scene.overlay().showText(90)
-                                .text("Output: where the generated power is extracted (free placing)")
-                                .pointAt(util.vector().blockSurface(output, Direction.UP))
-                                .attachKeyFrame()
-                                .placeNearTarget();
-                        scene.idle(80);
-                    }
-                    if (x == controller.getX() && y == controller.getY() && z == controller.getZ()) {
-                        scene.overlay().showText(110)
-                                .text("Controller: brain  of the reactor, and the place where the blueprint goes to start it")
-                                .pointAt(util.vector().blockSurface(controller, Direction.DOWN))
-                                .attachKeyFrame()
-                                .placeNearTarget();
-                        scene.idle(80);
+                }
+            } else {
+                for (int x = 0; x < plate; x++) {
+                    for (int z = 0; z < plate; z++) {
+                        scene.world().showSection(util.select().position(x, y, z), Direction.NORTH);
+                        scene.idle(4);
+                        tryShowCallout(scene, util, pos, x, y, z);
                     }
                 }
             }
@@ -173,12 +144,68 @@ public class CNPonderReactorScenes {
         scene.overlay()
                 .showText(110)
                 .text("To start the reactor you will need liquid and rods corresponding to the pattern, then right click the controller with the blueprint in hand");
-        Vec3 topSide = util.vector().blockSurface(controller, Direction.EAST);
+        Vec3 topSide = util.vector().blockSurface(pos.controller, Direction.EAST);
         scene.overlay()
                 .showControls(topSide, Pointing.UP, 60)
                 .withItem(CNItems.REACTOR_BLUEPRINT.asStack())
                 .rightClick();
-        scene.world().modifyBlock(controller, s -> s.setValue(ReactorControllerBlock.ASSEMBLED, true), true);
+        scene.world().modifyBlock(pos.controller, s -> s.setValue(ReactorControllerBlock.ASSEMBLED, true), true);
+    }
+
+    /** Shows the explanatory callout for the special block at (x,y,z), if any. Shared by both reveal modes. */
+    private static void tryShowCallout(SceneBuilder scene, SceneBuildingUtil util, Positions pos, int x, int y, int z) {
+        BlockPos input1 = pos.input1, input2 = pos.input2, liquidInput = pos.liquidInput,
+                alarm = pos.alarm, output = pos.output, controller = pos.controller;
+
+        if (x == input1.getX() && y == input1.getY() && z == input1.getZ()) {
+            scene.overlay().showText(90)
+                    .text("Input: stores one stack of rod (free placing : can replace any casing not in the edge)")
+                    .pointAt(util.vector().blockSurface(input1, Direction.UP))
+                    .attachKeyFrame()
+                    .placeNearTarget();
+            scene.idle(80);
+        }
+        if (x == input2.getX() && y == input2.getY() && z == input2.getZ()) {
+            scene.overlay().showText(110)
+                    .text("Second input: needed because you will likely have one input " +
+                            "of fuel rod and one for coolant (free placing)")
+                    .pointAt(util.vector().blockSurface(input2, Direction.UP))
+                    .attachKeyFrame()
+                    .placeNearTarget();
+            scene.idle(80);
+        }
+        if (x == liquidInput.getX() && y == liquidInput.getY() && z == liquidInput.getZ()) {
+            scene.overlay().showText(90)
+                    .text("Liquid Input: cooling fluid inlet (free placing)")
+                    .pointAt(util.vector().blockSurface(liquidInput, Direction.UP))
+                    .attachKeyFrame()
+                    .placeNearTarget();
+            scene.idle(80);
+        }
+        if (x == alarm.getX() && y == alarm.getY() && z == alarm.getZ()) {
+            scene.overlay().showText(90)
+                    .text("Alarm: will sound if reactor overheats (free placing)")
+                    .pointAt(util.vector().blockSurface(alarm, Direction.UP))
+                    .attachKeyFrame()
+                    .placeNearTarget();
+            scene.idle(80);
+        }
+        if (x == output.getX() && y == output.getY() && z == output.getZ()) {
+            scene.overlay().showText(90)
+                    .text("Output: where the generated power is extracted (free placing)")
+                    .pointAt(util.vector().blockSurface(output, Direction.UP))
+                    .attachKeyFrame()
+                    .placeNearTarget();
+            scene.idle(80);
+        }
+        if (x == controller.getX() && y == controller.getY() && z == controller.getZ()) {
+            scene.overlay().showText(110)
+                    .text("Controller: brain  of the reactor, and the place where the blueprint goes to start it")
+                    .pointAt(util.vector().blockSurface(controller, Direction.DOWN))
+                    .attachKeyFrame()
+                    .placeNearTarget();
+            scene.idle(80);
+        }
     }
 
     public static void t1(SceneBuilder scene, SceneBuildingUtil util) {
@@ -214,6 +241,7 @@ public class CNPonderReactorScenes {
         scene.showBasePlate();
         scene.rotateCameraY(180);
         scene.scaleSceneView(0.35f);
-        showReactorStructure(scene, util, S, H, plate);
+        // T3 reveals floor-by-floor (section-based) so the largest tier doesn't lag; T1/T2 stay block-by-block.
+        showReactorStructure(scene, util, S, H, plate, true);
     }
 }
