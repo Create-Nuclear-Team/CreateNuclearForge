@@ -129,7 +129,7 @@ public class CNPonderReactorScenes {
                 scene.idle(30);
                 for (BlockPos sp : pos.specials()) {
                     if (sp.getY() == y) {
-                        tryShowCallout(scene, util, pos, sp.getX(), sp.getY(), sp.getZ());
+                        tryShowCallout(scene, util, pos, sp.getX(), sp.getY(), sp.getZ(), bySections);
                     }
                 }
             } else {
@@ -137,7 +137,7 @@ public class CNPonderReactorScenes {
                     for (int z = 0; z < plate; z++) {
                         scene.world().showSection(util.select().position(x, y, z), Direction.NORTH);
                         scene.idle(4);
-                        tryShowCallout(scene, util, pos, x, y, z);
+                        tryShowCallout(scene, util, pos, x, y, z, bySections);
                     }
                 }
             }
@@ -155,59 +155,63 @@ public class CNPonderReactorScenes {
         scene.world().modifyBlock(pos.controller, s -> s.setValue(ReactorControllerBlock.ASSEMBLED, true), true);
     }
 
-    /** Shows the explanatory callout for the special block at (x,y,z), if any. Shared by both reveal modes. */
-    private static void tryShowCallout(SceneBuilder scene, SceneBuildingUtil util, Positions pos, int x, int y, int z) {
+    /**
+     * Shows the explanatory callout for the special block at (x,y,z), if any. Shared by both reveal
+     * modes. When {@code reduced} is true (T3), these block-explanation texts run 15% shorter
+     * (90->77, 110->94, hold 80->68); the other tiers keep the original durations.
+     */
+    private static void tryShowCallout(SceneBuilder scene, SceneBuildingUtil util, Positions pos, int x, int y, int z, boolean reduced) {
         BlockPos input1 = pos.input1, input2 = pos.input2, liquidInput = pos.liquidInput,
                 alarm = pos.alarm, output = pos.output, controller = pos.controller;
 
         if (x == input1.getX() && y == input1.getY() && z == input1.getZ()) {
-            scene.overlay().showText(90)
+            scene.overlay().showText(reduced ? 77 : 90)
                     .text("Input: stores one stack of rod (free placing : can replace any casing not in the edge)")
                     .pointAt(util.vector().blockSurface(input1, Direction.UP))
                     .attachKeyFrame()
                     .placeNearTarget();
-            scene.idle(80);
+            scene.idle(reduced ? 68 : 80);
         }
         if (x == input2.getX() && y == input2.getY() && z == input2.getZ()) {
-            scene.overlay().showText(110)
+            scene.overlay().showText(reduced ? 94 : 110)
                     .text("Second input: needed because you will likely have one input " +
                             "of fuel rod and one for coolant (free placing)")
                     .pointAt(util.vector().blockSurface(input2, Direction.UP))
                     .attachKeyFrame()
                     .placeNearTarget();
-            scene.idle(80);
+            scene.idle(reduced ? 68 : 80);
         }
         if (x == liquidInput.getX() && y == liquidInput.getY() && z == liquidInput.getZ()) {
-            scene.overlay().showText(90)
+            scene.overlay().showText(reduced ? 77 : 90)
                     .text("Liquid Input: cooling fluid inlet (free placing)")
                     .pointAt(util.vector().blockSurface(liquidInput, Direction.UP))
                     .attachKeyFrame()
                     .placeNearTarget();
-            scene.idle(80);
+            scene.idle(reduced ? 68 : 80);
         }
         if (x == alarm.getX() && y == alarm.getY() && z == alarm.getZ()) {
-            scene.overlay().showText(90)
+            scene.overlay().showText(reduced ? 77 : 90)
                     .text("Alarm: will sound if reactor overheats (free placing)")
                     .pointAt(util.vector().blockSurface(alarm, Direction.UP))
                     .attachKeyFrame()
                     .placeNearTarget();
-            scene.idle(80);
+            scene.idle(reduced ? 68 : 80);
         }
         if (x == output.getX() && y == output.getY() && z == output.getZ()) {
-            scene.overlay().showText(90)
+            scene.overlay().showText(reduced ? 77 : 90)
                     .text("Output: where the generated power is extracted (free placing)")
                     .pointAt(util.vector().blockSurface(output, Direction.UP))
                     .attachKeyFrame()
                     .placeNearTarget();
-            scene.idle(80);
+            scene.idle(reduced ? 68 : 80);
         }
         if (x == controller.getX() && y == controller.getY() && z == controller.getZ()) {
-            scene.overlay().showText(110)
+            scene.overlay().showText(reduced ? 94 : 110)
                     .text("Controller: brain  of the reactor, and the place where the blueprint goes to start it")
                     .pointAt(util.vector().blockSurface(controller, Direction.DOWN))
                     .attachKeyFrame()
                     .placeNearTarget();
-            scene.idle(80);
+            scene.idle(reduced ? 68 : 80);
         }
     }
 
