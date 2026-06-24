@@ -351,7 +351,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             int heat = (int) this.getConfiguredPatternTag().getDouble("heat");
             countCoolerRod = this.getConfiguredPatternTag().getInt("countCoolerRod");
             countFuelRod = this.getConfiguredPatternTag().getInt("countFuelRod");
-            totalHeatRatio = this.getConfiguredPatternTag().getInt("totalHeatRatio");
+            totalHeatRatio = ReactorHeatUpdateCoordinator.calculateActualTotalHeatRatio(configuredPattern, displayState, level);
         }
         resolveEntitiesIfNeeded();
 
