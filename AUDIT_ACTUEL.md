@@ -36,11 +36,13 @@ La **dette la plus structurelle reste l'absence totale de tests** (`src/test` vi
 
 ### 🔴 Critique — performance/correction du scan multiblock
 
-1. **Scan géométrique du contrôleur : aucune garde client + double appel sur un même événement** *(tous confirmés)*
-   - `ReactorPattern.findController`/`findControllerPos` (`ReactorPattern.java:34-71`) scannent ~3 971 blocs (11×19×19, `new BlockPos` par itération, borne `!=`) avec **aucune garde `level.isClientSide()`** nulle part dans la chaîne `onPlace/onRemove/playerDestroy → findController → ReactorAssembler.assemble/disassemble`. Or `assemble`/`disassemble` **mutent l'état de la BlockEntity** (`setAssembled`, `setMultiblockSize`, `removeIOAll`) et envoient un message joueur → mutation métier potentiellement **exécutée deux fois** (client + serveur) à chaque pose/casse autour d'un réacteur.
-   - **Double appel à la casse** : `ReactorCasing.java` appelle `findController` dans **`playerDestroy` (l.60) ET `onRemove` (l.66)** pour le même événement → deux scans complets. Idem `ReactorCooler.java` (l.39 + l.45). ⚠️ `ReactorFrame.java` est en revanche **plus malin** : son `onRemove` garde `if (!state.is(newState.getBlock()))` (l.128-135) — modèle à généraliser.
-   - **Spam de log** : `ReactorAssembler.assemble` logue en `LOGGER.warn` (`ReactorAssembler.java:37-38`) à **chaque** réussite de pattern → spam en conditions normales de jeu.
-   - *Recommandation* : `if (level.isClientSide()) return;` en tête de `findController`/`findControllerPos` ; supprimer l'appel redondant dans `ReactorCasing.playerDestroy`/`ReactorCooler.playerDestroy` (garder `onRemove`, idéalement avec la garde de `ReactorFrame`) ; `LOGGER.warn` → `LOGGER.debug`. Risque très faible, gain net en multijoueur. **C'est le problème de perf/correction le plus concret du projet.**
+1. **Scan géométrique du contrôleur : aucune garde client + double appel sur un même événement** *(partiellement corrigé, revérifié 2026-06-24)*
+   - ✅ **Corrigé** — `ReactorPattern.findController`/`findControllerPos` (`ReactorPattern.java`) partagent désormais une seule boucle de scan (`scanControllerCandidates`) avec court-circuit dès qu'un controller pertinent est trouvé. `findController` filtre maintenant via `isInReactorRange` : un controller voisin déjà assemblé dont la structure n'inclut pas `blockPos` n'est plus ré-assemblé/désassemblé inutilement (évitait un risque de double-enregistrement I/O via `ReactorAssembler.findAndRegisterSpecialBlocks`, qui n'est pas idempotent).
+   - ✅ **Corrigé** — `MultiblockHelpers.handleOnPlace`/`handleRemoval` faisaient **deux scans complets** par pose/casse (`findController` puis `findControllerPos`). Fusionné en un seul scan via une nouvelle surcharge `findControllerPos(pos, level, first)` qui fait le travail d'assemblage **et** retourne le controller pertinent ; la surcharge `handleOnPlace(pos, level, boolean)` (devenue inutilisée) a été supprimée.
+   - ❌ **Toujours non corrigé** — **aucune garde `level.isClientSide()`** nulle part dans la chaîne `onPlace/onRemove/playerDestroy → findController/findControllerPos → ReactorAssembler.assemble/disassemble`. Mutation d'état métier toujours potentiellement exécutée côté client en plus du serveur.
+   - ❌ **Toujours non corrigé** — **double appel à la casse** : `ReactorCasing.java` appelle toujours `pattern.findController` dans **`playerDestroy` (l.60) ET `onRemove` (l.66)** pour le même événement → deux scans complets. Idem `ReactorCooler.java` (l.39 + l.45). `ReactorFrame.java` reste le seul à garder `if (!state.is(newState.getBlock()))` côté `onRemove`.
+   - ❌ **Toujours non corrigé** — **spam de log** : `ReactorAssembler.assemble` logue toujours en `LOGGER.warn` (`ReactorAssembler.java:40-41`) à chaque réussite de pattern.
+   - *Reste à faire* : `if (level.isClientSide()) return;` en tête de `findController`/`findControllerPos` ; supprimer l'appel redondant dans `ReactorCasing.playerDestroy`/`ReactorCooler.playerDestroy` (garder `onRemove`) ; `LOGGER.warn` → `LOGGER.debug`. Risque très faible, gain net en multijoueur — **reste la priorité n°1 du projet**, mais le scan lui-même (le plus coûteux des deux problèmes initiaux) est désormais optimisé et plus sûr sur les multiblocks voisins.
 
 ### 🟠 Importants
 
@@ -121,7 +123,7 @@ La **dette la plus structurelle reste l'absence totale de tests** (`src/test` vi
 
 | Point | État | Réf. |
 |---|---|---|
-| `ReactorPattern.findController/findControllerPos` : ~3 971 blocs ×2 par casse, **sans garde client**, mutation d'état métier potentiellement double | ❌ non corrigé — **priorité n°1** | §2.1 |
+| `ReactorPattern.findController/findControllerPos` : scan fusionné + court-circuit + filtre `isInReactorRange` (✅), double scan `MultiblockHelpers` éliminé (✅) ; **sans garde client** (❌), double appel `playerDestroy`+`onRemove` sur `ReactorCasing`/`ReactorCooler` (❌) | 🟡 partiellement corrigé — reste **priorité n°1** | §2.1 |
 | `DefaultHeatCalculator.computeHeat` : ~O(n²) + désérialisation NBT par cellule, à chaque tick | ❌ non corrigé | §2.2 |
 | `HelmetOverlay.renderHotbar` + 3× `getArmor(HEAD)`/frame | ❌ non corrigé | — |
 | `clearLockIfAllInputsEmpty` : ancien scan cubique `O(n³)` | ✅ **corrigé** (utilise `inputFluidManager.getFuildHandlers`) | §3 |
@@ -147,8 +149,8 @@ Vérifiés résolus dans le code actuel : **B2** (`RadiationSyncPacket` supprim�
 ## 7. 🗺️ Feuille de route — priorités
 
 **Quick wins (risque quasi nul, gain immédiat)**
-1. Garde `level.isClientSide()` sur `findController`/`findControllerPos`/`ReactorAssembler` (§2.1). **← le plus rentable.**
-2. Retirer l'appel redondant à `findController` dans `ReactorCasing.playerDestroy` + `ReactorCooler.playerDestroy` (généraliser la garde de `ReactorFrame.onRemove`).
+1. Garde `level.isClientSide()` sur `findController`/`findControllerPos`/`ReactorAssembler` (§2.1). **← le plus rentable, toujours à faire.**
+2. Retirer l'appel redondant à `findController` dans `ReactorCasing.playerDestroy` + `ReactorCooler.playerDestroy` (généraliser la garde de `ReactorFrame.onRemove`). *(Toujours à faire — distinct du double-scan `MultiblockHelpers`, déjà corrigé le 2026-06-24.)*
 3. `ReactorAssembler` : `LOGGER.warn` → `LOGGER.debug` (l.37).
 4. `IHeat.HeatLevel.isNotDanger` : corriger la tautologie (`!= DANGER` seul), après confirmation balance.
 5. `NuclearExplosionEntity` (B15) : remplacer le try/catch de contrôle par une vérification explicite.

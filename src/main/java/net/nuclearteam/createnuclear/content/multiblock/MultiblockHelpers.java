@@ -18,9 +18,7 @@ public class MultiblockHelpers {
      * invoke provided callbacks to register or remove parts.
      */
     public static void handleOnPlace(BlockPos pos, Level level, BiConsumer<ReactorControllerBlockEntity, BlockPos> register) {
-        handleOnPlace(pos, level, true);
-
-        BlockPos controllerPos = pattern.findControllerPos(pos, level);
+        BlockPos controllerPos = pattern.findControllerPos(pos, level, true);
         if (controllerPos != null) {
             ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
             if (controllerBlockEntity != null) {
@@ -29,18 +27,8 @@ public class MultiblockHelpers {
         }
     }
 
-    /**
-     * Called when a multiblock part is placed. Locates the controller and
-     * invokes {@code register} with the controller and placed part position.
-     */
-    public static void handleOnPlace(BlockPos pos, Level level, boolean first) {
-        pattern.findController(pos, level, first);
-    }
-
     public static void handleRemoval(BlockPos pos, Level level, BiConsumer<ReactorControllerBlockEntity, BlockPos> remover) {
-        handleOnPlace(pos, level, false);
-
-        BlockPos controllerPos = pattern.findControllerPos(pos, level);
+        BlockPos controllerPos = pattern.findControllerPos(pos, level, false);
         if (controllerPos != null) {
             ReactorControllerBlockEntity controllerBlockEntity = (ReactorControllerBlockEntity) level.getBlockEntity(controllerPos);
             if (controllerBlockEntity != null) {
