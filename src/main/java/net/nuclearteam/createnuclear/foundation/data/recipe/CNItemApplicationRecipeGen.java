@@ -1,6 +1,7 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
 import com.simibubi.create.AllBlocks;
+import com.simibubi.create.AllItems;
 import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.api.data.recipe.ItemApplicationRecipeGen;
 import net.minecraft.data.PackOutput;
@@ -31,6 +32,12 @@ public class CNItemApplicationRecipeGen extends ItemApplicationRecipeGen {
             Items.HOPPER,
             CNBlocks.REACTOR_CASING.get(),
             CNBlocks.REACTOR_INPUT.get()
+    );
+
+    GeneratedRecipe REACTOR_LIQUID_INPUT = itemApplication("reactor_liquid_input_from_fluid_pipe_and_reactor_casing",
+            AllBlocks.FLUID_PIPE.asItem(),
+            CNBlocks.REACTOR_CASING.get(),
+            CNBlocks.REACTOR_LIQUID_INPUT.get()
     );
 
     protected GeneratedRecipe itemApplication(String name, Ingredient ingredient, ItemLike input, ItemLike output) {

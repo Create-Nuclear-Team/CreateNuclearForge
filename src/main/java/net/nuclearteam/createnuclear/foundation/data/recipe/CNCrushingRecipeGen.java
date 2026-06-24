@@ -32,11 +32,11 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
         COAL_DUST = create("coal", b -> b
             .duration(250)
             .require(ItemTags.COALS)
-            .output(.50f, CNItems.COAL_DUST)
+            .output(0.50f, CNItems.COAL_DUST)
         ),
 
         GRANITE_URANIUM_POWDER = create(() -> Items.GRANITE, b -> b.duration(250)
-            .output(.5f, CNItems.URANIUM_POWDER)
+            .output(0.5f, CNItems.URANIUM_POWDER)
             .output(1f, Blocks.RED_SAND)
         ),
 
@@ -48,32 +48,32 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
         RAW_THORIUM_BLOCK = create(() -> CNBlocks.RAW_THORIUM_BLOCK, b -> b
             .duration(250)
             .output(1, CNItems.THORIUM_DUST, 9)
-            .output(0.5f, CNItems.THORIUM_DUST, 72)
+            .output(0.75f, AllItems.EXP_NUGGET, 9)
         ),
 
         RAW_THORIUM_ITEM = create(() -> CNItems.RAW_THORIUM, b -> b
                 .duration(125)
                 .output(1, CNItems.THORIUM_DUST, 1)
-                .output(0.5f, CNItems.THORIUM_DUST, 8)
+                .output(0.75f, AllItems.EXP_NUGGET, 1)
         ),
 
         RAW_ZINC = create(() -> AllItems.RAW_ZINC, b -> b.duration(250)
             .output(1, AllItems.CRUSHED_ZINC, 1)
-            .output(.75f, AllItems.EXP_NUGGET, 1)
-            .output(.25f, CNItems.LEAD_NUGGET,1)
+            .output(0.75f, AllItems.EXP_NUGGET, 1)
+            .output(0.25f, CNItems.LEAD_NUGGET,1)
         ),
 
         RAW_COPPER = create(() -> Items.RAW_COPPER, b -> b.duration(250)
             .output(1, AllItems.CRUSHED_COPPER, 1)
-            .output(.75f, AllItems.EXP_NUGGET, 1)
-            .output(.15f, CNItems.LEAD_NUGGET,1)
+            .output(0.75f, AllItems.EXP_NUGGET, 1)
+            .output(0.15f, CNItems.LEAD_NUGGET,1)
         ),
 
         NITRATE = create("nitrate", b -> b
                 .require(AllPaletteStoneTypes.LIMESTONE.materialTag)
                 .duration(250)
-                .output(.6f, CNItems.NITRATE, 1)
-                .output(.4f, CNItems.LEAD_NUGGET, 1)
+                .output(0.6f, CNItems.NITRATE, 1)
+                .output(0.4f, CNItems.LEAD_NUGGET, 1)
         )
     ;
 
