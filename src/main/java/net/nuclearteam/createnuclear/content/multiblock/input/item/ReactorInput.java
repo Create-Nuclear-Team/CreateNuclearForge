@@ -16,7 +16,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -80,19 +79,16 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
 
 
     @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
-        withBlockEntityDo(level, pos, be -> ItemHelper.dropContents(level, pos, be.inventory));
-        MultiblockHelpers.handleRemoval(pos, level, ReactorControllerBlockEntity::removeInput);
-    }
-
-    @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+        // Only act when the block is actually removed/replaced, not on a mere state change
+        // (e.g. a FACING update) — otherwise rotating the block would spill its rods.
+        if (!pState.is(pNewState.getBlock())) {
+            // Drop the contents BEFORE super removes the block entity: super.onRemove()
+            // calls level.removeBlockEntity(pos), after which the inventory is gone.
+            withBlockEntityDo(pLevel, pPos, be -> ItemHelper.dropContents(pLevel, pPos, be.inventory));
+            MultiblockHelpers.handleRemoval(pPos, pLevel, ReactorControllerBlockEntity::removeInput);
+        }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-
-        withBlockEntityDo(pLevel, pPos, be -> ItemHelper.dropContents(pLevel, pPos, be.inventory));
-        pLevel.removeBlockEntity(pPos);
-        MultiblockHelpers.handleRemoval(pPos, pLevel, ReactorControllerBlockEntity::removeInput);
     }
 
     @Override
