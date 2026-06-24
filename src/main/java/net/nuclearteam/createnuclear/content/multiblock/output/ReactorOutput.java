@@ -54,26 +54,6 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
         super.createBlockStateDefinition(builder);
     }
 
-    @Override
-    public @NotNull InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (level.isClientSide)
-            return InteractionResult.SUCCESS;
-        else {
-            ReactorOutputEntity outputEntity = getBlockEntity(level, pos);
-            if (outputEntity == null) return InteractionResult.PASS;
-
-            ReactorControllerBlock controller = outputEntity.controller;
-            if (controller != null){
-                ReactorControllerBlockEntity entity = controller.getBlockEntity(level, pos.above(3));
-                if (entity != null && entity.getAssembled()){
-                    if (outputEntity.getDir() == 0)
-                        outputEntity.setDir(1, level, pos);
-                    else outputEntity.setDir(0, level, pos);
-                }
-            }
-            return InteractionResult.CONSUME;
-        }
-    }
 
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
