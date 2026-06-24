@@ -20,7 +20,13 @@ public class IrradiatedOverlayRendererVision {
 
     public static void renderOverlay(ForgeGui gui, GuiGraphics graphics, float partialTicks, int width, int height) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.options.hideGui || mc.gameMode.getPlayerMode() == GameType.SPECTATOR) return;
+        GameType playerMode = mc.gameMode.getPlayerMode();
+        // Skip the irradiated vision overlay in creative/spectator: the effect icon still
+        // shows in the HUD so the player stays aware, but the screen overlay is not applied.
+        if (mc.options.hideGui || playerMode == GameType.SPECTATOR || playerMode == GameType.CREATIVE) {
+            irradiatedVisionAlpha = 0.0f;
+            return;
+        }
         LocalPlayer localPlayer = mc.player;
         if (localPlayer == null) return;
         RenderSystem.enableBlend();
