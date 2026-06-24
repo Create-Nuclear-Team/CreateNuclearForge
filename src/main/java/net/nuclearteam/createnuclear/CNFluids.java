@@ -95,7 +95,7 @@ public class CNFluids {
             .lang("Liquid Nitrogen")
             .tag(CNFluidTags.NITROGEN.tag)
             .properties(p -> p.viscosity(1000)
-                .density(0)
+                .density(1000)
                 .canSwim(true)
                 .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_AXOLOTL)
                 .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_FISH)
