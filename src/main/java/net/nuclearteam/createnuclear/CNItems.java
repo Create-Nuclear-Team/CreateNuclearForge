@@ -65,7 +65,7 @@ public class CNItems {
             ResourceLocation baseParent = p.modLoc("item/" + c.getName() + "/item");
             ItemModelBuilder outer = p.withExistingParent(c.getName(), baseParent);
             // DyeColor.values() is ordered by id (0..15); overrides must be ascending by predicate
-            // value so vanilla override resolution selects the exact color (returns last match <= value).
+            // value so vanilla override resolution selects the exact color (returns last match <= value).cloth
             // The cloth_color property is clamped to [0,1] (see CreateNuclearClient), hence the
             // (id+1)/16 normalization here must match the value returned there exactly.
             for (DyeColor color : DyeColor.values()) {

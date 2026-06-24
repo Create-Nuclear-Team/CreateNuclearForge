@@ -1,4 +1,4 @@
-// 1.20.1	2026-06-22T19:57:09.3633092	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-06-24T11:17:44.2114024	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -507,22 +507,22 @@ af81c9ed277e6f3d0d9e48d413247debcc7b64be data/createnuclear/recipes/polished_cut
 9cd62ff9cbce5c4a5293c7bfcb9c8c35d68ea91e data/createnuclear/recipes/polished_cut_autunite_stairs_from_stone_types_autunite_stonecutting.json
 e74d31ed68a39baca7d719338fdfeb71a9cea9a4 data/createnuclear/recipes/polished_cut_autunite_wall.json
 bd7dd55600eb9ddebb17ac6932cf77f0538bfe02 data/createnuclear/recipes/polished_cut_autunite_wall_from_stone_types_autunite_stonecutting.json
-1713ce33da8ce2fd0145e9921cab615d31fa5e66 data/createnuclear/recipes/shapeless/cloth/black_cloth.json
-0d0c71a2b494a34439cb2d7873b31083b07877b0 data/createnuclear/recipes/shapeless/cloth/blue_cloth.json
-e6ec8d394df502aa1dcebd16d1ed0275f92e9d2a data/createnuclear/recipes/shapeless/cloth/brown_cloth.json
-8d0f363323584bcdefe7803e9057f252b63fd12d data/createnuclear/recipes/shapeless/cloth/cyan_cloth.json
-fff014f30a041fad100ceefcf70ed9e8a00c318c data/createnuclear/recipes/shapeless/cloth/gray_cloth.json
-cdd6de83eccb34f7bc4f38c6a92a32a74b7b3ff7 data/createnuclear/recipes/shapeless/cloth/green_cloth.json
-fe147f38895f8b99412c53a6f7530a1e9575003c data/createnuclear/recipes/shapeless/cloth/light_blue_cloth.json
-ab94d1c13af2e4bef0c92b8486108940180d3f9d data/createnuclear/recipes/shapeless/cloth/light_gray_cloth.json
-2cd96d4f78b81393bff120448e9a14235cf2376b data/createnuclear/recipes/shapeless/cloth/lime_cloth.json
-a22692736ff403a44bca8ef34b5f97a855eb0a7a data/createnuclear/recipes/shapeless/cloth/magenta_cloth.json
-bbc2714fa8586db7d42db2c1e4375accd7c264d2 data/createnuclear/recipes/shapeless/cloth/orange_cloth.json
-d6be8ab92dd0caa9df946afb83868ce278c2c437 data/createnuclear/recipes/shapeless/cloth/pink_cloth.json
-fa041c5a7e252bed6dc4636a45e5857d7e14dcb1 data/createnuclear/recipes/shapeless/cloth/purple_cloth.json
-c863e58a1e11f9b8a925b08b321d45f76cb96de4 data/createnuclear/recipes/shapeless/cloth/red_cloth.json
-2d315d82efde22d511e339baec628babdce5767f data/createnuclear/recipes/shapeless/cloth/white_cloth.json
-fac232af7ba0edf6cf8e0f018cf53678457e652e data/createnuclear/recipes/shapeless/cloth/yellow_cloth.json
+7d07afbab06c52adaf8463f256c238eb59e2969a data/createnuclear/recipes/shapeless/cloth/black_cloth.json
+4f14ccebaae840b99856155c779da52cc820c0fd data/createnuclear/recipes/shapeless/cloth/blue_cloth.json
+14d9c62de0aa59106b31785092acd2d1f4f5fa78 data/createnuclear/recipes/shapeless/cloth/brown_cloth.json
+481f0fcad9e386443f4abb193572be6dea20c50a data/createnuclear/recipes/shapeless/cloth/cyan_cloth.json
+8cb32e458634f2217f7b8fc0cb785cbbddb3e98d data/createnuclear/recipes/shapeless/cloth/gray_cloth.json
+b67355b2e6d9b792cc18ed12a95487277c27469c data/createnuclear/recipes/shapeless/cloth/green_cloth.json
+66de7a4a6f768e68b6a81a1510c3b4f1ae62b2fe data/createnuclear/recipes/shapeless/cloth/light_blue_cloth.json
+b04f0b6f3875abf2207f19951f6a078e7445bb83 data/createnuclear/recipes/shapeless/cloth/light_gray_cloth.json
+9f43e08955d8c269ec514e4bb66d186f1b60f34f data/createnuclear/recipes/shapeless/cloth/lime_cloth.json
+5a3bd7aeee574101cff4ab42aadfcc697ac05a16 data/createnuclear/recipes/shapeless/cloth/magenta_cloth.json
+b282815b9b858c78ba00870d4e795bc50d1c0380 data/createnuclear/recipes/shapeless/cloth/orange_cloth.json
+7e40f80880139ffd26def352e1f0c17b2b05872c data/createnuclear/recipes/shapeless/cloth/pink_cloth.json
+1cb11c3bbe8393116da50ac4e181ac1b68fbc7ee data/createnuclear/recipes/shapeless/cloth/purple_cloth.json
+389c841c99a2ef68a4eba3dca414952d3c3d9099 data/createnuclear/recipes/shapeless/cloth/red_cloth.json
+3a63377f0de2473803fe4b81b2fce121443faa42 data/createnuclear/recipes/shapeless/cloth/white_cloth.json
+0e075da2b474cc1ffb430fb612feaca8c5426932 data/createnuclear/recipes/shapeless/cloth/yellow_cloth.json
 8e194709b50fd2ca2ef2138b5d2528e092b45e4f data/createnuclear/recipes/shapeless/reactor_blueprint_item_clear.json
 bf49ba3e1332f0742e933d81ddd0dd9462f175db data/createnuclear/recipes/small_autunite_brick_from_stone_types_autunite_stonecutting.json
 01e0af5e7139dc9d887ee026e4d319d5063415e5 data/createnuclear/recipes/small_autunite_brick_slab.json

@@ -31,7 +31,7 @@ import static net.nuclearteam.createnuclear.content.multiblock.output.ReactorOut
 
 
 public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
-    public int speed = 1;
+    public int speed = 0;
     public float heat = 0;
 
     protected ReactorPattern pattern =  new ReactorPattern();
