@@ -50,10 +50,11 @@ public class PalettesVariantEntry {
 
             itemBuilder.tag(paletteStoneVariants.materialTag);
 
-            if (pattern.isTranslucent())
-                builder.addLayer(() -> RenderType::translucent);
+            if (pattern.isTranslucent()) {
+                // Le RenderType est maintenant géré directement dans la génération du modèle json (via PaletteBlockPattern)
+            }
             pattern.createCTBehaviour(name)
-                    .ifPresent(b -> builder.onRegister(connectedTextures(b)));
+                    .ifPresent(b -> builder.onRegister(CreateRegistrate.<Block>connectedTextures(b)));
 
             builder.recipe((c, p) -> {
                 p.stonecutting(DataIngredient.tag(paletteStoneVariants.materialTag), RecipeCategory.BUILDING_BLOCKS, c);

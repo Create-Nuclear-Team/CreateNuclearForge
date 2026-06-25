@@ -140,16 +140,24 @@ public class PaletteBlockPattern {
 
     public IBlockStateProvider cubeAll(String variant) {
         ResourceLocation all = toLocation(variant, textures[0]);
-        return (ctx, prov) -> prov.simpleBlock(ctx.get(), prov.models()
-                .cubeAll(createName(variant), all));
+        return (ctx, prov) -> {
+            net.minecraftforge.client.model.generators.BlockModelBuilder builder = prov.models()
+                    .cubeAll(createName(variant), all);
+            if (isTranslucent) builder.renderType("translucent");
+            prov.simpleBlock(ctx.get(), builder);
+        };
     }
 
     public IBlockStateProvider cubeBottomTop(String variant) {
         ResourceLocation side = toLocation(variant, textures[0]);
         ResourceLocation bottom = toLocation(variant, textures[1]);
         ResourceLocation top = toLocation(variant, textures[2]);
-        return (ctx, prov) -> prov.simpleBlock(ctx.get(), prov.models()
-                .cubeBottomTop(createName(variant), side, bottom, top));
+        return (ctx, prov) -> {
+            net.minecraftforge.client.model.generators.BlockModelBuilder builder = prov.models()
+                    .cubeBottomTop(createName(variant), side, bottom, top);
+            if (isTranslucent) builder.renderType("translucent");
+            prov.simpleBlock(ctx.get(), builder);
+        };
     }
 
     public IBlockStateProvider pillar(String variant) {
@@ -159,15 +167,19 @@ public class PaletteBlockPattern {
         return (ctx, prov) -> prov.getVariantBuilder(ctx.getEntry())
                 .forAllStatesExcept(state -> {
                             Axis axis = state.getValue(BlockStateProperties.AXIS);
-                            if (axis == Axis.Y)
+                            net.minecraftforge.client.model.generators.BlockModelBuilder builder;
+                            if (axis == Axis.Y) {
+                                builder = prov.models().cubeColumn(createName(variant), side, end);
+                                if (isTranslucent) builder.renderType("translucent");
                                 return ConfiguredModel.builder()
-                                        .modelFile(prov.models()
-                                                .cubeColumn(createName(variant), side, end))
+                                        .modelFile(builder)
                                         .uvLock(false)
                                         .build();
+                            }
+                            builder = prov.models().cubeColumnHorizontal(createName(variant) + "_horizontal", side, end);
+                            if (isTranslucent) builder.renderType("translucent");
                             return ConfiguredModel.builder()
-                                    .modelFile(prov.models()
-                                            .cubeColumnHorizontal(createName(variant) + "_horizontal", side, end))
+                                    .modelFile(builder)
                                     .uvLock(false)
                                     .rotationX(90)
                                     .rotationY(axis == Axis.X ? 90 : 0)
@@ -179,8 +191,12 @@ public class PaletteBlockPattern {
     public IBlockStateProvider cubeColumn(String variant) {
         ResourceLocation side = toLocation(variant, textures[0]);
         ResourceLocation end = toLocation(variant, textures[1]);
-        return (ctx, prov) -> prov.simpleBlock(ctx.get(), prov.models()
-                .cubeColumn(createName(variant), side, end));
+        return (ctx, prov) -> {
+            net.minecraftforge.client.model.generators.BlockModelBuilder builder = prov.models()
+                    .cubeColumn(createName(variant), side, end);
+            if (isTranslucent) builder.renderType("translucent");
+            prov.simpleBlock(ctx.get(), builder);
+        };
     }
 
     // Utility
