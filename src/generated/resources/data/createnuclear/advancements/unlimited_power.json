@@ -1,5 +1,5 @@
 {
-  "parent": "createnuclear:reactor_fluid_input",
+  "parent": "createnuclear:fueling_the_reactor",
   "criteria": {
     "0": {
       "conditions": {
@@ -18,7 +18,7 @@
     "announce_to_chat": false,
     "description": {
       "color": "#DBA213",
-      "translate": "advancement.createnuclear.reactor_output.desc"
+      "translate": "advancement.createnuclear.unlimited_power.desc"
     },
     "frame": "task",
     "hidden": false,
@@ -27,7 +27,7 @@
     },
     "show_toast": true,
     "title": {
-      "translate": "advancement.createnuclear.reactor_output"
+      "translate": "advancement.createnuclear.unlimited_power"
     }
   },
   "requirements": [
