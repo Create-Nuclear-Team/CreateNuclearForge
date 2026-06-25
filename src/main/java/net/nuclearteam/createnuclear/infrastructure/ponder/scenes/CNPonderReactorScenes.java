@@ -123,28 +123,6 @@ public class CNPonderReactorScenes {
         int minY = 1;
         int maxY = H;
 
-        // Remplacer toutes les faces (sauf les arêtes et le contrôleur) par du Casing
-        // Cela permet de boucher tous les trous causés par les anciens blocs I/O renommés dans le NBT.
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    boolean onXFace = (x == minX || x == maxX);
-                    boolean onYFace = (y == minY || y == maxY);
-                    boolean onZFace = (z == minZ || z == maxZ);
-
-                    int faceCount = (onXFace ? 1 : 0) + (onYFace ? 1 : 0) + (onZFace ? 1 : 0);
-
-                    // faceCount == 1 signifie qu'on est sur une face plane (pas une arête)
-                    if (faceCount == 1) {
-                        BlockPos currentPos = new BlockPos(x, y, z);
-                        if (!currentPos.equals(pos.controller)) {
-                            scene.world().modifyBlock(currentPos, s -> CNBlocks.REACTOR_CASING.get().defaultBlockState(), false);
-                        }
-                    }
-                }
-            }
-        }
-
         scene.idle(20);
 
         for (int y = 1; y <= H; y++) {
