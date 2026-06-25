@@ -13,7 +13,6 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -270,7 +269,7 @@ public class CNItems {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                 .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                 .define('X', CNTags.forgeItemTag("ingots/lead"))
-                .define('Y', Ingredient.of(ItemTags.create(new ResourceLocation("forge", "ingots/brass"))))
+                .define('Y', CNTags.forgeItemTag("ingots/brass"))
                 .define('Z', CNBlocks.REINFORCED_GLASS.asItem())
                 .pattern("YXY")
                 .pattern("XZX")
@@ -304,7 +303,7 @@ public class CNItems {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                     .define('X', CNTags.forgeItemTag("ingots/lead"))
-                    .define('Y', Ingredient.of(ItemTags.create(new ResourceLocation("forge", "ingots/brass"))))
+                    .define('Y', CNTags.forgeItemTag("ingots/brass"))
                     .define('Z', CNItems.GRAPHITE_ROD)
                     .pattern("Y Y")
                     .pattern("XXX")
@@ -338,7 +337,7 @@ public class CNItems {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                 .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                 .define('X', CNTags.forgeItemTag("ingots/lead"))
-                .define('Y', Ingredient.of(ItemTags.create(new ResourceLocation("forge", "ingots/brass"))))
+                .define('Y', CNTags.forgeItemTag("ingots/brass"))
                 .pattern("YXY")
                 .pattern("X X")
                 .pattern("Y Y")
@@ -372,7 +371,7 @@ public class CNItems {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                 .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                 .define('X', CNTags.forgeItemTag("ingots/lead"))
-                .define('Y', Ingredient.of(ItemTags.create(new ResourceLocation("forge", "ingots/brass"))))
+                .define('Y', CNTags.forgeItemTag("ingots/brass"))
                 .pattern("Y Y")
                 .pattern("X X")
                 .showNotification(true)
