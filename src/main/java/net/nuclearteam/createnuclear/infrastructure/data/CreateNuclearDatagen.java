@@ -40,7 +40,6 @@ public class CreateNuclearDatagen {
         generator.addProvider(event.includeClient(), new CNStandardRecipeGen(output));
         generator.addProvider(event.includeClient(), new CNMechanicalCraftingRecipeGen(output));
         generator.addProvider(event.includeClient(), new CNAdvancement(output));
-
         /*if (event.includeClient()) {
 
         }*/

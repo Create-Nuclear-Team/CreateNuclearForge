@@ -22,23 +22,6 @@ public class CNItemApplicationRecipeGen extends ItemApplicationRecipeGen {
             CNBlocks.REACTOR_CASING.get()
     );
 
-    GeneratedRecipe REACTOR_OUTPUT = itemApplication("reactor_output_from_shaft_and_reactor_casing",
-            AllBlocks.SHAFT.asItem(),
-            CNBlocks.REACTOR_CASING.get(),
-            CNBlocks.REACTOR_OUTPUT.get()
-    );
-
-    GeneratedRecipe REACTOR_INPUT = itemApplication("reactor_input_from_hopper_and_reactor_casing",
-            Items.HOPPER,
-            CNBlocks.REACTOR_CASING.get(),
-            CNBlocks.REACTOR_INPUT.get()
-    );
-
-    GeneratedRecipe REACTOR_LIQUID_INPUT = itemApplication("reactor_liquid_input_from_fluid_pipe_and_reactor_casing",
-            AllBlocks.FLUID_PIPE.asItem(),
-            CNBlocks.REACTOR_CASING.get(),
-            CNBlocks.REACTOR_LIQUID_INPUT.get()
-    );
 
     protected GeneratedRecipe itemApplication(String name, Ingredient ingredient, ItemLike input, ItemLike output) {
         return create(CreateNuclear.asResource(name), b ->
