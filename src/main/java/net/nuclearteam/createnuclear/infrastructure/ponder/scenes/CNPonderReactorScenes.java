@@ -116,11 +116,34 @@ public class CNPonderReactorScenes {
     private static void showReactorStructure(SceneBuilder scene, SceneBuildingUtil util, int S, int H, int plate, boolean bySections) {
         Positions pos = positionsFor(S, H);
 
-        scene.world().modifyBlock(pos.input1, s -> CNBlocks.REACTOR_CASING.get().defaultBlockState(), false);
-        scene.world().modifyBlock(pos.input2, s -> CNBlocks.REACTOR_CASING.get().defaultBlockState(), false);
-        scene.world().modifyBlock(pos.liquidInput, s -> CNBlocks.REACTOR_CASING.get().defaultBlockState(), false);
-        scene.world().modifyBlock(pos.alarm, s -> CNBlocks.REACTOR_CASING.get().defaultBlockState(), false);
-        scene.world().modifyBlock(pos.output, s -> CNBlocks.REACTOR_CASING.get().defaultBlockState(), false);
+        int minX = MARGIN;
+        int maxX = MARGIN + S - 1;
+        int minZ = MARGIN;
+        int maxZ = MARGIN + S - 1;
+        int minY = 1;
+        int maxY = H;
+
+        // Remplacer toutes les faces (sauf les arêtes et le contrôleur) par du Casing
+        // Cela permet de boucher tous les trous causés par les anciens blocs I/O renommés dans le NBT.
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    boolean onXFace = (x == minX || x == maxX);
+                    boolean onYFace = (y == minY || y == maxY);
+                    boolean onZFace = (z == minZ || z == maxZ);
+
+                    int faceCount = (onXFace ? 1 : 0) + (onYFace ? 1 : 0) + (onZFace ? 1 : 0);
+
+                    // faceCount == 1 signifie qu'on est sur une face plane (pas une arête)
+                    if (faceCount == 1) {
+                        BlockPos currentPos = new BlockPos(x, y, z);
+                        if (!currentPos.equals(pos.controller)) {
+                            scene.world().modifyBlock(currentPos, s -> CNBlocks.REACTOR_CASING.get().defaultBlockState(), false);
+                        }
+                    }
+                }
+            }
+        }
 
         scene.idle(20);
 
@@ -234,6 +257,13 @@ public class CNPonderReactorScenes {
         scene.showBasePlate();
         scene.rotateCameraY(180);
         scene.scaleSceneView(0.55f);
+
+        // Populate the correct I/O blocks at the beginning because the schematic has old broken IDs
+        scene.world().modifyBlock(pos.input1, s -> CNBlocks.REACTOR_ROD_INPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.SOUTH), false);
+        scene.world().modifyBlock(pos.input2, s -> CNBlocks.REACTOR_ROD_INPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.SOUTH), false);
+        scene.world().modifyBlock(pos.liquidInput, s -> CNBlocks.REACTOR_FLUID_INPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.SOUTH), false);
+        scene.world().modifyBlock(pos.alarm, s -> CNBlocks.REACTOR_ALARM.get().defaultBlockState(), false);
+        scene.world().modifyBlock(pos.output, s -> CNBlocks.REACTOR_OUTPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.SOUTH), false);
 
         // Show the entire T1 structure instantly
         scene.world().showSection(util.select().layersFrom(1), Direction.UP);
