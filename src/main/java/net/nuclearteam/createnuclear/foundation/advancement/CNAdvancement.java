@@ -317,24 +317,24 @@ public class CNAdvancement implements DataProvider {
         .whenIconCollected()
     ),
 
-    REACTOR_INPUT = create("reactor_input", b -> b.icon(CNBlocks.REACTOR_INPUT)
+    REACTOR_ROD_INPUT = create("reactor_rod_input", b -> b.icon(CNBlocks.REACTOR_ROD_INPUT)
         .title("Fueling The Reactor")
-        .description("Craft a reactor input to feed uranium and graphite rods into your reactor")
+        .description("Craft a reactor rod input to feed uranium and graphite rods into your reactor")
         .after(REACTOR_CASING)
         .whenIconCollected()
     ),
 
-    REACTOR_LIQUID_INPUT = create("reactor_liquid_input", b -> b.icon(CNBlocks.REACTOR_LIQUID_INPUT)
-        .title("Liquid Fuel")
-        .description("Craft a reactor liquid input to feed liquid coolant into your reactor")
-        .after(REACTOR_INPUT)
+    REACTOR_FLUID_INPUT = create("reactor_fluid_input", b -> b.icon(CNBlocks.REACTOR_FLUID_INPUT)
+        .title("Fluid Fuel")
+        .description("Craft a reactor fluid input to feed fluid coolant into your reactor")
+        .after(REACTOR_ROD_INPUT)
         .whenIconCollected()
     ),
 
     REACTOR_OUTPUT = create("reactor_output", b -> b.icon(CNBlocks.REACTOR_OUTPUT)
         .title("Power Output")
         .description("Craft a reactor output to transfer the energy produced by your reactor")
-        .after(REACTOR_LIQUID_INPUT)
+        .after(REACTOR_FLUID_INPUT)
         .whenIconCollected()
     ),
 

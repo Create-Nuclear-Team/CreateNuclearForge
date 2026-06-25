@@ -2,10 +2,10 @@
   "credit": "Made with Blockbench",
   "parent": "block/block",
   "textures": {
-    "0": "createnuclear:block/reactor/input/input",
+    "0": "createnuclear:block/reactor/rod_input/rod_input",
     "1": "createnuclear:block/reactor/casing/reactor_casing",
     "2": "createnuclear:block/reactor/casing/reactor_casing",
-    "particle": "createnuclear:block/reactor/input/input"
+    "particle": "createnuclear:block/reactor/rod_input/rod_input"
   },
   "elements": [
     {

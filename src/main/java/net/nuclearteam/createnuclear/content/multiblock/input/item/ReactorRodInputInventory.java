@@ -9,10 +9,10 @@ import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRod;
 import org.jetbrains.annotations.NotNull;
 
-public class ReactorInputInventory extends ItemStackHandler {
-    private final ReactorInputEntity be;
+public class ReactorRodInputInventory extends ItemStackHandler {
+    private final ReactorRodInputEntity be;
 
-    public ReactorInputInventory(ReactorInputEntity be) {
+    public ReactorRodInputInventory(ReactorRodInputEntity be) {
         super(1);
         this.be = be;
     }

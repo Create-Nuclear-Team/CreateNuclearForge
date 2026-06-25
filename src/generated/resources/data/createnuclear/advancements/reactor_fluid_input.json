@@ -1,12 +1,12 @@
 {
-  "parent": "createnuclear:reactor_casing",
+  "parent": "createnuclear:reactor_rod_input",
   "criteria": {
     "0": {
       "conditions": {
         "items": [
           {
             "items": [
-              "createnuclear:reactor_input"
+              "createnuclear:reactor_fluid_input"
             ]
           }
         ]
@@ -18,16 +18,16 @@
     "announce_to_chat": false,
     "description": {
       "color": "#DBA213",
-      "translate": "advancement.createnuclear.reactor_input.desc"
+      "translate": "advancement.createnuclear.reactor_fluid_input.desc"
     },
     "frame": "task",
     "hidden": false,
     "icon": {
-      "item": "createnuclear:reactor_input"
+      "item": "createnuclear:reactor_fluid_input"
     },
     "show_toast": true,
     "title": {
-      "translate": "advancement.createnuclear.reactor_input"
+      "translate": "advancement.createnuclear.reactor_fluid_input"
     }
   },
   "requirements": [

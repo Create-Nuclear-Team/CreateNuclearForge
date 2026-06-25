@@ -1,5 +1,5 @@
 {
-  "parent": "createnuclear:reactor_liquid_input",
+  "parent": "createnuclear:reactor_fluid_input",
   "criteria": {
     "0": {
       "conditions": {

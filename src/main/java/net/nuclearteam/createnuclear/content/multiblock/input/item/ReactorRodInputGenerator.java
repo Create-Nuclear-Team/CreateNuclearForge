@@ -8,17 +8,17 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.generators.ModelFile;
 
-public class ReactorInputGenerator extends SpecialBlockStateGen {
+public class ReactorRodInputGenerator extends SpecialBlockStateGen {
     @Override
     protected int getXRotation(BlockState state) {
-        return state.getValue(ReactorInput.FACING) == Direction.DOWN ? 180 : 0;
+        return state.getValue(ReactorRodInput.FACING) == Direction.DOWN ? 180 : 0;
     }
 
     @Override
     protected int getYRotation(BlockState state) {
-        return state.getValue(ReactorInput.FACING).getAxis().isVertical()
+        return state.getValue(ReactorRodInput.FACING).getAxis().isVertical()
                 ? 0
-                : horizontalAngle(state.getValue(ReactorInput.FACING));
+                : horizontalAngle(state.getValue(ReactorRodInput.FACING));
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ReactorInputGenerator extends SpecialBlockStateGen {
         return prov
                 .models()
                 .getExistingFile(prov
-                        .modLoc("block/reactor/input/input" + (state.getValue(ReactorInput.FACING).getAxis().isVertical()
+                        .modLoc("block/reactor/rod_input/rod_input" + (state.getValue(ReactorRodInput.FACING).getAxis().isVertical()
                                 ? "_vertical"
                                 : ""
                         )));

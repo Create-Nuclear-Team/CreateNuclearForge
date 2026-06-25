@@ -20,7 +20,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -41,22 +40,19 @@ import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfir
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
 import net.minecraftforge.common.Tags;
 
-import net.minecraftforge.common.util.ForgeSoundType;
-import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasing;
 import net.nuclearteam.createnuclear.CNTags.CNBlockTags;
-import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.cooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCore;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrame;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorframeItem;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputGenerator;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorLiquidInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorLiquidInputGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
@@ -149,31 +145,31 @@ public class CNBlocks {
             .transform(pickaxeOnly())
             .register();
 
-    public static final BlockEntry<ReactorInput> REACTOR_INPUT = CreateNuclear.REGISTRATE
-            .block("reactor_input", ReactorInput::new)
+    public static final BlockEntry<ReactorRodInput> REACTOR_ROD_INPUT = CreateNuclear.REGISTRATE
+            .block("reactor_rod_input", ReactorRodInput::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(2F))
             .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-            .blockstate(new ReactorInputGenerator()::generate)
+            .blockstate(new ReactorRodInputGenerator()::generate)
             .item()
-            .transform(customItemModel("reactor", "input", "item"))
+            .transform(customItemModel("reactor", "rod_input", "item"))
             .register();
 
 
-    public static final BlockEntry<ReactorLiquidInput> REACTOR_LIQUID_INPUT =
-        CreateNuclear.REGISTRATE.block("reactor_liquid_input", ReactorLiquidInput::new)
+    public static final BlockEntry<ReactorFluidInput> REACTOR_FLUID_INPUT =
+        CreateNuclear.REGISTRATE.block("reactor_fluid_input", ReactorFluidInput::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(2F))
             .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-            .blockstate(new ReactorLiquidInputGenerator()::generate)
+            .blockstate(new ReactorFluidInputGenerator()::generate)
             .item()
-            .transform(customItemModel("reactor", "liquid_input", "item"))
+            .transform(customItemModel("reactor", "fluid_input", "item"))
             .register();
 
     public static final BlockEntry<ReactorOutput> REACTOR_OUTPUT =

@@ -31,9 +31,9 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-public class ReactorLiquidInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorFluidInputEntity> {
+public class ReactorFluidInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorFluidInputEntity> {
 
-	public ReactorLiquidInput(Properties properties) {
+	public ReactorFluidInput(Properties properties) {
 		super(properties);
 	}
 
@@ -73,7 +73,7 @@ public class ReactorLiquidInput extends MultiDirectionalReactorBlock implements 
 
 	@Override
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-        return CNShapes.REACTOR_LIQUID_INPUT.get(state.getValue(FACING));
+        return CNShapes.REACTOR_FLUID_INPUT.get(state.getValue(FACING));
     }
 
 	@Override
@@ -109,7 +109,7 @@ public class ReactorLiquidInput extends MultiDirectionalReactorBlock implements 
 
 	@Override
 	public BlockEntityType<? extends ReactorFluidInputEntity> getBlockEntityType() {
-		return CNBlockEntityTypes.REACTOR_LIQUID_INPUT.get();
+		return CNBlockEntityTypes.REACTOR_FLUID_INPUT.get();
 	}
 
 	@Override

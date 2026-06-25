@@ -19,8 +19,8 @@ public class ReactorPattern {
     private static final Predicate<BlockInWorld> blockInWorldAPredicate = state ->
         stateIs(CNBlocks.REACTOR_CASING.get()).test(state)
                 || stateIs(CNBlocks.REACTOR_OUTPUT.get()).test(state)
-                || stateIs(CNBlocks.REACTOR_INPUT.get()).test(state)
-                || stateIs(CNBlocks.REACTOR_LIQUID_INPUT.get()).test(state)
+                || stateIs(CNBlocks.REACTOR_ROD_INPUT.get()).test(state)
+                || stateIs(CNBlocks.REACTOR_FLUID_INPUT.get()).test(state)
                 || stateIs(CNBlocks.REACTOR_ALARM.get()).test(state)
     ;
 

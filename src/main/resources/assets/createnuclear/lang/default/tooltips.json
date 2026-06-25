@@ -4,13 +4,13 @@
   "tag.item.createnuclear.fuel": "Fuel",
 
 
-  "block.createnuclear.reactor_input.tooltip.summary": "_The Reactor Rod Input_ is a _block_ that can be used to insert _Heating_ or _Cooling_ rods into the Reactor.",
-  "block.createnuclear.reactor_input.tooltip.condition1": "When the reactor is assembled",
-  "block.createnuclear.reactor_input.tooltip.behaviour1": "Insert _Heating_ (like _Uranium_ or _Thorium_) and _Cooling_ (like _Graphite_) rods in large quantities to power _The Reactor_.",
+  "block.createnuclear.reactor_rod_input.tooltip.summary": "_The Reactor Rod Input_ is a _block_ that can be used to insert _Heating_ or _Cooling_ rods into the Reactor.",
+  "block.createnuclear.reactor_rod_input.tooltip.condition1": "When the reactor is assembled",
+  "block.createnuclear.reactor_rod_input.tooltip.behaviour1": "Insert _Heating_ (like _Uranium_ or _Thorium_) and _Cooling_ (like _Graphite_) rods in large quantities to power _The Reactor_.",
 
-  "block.createnuclear.reactor_liquid_input.tooltip.summary": "_The Reactor Fluid Input_ is a _block_ that can be used to insert _Water_ or _Liquid Nitrogen_ into the Reactor.",
-  "block.createnuclear.reactor_liquid_input.tooltip.condition1": "When the reactor is assembled",
-  "block.createnuclear.reactor_liquid_input.tooltip.behaviour1": "Insert _Water_ or _Liquid Nitrogen_ in large quantities to power _The Reactor_ and avoid _overheating_.",
+  "block.createnuclear.reactor_fluid_input.tooltip.summary": "_The Reactor Fluid Input_ is a _block_ that can be used to insert _Water_ or _Liquid Nitrogen_ into the Reactor.",
+  "block.createnuclear.reactor_fluid_input.tooltip.condition1": "When the reactor is assembled",
+  "block.createnuclear.reactor_fluid_input.tooltip.behaviour1": "Insert _Water_ or _Liquid Nitrogen_ in large quantities to power _The Reactor_ and avoid _overheating_.",
 
 
   "block.createnuclear.reactor_controller.tooltip.summary": " The _Reactor Controller_ is the _most important_ block for operating the reactor",
@@ -33,11 +33,11 @@
   "block.createnuclear.reactor_frame.tooltip.summary": "_Block_ used to build the _reactor_",
 
 
-  "item.createnuclear.graphite_rod.tooltip.summary": "_Rod_ to be used in the _reactor input_ to operate it.",
+  "item.createnuclear.graphite_rod.tooltip.summary": "_Rod_ to be used in the _reactor rod input_ to operate it.",
 
-  "item.createnuclear.uranium_rod.tooltip.summary": "_Rod_ to be used in the _reactor input_ to operate it.",
+  "item.createnuclear.uranium_rod.tooltip.summary": "_Rod_ to be used in the _reactor rod input_ to operate it.",
 
-  "item.createnuclear.thorium_rod.tooltip.summary": "_Rod_ to be used in the _reactor input_ to operate it.",
+  "item.createnuclear.thorium_rod.tooltip.summary": "_Rod_ to be used in the _reactor rod input_ to operate it.",
 
   "item.createnuclear.reactor_blueprint_item.tooltip.summary": "It allows you to configure your own pattern.",
   "item.createnuclear.reactor_blueprint_item.tooltip.condition1": "Filled with cooling and heating rods",

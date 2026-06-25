@@ -9,11 +9,11 @@ import net.nuclearteam.createnuclear.foundation.gui.CNGuiTextures;
 
 import static com.simibubi.create.foundation.gui.AllGuiTextures.PLAYER_INVENTORY;
 
-public class ReactorInputScreen extends AbstractSimiContainerScreen<ReactorInputMenu> {
+public class ReactorRodInputScreen extends AbstractSimiContainerScreen<ReactorRodInputMenu> {
 
     protected static final CNGuiTextures background = CNGuiTextures.REACTOR_SLOT_INVENTOR;
 
-    public ReactorInputScreen(ReactorInputMenu container, Inventory inv, Component title) {
+    public ReactorRodInputScreen(ReactorRodInputMenu container, Inventory inv, Component title) {
         super(container, inv, title);
     }
 

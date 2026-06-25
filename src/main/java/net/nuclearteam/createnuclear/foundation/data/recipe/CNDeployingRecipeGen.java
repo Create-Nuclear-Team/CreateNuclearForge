@@ -12,16 +12,16 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 
 public class CNDeployingRecipeGen extends DeployingRecipeGen {
 
-    GeneratedRecipe REACTOR_INPUT = deploying("reactor_input_from_hopper_and_reactor_casing",
+    GeneratedRecipe REACTOR_ROD_INPUT = deploying("reactor_rod_input_from_hopper_and_reactor_casing",
             Items.HOPPER,
             CNBlocks.REACTOR_CASING.get(),
-            CNBlocks.REACTOR_INPUT.get()
+            CNBlocks.REACTOR_ROD_INPUT.get()
     );
 
-    GeneratedRecipe REACTOR_LIQUID_INPUT = deploying("reactor_liquid_input_from_fluid_pipe_and_reactor_casing",
+    GeneratedRecipe REACTOR_FLUID_INPUT = deploying("reactor_fluid_input_from_fluid_pipe_and_reactor_casing",
             AllBlocks.FLUID_PIPE.asItem(),
             CNBlocks.REACTOR_CASING.get(),
-            CNBlocks.REACTOR_LIQUID_INPUT.get()
+            CNBlocks.REACTOR_FLUID_INPUT.get()
     );
 
     GeneratedRecipe REACTOR_OUTPUT = deploying("reactor_output_from_shaft_and_reactor_casing",

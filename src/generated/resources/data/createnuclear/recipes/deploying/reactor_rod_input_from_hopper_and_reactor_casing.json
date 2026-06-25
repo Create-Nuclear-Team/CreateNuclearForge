@@ -5,12 +5,12 @@
       "item": "createnuclear:reactor_casing"
     },
     {
-      "item": "create:fluid_pipe"
+      "item": "minecraft:hopper"
     }
   ],
   "results": [
     {
-      "item": "createnuclear:reactor_liquid_input"
+      "item": "createnuclear:reactor_rod_input"
     }
   ]
 }

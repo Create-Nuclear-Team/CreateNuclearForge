@@ -8,17 +8,17 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.generators.ModelFile;
 
-public class ReactorLiquidInputGenerator extends SpecialBlockStateGen {
+public class ReactorFluidInputGenerator extends SpecialBlockStateGen {
     @Override
     protected int getXRotation(BlockState state) {
-        return state.getValue(ReactorLiquidInput.FACING) == Direction.DOWN ? 180 : 0;
+        return state.getValue(ReactorFluidInput.FACING) == Direction.DOWN ? 180 : 0;
     }
 
     @Override
     protected int getYRotation(BlockState state) {
-        return state.getValue(ReactorLiquidInput.FACING).getAxis().isVertical()
+        return state.getValue(ReactorFluidInput.FACING).getAxis().isVertical()
                 ? 0
-                : horizontalAngle(state.getValue(ReactorLiquidInput.FACING));
+                : horizontalAngle(state.getValue(ReactorFluidInput.FACING));
     }
 
     @Override
@@ -26,7 +26,7 @@ public class ReactorLiquidInputGenerator extends SpecialBlockStateGen {
         return prov
                 .models()
                 .getExistingFile(prov
-                        .modLoc("block/reactor/liquid_input/liquid_input" + (state.getValue(ReactorLiquidInput.FACING).getAxis().isVertical()
+                        .modLoc("block/reactor/fluid_input/fluid_input" + (state.getValue(ReactorFluidInput.FACING).getAxis().isVertical()
                                 ? "_vertical"
                                 : ""
                         )));

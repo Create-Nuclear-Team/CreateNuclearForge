@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInput;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
@@ -73,7 +73,7 @@ public class ReactorCasing extends Block implements IWrenchable, IBE<ReactorCasi
         Player player = context.getPlayer();
 
         if (player.getItemInHand(InteractionHand.OFF_HAND).is(Blocks.HOPPER.asItem())) {
-            level.setBlock(pos, CNBlocks.REACTOR_INPUT.getDefaultState().setValue(ReactorInput.FACING, context.getClickedFace()), 2);
+            level.setBlock(pos, CNBlocks.REACTOR_ROD_INPUT.getDefaultState().setValue(ReactorRodInput.FACING, context.getClickedFace()), 2);
             player.sendSystemMessage(Component.translatable("reactor.update.casing.input"));
         }
         return InteractionResult.SUCCESS;

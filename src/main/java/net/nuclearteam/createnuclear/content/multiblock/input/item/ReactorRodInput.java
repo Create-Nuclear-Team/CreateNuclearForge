@@ -38,9 +38,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 
 @ParametersAreNonnullByDefault
-public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorInputEntity> {
+public class ReactorRodInput extends MultiDirectionalReactorBlock implements IWrenchable, IBE<ReactorRodInputEntity> {
     
-    public ReactorInput(Properties properties) {
+    public ReactorRodInput(Properties properties) {
         super(properties);
     }
 
@@ -98,16 +98,16 @@ public class ReactorInput extends MultiDirectionalReactorBlock implements IWrenc
     }
     @Override
     public @NotNull VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
-        return CNShapes.REACTOR_INPUT.get(state.getValue(FACING));
+        return CNShapes.REACTOR_ROD_INPUT.get(state.getValue(FACING));
     }
 
     @Override
-    public Class<ReactorInputEntity> getBlockEntityClass() {
-        return ReactorInputEntity.class;
+    public Class<ReactorRodInputEntity> getBlockEntityClass() {
+        return ReactorRodInputEntity.class;
     }
 
     @Override
-    public BlockEntityType<? extends ReactorInputEntity> getBlockEntityType() {
-        return CNBlockEntityTypes.REACTOR_INPUT.get();
+    public BlockEntityType<? extends ReactorRodInputEntity> getBlockEntityType() {
+        return CNBlockEntityTypes.REACTOR_ROD_INPUT.get();
     }
 }

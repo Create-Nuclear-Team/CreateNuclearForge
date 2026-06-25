@@ -301,9 +301,9 @@ public class CNPonderReactorScenes {
         scene.world().modifyBlock(pos.output, s -> CNBlocks.REACTOR_CASING.get().defaultBlockState(), true);
         
         // Place I/O on roof
-        scene.world().modifyBlock(newIn1, s -> CNBlocks.REACTOR_INPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP), true);
-        scene.world().modifyBlock(newIn2, s -> CNBlocks.REACTOR_INPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP), true);
-        scene.world().modifyBlock(newLiq, s -> CNBlocks.REACTOR_LIQUID_INPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP), true);
+        scene.world().modifyBlock(newIn1, s -> CNBlocks.REACTOR_ROD_INPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP), true);
+        scene.world().modifyBlock(newIn2, s -> CNBlocks.REACTOR_ROD_INPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP), true);
+        scene.world().modifyBlock(newLiq, s -> CNBlocks.REACTOR_FLUID_INPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP), true);
         // Note: ReactorAlarm might not have FACING. Using default state.
         scene.world().modifyBlock(newAlm, s -> CNBlocks.REACTOR_ALARM.get().defaultBlockState(), true);
         scene.world().modifyBlock(newOut, s -> CNBlocks.REACTOR_OUTPUT.get().defaultBlockState().setValue(BlockStateProperties.FACING, Direction.UP), true);

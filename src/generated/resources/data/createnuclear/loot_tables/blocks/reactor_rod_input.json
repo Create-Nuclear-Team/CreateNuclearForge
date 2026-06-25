@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "createnuclear:reactor_liquid_input"
+          "name": "createnuclear:reactor_rod_input"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "createnuclear:blocks/reactor_liquid_input"
+  "random_sequence": "createnuclear:blocks/reactor_rod_input"
 }

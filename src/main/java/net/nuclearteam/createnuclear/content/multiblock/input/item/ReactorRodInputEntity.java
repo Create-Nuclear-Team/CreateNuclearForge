@@ -22,17 +22,17 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorContro
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider {
+public class ReactorRodInputEntity extends SmartBlockEntity implements MenuProvider {
     //protected ReactorControllerBlockEntity controller;
     public ReactorControllerBlock controller = null;
 
-    public ReactorInputInventory inventory;
+    public ReactorRodInputInventory inventory;
     LazyOptional<IItemHandler> inventoryProvider;
 
 
-    public ReactorInputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public ReactorRodInputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        inventory = new ReactorInputInventory(this);
+        inventory = new ReactorRodInputInventory(this);
         inventoryProvider = LazyOptional.of(() -> inventory);
 
     }
@@ -79,7 +79,7 @@ public class ReactorInputEntity extends SmartBlockEntity implements MenuProvider
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return ReactorInputMenu.create(i, inventory, this);
+        return ReactorRodInputMenu.create(i, inventory, this);
     }
 
     @Override

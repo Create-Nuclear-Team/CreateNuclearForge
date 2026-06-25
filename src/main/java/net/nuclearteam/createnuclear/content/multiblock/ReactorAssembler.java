@@ -74,8 +74,8 @@ public final class ReactorAssembler {
         int zMin = reactorPos.minZ(), zMax = reactorPos.maxZ();
 
         final Block reactorOutputBlock = CNBlocks.REACTOR_OUTPUT.get();
-        final Block reactorInputBlock = CNBlocks.REACTOR_INPUT.get();
-        final Block reactorInputFluidBlock = CNBlocks.REACTOR_LIQUID_INPUT.get();
+        final Block reactorRodInputBlock = CNBlocks.REACTOR_ROD_INPUT.get();
+        final Block reactorInputFluidBlock = CNBlocks.REACTOR_FLUID_INPUT.get();
         final Block reactorAlarmBlock = CNBlocks.REACTOR_ALARM.get();
         final Block reactorFrameBlock = CNBlocks.REACTOR_FRAME.get();
 
@@ -102,7 +102,7 @@ public final class ReactorAssembler {
 
                     if (blockState.is(reactorOutputBlock)) {
                         entity.addOutput(mutablePos.immutable());
-                    } else if (blockState.is(reactorInputBlock)) {
+                    } else if (blockState.is(reactorRodInputBlock)) {
                         entity.addInput(mutablePos.immutable());
                     } else if (blockState.is(reactorInputFluidBlock)) {
                         entity.addInputFluid(mutablePos.immutable());
