@@ -48,7 +48,7 @@ public class ReactorAlarm extends Block implements IBE<ReactorAlarmEntity> {
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, pPlacer, stack);
-        CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
+        MultiblockHelpers.handleAdvancedPlacedBy(pos, level, pPlacer);
     }
 
     // Unregisters this alarm from the multiblock controller on removal (piston, explosion, etc.)

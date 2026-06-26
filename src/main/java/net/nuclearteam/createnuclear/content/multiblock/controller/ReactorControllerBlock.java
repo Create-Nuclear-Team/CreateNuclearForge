@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.ReactorAssembler;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
@@ -161,7 +162,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, pPlacer, stack);
-        CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
+        MultiblockHelpers.handleAdvancedPlacedBy(pos, level, pPlacer);
         if (state.getValue(ASSEMBLED))
             return;
         ReactorAssembler.assemble(pos, level);

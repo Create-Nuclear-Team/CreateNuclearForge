@@ -46,7 +46,7 @@ public class ReactorFluidInput extends MultiDirectionalReactorBlock implements I
 	@Override
 	public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
 		super.setPlacedBy(level, pos, state, pPlacer, stack);
-		CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
+		MultiblockHelpers.handleAdvancedPlacedBy(pos, level, pPlacer);
 	}
 
 	@Override

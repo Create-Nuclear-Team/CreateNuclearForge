@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
+import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
@@ -115,7 +116,7 @@ public class ReactorFrame extends Block implements IWrenchable, IBE<ReactorFrame
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @javax.annotation.Nullable LivingEntity pPlacer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, pPlacer, stack);
-        CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
+        MultiblockHelpers.handleAdvancedPlacedBy(pos, level, pPlacer);
     }
 
     @Override // called when the player destroys the block, with or without a tool

@@ -103,7 +103,7 @@ public class CNAdvancementBehaviour extends BlockEntityBehaviour {
     }
 
     private void award(CreateNuclearAdvancement advancement, Player player) {
-        if (advancements.contains(advancement)) advancement.awardTo(player);
+        if (!advancement.isAlreadyAwardedTo(player)) advancement.awardTo(player);
         removeAwarded();
     }
 

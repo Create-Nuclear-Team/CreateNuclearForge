@@ -64,7 +64,7 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @javax.annotation.Nullable LivingEntity pPlacer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, pPlacer, stack);
-        CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
+        MultiblockHelpers.handleAdvancedPlacedBy(pos, level, pPlacer);
     }
 
     @Override
@@ -76,7 +76,6 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        List<? extends Player> players = pLevel.players();
         MultiblockHelpers.handleRemoval(pPos, pLevel, ReactorControllerBlockEntity::removeOutput);
     }
 
