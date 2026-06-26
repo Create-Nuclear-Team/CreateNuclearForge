@@ -37,9 +37,6 @@ public final class ReactorAssembler {
         BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity);
         if (result == null) return;
 
-        CreateNuclear.LOGGER.warn("ReactorAssembler#assemble id: {}, size: {}, name: {}",
-                result.id(), result.data().getSize(), result.data().getName());
-
         sendMessageToPlayer(level, pos, CreateNuclearLang.translate("notification.reactor.assembled"), !entity.isAssembled());
 
         switch (result.data()) {
