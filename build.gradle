@@ -117,6 +117,12 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
         }
 
+        client2 {
+            parent runs.client
+            workingDirectory project.file('run/client2')
+            args '--username', 'Dev2'
+        }
+
         server {
             workingDirectory project.file('run/server')
             //property 'forge.enabledGameTestNamespaces', mod_id
