@@ -4,10 +4,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.foundation.mixin.CameraAccessor;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
@@ -77,6 +82,25 @@ public class ClientEvents {
                         CNClientProxy.randomTremorOffsets[2] * 0.5F * intensity
                 );
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRenderPlayerPre(RenderPlayerEvent.Pre event) {
+        Player player = event.getEntity();
+        PlayerModel<?> model = event.getRenderer().getModel();
+
+        if (player.getItemBySlot(EquipmentSlot.HEAD).getItem() instanceof AntiRadiationArmorItem) {
+            model.hat.visible = false;
+        }
+        if (player.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof AntiRadiationArmorItem) {
+            model.jacket.visible = false;
+            model.rightSleeve.visible = false;
+            model.leftSleeve.visible = false;
+        }
+        if (player.getItemBySlot(EquipmentSlot.LEGS).getItem() instanceof AntiRadiationArmorItem) {
+            model.rightPants.visible = false;
+            model.leftPants.visible = false;
         }
     }
 }
