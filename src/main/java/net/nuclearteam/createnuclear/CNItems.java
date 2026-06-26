@@ -50,11 +50,15 @@ public class CNItems {
     /**
      * Generates the item model for a dyeable anti-radiation armor piece.
      * <p>
-     * Replicates {@link AssetLookup#itemModelWithPartials()} (outer model parenting the
-     * Blockbench {@code item/<name>/item} model) and adds one model override per {@link DyeColor},
-     * driven by the client-side {@code createnuclear:cloth_color} item property
-     * (see {@code CreateNuclearClient}). Each per-color child model reuses the same geometry but
-     * re-textures it with the matching {@code item/armors/<color>_anti_radiation_suit} sheet.
+     * The undyed ("default") piece uses a flat 2D icon ({@code item/generated} with the
+     * {@code item/armors/default_anti_radiation_<slot>} sprite) instead of the 3D Blockbench
+     * model, since the dropped/inventory 3D rendering was problematic. The worn armor on the
+     * body is unaffected (handled by {@code AntiRadiationArmorModel}).
+     * <p>
+     * One model override per {@link DyeColor} is added, driven by the client-side
+     * {@code createnuclear:cloth_color} item property (see {@code CreateNuclearClient}). Each
+     * per-color child model still re-textures the 3D Blockbench geometry ({@code item/<name>/item})
+     * with the matching {@code item/armors/<color>_anti_radiation_suit} sheet.
      * <p>
      * The texture keys differ per slot: the helmet geometry uses {@code layer0}/{@code particle},
      * the other pieces use {@code 14} — hence {@code textureKeys} is passed explicitly.
@@ -62,7 +66,7 @@ public class CNItems {
     private static <T extends Item> NonNullBiConsumer<DataGenContext<Item, T>, RegistrateItemModelProvider> coloredArmorModel(String slot, String... textureKeys) {
         return (c, p) -> {
             ResourceLocation baseParent = p.modLoc("item/" + c.getName() + "/item");
-            ItemModelBuilder outer = p.withExistingParent(c.getName(), baseParent);
+            ItemModelBuilder outer = p.generated(c, CreateNuclear.asResource("item/armors/default_anti_radiation_" + slot));
             // DyeColor.values() is ordered by id (0..15); overrides must be ascending by predicate
             // value so vanilla override resolution selects the exact color (returns last match <= value).cloth
             // The cloth_color property is clamped to [0,1] (see CreateNuclearClient), hence the

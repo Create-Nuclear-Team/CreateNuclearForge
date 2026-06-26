@@ -1,5 +1,5 @@
 {
-  "parent": "createnuclear:item/default_anti_radiation_leggings/item",
+  "parent": "minecraft:item/generated",
   "overrides": [
     {
       "model": "createnuclear:item/colored/white_anti_radiation_leggings",
@@ -97,5 +97,8 @@
         "createnuclear:cloth_color": 1.0
       }
     }
-  ]
+  ],
+  "textures": {
+    "layer0": "createnuclear:item/armors/default_anti_radiation_leggings"
+  }
 }
