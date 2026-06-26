@@ -22,11 +22,11 @@ public class CNPotions {
     public static final RegistryObject<Potion> POTION_2 = CN_POTIONS.register("potion_of_radiation_2",
         () -> new Potion(new MobEffectInstance(CNEffects.RADIATION.get(), 410, 1)));
 
-    public static final RegistryObject<Potion> POTION_1_IODINE = CN_POTIONS.register("potion_of_protection_iodine",
-            () -> new Potion(new MobEffectInstance(CNEffects.IODINE_PROTECTION.get(), 900))
+    public static final RegistryObject<Potion> POTION_1_IODINE = CN_POTIONS.register("potion_of_iodine",
+            () -> new Potion(new MobEffectInstance(CNEffects.IODINE.get(), 900))
     );
-    public static final RegistryObject<Potion> POTION_AUGMENT_1_IODINE = CN_POTIONS.register("potion_of_protection_iodine_augment",
-            () -> new Potion(new MobEffectInstance(CNEffects.IODINE_PROTECTION.get(), 1800))
+    public static final RegistryObject<Potion> POTION_AUGMENT_1_IODINE = CN_POTIONS.register("potion_of_iodine_augment",
+            () -> new Potion(new MobEffectInstance(CNEffects.IODINE.get(), 1800))
     );
 
     public static void register(IEventBus eventBus) {
