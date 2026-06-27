@@ -22,6 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.nuclearteam.createnuclear.content.biome.BiomeRestoreCellItem;
+import net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
 import net.nuclearteam.createnuclear.content.radiation.RadiationItem;
@@ -44,76 +45,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers.biomeRestoreModel;
+import static net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers.coloredArmorModel;
+
 @SuppressWarnings({"unused", "deprecation"})
 public class CNItems {
-
-    /**
-     * Generates the item model for a dyeable anti-radiation armor piece.
-     * <p>
-     * The undyed ("default") piece uses a flat 2D icon ({@code item/generated} with the
-     * {@code item/armors/default_anti_radiation_<slot>} sprite) instead of the 3D Blockbench
-     * model, since the dropped/inventory 3D rendering was problematic. The worn armor on the
-     * body is unaffected (handled by {@code AntiRadiationArmorModel}).
-     * <p>
-     * One model override per {@link DyeColor} is added, driven by the client-side
-     * {@code createnuclear:cloth_color} item property (see {@code CreateNuclearClient}). Each
-     * per-color child model still re-textures the 3D Blockbench geometry ({@code item/<name>/item})
-     * with the matching {@code item/armors/<color>_anti_radiation_suit} sheet.
-     * <p>
-     * The texture keys differ per slot: the helmet geometry uses {@code layer0}/{@code particle},
-     * the other pieces use {@code 14} — hence {@code textureKeys} is passed explicitly.
-     */
-    private static <T extends Item> NonNullBiConsumer<DataGenContext<Item, T>, RegistrateItemModelProvider> coloredArmorModel(String slot, String... textureKeys) {
-        return (c, p) -> {
-            ResourceLocation baseParent = p.modLoc("item/" + c.getName() + "/item");
-            ItemModelBuilder outer = p.generated(c, CreateNuclear.asResource("item/armors/default_anti_radiation_" + slot));
-            // DyeColor.values() is ordered by id (0..15); overrides must be ascending by predicate
-            // value so vanilla override resolution selects the exact color (returns last match <= value).cloth
-            // The cloth_color property is clamped to [0,1] (see CreateNuclearClient), hence the
-            // (id+1)/16 normalization here must match the value returned there exactly.
-            for (DyeColor color : DyeColor.values()) {
-                String colorName = color.getSerializedName();
-                ItemModelBuilder child = p.withExistingParent("item/colored/" + colorName + "_anti_radiation_" + slot, baseParent);
-                for (String key : textureKeys) {
-                    child.texture(key, "item/armors/" + colorName + "_anti_radiation_suit");
-                }
-                outer.override()
-                    .predicate(CreateNuclear.asResource("cloth_color"), (color.getId() + 1) / 16f)
-                    .model(child)
-                    .end();
-            }
-        };
-    }
-
-    /**
-     * Generates the per-tier model overrides for the biome restore cell, driven by the
-     * client-side {@code createnuclear:charge} item property (see {@code CreateNuclearClient}).
-     * Overrides must stay ascending by predicate value (vanilla resolves to the last match <= value),
-     * and the thresholds here must match the ratio returned by {@code biomeRestoreItemProperties}.
-     */
-    private static <T extends Item> NonNullBiConsumer<DataGenContext<Item, T>, RegistrateItemModelProvider> biomeRestoreModel() {
-        return (c, p) -> {
-            ItemModelBuilder outer = p.generated(c, CreateNuclear.asResource("item/biome_restore_cell/empty"));
-
-            record Tier(String name, float threshold) {}
-            List<Tier> tiers = List.of(
-                    new Tier("quarter", 0.25f),
-                    new Tier("half", 0.5f),
-                    new Tier("three_quarters", 0.75f),
-                    new Tier("full", 1.0f)
-            );
-
-            for (Tier tier : tiers) {
-                ItemModelBuilder child = p.withExistingParent("item/biome_restore_cell/" + tier.name(), p.mcLoc("item/generated"))
-                        .texture("layer0", CreateNuclear.asResource("item/biome_restore_cell/" + tier.name()));
-
-                outer.override()
-                        .predicate(CreateNuclear.asResource(BiomeRestoreCellItem.TAG), tier.threshold())
-                        .model(child)
-                        .end();
-            }
-        };
-    }
 
     public static final ItemEntry<? extends Item>
         YELLOWCAKE = CreateNuclear.REGISTRATE
@@ -450,10 +386,9 @@ public class CNItems {
             .register();
     });
 
-
-    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_WOLF = registerSpawnEgg("wolf_irradiated_spawn_egg", CNEntityType.IRRADIATED_WOLF, 0x42452B,0x4C422B, "Irradiated Wolf Spawn Egg");
-    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_CAT = registerSpawnEgg("cat_irradiated_spawn_egg", CNEntityType.IRRADIATED_CAT, 0x382C19, 0x742728, "Irradiated Cat Spawn Egg");
-    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_CHICKEN = registerSpawnEgg("chicken_irradiated_spawn_egg", CNEntityType.IRRADIATED_CHICKEN, 0x6B9455, 0x95393C, "Irradiated Chicken Spawn Egg");
+    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_WOLF = CNBuilderTransformers.spawnEgg("wolf_irradiated_spawn_egg", CNEntityType.IRRADIATED_WOLF, 0x42452B, 0x4C422B, "Irradiated Wolf Spawn Egg");
+    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_CAT = CNBuilderTransformers.spawnEgg("cat_irradiated_spawn_egg", CNEntityType.IRRADIATED_CAT, 0x382C19, 0x742728, "Irradiated Cat Spawn Egg");
+    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_CHICKEN = CNBuilderTransformers.spawnEgg("chicken_irradiated_spawn_egg", CNEntityType.IRRADIATED_CHICKEN, 0x6B9455, 0x95393C, "Irradiated Chicken Spawn Egg");
 
     public static final ItemEntry<ReactorBluePrintItem> REACTOR_BLUEPRINT = CreateNuclear.REGISTRATE
         .item("reactor_blueprint_item", ReactorBluePrintItem::new)
@@ -484,15 +419,6 @@ public class CNItems {
         .properties(p -> p.stacksTo(1).fireResistant().setNoRepair())
         .model(biomeRestoreModel())
         .register();
-
-
-    private static ItemEntry<ForgeSpawnEggItem> registerSpawnEgg(String name, Supplier<? extends EntityType<? extends Mob>> entity, int backgroundColor, int highlightColor, String nameItems) {
-        return CreateNuclear.REGISTRATE
-            .item(name, p -> new ForgeSpawnEggItem(entity, backgroundColor, highlightColor, p))
-            .lang(nameItems)
-            .model((c, p) -> p.withExistingParent(c.getName(), new ResourceLocation("item/template_spawn_egg")))
-            .register();
-    }
 
     public static void register() {}
 }

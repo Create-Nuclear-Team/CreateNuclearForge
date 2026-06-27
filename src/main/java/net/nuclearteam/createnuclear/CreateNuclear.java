@@ -117,5 +117,4 @@ public class CreateNuclear {
     public static ResourceLocation asResource(String path) {
         return new ResourceLocation(MOD_ID, path);
     }
-
 }
