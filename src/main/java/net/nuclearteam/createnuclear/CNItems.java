@@ -1,6 +1,5 @@
 package net.nuclearteam.createnuclear;
 
-import com.simibubi.create.foundation.data.AssetLookup;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
@@ -22,6 +21,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.nuclearteam.createnuclear.content.biome.BiomeRestoreCellItem;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
 import net.nuclearteam.createnuclear.content.radiation.RadiationItem;
@@ -81,6 +81,36 @@ public class CNItems {
                     .predicate(CreateNuclear.asResource("cloth_color"), (color.getId() + 1) / 16f)
                     .model(child)
                     .end();
+            }
+        };
+    }
+
+    /**
+     * Generates the per-tier model overrides for the biome restore cell, driven by the
+     * client-side {@code createnuclear:charge} item property (see {@code CreateNuclearClient}).
+     * Overrides must stay ascending by predicate value (vanilla resolves to the last match <= value),
+     * and the thresholds here must match the ratio returned by {@code biomeRestoreItemProperties}.
+     */
+    private static <T extends Item> NonNullBiConsumer<DataGenContext<Item, T>, RegistrateItemModelProvider> biomeRestoreModel() {
+        return (c, p) -> {
+            ItemModelBuilder outer = p.generated(c, CreateNuclear.asResource("item/biome_restore_cell/empty"));
+
+            record Tier(String name, float threshold) {}
+            List<Tier> tiers = List.of(
+                    new Tier("quarter", 0.25f),
+                    new Tier("half", 0.5f),
+                    new Tier("three_quarters", 0.75f),
+                    new Tier("full", 1.0f)
+            );
+
+            for (Tier tier : tiers) {
+                ItemModelBuilder child = p.withExistingParent("item/biome_restore_cell/" + tier.name(), p.mcLoc("item/generated"))
+                        .texture("layer0", CreateNuclear.asResource("item/biome_restore_cell/" + tier.name()));
+
+                outer.override()
+                        .predicate(CreateNuclear.asResource(BiomeRestoreCellItem.TAG), tier.threshold())
+                        .model(child)
+                        .end();
             }
         };
     }
@@ -448,6 +478,13 @@ public class CNItems {
         .properties(p -> p.stacksTo(1))
         .register();
 
+    public static final ItemEntry<BiomeRestoreCellItem> BIOME_RESTORE_CELL = CreateNuclear.REGISTRATE
+        .item("biome_restore_cell", BiomeRestoreCellItem::new)
+        .lang("Biome Restore Cell")
+        .properties(p -> p.stacksTo(1).fireResistant().setNoRepair())
+        .model(biomeRestoreModel())
+        .register();
+
 
     private static ItemEntry<ForgeSpawnEggItem> registerSpawnEgg(String name, Supplier<? extends EntityType<? extends Mob>> entity, int backgroundColor, int highlightColor, String nameItems) {
         return CreateNuclear.REGISTRATE
@@ -455,7 +492,6 @@ public class CNItems {
             .lang(nameItems)
             .model((c, p) -> p.withExistingParent(c.getName(), new ResourceLocation("item/template_spawn_egg")))
             .register();
-
     }
 
     public static void register() {}

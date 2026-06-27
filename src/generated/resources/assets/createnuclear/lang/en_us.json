@@ -327,6 +327,7 @@
   "fluid.createnuclear.uranium": "Liquid Uranium",
   "gui.createnuclear.reactor_controller.title": "Reactor Controller",
   "gui.createnuclear.reactor_input.title": "Reactor Input Storage",
+  "item.createnuclear.biome_restore_cell": "Biome Restore Cell",
   "item.createnuclear.black_cloth": "Black Cloth",
   "item.createnuclear.blue_cloth": "Blue Cloth",
   "item.createnuclear.brown_cloth": "Brown Cloth",

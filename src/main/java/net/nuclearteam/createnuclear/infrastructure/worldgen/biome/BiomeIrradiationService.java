@@ -7,10 +7,12 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeResolver;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +47,53 @@ public final class BiomeIrradiationService {
             }
         }
 
+        PersistentIrradiatedZones.get(serverLevel).addChunks(chunks.stream().map(ChunkAccess::getPos).toList());
         serverLevel.getChunkSource().chunkMap.resendBiomesForChunks(chunks);
+    }
+
+    public static boolean restoreArea(ServerLevel serverLevel, BlockPos pos) {
+        ChunkPos centerChunk = new ChunkPos(pos);
+        PersistentIrradiatedZones zones = PersistentIrradiatedZones.get(serverLevel);
+
+        List<ChunkAccess> restored = new ArrayList<>();
+        for (ChunkPos target : resolveRestoreTargets(centerChunk)) {
+            if (!zones.containsChunk(target)) continue;
+
+            ChunkAccess chunkAccess = serverLevel.getChunk(target.x, target.z, ChunkStatus.FULL, false);
+            if (chunkAccess == null) continue;
+
+            BiomeResolver resolver = (x, y, z, sample) -> serverLevel.getChunkSource().getGenerator().getBiomeSource().getNoiseBiome(x, y, z, sample);
+
+            chunkAccess.fillBiomesFromNoise(resolver, serverLevel.getChunkSource().randomState().sampler());
+            chunkAccess.setUnsaved(true);
+            restored.add(chunkAccess);
+
+            zones.removeChunk(target);
+        }
+
+        if (restored.isEmpty()) return false;
+
+        serverLevel.getChunkSource().chunkMap.resendBiomesForChunks(restored);
+
+        return true;
+    }
+
+    private static List<ChunkPos> resolveRestoreTargets(ChunkPos center) {
+        if (!CNConfigs.server().biomeRestore.restoreInCircle.get()) {
+            return List.of(center);
+        }
+
+        int radius = CNConfigs.server().biomeRestore.restoreRadiusChunks.get();
+        List<ChunkPos> targets = new ArrayList<>();
+        for (int dz = -radius; dz <= radius; dz++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                if (dx * dx + dz * dz <= radius * radius) {
+                    targets.add(new ChunkPos(center.x + dx, center.z + dz));
+                }
+            }
+        }
+
+        return targets;
     }
 
     private static BiomeResolver createCircularResolver(Registry<Biome> biomeRegistry, BlockPos center, double radiusSq, ResourceKey<Biome> defaultTarget, ServerLevel level) {
