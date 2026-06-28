@@ -1,6 +1,6 @@
 # Audit consolidé — CreateNuclearForge (branche V2-CorrectifAudit)
 
-**Dernière mise à jour : 2026-06-28.** Nouvel audit indépendant réalisé en repartant exclusivement du code actuel (`src/main/java`, **291 fichiers, ~25 070 lignes**, hors `src/generated` et `src/main/resources`). `AUDIT_V1.md` et l'historique de ce fichier (versions précédentes) n'ont servi qu'à comparer les résultats — chaque point a été **revérifié par lecture directe des fichiers cités** (et, pour les zones les plus actives, par `git show`/`git log` sur les commits du 2026-06-24 au 2026-06-28).
+**Dernière mise à jour : 2026-06-28 (après commits `2aaddb4d`, `562ce99d`, `30de52a7`).** Nouvel audit indépendant réalisé en repartant exclusivement du code actuel (`src/main/java`, **291 fichiers, ~25 070 lignes**, hors `src/generated` et `src/main/resources`). `AUDIT_V1.md` et l'historique de ce fichier (versions précédentes) n'ont servi qu'à comparer les résultats — chaque point a été **revérifié par lecture directe des fichiers cités** (et, pour les zones les plus actives, par `git show`/`git log` sur les commits du 2026-06-24 au 2026-06-28).
 
 > Ce document ne liste que **ce qui reste à corriger ou à décider**. Les bugs résolus sont récapitulés en §6 pour mémoire, puis ne sont plus repris.
 
@@ -16,7 +16,9 @@ Aucun de ces changements ne casse les acquis des audits précédents : le point 
 
 **Nouveauté la plus significative de cet audit** : en creusant le scan multiblock fusionné (déjà crédité « corrigé » au tour précédent), la boucle partagée `scanControllerCandidates` (`ReactorPattern.java:40-56`) ne court-circuite en réalité que via `findControllerPos` (utilisé par `MultiblockHelpers`, donc par `ReactorOutput`/`ReactorRodInput`/`ReactorFluidInput`/`ReactorAlarm`). La méthode `findController` — appelée **directement** par `ReactorCasing`, `ReactorCooler` et `ReactorFrame` — a un visiteur qui retourne toujours `false` et **ne s'arrête jamais avant d'avoir parcouru les ~3971 positions** de la zone de recherche, même après avoir trouvé et traité le contrôleur pertinent. Comme `ReactorCasing` constitue le gros de la coque d'un réacteur (le bloc le plus posé/cassé), c'est en réalité le chemin le plus coûteux des deux — voir §2 point 1.
 
-La dette la plus structurelle reste **l'absence totale de tests** (`src/test` toujours vide, confirmé) — précisément là où des bugs silencieux (sur-extraction fluide, tautologie `IHeat`, scan non court-circuité) survivent à plusieurs passes d'audit.
+**Depuis cette mise à jour**, trois commits supplémentaires : retrait de `SimpleMultiBlockPattern.test()` (`2aaddb4d`, quick win déjà acquis), puis l'exécution en deux temps du chantier « tags vs `RodType` » assigné à Gio — `562ce99d` migre l'essentiel (5 des 6 sites) et enfile enfin `Level` jusqu'à `DefaultHeatCalculator`, et `30de52a7` corrige les deux sites manqués par le premier commit (`ReactorBluePrintMenu`, lookup du voisin dans `DefaultHeatCalculator`). Le chantier est désormais **intégralement terminé et cohérent** (vérifié par grep : plus aucun site de classification ne lit `CNItemTags.FUEL`/`COOLER`, seules les déclarations de tag de craft dans `CNItems.java` subsistent) — voir §2 point 8, reclassé en §6.
+
+La dette la plus structurelle reste **l'absence totale de tests** (`src/test` toujours vide, confirmé) — précisément là où des bugs silencieux (sur-extraction fluide, tautologie `IHeat`, scan non court-circuité) survivent à plusieurs passes d'audit. Ce chantier de classification illustre d'ailleurs bien le risque : la première passe (`562ce99d`) a laissé passer deux sites incohérents, repérés seulement par relecture manuelle puis corrigés en quelques minutes (`30de52a7`) — un test unitaire sur `TypeRodPredicate.isFuel/isCooled` aurait détecté l'écart immédiatement.
 
 ---
 
@@ -47,7 +49,7 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 2. **`DefaultHeatCalculator.computeHeat` — partiellement amélioré, reste O(n×81) + asymétrie fuel/cooler** *(réévalué 2026-06-28, moins grave qu'estimé précédemment)*
    `DefaultHeatCalculator.java:35-97` a changé de forme depuis le dernier audit : les items du pattern sont désormais désérialisés **une seule fois** dans une `Map<Integer, ItemStack> actualRods` (l.44-54), et la recherche du **voisin** se fait par lookup direct `actualRods.containsKey(neighborSlot)` (l.81) — **l'ancienne re-boucle O(n) sur tous les items à chaque voisin a disparu**, ce n'est donc plus un O(n²) sur les items. Reste cependant, pour chaque rod, une boucle complète sur la grille `formattedPattern` (9×9=81 cellules, l.70-73) pour retrouver sa propre position — non remplacée par une map slot→position précalculée (coût ~57×81 ≈ 4617 itérations/tick sur réacteur plein, contre le ~1 050 000 estimé par l'ancien audit, qui est donc à reclasser **🟡 mineur** plutôt que 🟠).
    - **Asymétrie toujours présente** (l.82) : l'examen des voisins ne se fait que si `"fuel".equals(currentRod)` ; un cooler ne déclenche jamais l'examen de ses voisins. `heat += rod.baseRodHeat() / neighborRod.proximityRodHeat()` (l.88, **division**) côté fuel→cooler-voisin vs addition (l.86) côté fuel→fuel-voisin. **Ne pas toucher sans confirmation balance** (toujours valable).
-   - `IHeatCalculator.computeHeat` (`IHeatCalculator.java:9`) ne reçoit toujours **aucun `Level`** ; `HeatManager.calculateHeat` (`HeatManager.java:30`) en reçoit un mais ne le propage pas (`HeatManager.java:34`) — bloque toujours la migration `isFuel`/`isCooled` (voir point 8) sur ce fichier précis.
+   - ✅ **Corrigé le 2026-06-28** (`562ce99d`) — `IHeatCalculator.computeHeat` reçoit maintenant un `Level` (`IHeatCalculator.java:10`), propagé par `HeatManager.calculateHeat` (`HeatManager.java:34`) puis utilisé pour résoudre le rod courant **et**, depuis `30de52a7`, le rod voisin (`DefaultHeatCalculator.java:60` et `:85`) via `RodType.resolveRodType`. Plus aucun appel à l'ancienne `ItemRodTypesValue.getRodType` dans ce fichier. Voir §6 pour le détail du chantier.
    - *Recommandation* : précalculer une `Map<Integer slot, int[] position>` (ou inverser `formattedPattern` en `Map<Integer,int[]>` statique au chargement de la classe) pour éliminer la boucle 81 cellules — gain mineur, risque nul, mais moins urgent qu'estimé avant.
 
 3. **`ReactorSummaryDisplaySource` — sentinelle de taille + accès positionnel fragiles** *(inchangé)*
@@ -61,8 +63,7 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 5. **`CreateNuclearJEI`** — champ statique mutable `Categories`, vidé/reconstruit à chaque `registerCategories` ; risque si JEI ré-appelle le cycle (reload ressources). *(non revérifié ce tour, signal inchangé)*
 6. **`CNPonderReactorScenes.showReactorStructure`** — boucle triple (~11×13×13) avec comparaisons positionnelles ; coût ponctuel (ouverture ponder), remplaçable par une `Map` précalculée.
 7. **`ReactorFrameDisplayManager.write`** — persiste systématiquement les sentinelles `Integer.MAX_VALUE`/`MIN_VALUE` même quand `hasFrameColumn()` est faux — pollution NBT mineure.
-8. **`CNItemTags.FUEL`/`COOLER` — double source de catégorisation avec `RodType.type()`, toujours désynchronisée** *(assigné Gio, priorité basse — inchangé, plan non encore exécuté)* — `RodType.java:301-320` (`TypeRodPredicate.IS_FUEL`/`IS_COOLED`) est **toujours** un `Predicate<ItemStack>` basé sur `ItemRodTypesValue.getRodType` (sans `Level`), **pas migré** vers `isFuel(ItemStack, Level)`/`isCooled(ItemStack, Level)` basé sur `RodType.resolveRodType`. Tous les sites listés au tour précédent (`ReactorRodInputInventory.isItemValid`, `ReactorBluePrintMenu.saveData` ×2, `*DisplaySource`, `ReactorInputManager`, `DefaultHeatCalculator`) testent toujours le double critère `stack.is(TAG) || rod.type() == X`. **`THORIUM_ROD`** (`CNItems.java:220-228`) a toujours `RodType.fuelRodType()` enregistré mais **pas** le tag `CNItemTags.FUEL` (seul `CNTags.forgeItemTag("rods")`, l.228) — preuve de désync inchangée. Plan déjà documenté au tour précédent, toujours valide, **non commencé**.
-9. **Duplication `drawGauge`** *(nouveau point, déjà signalé dans `AUDIT_V1` mais jamais repris dans ce document — confirmé toujours présent)* — la méthode `drawGauge(...)` est copiée à l'identique dans `FuelDisplaySource.java:49-51`, `CoolerDisplaySource.java:52-54`, `HeatDisplaySource.java:47-50`, `LiquidLevelDisplaySource.java:43-45` et `ReactorSummaryDisplaySource.java:178-180`, avec des magic numbers (`maxFuel=64`, `maxCooler=64`, `maxFluid=16000`, `maxHeat=1000`) éparpillés dans chaque classe. Aucune classe abstraite commune. Risque faible, mais 5 points de maintenance pour 1 seule logique de rendu — extraire une `AbstractReactorStatDisplaySource`.
+8. **Duplication `drawGauge`** *(nouveau point, déjà signalé dans `AUDIT_V1` mais jamais repris dans ce document — confirmé toujours présent)* — la méthode `drawGauge(...)` est copiée à l'identique dans `FuelDisplaySource.java:49-51`, `CoolerDisplaySource.java:52-54`, `HeatDisplaySource.java:47-50`, `LiquidLevelDisplaySource.java:43-45` et `ReactorSummaryDisplaySource.java:178-180`, avec des magic numbers (`maxFuel=64`, `maxCooler=64`, `maxFluid=16000`, `maxHeat=1000`) éparpillés dans chaque classe. Aucune classe abstraite commune. Risque faible, mais 5 points de maintenance pour 1 seule logique de rendu — extraire une `AbstractReactorStatDisplaySource`.
 
 ---
 
@@ -136,6 +137,8 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 
 **Corrigé le 2026-06-28** : garde `level.isClientSide` manquante sur la chaîne multiblock et double scan `playerDestroy`/`onRemove` (§2.1). Fix appliqué de façon centralisée plutôt que classe par classe : (1) `if (level.isClientSide) return;` ajouté en tête de `ReactorAssembler.assemble`/`disassemble` — point de convergence unique de toute la chaîne `onPlace/onRemove/playerDestroy → findController/findControllerPos → ReactorAssembler` ; (2) l'override `playerDestroy` a été supprimé de `ReactorCasing`, `ReactorCooler`, `ReactorFrame`, `ReactorAlarm`, `ReactorOutput` et `ReactorFluidInput`, généralisant le modèle déjà correct de `ReactorRodInput` (un seul appel de retrait, dans `onRemove`, qui se déclenche systématiquement y compris lors d'une casse joueur). Vérifié par lecture directe des 7 fichiers modifiés. Seul le court-circuit manquant de `findController` (perf pure) reste ouvert — voir §2.1 et §7.
 
+**Corrigé le 2026-06-28** (`562ce99d` + `30de52a7`) : désynchronisation `CNItemTags.FUEL`/`COOLER` vs `RodType.type()` (ex-§2 point 8, assigné Gio). `RodType.TypeRodPredicate.IS_FUEL`/`IS_COOLED` (anciens `Predicate<ItemStack>` basés sur `ItemRodTypesValue.getRodType`, sans `Level`) ont été remplacés par `isFuel(ItemStack, Level)`/`isCooled(ItemStack, Level)` basés uniquement sur `RodType.resolveRodType` (`RodType.java:303-309`). `Level` a été enfilé jusqu'à `IHeatCalculator.computeHeat`/`HeatManager.calculateHeat`/`DefaultHeatCalculator.computeHeat`. Premier commit (`562ce99d`) avait migré 5 des 6 sites mais laissé deux endroits sur l'ancien critère mixte `stack.is(TAG) || rod.type() == X` (`ReactorBluePrintMenu.java:165-166`) ou l'ancienne API sans `Level` (`DefaultHeatCalculator.java:85`, lookup du voisin) ; second commit (`30de52a7`) les a corrigés. Vérifié par grep sur tout `src/main/java` : plus aucun site de classification ne lit `CNItemTags.FUEL`/`COOLER` ou n'appelle `ItemRodTypesValue.getRodType` en dehors de l'implémentation interne de `RodType.resolveRodType` lui-même. Le tag `CNItemTags.FUEL` reste posé sur `THORIUM_ROD` (`CNItems.java:220`) à titre de tag de craft/recette, explicitement découplé de la classification — cohérent, pas un résidu de désync.
+
 **Confirmé neutre** : le commit `20c1df0b` (*"IO blocks are now natively Casings in NBT"*) ne fusionne rien dans le code de jeu — nettoyage cosmétique d'une scène Ponder uniquement.
 
 ---
@@ -148,25 +151,22 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 3. ~~Généraliser le modèle `ReactorRodInput`...~~ ✅ **fait le 2026-06-28** — `playerDestroy` supprimé de `ReactorCasing`, `ReactorCooler`, `ReactorFrame`, `ReactorAlarm`, `ReactorOutput`, `ReactorFluidInput` ; la logique de retrait vit désormais uniquement dans `onRemove` pour ces 6 classes (comme `ReactorRodInput`). Point résiduel mineur non traité : `ReactorOutput`/`ReactorFluidInput` n'ont pas la garde `!state.is(newState.getBlock())` dans `onRemove` malgré leurs propriétés mutables `DIR`/`FACING` (cf. §2.1).
 4. `IHeat.HeatLevel.isNotDanger` : corriger la tautologie (`!= DANGER` seul), après confirmation balance.
 5. ~~`git rm --cached` sur les 6 fichiers de debug `run/` (§4).~~ ✅ **fait le 2026-06-28**
-6. ~~Retirer `SimpleMultiBlockPattern.test()`~~ ✅ **fait** et retirer `IrradiatedBiomes.monsters()` (toujours à faire).
+6. ~~Retirer `SimpleMultiBlockPattern.test()`~~ ✅ **fait le 2026-06-28** (commit `2aaddb4d`) et retirer `IrradiatedBiomes.monsters()` (toujours à faire).
 
 **Corrections ciblées (risque faible à moyen)**
 7. `ReactorInputFluidManager` : décrémenter `fluidNeeded` entre handlers + gérer `toExtract == 1` (§1).
 8. `DefaultHeatCalculator` : précalculer une map slot→position pour éliminer la boucle 81 cellules (gain mineur désormais, priorité baissée par rapport au tour précédent) ; **ne pas** toucher l'asymétrie fuel/cooler sans validation balance.
-9. Extraire `AbstractReactorStatDisplaySource.drawGauge` pour dédupliquer les 5 copies identiques (§2.9).
-
-**Assigné Gio (priorité basse, à faire quand le temps le permet)**
-10. Tags `CNItemTags.FUEL`/`COOLER` → créer `TypeRodPredicate.isFuel/isCooled(stack, level)` basés sur `RodType.resolveRodType`, migrer `ReactorRodInputInventory`, `ReactorBluePrintMenu`, les `*DisplaySource`, `ReactorInputManager` ; restreindre les tags au craft (§2.8). Le site `DefaultHeatCalculator` nécessite d'abord d'ajouter `Level` à `IHeatCalculator.computeHeat` — toujours en suspens, non commencé.
+9. Extraire `AbstractReactorStatDisplaySource.drawGauge` pour dédupliquer les 5 copies identiques (§2.8).
 
 **Décisions produit (choisir puis exécuter)**
-11. Collier teignable chat/loup : finir le câblage (`addLayer` + `render` + interaction `DyeItem` sur `IrradiatedWolf`) ou retirer toute la mécanique (§4).
-12. `PlayerInteracteReactorFluidInput` / `ReactorOutput.SPEED` : terminer ou retirer le code commenté (§4).
+10. Collier teignable chat/loup : finir le câblage (`addLayer` + `render` + interaction `DyeItem` sur `IrradiatedWolf`) ou retirer toute la mécanique (§4).
+11. `PlayerInteracteReactorFluidInput` / `ReactorOutput.SPEED` : terminer ou retirer le code commenté (§4).
 
 **Chantier de fond (le plus rentable à long terme)**
-13. Démarrer une couverture de tests sur `DefaultHeatCalculator`, le pattern matcher (`ReactorPattern`/`CNMultiblock`) et `PersistentFluidLocks` — les trois zones où des bugs/inefficacités silencieuses ont survécu à plusieurs audits successifs.
+12. Démarrer une couverture de tests sur `DefaultHeatCalculator`, le pattern matcher (`ReactorPattern`/`CNMultiblock`) et `PersistentFluidLocks` — les trois zones où des bugs/inefficacités silencieuses ont survécu à plusieurs audits successifs.
 
 **À surveiller sans action immédiate**
-14. `RadiationCapability.tickRadiation` pour les `LivingEntity` non-joueurs : pas de dirty-check d'inventaire (recalcul à chaque tick) — compromis assumé par le commit `9ded502c`, à reconsidérer seulement si la densité de mobs équipés irradiés pose un problème de perf mesuré.
+13. `RadiationCapability.tickRadiation` pour les `LivingEntity` non-joueurs : pas de dirty-check d'inventaire (recalcul à chaque tick) — compromis assumé par le commit `9ded502c`, à reconsidérer seulement si la densité de mobs équipés irradiés pose un problème de perf mesuré.
 
 **Explicitement retiré du plan (ne plus y revenir sans nouvel élément)**
 - Découpage supplémentaire de `ReactorControllerBlockEntity` (chantier clos, croissance maîtrisée).
@@ -175,3 +175,4 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 - Coordinateur dédié au verrouillage fluide (non justifié).
 - Spam de log `ReactorAssembler` (corrigé le 2026-06-26).
 - Anti-pattern try/catch `NuclearExplosionEntity` / B15 (corrigé).
+- Tags `CNItemTags.FUEL`/`COOLER` désynchronisés de `RodType.type()` (assigné Gio, **terminé le 2026-06-28** via `562ce99d` + `30de52a7` — voir §6).
