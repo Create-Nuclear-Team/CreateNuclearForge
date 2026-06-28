@@ -82,8 +82,8 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
             for (int s = 0; s < slots; s++) {
                 ItemStack st = h.getStackInSlot(s);
 
-                if (TypeRodPredicate.IS_FUEL.test(st)) totalFuel += st.getCount();
-                else if (TypeRodPredicate.IS_COOLED.test(st)) totalCooler += st.getCount();
+                if (TypeRodPredicate.isFuel(st, level)) totalFuel += st.getCount();
+                else if (TypeRodPredicate.isCooled(st, level)) totalCooler += st.getCount();
             }
         }
 
@@ -106,11 +106,11 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
                 if (stack.isEmpty()) continue;
 
 
-                if (fuelRemaining > 0 && TypeRodPredicate.IS_FUEL.test(stack)) {
+                if (fuelRemaining > 0 && TypeRodPredicate.isFuel(stack, level)) {
                     int toExtract = Math.min(fuelRemaining, stack.getCount());
                     handler.extractItem(s, toExtract, false);
                     fuelRemaining -= toExtract;
-                } else if (coolerRemaining > 0 && TypeRodPredicate.IS_COOLED.test(stack)) {
+                } else if (coolerRemaining > 0 && TypeRodPredicate.isCooled(stack, level)) {
                     int toExtract = Math.min(coolerRemaining, stack.getCount());
                     handler.extractItem(s, toExtract, false);
                     coolerRemaining -= toExtract;

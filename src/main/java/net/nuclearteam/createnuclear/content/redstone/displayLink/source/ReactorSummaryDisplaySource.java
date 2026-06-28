@@ -123,9 +123,9 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
         int cooler = 0;
         if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
             for (var entry : controller.getDisplayState().items().entrySet()) {
-                if (TypeRodPredicate.IS_FUEL.test(entry.getKey().getDefaultInstance())) {
+                if (TypeRodPredicate.isFuel(entry.getKey().getDefaultInstance(), context.level())) {
                     fuel += entry.getValue();
-                } else if (TypeRodPredicate.IS_COOLED.test(entry.getKey().getDefaultInstance())) {
+                } else if (TypeRodPredicate.isCooled(entry.getKey().getDefaultInstance(), context.level())) {
                     cooler += entry.getValue();
                 }
             }

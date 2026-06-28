@@ -3,18 +3,11 @@ package net.nuclearteam.createnuclear;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
-import com.tterrag.registrate.providers.DataGenContext;
-import com.tterrag.registrate.providers.RegistrateItemModelProvider;
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
-import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -30,7 +23,6 @@ import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
 import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
-import java.util.function.Supplier;
 import net.minecraft.world.item.Items;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
@@ -225,7 +217,7 @@ public class CNItems {
                 .dynamicRodTimer(() -> CNConfigs.server().rods.thoriumRodLifetime.get())
                 .dynamicHeatRatio(() -> CNConfigs.server().rods.thoriumHeatRatio.get())
                 .fuelRodType()))
-            .tag(CNTags.forgeItemTag("rods"))
+            .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register()
     ;
 

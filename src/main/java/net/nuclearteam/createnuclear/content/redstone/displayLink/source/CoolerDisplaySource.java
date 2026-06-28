@@ -32,7 +32,7 @@ public class CoolerDisplaySource extends NumericSingleLineDisplaySource {
         int cooler = 0;
         if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
             for (Entry<Item, Integer> entry : controller.getDisplayState().items().entrySet()) {
-                if (TypeRodPredicate.IS_COOLED.test(entry.getKey().getDefaultInstance())) {
+                if (TypeRodPredicate.isCooled(entry.getKey().getDefaultInstance(), context.level())) {
                     cooler += entry.getValue();
                 }
             }

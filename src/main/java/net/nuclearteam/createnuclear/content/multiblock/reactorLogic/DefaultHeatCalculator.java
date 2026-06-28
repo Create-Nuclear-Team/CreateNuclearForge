@@ -5,6 +5,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
@@ -32,7 +33,7 @@ public class DefaultHeatCalculator implements IHeatCalculator {
     private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 
     @Override
-    public double computeHeat(BigFluidStack bigFluidStack, ReactorFluidType type, ReactorControllerInventory inventory, double overHeat, ReactorDisplayState displayState) {
+    public double computeHeat(BigFluidStack bigFluidStack, ReactorFluidType type, ReactorControllerInventory inventory, double overHeat, ReactorDisplayState displayState, Level level) {
         double heat = 0;
 
         ListTag list = inventory.getStackInSlot(0).getOrCreateTag().getCompound("pattern").getList("Items", Tag.TAG_COMPOUND);
@@ -56,12 +57,12 @@ public class DefaultHeatCalculator implements IHeatCalculator {
         for (Map.Entry<Integer, ItemStack> entry : actualRods.entrySet()) {
             int slot = entry.getKey();
             ItemStack currentStack = entry.getValue();
-            RodType rod = ItemRodTypesValue.getRodType(currentStack.getItem());
+            RodType rod = RodType.resolveRodType(currentStack.getItem(), level);
             String currentRod = "";
-            if (currentStack.is(CNTags.CNItemTags.FUEL.tag) || (rod.items().size() > 0 && rod.type() == RodType.TypeRod.FUEL)) {
+            if (rod.items().size() > 0 && rod.type() == RodType.TypeRod.FUEL) {
                 heat += rod.baseRodHeat();
                 currentRod = "fuel";
-            } else if (currentStack.is(CNTags.CNItemTags.COOLER.tag) || (rod.items().size() > 0 && rod.type() == RodType.TypeRod.COOLER)) {
+            } else if (rod.items().size() > 0 && rod.type() == RodType.TypeRod.COOLER) {
                 heat += rod.baseRodHeat();
                 currentRod = "cooler";
             }
@@ -82,9 +83,9 @@ public class DefaultHeatCalculator implements IHeatCalculator {
                             if ("fuel".equals(currentRod)) {
                                 ItemStack stack = actualRods.get(neighborSlot);
                                 RodType neighborRod = ItemRodTypesValue.getRodType(stack.getItem());
-                                if (stack.is(CNTags.CNItemTags.FUEL.tag) || (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.FUEL)) {
+                                if (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.FUEL) {
                                     heat += rod.proximityRodHeat();
-                                } else if (stack.is(CNTags.CNItemTags.COOLER.tag) || (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.COOLER)) {
+                                } else if (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.COOLER) {
                                     heat += rod.baseRodHeat() / neighborRod.proximityRodHeat();
                                 }
                             }

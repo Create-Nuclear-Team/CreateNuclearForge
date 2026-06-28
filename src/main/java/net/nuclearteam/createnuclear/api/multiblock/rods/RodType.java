@@ -14,7 +14,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
-import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 
@@ -301,20 +300,18 @@ public record RodType(HolderSet<Item> items,
     public static final class TypeRodPredicate {
         public static final Predicate<ItemStack> IS_NOT_NULL = Objects::nonNull;
 
-        public static final Predicate<ItemStack> IS_FUEL = s -> {
-            TypeRod type = ItemRodTypesValue.getRodType(s.getItem()).type;
-            return IS_NOT_NULL.test(s) && (s.is(CNItemTags.FUEL.tag) || type == TypeRod.FUEL);
-        };
+        public static boolean isFuel(ItemStack stack, Level level) {
+            return IS_NOT_NULL.test(stack) && RodType.resolveRodType(stack.getItem(), level).type == TypeRod.FUEL;
+        }
 
-        public static final Predicate<ItemStack> IS_COOLED = s -> {
-            TypeRod type = ItemRodTypesValue.getRodType(s.getItem()).type;
-            return IS_NOT_NULL.test(s) && (s.is(CNItemTags.COOLER.tag) || type == TypeRod.COOLER);
-        };
+        public static boolean isCooled(ItemStack stack, Level level) {
+            return IS_NOT_NULL.test(stack) && RodType.resolveRodType(stack.getItem(), level).type == TypeRod.COOLER;
+        }
 
-        public static String tooltipKey(ItemStack stack) {
+        public static String tooltipKey(ItemStack stack, Level level) {
             if (!IS_NOT_NULL.test(stack)) return "unknown";
-            if (IS_FUEL.test(stack)) return "fuel";
-            if (IS_COOLED.test(stack)) return "cooled";
+            if (isFuel(stack, level)) return "fuel";
+            if (isCooled(stack, level)) return "cooled";
             return "unknown";
         }
     }

@@ -1,4 +1,4 @@
-// 1.20.1	2026-06-27T22:58:21.7694379	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
+// 1.20.1	2026-06-28T17:14:06.741002	Registrate Provider for createnuclear [Recipes, Advancements, Loot Tables, Tags (blocks), Tags (items), Tags (fluids), Tags (entity_types), Blockstates, Item models, Lang (en_us/en_ud)]
 0b2c76c9cff305eacfdfb57c4b703f94ca6dc903 assets/createnuclear/blockstates/autunite.json
 5d06bc544bcbeb7443178d66955bb5101cf696da assets/createnuclear/blockstates/autunite_pillar.json
 5b375444ac5057e63776f4991589c57824574b4a assets/createnuclear/blockstates/cut_autunite.json
@@ -612,7 +612,7 @@ bfd5a561b60a7d59d7f7c248ec75e3571a0f2fed data/createnuclear/tags/fluids/uranium.
 bce34f53cb2d00f7dee84683e8fdd429dabbcc1d data/createnuclear/tags/items/anti_radiation_armor.json
 2e4d08932c4a84863f0198eb2845f80d8fda1221 data/createnuclear/tags/items/cloth.json
 8e6598f14a72a61cbe1e5ed2aaea229fb2dd74e6 data/createnuclear/tags/items/cooler.json
-c5587bb72c54f59e9f9a4cd2c3e6bedb78ee198d data/createnuclear/tags/items/fuel.json
+d534438c9314e8b014bf1796060dd801f4ef4d4e data/createnuclear/tags/items/fuel.json
 1a438d724641b4899f18b4abeef0b0708c76ea70 data/createnuclear/tags/items/stone_types/autunite.json
 d8d6ad7a4fc31fd68a98b368207c359fb610f417 data/create/tags/blocks/safe_nbt.json
 75f0600da4891d0f4a3329fb44cac6c4945a0b49 data/forge/tags/blocks/glass.json

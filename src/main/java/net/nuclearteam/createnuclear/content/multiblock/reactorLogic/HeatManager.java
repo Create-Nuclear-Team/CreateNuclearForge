@@ -31,7 +31,7 @@ public class HeatManager {
         ReactorFluidType type = bigFluidStack == null ? null : bigFluidStack.getFluidtype(level);
         overheatController.updateState(totalHeatRatio, bigFluidStack, type);
 
-        return calculator.computeHeat(bigFluidStack, type, inventory, overheatController.getOverHeat(), displayState);
+        return calculator.computeHeat(bigFluidStack, type, inventory, overheatController.getOverHeat(), displayState, level);
     }
 
     public int getLiquidTimer() { return  overheatController.getLiquidTimer();}

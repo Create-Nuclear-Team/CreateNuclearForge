@@ -2,11 +2,9 @@ package net.nuclearteam.createnuclear.content.multiblock.input.item;
 
 
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.items.ItemStackHandler;
-import net.nuclearteam.createnuclear.CNTags;
-import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
-import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
-import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRod;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import org.jetbrains.annotations.NotNull;
 
 public class ReactorRodInputInventory extends ItemStackHandler {
@@ -25,9 +23,9 @@ public class ReactorRodInputInventory extends ItemStackHandler {
 
     @Override
     public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-        RodType rodType = ItemRodTypesValue.getRodType(stack.getItem());
+        Level level = be.getLevel();
         return switch (slot) {
-            case 0 -> CNTags.CNItemTags.FUEL.matches(stack) || rodType.type() == TypeRod.FUEL || CNTags.CNItemTags.COOLER.matches(stack) || rodType.type() == TypeRod.COOLER;
+            case 0 -> level != null && (TypeRodPredicate.isFuel(stack, level) || TypeRodPredicate.isCooled(stack, level));
             default -> !super.isItemValid(slot, stack);
         };
     }

@@ -8,6 +8,7 @@ import net.createmod.catnip.lang.Lang;
 import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
@@ -108,10 +109,10 @@ public interface IHeat extends IWrenchable {
             return builder;
         }
 
-        public static LangBuilder getFormattedItemText(ItemStack itemRod, Boolean isEmpty) {
+        public static LangBuilder getFormattedItemText(ItemStack itemRod, Boolean isEmpty, Level level) {
             LangBuilder builder = Lang.builder(CreateNuclear.MOD_ID);
 
-            String tooltip = TypeRodPredicate.tooltipKey(itemRod);
+            String tooltip = TypeRodPredicate.tooltipKey(itemRod, level);
 
             builder.translate("tooltip.item." + tooltip + ".rod")
                 // when it's empty, we show the number minus one to display zero because we fake the item count as 1
@@ -122,8 +123,8 @@ public interface IHeat extends IWrenchable {
             return builder;
         }
 
-        public static LangBuilder getFormattedItemText(BigItemStack itemRod, Boolean isEmpty) {
-            return getFormattedItemText(new ItemStack(itemRod.stack.getItem(), itemRod.count), isEmpty);
+        public static LangBuilder getFormattedItemText(BigItemStack itemRod, Boolean isEmpty, Level level) {
+            return getFormattedItemText(new ItemStack(itemRod.stack.getItem(), itemRod.count), isEmpty, level);
         }
 
         public static LangBuilder getName(String name) {
