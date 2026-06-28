@@ -2,6 +2,7 @@ package net.nuclearteam.createnuclear.api.radiation;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -43,10 +44,10 @@ public class RadiationRegistry {
         return 0D;
     }
 
-    public static double getRadiation(ItemStack stack, Player player) {
+    public static double getRadiation(ItemStack stack, LivingEntity entity) {
         return get(stack) * stack.getCount();
     }
-    public static double getRadiation(ResourceKey<Biome> biome, Player player) {
+    public static double getRadiation(ResourceKey<Biome> biome, LivingEntity entity) {
         return get(biome);
     }
 

@@ -2,10 +2,10 @@ package net.nuclearteam.createnuclear.foundation.events;
 
 import net.minecraft.world.entity.*;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.nuclearteam.createnuclear.*;
@@ -24,15 +24,17 @@ public class CommentEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent event) {
-        RadiationCapability.onPlayerTick(event);
+    public static void onLivingEntityTick(LivingTickEvent event) {
+        RadiationCapability.onLivingEntityTick(event);
     }
 
     @Mod.EventBusSubscriber(modid = CreateNuclear.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RadiationEvent {
         @SubscribeEvent
         public static void onEntityAttribute(EntityAttributeModificationEvent event) {
-            event.add(EntityType.PLAYER, CNAttributes.IRRADIATED_RESISTANCE.get());
+            for (EntityType<? extends LivingEntity> type : event.getTypes()) {
+                event.add(type, CNAttributes.IRRADIATED_RESISTANCE.get());
+            }
         }
     }
 
