@@ -68,8 +68,4 @@ public record SimpleMultiBlockPattern(List<MultiBlockOffsetPos> multiBlockOffset
             }
         }
     }
-
-    public List<MultiBlockOffsetPos> test() {
-        return this.multiBlockOffsetPosList;
-    }
 }

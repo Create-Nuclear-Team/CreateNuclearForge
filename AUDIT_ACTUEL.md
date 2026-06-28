@@ -87,8 +87,8 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 > **⚠️ Faux positifs à NE PAS supprimer** : `CNTabulaModelRenderUtils` (rendu vivant du champignon atomique) ; `ReactorOutputEntity.outputPos` (lu/écrit en NBT) ; `setRotateAngle` (appelé par `NuclearMushroomCloudModel`).
 
 **Pur dead code (retrait sûr)**
-- **`lib/multiblock/SimpleMultiBlockPattern.java` méthode `test()`** (l.72-74) — toujours aucun appelant (grep confirmé). Retrait trivial.
-- **`IrradiatedBiomes.monsters()`** — corps toujours vide, appelé avec des arguments (95, 5, 100) silencieusement ignorés. À retirer ou implémenter.
+- ~~**`lib/multiblock/SimpleMultiBlockPattern.java` méthode `test()`**~~ ✅ **Retiré** — confirmé par `git diff` : la méthode a disparu du fichier de travail, aucun appelant n'était présent.
+- **`IrradiatedBiomes.monsters()`** — corps toujours vide (`IrradiatedBiomes.java:17-18`), appelé avec des arguments (95, 5, 100) silencieusement ignorés (l.55). À retirer ou implémenter.
 
 **Code commencé puis abandonné (hygiène de fin de PR)**
 - `content/multiblock/input/fluid/PlayerInteracteReactorFluidInput.java:57-61` — bloc d'interaction fluide toujours commenté/inachevé (non touché par le récent nettoyage de `ReactorOutput`).
@@ -148,7 +148,7 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 3. ~~Généraliser le modèle `ReactorRodInput`...~~ ✅ **fait le 2026-06-28** — `playerDestroy` supprimé de `ReactorCasing`, `ReactorCooler`, `ReactorFrame`, `ReactorAlarm`, `ReactorOutput`, `ReactorFluidInput` ; la logique de retrait vit désormais uniquement dans `onRemove` pour ces 6 classes (comme `ReactorRodInput`). Point résiduel mineur non traité : `ReactorOutput`/`ReactorFluidInput` n'ont pas la garde `!state.is(newState.getBlock())` dans `onRemove` malgré leurs propriétés mutables `DIR`/`FACING` (cf. §2.1).
 4. `IHeat.HeatLevel.isNotDanger` : corriger la tautologie (`!= DANGER` seul), après confirmation balance.
 5. ~~`git rm --cached` sur les 6 fichiers de debug `run/` (§4).~~ ✅ **fait le 2026-06-28**
-6. Retirer `SimpleMultiBlockPattern.test()` et `IrradiatedBiomes.monsters()`.
+6. ~~Retirer `SimpleMultiBlockPattern.test()`~~ ✅ **fait** et retirer `IrradiatedBiomes.monsters()` (toujours à faire).
 
 **Corrections ciblées (risque faible à moyen)**
 7. `ReactorInputFluidManager` : décrémenter `fluidNeeded` entre handlers + gérer `toExtract == 1` (§1).
