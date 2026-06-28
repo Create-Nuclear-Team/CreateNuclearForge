@@ -160,10 +160,10 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
                 continue;
             }
 
-            RodType typeRod = ItemRodTypesValue.getRodType(stack.getItem());
+            RodType typeRod = RodType.resolveRodType(stack.getItem(), playerInventory.player.level());
 
-            boolean isFuel = stack.is(CNItemTags.FUEL.tag) || typeRod.type() == TypeRod.FUEL;
-            boolean isCooler = stack.is(CNItemTags.COOLER.tag) || typeRod.type() == TypeRod.COOLER;
+            boolean isFuel = typeRod.type() == TypeRod.FUEL;
+            boolean isCooler = typeRod.type() == TypeRod.COOLER;
 
             if (!(isFuel || isCooler)) {
                 ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));

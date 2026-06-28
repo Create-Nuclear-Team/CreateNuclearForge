@@ -82,7 +82,7 @@ public class DefaultHeatCalculator implements IHeatCalculator {
                         if (actualRods.containsKey(neighborSlot)) {
                             if ("fuel".equals(currentRod)) {
                                 ItemStack stack = actualRods.get(neighborSlot);
-                                RodType neighborRod = ItemRodTypesValue.getRodType(stack.getItem());
+                                RodType neighborRod = RodType.resolveRodType(stack.getItem(), level);
                                 if (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.FUEL) {
                                     heat += rod.proximityRodHeat();
                                 } else if (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.COOLER) {
