@@ -1,34 +1,32 @@
 # Audit consolidé — CreateNuclearForge (branche V2-CorrectifAudit)
 
-**Dernière fusion : 2026-06-22.** Ce document fusionne `AUDIT_ACTUEL.md` (7 audits croisés sur `src/main/java`) et `AUDIT_INDEPENDANT.md` (relecture indépendante du 2026-06-20). Chaque point litigieux entre les deux a été **revérifié directement dans le code** (lecture de fichier + grep des appelants) avant classement. Les divergences entre les deux audits sont tranchées et annotées ci-dessous.
-
-> **Mise à jour 2026-06-23** : tous les problèmes radiation (ancienne §2) ont été corrigés et déplacés en §6 « pour mémoire ». Les sections et les points ont été renumérotés en conséquence.
+**Dernière mise à jour : 2026-06-28.** Nouvel audit indépendant réalisé en repartant exclusivement du code actuel (`src/main/java`, **291 fichiers, ~25 070 lignes**, hors `src/generated` et `src/main/resources`). `AUDIT_V1.md` et l'historique de ce fichier (versions précédentes) n'ont servi qu'à comparer les résultats — chaque point a été **revérifié par lecture directe des fichiers cités** (et, pour les zones les plus actives, par `git show`/`git log` sur les commits du 2026-06-24 au 2026-06-28).
 
 > Ce document ne liste que **ce qui reste à corriger ou à décider**. Les bugs résolus sont récapitulés en §6 pour mémoire, puis ne sont plus repris.
 
-**Périmètre** : `src/main/java` (286 fichiers, ~24 600 lignes), hors `src/generated` et `src/main/resources`. Recoupé avec l'historique Git.
-
-**Limite de couverture honnête** : les bugs mineurs/robustesse `B7, B10, B17, B18` et la liste « mineurs » non numérotée d'`AUDIT_V1.md` n'ont pas été re-vérifiés ici faute de signal de changement — ni confirmés ni infirmés, à re-vérifier ponctuellement avant traitement.
+**Limite de couverture honnête** : les bugs mineurs/robustesse listés au §1 de l'historique (`B7, B10, B17, B18` et la liste « mineurs » non numérotée d'`AUDIT_V1.md`) n'ont pas été re-vérifiés ici faute de signal de changement — ni confirmés ni infirmés, à re-vérifier ponctuellement avant traitement.
 
 ---
 
 ## 0. Constat global
 
-Le **chantier architectural n°1 des audits précédents — la décomposition de `ReactorControllerBlockEntity` — est désormais réellement effectif** (commits `dd918582`, `6e717c44`, `8611ed76`, `56373bf7`, `39092ca3`). La classe fait **492 lignes** et délègue à `service/` (8 fichiers), `manager/` (5 fichiers), `consumable/` (6 fichiers), `display/` (2 fichiers). Ce qui reste est de la **coordination de multiblock** (positions I/O, état de pattern, délégation de verrou), plus un hub god-class. **Ce chantier est considéré comme clos** (voir §3).
+Depuis le dernier audit (2026-06-24), le projet a continué d'évoluer activement (16 commits en 4 jours) : extraction de `CNBuilderTransformers` (SRP propre, 97 lignes, 3 builders isolés), ajout de l'item **Biome Restore Cell** (code neuf, propre, bien isolé dans `BiomeRestoreCellItem`/`BiomeIrradiationService`), refonte du système de radiation pour couvrir **toutes les `LivingEntity`** et non plus seulement les joueurs (`9ded502c`), centralisation de l'attribution des advancements de pose via le contrôleur plutôt que la pièce posée (`19617118`), et suppression du `LOGGER.warn` redondant dans `ReactorAssembler` (`b309f231`, **quick win déjà traité**).
 
-En contrepartie, deux affirmations structurelles d'`AUDIT_V1.md`, reprises sans re-vérification, sont **fausses sur le code actuel** : l'« inversion de dépendance `api/` » et les « frameworks multiblock concurrents » (voir §3). À l'inverse, des bugs simples et jamais mis en doute (`B15`, tautologie `isNotDanger`) restent présents — signe que le nettoyage a suivi les zones très signalées (radiation, dead code, controller) plutôt qu'une revue ligne à ligne.
+Aucun de ces changements ne casse les acquis des audits précédents : le point de vérité unique radiation (`canBeIrradiated`) tient toujours, l'extension aux mobs ne boucle pas sur le monde (elle s'appuie sur `LivingTickEvent`, déclenché nativement par tick et par entité), et la centralisation des advancements est un vrai gain (élimine un risque de double-attribution). Un commit au message trompeur (`20c1df0b`, *"IO blocks are now natively Casings"*) ne change **rien** à l'architecture : il ne fait que nettoyer 22 lignes d'une scène Ponder ; les blocs I/O (`ReactorOutput`, `ReactorRodInput`, `ReactorFluidInput`, `ReactorAlarm`) restent des classes `Block` séparées de `ReactorCasing`.
 
-La **dette la plus structurelle reste l'absence totale de tests** (`src/test` vide) sur une logique métier non triviale (chaleur, pattern matching, verrouillage fluide) — précisément les zones où des bugs silencieux survivent à plusieurs passes d'audit.
+**Nouveauté la plus significative de cet audit** : en creusant le scan multiblock fusionné (déjà crédité « corrigé » au tour précédent), la boucle partagée `scanControllerCandidates` (`ReactorPattern.java:40-56`) ne court-circuite en réalité que via `findControllerPos` (utilisé par `MultiblockHelpers`, donc par `ReactorOutput`/`ReactorRodInput`/`ReactorFluidInput`/`ReactorAlarm`). La méthode `findController` — appelée **directement** par `ReactorCasing`, `ReactorCooler` et `ReactorFrame` — a un visiteur qui retourne toujours `false` et **ne s'arrête jamais avant d'avoir parcouru les ~3971 positions** de la zone de recherche, même après avoir trouvé et traité le contrôleur pertinent. Comme `ReactorCasing` constitue le gros de la coque d'un réacteur (le bloc le plus posé/cassé), c'est en réalité le chemin le plus coûteux des deux — voir §2 point 1.
+
+La dette la plus structurelle reste **l'absence totale de tests** (`src/test` toujours vide, confirmé) — précisément là où des bugs silencieux (sur-extraction fluide, tautologie `IHeat`, scan non court-circuité) survivent à plusieurs passes d'audit.
 
 ---
 
 ## 1. 🐛 Bugs confirmés toujours présents (revérifiés)
 
-| Réf. | Fichier:ligne | Gravité | Détail (vérifié) |
+| Réf. | Fichier:ligne | Gravité | Détail (vérifié 2026-06-28) |
 |---|---|---|---|
-| **isNotDanger tautologie** | `content/multiblock/IHeat.java:88-90` | 🟠 | `return of(heat,size) != DANGER \|\| of(heat,size) != NONE;` — toujours `true` (un `HeatLevel` ne peut être les deux). Appelant **confirmé `ReactorControllerBlockEntity.java:391`** (et non ~454 comme indiqué auparavant) : la garde « ne pas faire tourner les sorties en `DANGER` » est **inopérante**, les sorties tournent même en surchauffe. Correctif d'1 ligne (`!= DANGER` seul), à confirmer côté balance. |
-| **ReactorInputFluidManager — sur-extraction** | `ReactorInputFluidManager.java:146-151` | 🟠 | `fluidNeeded` **n'est jamais décrémenté** entre handlers dans la boucle d'extraction → chaque handler tente d'extraire le besoin complet (sur-extraction si plusieurs inputs). De plus `if (toExtract > 1)` **ignore les extractions de 1 unité**. ⚠️ L'off-by-one `getFluidInTank(getTanks())` est en revanche **corrigé** → `getFluidInTank(0)` (l.126, l.144). *(Tranche le désaccord entre les deux audits : `AUDIT_ACTUEL` avait raison sur l'off-by-one corrigé ; `AUDIT_INDEPENDANT` se trompait en le disant encore présent.)* Toléré aujourd'hui car `SmartFluidTank` est mono-tank, mais reste une violation de contrat `IFluidHandler` qui deviendra active au premier tank multi-slot. |
-| **InventoryHashUtil — resync durabilité** | `InventoryHashUtil` | 🟡 | Toujours `h = 31*h + stack.getDamageValue()` → resync radiation à chaque variation de durabilité d'un item. |
+| **isNotDanger tautologie** | `content/multiblock/IHeat.java:88-90` | 🟠 | `return of(heat,size) != DANGER \|\| of(heat,size) != NONE;` — toujours `true`. Appelant unique confirmé `ReactorControllerBlockEntity.java:428` (la classe a grossi, la ligne a bougé). La garde « ne pas faire tourner les sorties en `DANGER` » reste **inopérante** : les sorties tournent même en surchauffe. Correctif d'1 ligne (`!= DANGER` seul), à confirmer côté balance. |
+| **ReactorInputFluidManager — sur-extraction** | `controller/manager/ReactorInputFluidManager.java:137-155` | 🟠 | `fluidNeeded` (paramètre de `extractFluids`) n'est **toujours jamais décrémenté** entre handlers (l.146-151) → chaque handler de la boucle tente d'extraire le besoin complet, sur-extraction possible avec plusieurs inputs. `if (toExtract > 1)` (l.147) ignore toujours les extractions de 1 unité. Toléré aujourd'hui (tank mono-slot), reste une violation de contrat latente. |
+| **InventoryHashUtil — resync durabilité** | `foundation/utility/InventoryHashUtil.java:90-91` | 🟡 | Toujours `h = 31*h + stack.getDamageValue()` pour tout item endommageable → resync à chaque variation de durabilité. |
 
 ---
 
@@ -36,86 +34,82 @@ La **dette la plus structurelle reste l'absence totale de tests** (`src/test` vi
 
 ### 🔴 Critique — performance/correction du scan multiblock
 
-1. **Scan géométrique du contrôleur : aucune garde client + double appel sur un même événement** *(partiellement corrigé, revérifié 2026-06-24)*
-   - ✅ **Corrigé** — `ReactorPattern.findController`/`findControllerPos` (`ReactorPattern.java`) partagent désormais une seule boucle de scan (`scanControllerCandidates`) avec court-circuit dès qu'un controller pertinent est trouvé. `findController` filtre maintenant via `isInReactorRange` : un controller voisin déjà assemblé dont la structure n'inclut pas `blockPos` n'est plus ré-assemblé/désassemblé inutilement (évitait un risque de double-enregistrement I/O via `ReactorAssembler.findAndRegisterSpecialBlocks`, qui n'est pas idempotent).
-   - ✅ **Corrigé** — `MultiblockHelpers.handleOnPlace`/`handleRemoval` faisaient **deux scans complets** par pose/casse (`findController` puis `findControllerPos`). Fusionné en un seul scan via une nouvelle surcharge `findControllerPos(pos, level, first)` qui fait le travail d'assemblage **et** retourne le controller pertinent ; la surcharge `handleOnPlace(pos, level, boolean)` (devenue inutilisée) a été supprimée.
-   - ❌ **Toujours non corrigé** — **aucune garde `level.isClientSide()`** nulle part dans la chaîne `onPlace/onRemove/playerDestroy → findController/findControllerPos → ReactorAssembler.assemble/disassemble`. Mutation d'état métier toujours potentiellement exécutée côté client en plus du serveur.
-   - ❌ **Toujours non corrigé** — **double appel à la casse** : `ReactorCasing.java` appelle toujours `pattern.findController` dans **`playerDestroy` (l.60) ET `onRemove` (l.66)** pour le même événement → deux scans complets. Idem `ReactorCooler.java` (l.39 + l.45). `ReactorFrame.java` reste le seul à garder `if (!state.is(newState.getBlock()))` côté `onRemove`.
-   - ❌ **Toujours non corrigé** — **spam de log** : `ReactorAssembler.assemble` logue toujours en `LOGGER.warn` (`ReactorAssembler.java:40-41`) à chaque réussite de pattern.
-   - *Reste à faire* : `if (level.isClientSide()) return;` en tête de `findController`/`findControllerPos` ; supprimer l'appel redondant dans `ReactorCasing.playerDestroy`/`ReactorCooler.playerDestroy` (garder `onRemove`) ; `LOGGER.warn` → `LOGGER.debug`. Risque très faible, gain net en multijoueur — **reste la priorité n°1 du projet**, mais le scan lui-même (le plus coûteux des deux problèmes initiaux) est désormais optimisé et plus sûr sur les multiblocks voisins.
+1. **Scan géométrique du contrôleur : court-circuit incomplet + aucune garde client + double appel pose/casse** *(nuancé — affiné 2026-06-28)*
+   - ✅ **Toujours acquis** — `ReactorPattern` n'a qu'**une seule** boucle de scan partagée (`scanControllerCandidates`, `ReactorPattern.java:40-56`) sur ~3971 positions (`y∈[-5,+5]`, `x,z∈[-9,+9]`), filtrée par `isInReactorRange` (l.111-113).
+   - ❌ **Nuance nouvelle, non vue par l'audit précédent** — le court-circuit (`return true` dans le visiteur dès qu'un contrôleur pertinent est trouvé) n'existe que dans **`findControllerPos`** (`ReactorPattern.java:73-94`, utilisé via `MultiblockHelpers.handleOnPlace/handleRemoval/getControllerForPart` → donc par `ReactorOutput`, `ReactorRodInput`, `ReactorFluidInput`, `ReactorAlarm`). **`findController`** (`ReactorPattern.java:58-71`), appelé **directement** par `ReactorCasing.java:49,61,67`, `ReactorCooler.java:28,40,46` et `ReactorFrame.java:113,125,135`, a un visiteur qui **retourne toujours `false`** (l.69) : il continue de parcourir les ~3971 positions restantes même après avoir traité le contrôleur pertinent. `ReactorCasing` étant le bloc le plus posé/cassé (coque du réacteur), c'est le chemin le plus chaud des deux et il n'est **pas** optimisé. Fix trivial : faire retourner `inRange` au lieu de `false` dans le visiteur de `findController`, comme c'est déjà fait dans `findControllerPos`.
+   - ❌ **Toujours non corrigé** — **aucune garde `level.isClientSide()`** dans toute la chaîne `onPlace/onRemove/playerDestroy → findController/findControllerPos → ReactorAssembler.assemble/disassemble`. (Le seul `isClientSide` du fichier, `ReactorFrame.java:71`, est dans `neighborChanged`, sans rapport.)
+   - ❌ **Toujours non corrigé, état affiné par bloc** — double scan à la casse :
+     - `ReactorCasing`/`ReactorCooler` : **aucune garde**, `playerDestroy` et `onRemove` appellent chacun `pattern.findController(pos, level, false)` sans condition → double scan systématique à chaque casse joueur.
+     - `ReactorOutput.java:71-79` et `ReactorFluidInput.java:94-103` : même défaut via `MultiblockHelpers.handleRemoval`, **sans aucune garde** dans `onRemove`.
+     - `ReactorAlarm.java:43-60` et `ReactorFrame.java:123-137` : `onRemove` est **guardé** (`if (!state.is(newState.getBlock()))`) pour ne pas re-scanner sur un simple changement d'état (rotation, etc.), mais ce garde **ne protège pas** du double appel quand le joueur casse réellement le bloc — `playerDestroy` s'exécute toujours en plus.
+     - **`ReactorRodInput.java:82-92` est le seul bloc correctement conçu** : pas de `playerDestroy` du tout, un seul appel dans `onRemove`, guardé par le changement de type de bloc. **C'est le modèle de référence à généraliser** aux 5 autres blocs (retirer l'appel de `playerDestroy`, garder l'appel guardé dans `onRemove`).
+   - ✅ **Corrigé et confirmé stable** — `ReactorAssembler.assemble` ne logue plus rien en succès (`ReactorAssembler.java`, vérifié : aucun `LOGGER.warn`/`LOGGER.info` dans `assemble`/`disassemble`). *(Quick win traité par le commit `b309f231`.)*
+   - *Reste à faire* : (a) `findController` doit court-circuiter comme `findControllerPos` (1 ligne, gain net immédiat sur le chemin le plus chaud) ; (b) `if (level.isClientSide()) return;` en tête de `findController`/`findControllerPos` ; (c) aligner `ReactorCasing`, `ReactorCooler`, `ReactorOutput`, `ReactorFluidInput`, `ReactorAlarm` sur le modèle `ReactorRodInput` (un seul appel, dans `onRemove`, guardé par le changement de bloc). Risque très faible, **reste la priorité n°1 du projet**.
 
 ### 🟠 Importants
 
-2. **`DefaultHeatCalculator.computeHeat` — coût ~O(n²) avec désérialisation NBT répétée + asymétrie fuel/cooler** *(confirmé `DefaultHeatCalculator.java:35-75`)*
-   Pour chaque item du pattern, boucle sur la grille pour localiser sa position, puis pour chaque voisin **re-boucle sur la totalité des items** (l.59) pour retrouver le voisin par slot — chaque itération désérialise un `ItemStack.of(...)` depuis NBT sans cache (l.36, l.62). Coût pire cas ~57×81×4×57 ≈ 1 050 000 itérations/tick sur réacteur plein. Non couvert par les audits historiques (`reactorLogic/`).
-   - **Asymétrie** (l.61) : le calcul de proximité ne fire que si `"fuel".equals(currentRod)` ; un cooler ne déclenche jamais l'examen de ses voisins. De plus `heat += rod.baseRodHeat() / neighborRod.proximityRodHeat()` (l.67, **division**) côté fuel→voisin vs additions ailleurs.
-   - *Recommandation* : remplacer la boucle de recherche du voisin (l.59) par une `Map<Integer slot, ItemStack>` construite une fois par appel → O(n) au lieu de O(n²), **sans changer le comportement**. **Ne pas toucher** à l'asymétrie/division sans confirmation balance (la logique de chaleur a des distinctions intentionnelles entre chemins — ne pas unifier sans vérification).
-   - **Dépendance avec le point 9 (tags `FUEL`/`COOLER`)** : `computeHeat` (et l'interface `IHeatCalculator.computeHeat`, `IHeatCalculator.java:9`) ne reçoivent **aucun `Level`**, alors que `HeatManager.calculateHeat` (`HeatManager.java:29`) en a un et ne le propage pas (`HeatManager.java:32`). Tant que ce `Level` n'est pas ajouté à la signature, ce fichier ne peut pas utiliser `TypeRodPredicate.isFuel/isCooled` (qui ont besoin de `RodType.resolveRodType(item, level)`) et reste donc sur le double-check `stack.is(TAG) || rod.type() == X` (l.61, l.64, l.85, l.87) — c'est le site le plus engageant des 4 listés au point 9, car il touche une interface publique et non un simple remplacement local.
+2. **`DefaultHeatCalculator.computeHeat` — partiellement amélioré, reste O(n×81) + asymétrie fuel/cooler** *(réévalué 2026-06-28, moins grave qu'estimé précédemment)*
+   `DefaultHeatCalculator.java:35-97` a changé de forme depuis le dernier audit : les items du pattern sont désormais désérialisés **une seule fois** dans une `Map<Integer, ItemStack> actualRods` (l.44-54), et la recherche du **voisin** se fait par lookup direct `actualRods.containsKey(neighborSlot)` (l.81) — **l'ancienne re-boucle O(n) sur tous les items à chaque voisin a disparu**, ce n'est donc plus un O(n²) sur les items. Reste cependant, pour chaque rod, une boucle complète sur la grille `formattedPattern` (9×9=81 cellules, l.70-73) pour retrouver sa propre position — non remplacée par une map slot→position précalculée (coût ~57×81 ≈ 4617 itérations/tick sur réacteur plein, contre le ~1 050 000 estimé par l'ancien audit, qui est donc à reclasser **🟡 mineur** plutôt que 🟠).
+   - **Asymétrie toujours présente** (l.82) : l'examen des voisins ne se fait que si `"fuel".equals(currentRod)` ; un cooler ne déclenche jamais l'examen de ses voisins. `heat += rod.baseRodHeat() / neighborRod.proximityRodHeat()` (l.88, **division**) côté fuel→cooler-voisin vs addition (l.86) côté fuel→fuel-voisin. **Ne pas toucher sans confirmation balance** (toujours valable).
+   - `IHeatCalculator.computeHeat` (`IHeatCalculator.java:9`) ne reçoit toujours **aucun `Level`** ; `HeatManager.calculateHeat` (`HeatManager.java:30`) en reçoit un mais ne le propage pas (`HeatManager.java:34`) — bloque toujours la migration `isFuel`/`isCooled` (voir point 8) sur ce fichier précis.
+   - *Recommandation* : précalculer une `Map<Integer slot, int[] position>` (ou inverser `formattedPattern` en `Map<Integer,int[]>` statique au chargement de la classe) pour éliminer la boucle 81 cellules — gain mineur, risque nul, mais moins urgent qu'estimé avant.
 
-3. **`ReactorSummaryDisplaySource` — sentinelle de taille + accès positionnel fragiles**
-   `getComponents()` retourne une liste de taille **1** (pas de contrôleur) ou **6** (normal) ; les appelants testent `components.size() < 6` et `components.get(2).get(1)` accède positionnellement à la ligne « fuel ». Tout ajout/réordonnancement de ligne casse silencieusement ces contrats implicites.
+3. **`ReactorSummaryDisplaySource` — sentinelle de taille + accès positionnel fragiles** *(inchangé)*
+   `getComponents()` retourne toujours une liste de taille 1 (pas de contrôleur) ou 6 (normal) ; les appelants gardent `if (components.size() < 6)` avant un accès positionnel `components.get(2).get(1)` (ligne « fuel »). Toujours fragile à tout réordonnancement de ligne.
 
-4. **`ReactorSummaryDisplaySource.formatValue` — incohérence de mode**
-   En mode « normal » (0), `HeatDisplaySource` affiche `"500 °C"` alors que `ReactorSummaryDisplaySource` affiche une **jauge** pour le heat dans le même mode (`gaugeOnNormal=true` pour heat uniquement) — incohérence visuelle pour un même mode utilisateur.
+4. **`ReactorSummaryDisplaySource.formatValue` — incohérence de mode** *(inchangé)*
+   `HeatDisplaySource` affiche `"500 °C"` en mode normal alors que `ReactorSummaryDisplaySource` force une jauge pour le heat dans le même mode (`gaugeOnNormal=true` pour heat uniquement) — incohérence visuelle toujours présente.
 
 ### 🟡 Mineurs
 
-5. **`CreateNuclearJEI`** — champ statique mutable `Categories` (nom non conventionnel), vidé/reconstruit à chaque `registerCategories` ; risque si JEI ré-appelle le cycle (reload ressources).
-6. **`CNPonderReactorScenes.showReactorStructure`** — boucle triple (~11×13×13 ≈ 1859 itérations) avec 6 comparaisons positionnelles par cellule ; remplaçable par une `Map` précalculée. Coût ponctuel (ouverture ponder).
+5. **`CreateNuclearJEI`** — champ statique mutable `Categories`, vidé/reconstruit à chaque `registerCategories` ; risque si JEI ré-appelle le cycle (reload ressources). *(non revérifié ce tour, signal inchangé)*
+6. **`CNPonderReactorScenes.showReactorStructure`** — boucle triple (~11×13×13) avec comparaisons positionnelles ; coût ponctuel (ouverture ponder), remplaçable par une `Map` précalculée.
 7. **`ReactorFrameDisplayManager.write`** — persiste systématiquement les sentinelles `Integer.MAX_VALUE`/`MIN_VALUE` même quand `hasFrameColumn()` est faux — pollution NBT mineure.
-8. **`NuclearExplosionEntity.tick()` (`:96`)** — tri d'une pile de `BlockPos` par `distManhattan` en un tick. ⚠️ La taille réelle est `(2·chunksAffected+1)³` (≈125 pour `size=2`), **pas** 1331 comme indiqué auparavant — coût modeste, corrigé ici.
-9. **`CNItemTags.FUEL`/`COOLER` — double source de catégorisation avec `RodType.type()`, déjà désynchronisée** *(assigné Gio, priorité basse)* — Tous les chemins métier (`RodType.TypeRodPredicate.IS_FUEL/IS_COOLED`, `ReactorInputInventory.isItemValid`, `DefaultHeatCalculator`, `ReactorBluePrintMenu`) testent `stack.is(TAG) || rodType.type() == X`, un OR redondant entre deux sources indépendantes. Le tag ne porte aucune stat (juste un `TagKey<Item>`) ; toutes les valeurs métier vivent déjà sur `RodType` (registre Java `ItemRodTypesValue` **et** registre dynamique data-driven `CreateNuclearRegistries.ROD_TYPE`, donc déjà extensible par datapack sans tag — confirme le constat positif d'`AUDIT_V1.md:154` sur ce design). Preuve de désync déjà réelle : `THORIUM_ROD` (`CNItems.java:250-258`) a `RodType.fuelRodType()` enregistré mais n'a **pas** le tag `CNItemTags.FUEL` (seulement le tag générique `"rods"`) — ne fonctionne aujourd'hui que grâce au fallback `RodType` dans le OR.
-   - **Plan concret retenu** : remplacer `TypeRodPredicate.IS_FUEL`/`IS_COOLED` (`RodType.java:301-320`, actuellement `Predicate<ItemStack>` basés sur `ItemRodTypesValue.getRodType`, qui ignore le registre dynamique data-driven) par deux méthodes statiques `isFuel(ItemStack stack, Level level)`/`isCooled(ItemStack stack, Level level)` appelant `RodType.resolveRodType(stack.getItem(), level).type() == TypeRod.FUEL/COOLER` — `resolveRodType` interroge le registre dynamique avant de retomber sur le registre Java statique, donc un `RodType` défini uniquement par datapack sera enfin reconnu. Une variante `BiPredicate<ItemStack, Level>` a été envisagée mais écartée : aucun appelant actuel ne compose (`and`/`or`/`negate`) ni ne stocke ces prédicats comme valeur, donc le gain fonctionnel d'un type `(Bi)Predicate` est nul ici — une méthode statique nommée `isFuel`/`isCooled` est plus honnête qu'une constante `IS_FUEL` qui dépend en réalité d'un contexte (`Level`) à chaque appel.
-   - **Sites à migrer une fois `isFuel`/`isCooled` créées** (tous ont déjà un `Level` accessible sauf `DefaultHeatCalculator`, voir point 2) : `ReactorInputInventory.isItemValid` (`:30`, via `be.getLevel()`, ⚠️ nullable hors monde — prévoir fallback), `ReactorBluePrintMenu.saveData` (`:132-133` et `:165-166`, deux boucles dans la même méthode, via `playerInventory.player.level()`), `FuelDisplaySource`/`CoolerDisplaySource`/`ReactorSummaryDisplaySource` (déjà via `context.level()`), `ReactorInputManager.getInventory/extractItems` (déjà un paramètre `Level level`).
-   - **Déjà conformes au design cible** (aucun tag, déjà `RodType.resolveRodType(item, level)`) : `ReactorHeatUpdateCoordinator.canRun` (`:91`) et `RodsStats.getRodTypeStats` (`:60`) — pas de duplication ici, à ne pas toucher, sert de modèle de référence pour la migration des autres sites.
-   - *Recommandation* : restreindre les tags `FUEL`/`COOLER` à leur seul usage légitime restant (ingrédients de recettes JSON `Ingredient.of(tag)`, compat datapack/mods tiers côté craft) et ne plus s'y fier dans la logique interne — ne garder que `rodType.type() == X` via `isFuel`/`isCooled`. Risque faible, pas de stats dupliquées à corriger, juste un critère booléen redondant à retirer à 4 endroits (+1 nécessitant d'abord un changement de signature, voir point 2).
-   - **Pourquoi l'ajouter à l'audit malgré la priorité basse** : c'est une dette qui **s'auto-aggrave silencieusement** — chaque nouvel item fuel/cooler ajouté à `CNItems.java` est un nouveau risque d'oubli du tag (déjà arrivé une fois sur 3 avec `THORIUM_ROD`), et le `||` défensif partout dans le code masque le symptôme sans le corriger. Documenter le plan maintenant évite de redécouvrir le même diagnostic à un audit futur, et fixe le bon modèle de référence (`ReactorHeatUpdateCoordinator`/`RodsStats`) pendant qu'il est encore frais.
+8. **`CNItemTags.FUEL`/`COOLER` — double source de catégorisation avec `RodType.type()`, toujours désynchronisée** *(assigné Gio, priorité basse — inchangé, plan non encore exécuté)* — `RodType.java:301-320` (`TypeRodPredicate.IS_FUEL`/`IS_COOLED`) est **toujours** un `Predicate<ItemStack>` basé sur `ItemRodTypesValue.getRodType` (sans `Level`), **pas migré** vers `isFuel(ItemStack, Level)`/`isCooled(ItemStack, Level)` basé sur `RodType.resolveRodType`. Tous les sites listés au tour précédent (`ReactorRodInputInventory.isItemValid`, `ReactorBluePrintMenu.saveData` ×2, `*DisplaySource`, `ReactorInputManager`, `DefaultHeatCalculator`) testent toujours le double critère `stack.is(TAG) || rod.type() == X`. **`THORIUM_ROD`** (`CNItems.java:220-228`) a toujours `RodType.fuelRodType()` enregistré mais **pas** le tag `CNItemTags.FUEL` (seul `CNTags.forgeItemTag("rods")`, l.228) — preuve de désync inchangée. Plan déjà documenté au tour précédent, toujours valide, **non commencé**.
+9. **Duplication `drawGauge`** *(nouveau point, déjà signalé dans `AUDIT_V1` mais jamais repris dans ce document — confirmé toujours présent)* — la méthode `drawGauge(...)` est copiée à l'identique dans `FuelDisplaySource.java:49-51`, `CoolerDisplaySource.java:52-54`, `HeatDisplaySource.java:47-50`, `LiquidLevelDisplaySource.java:43-45` et `ReactorSummaryDisplaySource.java:178-180`, avec des magic numbers (`maxFuel=64`, `maxCooler=64`, `maxFluid=16000`, `maxHeat=1000`) éparpillés dans chaque classe. Aucune classe abstraite commune. Risque faible, mais 5 points de maintenance pour 1 seule logique de rendu — extraire une `AbstractReactorStatDisplaySource`.
 
 ---
 
-## 3. 🏗️ Architecture — état réévalué (sans objectif imposé)
+## 3. 🏗️ Architecture — état réévalué
 
-> Plusieurs « problèmes structurels » des audits V1/ACTUEL sont **réfutés par le code actuel**. On ne raisonne pas par règle automatique (« classe > N lignes → découper »).
-
-| Affirmation historique | Verdict actuel |
+| Affirmation historique | Verdict actuel (revérifié 2026-06-28) |
 |---|---|
-| **Inversion `api/`** (`MultiBlockManagerBeta`/`RodType`/`ReactorFluidType` importeraient `content.*`) | ❌ **Réfuté** — aucun des trois n'importe `content.*` ; ils utilisent leurs propres types `*Value` (api). Aucune action. |
-| **Deux/trois frameworks multiblock concurrents** | ❌ **Réfuté** — `lib.multiblock.manager.*` et `IBetterPattern` **n'existent plus**. Le reste de `lib/multiblock` est **activement utilisé** par `CNMultiblock`. Ce n'est pas une couche concurrente mais un **pipeline séquentiel** : scan géométrique → `ReactorAssembler` → `CNMultiblock.findStructure` → données `RodType`/`ReactorFluidType`. Le vrai problème n'est pas la coexistence mais la **garde d'exécution de la 1ʳᵉ étape** (§2 point 1). Ne pas fusionner (gros risque, gain incertain). |
-| **God class `ReactorControllerBlockEntity`, cible <300 lignes** | ✅ **Chantier clos** — 492 lignes, délégation réelle (service/manager/consumable/display). Ce qui reste est la coordination légitime d'un multiblock. **Continuer à viser <300 lignes serait une erreur** : il n'y a plus de logique métier à extraire, seulement de la coordination — découper ajouterait de l'indirection. |
-| **Coordinateur de verrou fluide `ReactorFluidLockCoordinator`** | ✅ **Non justifié** (les deux audits convergent) — `tryLockFluid`/`canAcceptFluid`/`clearLock` sont de simples délégations 3-7 lignes vers `PersistentFluidLocks` (le double-système `FluidLockManager` a été supprimé, B14 résolu). `clearLockIfAllInputsEmpty` n'a plus de scan 3D (utilise `inputFluidManager.getFuildHandlers(level)`). Ne plus y revenir. |
-| **`run/` à `.gitignore`** | ✅ Règles `run/*` présentes — mais résidu de fichiers déjà trackés (voir §4). |
+| **Inversion `api/`** | ❌ **Toujours réfuté** — `MultiBlockManagerBeta`, `api/multiblock/rods/RodType`, `api/multiblock/fluid/ReactorFluidType` n'importent toujours aucun `content.*` (imports vérifiés ligne par ligne). Aucune action. |
+| **Deux/trois frameworks multiblock concurrents** | ❌ **Toujours réfutté** — `lib/multiblock/manager/*` et `IBetterPattern` n'existent toujours pas (8 fichiers restants dans `lib/multiblock/`, tous utilisés). Le commit `20c1df0b` (*"IO blocks are now natively Casings"*) ne change rien à l'architecture : il nettoie 22 lignes d'une scène Ponder, les blocs I/O restent des `Block` séparés. |
+| **God class `ReactorControllerBlockEntity`** | ✅ **Chantier toujours clos, classe en légère croissance maîtrisée** — **529 lignes** (492 au dernier audit), délégation à **34 fichiers** de support : `service/` (14, était 8), `manager/` (12, était 5), `consumable/` (6), `display/` (2). La croissance suit l'ajout de fonctionnalités (gestion de la frame, alarmes, etc.), pas une régression de la délégation — le constructeur injecte toujours les dépendances via interfaces (`IHeatService`, `IPersistenceService`, etc.). Pas d'action. |
+| **Coordinateur de verrou fluide** | ✅ **Toujours non justifié** — `PersistentFluidLocks` reste le seul système ; pas de `FluidLockManager` concurrent retrouvé. `clearLockIfAllInputsEmpty` utilise toujours `inputFluidManager.getFuildHandlers(level)` (pas de scan 3D), avec une double itération mineure (boucle sur handlers puis sur `getTanks()`) sans gravité. |
+| **`src/test`** | ❌ **Toujours vide** — confirmé, 0 fichier `.java` sous `src/test`. Le point structurel le plus important du projet reste entier. |
+| **Radiation étendue à `LivingEntity` (nouveau, `9ded502c`)** | ✅ **Extension propre** — le point de vérité unique `canBeIrradiated(LivingEntity)` est toujours respecté (un seul appel, `RadiationCapability.java:107`), le hook passe par `LivingTickEvent` (pas de boucle manuelle sur les entités du monde). ⚠️ **Point à surveiller, pas un bug** : pour les non-joueurs, `tickRadiation` recalcule `computeItemRadiation` à **chaque tick sans dirty-check** (le hash d'inventaire existant ne couvre que le joueur, l.90-95 vs l.96-98) — assumé dans le commit (« no equivalent inventory to diff against »), mais à reconsidérer si la densité de mobs équipés en zone irradiée augmente. |
+| **Advancements de pose centralisés sur le contrôleur (nouveau, `19617118`)** | ✅ **Amélioration confirmée** — `MultiblockHelpers.handleAdvancedPlacedBy` (l.58-66) redirige `setPlacedBy` vers le contrôleur via `getControllerForPart`, et `CNAdvancementBehaviour.java:106` vérifie maintenant `!advancement.isAlreadyAwardedTo(player)` (état Minecraft natif) au lieu d'une liste interne. Élimine un risque de double-attribution. Limite résiduelle (pas une régression) : si le contrôleur n'est pas encore résolu au moment de la pose, l'advancement de pose est silencieusement sauté pour cette pièce. |
 
-**Vrai writ-large structurel : l'absence de tests.** Ni la taille des classes ni le nombre de packages radiation ne limitent autant la maintenabilité que l'absence totale de couverture sur la chaleur, le pattern matching et le verrouillage fluide — exactement là où les bugs silencieux (sur-extraction fluide, asymétrie `DefaultHeatCalculator`, tautologie `IHeat`) survivent à plusieurs audits.
+**Vrai writ-large structurel : l'absence de tests**, inchangé — c'est toujours là (chaleur, pattern matching, verrouillage fluide, et maintenant le double-scan multiblock) que les bugs silencieux survivent aux audits successifs.
 
 ---
 
 ## 4. 🧹 Dead code & features inachevées — reste à faire
 
-> **⚠️ Faux positifs à NE PAS supprimer** : `CNTabulaModelRenderUtils` (utilisé par `CNAdvancedModelBox` sur le chemin de rendu vivant du champignon atomique) ; `ReactorOutputEntity.outputPos` (lu/écrit en NBT) ; `setRotateAngle` (appelé ~10× par `NuclearMushroomCloudModel`).
+> **⚠️ Faux positifs à NE PAS supprimer** : `CNTabulaModelRenderUtils` (rendu vivant du champignon atomique) ; `ReactorOutputEntity.outputPos` (lu/écrit en NBT) ; `setRotateAngle` (appelé par `NuclearMushroomCloudModel`).
 
 **Pur dead code (retrait sûr)**
-- **`SimpleMultiBlockPattern.test()`** (`lib/multiblock/SimpleMultiBlockPattern.java:72-74`) — aucun appelant (grep confirmé). Retrait trivial.
-- **`IrradiatedBiomes.monsters()`** (l.17-18) — corps **vide**, appelé `(95, 5, 100)` (`:55`) silencieusement ignorés. À retirer ou implémenter.
-- **Méthodes d'animation mortes** dans `CNAdvancedEntityModel`/`CNAdvancedModelBox` (`chainSwing`, `chainWave`, `chainFlap`, `faceTarget`, `walk`, `flap`, `swing`, `bob`, `moveBox`, `progressRotation*`, `progressPosition*`, `getMovementScale`/`setMovementScale`, `transitionTo`, `calculateChain*`, `displayList`/`compiled`) — zéro appelant, mais **retrait non trivial** (cascade interne : `calculateRotation`/`bob` appellent `getMovementScale()`). Nettoyage dédié + dédup `ModelBox`. **Pas un quick win.**
+- **`lib/multiblock/SimpleMultiBlockPattern.java` méthode `test()`** (l.72-74) — toujours aucun appelant (grep confirmé). Retrait trivial.
+- **`IrradiatedBiomes.monsters()`** — corps toujours vide, appelé avec des arguments (95, 5, 100) silencieusement ignorés. À retirer ou implémenter.
 
 **Code commencé puis abandonné (hygiène de fin de PR)**
-- `PlayerInteracteReactorFluidInput.java:57-61` — bloc d'interaction fluide commenté/inachevé.
-- `ReactorOutput.java:43,52,114` — propriété `SPEED` entièrement commentée.
-- `CNStandardRecipeGen.java:226` — `// FIXME 5.1 refactor - recipe categories as markers...` à trancher.
+- `content/multiblock/input/fluid/PlayerInteracteReactorFluidInput.java:57-61` — bloc d'interaction fluide toujours commenté/inachevé (non touché par le récent nettoyage de `ReactorOutput`).
+- `content/multiblock/output/ReactorOutput.java:43,52,93` — propriété `SPEED` toujours entièrement commentée (pas supprimée).
+- `foundation/data/recipe/CNStandardRecipeGen.java:226` — `// FIXME 5.1 refactor - recipe categories as markers...` toujours présent, à trancher.
 
-**Reliquats Git (`run/`)** — 19 fichiers encore trackés malgré `.gitignore`. `git rm --cached` sur les **6 artefacts de debug/env** uniquement :
+**Reliquats Git (`run/`)** — confirmé via `git ls-files run/` : il reste **6 fichiers de debug/env trackés** malgré `.gitignore` :
 `run/hs_err_pid21100.log`, `run/hs_err_pid27848.log`, `run/imgui.ini`, `run/servers.dat`, `run/servers.dat_old`, `run/mods/Jade-1.20.1-Forge-11.12.2.jar.disabled`.
-⚠️ **Conserver** les `run/schematics/*.nbt` (assets de gameplay légitimes : `reactor*.nbt`, ponder, etc.).
+⚠️ **Conserver** les 10 `run/schematics/*.nbt` (assets de gameplay légitimes).
 
 **Décisions produit (pas du pur dead code — choisir puis exécuter)**
 
-- **Collier teignable chat/loup non câblé** *(confirmé)* : `IrradiatedWoldCollarLayer.render()` est un **corps vide** (l.21-22) ; `IrradiatedCatCollarLayer` n'est **jamais enregistré** via `addLayer(...)` (grep confirmé, renderers dans `CNEntityType.java:51,71` sans layer). Pourtant `IrradiatedCat` câble entièrement `DyeItem → setCollarColor/getCollarColor` (`IrradiatedCat.java:334-342`). ⚠️ `IrradiatedWolf` ne câble **même pas** l'interaction dye (`DATA_COLLAR_COLOR` commenté l.61, `mobInteract` sans logique dye). → Un joueur peut teindre le collier d'un chat irradié, l'action est acceptée, **rien ne s'affiche jamais**. *Décision* : enregistrer le layer + implémenter `render`, ou retirer toute la mécanique `DyeItem`/`setCollarColor`.
+- **Collier teignable chat/loup non câblé** *(inchangé)* : `IrradiatedWoldCollarLayer.render()` reste un corps vide ; `IrradiatedCatCollarLayer` n'est toujours pas enregistré via `addLayer(...)` dans `CNEntityType.java`. `IrradiatedWolf` ne câble toujours pas l'interaction `DyeItem`/`setCollarColor` (`mobInteract` sans logique dye), alors qu'`IrradiatedCat` câble entièrement `DyeItem → setCollarColor/getCollarColor`. Un joueur peut toujours teindre le collier d'un chat irradié sans effet visible. *Décision* : enregistrer le layer + implémenter `render`, ou retirer toute la mécanique `DyeItem`/`setCollarColor`.
 
-- ~~**Teinture de tissu sur l'armure anti-radiation — icône d'item non colorée**~~ — **✅ RÉSOLU (2026-06-22), vérifié en jeu**. Le diagnostic des deux audits était incomplet : l'**armure portée** prenait déjà la bonne couleur via `getArmorTexture` (chemin `HumanoidArmorLayer`, qui lit bien le NBT `ClothColor` en Forge 47.x), mais l'**icône d'item** (inventaire + slot résultat de la smithing table) restait sur la texture par défaut car le **modèle d'item est statique** et ne lit aucun NBT — deux chemins de rendu distincts. Correctif appliqué : enregistrement d'une `ItemProperty` client `createnuclear:cloth_color` (`CreateNuclearClient.registerItemProperties`, valeur normalisée `(id+1)/16` pour passer l'écrêtage `[0,1]`) + génération en datagen de 64 modèles enfants colorés et des `overrides` correspondants (`CNItems.coloredArmorModel`, clés texture `layer0`/`particle` pour le casque, `14` pour les autres pièces, pointant vers les sheets `item/armors/<couleur>_anti_radiation_suit` déjà présentes). Le tooltip de pis-aller (`AntiRadiationArmorItem.makeSummary`/`appendHoverText`) et la clé de lang `tooltip.cloth.color` ont été retirés. `getArmorTexture` + `ClothTagHelper` sont donc **bien vivants et fonctionnels** — ni l'un ni l'autre n'est à supprimer.
-
-**Worldgen « irradié » — template non terminé**
-- `IrradiatedBiomes.addDefaultIrradiatedOres`/`addDefaultSoftDisks` ajoutent du contenu vanilla sans rapport (`MiscOverworldPlacements.BLUE_ICE`, `Carvers.NETHER_CAVE`, `VOID_START_PLATFORM`) + `monsters()` no-op — pipeline copié/non re-thémé.
-- `CNNoiseGeneratorSettings.IRRADIATED` définit `STEEL_BLOCK` comme bloc de remplissage par défaut (équivalent « stone ») — terrain massivement en acier si relié à une dimension. Point d'alerte indépendant des surface rules (corrigées).
+**Worldgen « irradié » — template non terminé** *(inchangé)*
+- `IrradiatedBiomes.addDefaultIrradiatedOres`/`addDefaultSoftDisks` ajoutent toujours du contenu vanilla sans rapport (`BLUE_ICE`, `NETHER_CAVE`, `VOID_START_PLATFORM`).
+- `CNNoiseGeneratorSettings.IRRADIATED` utilise toujours `STEEL_BLOCK` comme bloc de remplissage par défaut.
 
 ---
 
@@ -123,56 +117,61 @@ La **dette la plus structurelle reste l'absence totale de tests** (`src/test` vi
 
 | Point | État | Réf. |
 |---|---|---|
-| `ReactorPattern.findController/findControllerPos` : scan fusionné + court-circuit + filtre `isInReactorRange` (✅), double scan `MultiblockHelpers` éliminé (✅) ; **sans garde client** (❌), double appel `playerDestroy`+`onRemove` sur `ReactorCasing`/`ReactorCooler` (❌) | 🟡 partiellement corrigé — reste **priorité n°1** | §2.1 |
-| `DefaultHeatCalculator.computeHeat` : ~O(n²) + désérialisation NBT par cellule, à chaque tick | ❌ non corrigé | §2.2 |
-| `HelmetOverlay.renderHotbar` + 3× `getArmor(HEAD)`/frame | ❌ non corrigé | — |
-| `clearLockIfAllInputsEmpty` : ancien scan cubique `O(n³)` | ✅ **corrigé** (utilise `inputFluidManager.getFuildHandlers`) | §3 |
+| `ReactorPattern.findController` (Casing/Cooler/Frame) : **ne court-circuite jamais**, scanne ~3971 positions à chaque pose/casse même après avoir trouvé le contrôleur | ❌ **non corrigé, nouvellement précisé** — chemin le plus chaud | §2.1 |
+| `ReactorPattern.findControllerPos` (Output/RodInput/FluidInput/Alarm via `MultiblockHelpers`) : court-circuite bien | ✅ déjà correct | §2.1 |
+| Aucune garde `level.isClientSide()` sur toute la chaîne de scan | ❌ non corrigé | §2.1 |
+| Double scan à la casse (`playerDestroy` + `onRemove`) sur Casing/Cooler/Output/FluidInput (sans garde) et Alarm/Frame (garde partielle) ; **`ReactorRodInput` seul correctement conçu** | ❌ non corrigé, modèle de référence identifié | §2.1 |
+| `DefaultHeatCalculator.computeHeat` : neighbor lookup passé de O(n) à O(1) (map), reste une boucle O(81) de recherche de position par rod | 🟡 **partiellement corrigé, gravité réévaluée à la baisse** | §2.2 |
+| `clearLockIfAllInputsEmpty` : pas de scan cubique O(n³), double itération mineure | ✅ acceptable | §3 |
 
 ---
 
 ## 6. ✅ Pour mémoire — déjà corrigé (ne plus reprendre)
 
-Vérifiés résolus dans le code actuel : **B2** (`RadiationSyncPacket` supprimé, synchro via capability + `PlayerTickEvent`), **B3/B4/B5/B6/B8/B9/B11/B13/B16/B19** (cooldown `Map<UUID,Long>`, loot/tag thorium, `BiomeTagRule.apply` → `Condition`, packet blueprint, scan null-safe, paliers radiation 4 niveaux, logger après null-check, bras armure anti-radiation, garde `conditions` datagen, surface rules v1 disparues), **B12** (`AnimalUtil.isFood` teste `foodItems.test(stack)`), **B14** (`FluidLockManager` supprimé, `PersistentFluidLocks` seul), **off-by-one `getFluidInTank`** (→ `getFluidInTank(0)`). Le « double comptage `IRadiationSource` vs `RadiationRegistry` » est **architecturalement bloqué** (`RadiationRegistry` lève `IllegalStateException` à l'enregistrement si l'item implémente déjà `IRadiationSource`) — duplication de design maladroite mais pas de bug concret.
+Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B3/B4/B5/B6/B8/B9/B11/B13/B16/B19, B12, B14**, off-by-one `getFluidInTank`, icône d'item de l'armure anti-radiation teinte, tous les problèmes radiation historiques (point de vérité unique `canBeIrradiated`).
 
-**Corrigé le 2026-06-22** : **icône d'item de l'armure anti-radiation teinte** — l'icône en inventaire / slot résultat de la smithing table suivait pas la couleur du tissu (l'armure *portée*, elle, fonctionnait déjà). Cause : modèle d'item statique, chemin de rendu distinct de `getArmorTexture`. Câblé via `ItemProperty` client `createnuclear:cloth_color` + 64 modèles d'overrides générés en datagen (`CNItems.coloredArmorModel`, `CreateNuclearClient.registerItemProperties`). Tooltip de pis-aller + clé de lang `tooltip.cloth.color` retirés. Détail en §4.
+**Confirmé corrigé le 2026-06-26** : **spam de log `ReactorAssembler.assemble`** — plus aucun `LOGGER.warn`/`info` dans le chemin de succès (commit `b309f231`). *(Quick win n°3 de la feuille de route précédente, traité.)*
 
-**Corrigé le 2026-06-23** : **tous les problèmes radiation (ancienne §2)**. Cause racine commune des 3 chemins d'application : la logique d'éligibilité était dupliquée et divergente.
-- **Point de vérité unique** : nouveau `RadiationCapability.canBeIrradiated(LivingEntity)` (spectateur → tag `IRRADIATED_IMMUNE` → config `enabledItemRadiation` → blacklist → résistance < 1.0), réutilisé par les trois chemins.
-- **`RadiationEffectHandler.apply`** (fuite de tuyau, 3ᵉ chemin) : appliquait la radiation **sans aucune garde** → filtre désormais via `canBeIrradiated`.
-- **`RadiationEffect`** : le filtre du `VicinityEffect` reconstruisait un `HashSet` + reparsait la blacklist **par entité/tick** → réduit à `canBeIrradiated(e) && !e.hasEffect(...)`. La blacklist est mise en **cache statique** dans `RadiationCapability`, reconstruite uniquement quand l'instance de liste de config change (auto-invalidée au reload, sans event ni couplage `config → content`). Élimine le point de perf §5.
-- **`RadiationCapability.applyEffects`** : pas de garde spectateur → `onPlayerTick` gate désormais sur `canBeIrradiated(player)`. L'atténuation continue par résistance reste séparée (non touchée).
-- **`RadiationCapability.lastBiomeLocation`** : lu mais non persisté → sérialisé/désérialisé en NBT (`RadiationProvider`).
-- **Overlays concurrents** : `RadiationOverlay` (jamais rendu, fade binarisé par `Math.round`) + `EasingHudOverlay` + l'appel no-op `HelmetOverlay.setCoverage`/`COVERAGE_FACTORS` **supprimés** ; `IrradiatedOverlayRendererVision` (fade lisse, garde spectateur) reste seul. Compilation vérifiée (`gradlew compileJava`).
+**Confirmé corrigé (NuclearExplosionEntity, ex-B15)** : l'ancien anti-pattern `try { onBlockExploded } catch(Exception){ destroyBlock(...,true) }` a disparu. Le code actuel (`NuclearExplosionEntity.java:224-232`) fait une vérification explicite (`if (level().getBlockState(immutablePos).is(state.getBlock())) level().destroyBlock(...)`) au lieu d'avaler une exception. Plus d'anti-pattern de contrôle par exception.
+
+**Confirmé sain, nouveau code 2026-06-25/27** : `CNBuilderTransformers` (extraction propre des builders de modèles d'item/spawn-egg hors de `CNItems`, 97 lignes, SRP respectée) et l'item **Biome Restore Cell** (`BiomeRestoreCellItem`, 75 lignes, logique métier déléguée à `BiomeIrradiationService`, gardes serveur/client correctes) — aucun problème structurel à signaler, rien à ajouter au plan d'action.
+
+**Confirmé neutre** : le commit `20c1df0b` (*"IO blocks are now natively Casings in NBT"*) ne fusionne rien dans le code de jeu — nettoyage cosmétique d'une scène Ponder uniquement.
 
 ---
 
 ## 7. 🗺️ Feuille de route — priorités
 
 **Quick wins (risque quasi nul, gain immédiat)**
-1. Garde `level.isClientSide()` sur `findController`/`findControllerPos`/`ReactorAssembler` (§2.1). **← le plus rentable, toujours à faire.**
-2. Retirer l'appel redondant à `findController` dans `ReactorCasing.playerDestroy` + `ReactorCooler.playerDestroy` (généraliser la garde de `ReactorFrame.onRemove`). *(Toujours à faire — distinct du double-scan `MultiblockHelpers`, déjà corrigé le 2026-06-24.)*
-3. `ReactorAssembler` : `LOGGER.warn` → `LOGGER.debug` (l.37).
+1. **`ReactorPattern.findController` : faire retourner `inRange` au lieu de `false` dans le visiteur** (l.69), pour court-circuiter comme `findControllerPos` le fait déjà. **← nouveau, le plus rentable : c'est le chemin appelé par le bloc le plus posé/cassé (Casing).**
+2. Garde `level.isClientSide()` en tête de `findController`/`findControllerPos`/`ReactorAssembler.assemble/disassemble`.
+3. Généraliser le modèle `ReactorRodInput` (un seul appel, dans `onRemove`, guardé par `!state.is(newState.getBlock())`, pas de `playerDestroy`) à `ReactorCasing`, `ReactorCooler`, `ReactorOutput`, `ReactorFluidInput` (aucune garde aujourd'hui) et `ReactorAlarm`/`ReactorFrame` (garde partielle, mais double appel résiduel à la casse joueur).
 4. `IHeat.HeatLevel.isNotDanger` : corriger la tautologie (`!= DANGER` seul), après confirmation balance.
-5. `NuclearExplosionEntity` (B15) : remplacer le try/catch de contrôle par une vérification explicite.
-6. `git rm --cached` sur les 6 fichiers de debug `run/` (§4).
-7. Retirer `SimpleMultiBlockPattern.test()` et `IrradiatedBiomes.monsters()`.
+5. `git rm --cached` sur les 6 fichiers de debug `run/` (§4).
+6. Retirer `SimpleMultiBlockPattern.test()` et `IrradiatedBiomes.monsters()`.
 
 **Corrections ciblées (risque faible à moyen)**
-8. `ReactorInputFluidManager` : décrémenter `fluidNeeded` entre handlers + gérer `toExtract == 1` (§1).
-9. `DefaultHeatCalculator` : map slot→ItemStack précalculée (O(n²) → O(n)) ; **ne pas** toucher l'asymétrie fuel/cooler sans validation balance (§2.2).
+7. `ReactorInputFluidManager` : décrémenter `fluidNeeded` entre handlers + gérer `toExtract == 1` (§1).
+8. `DefaultHeatCalculator` : précalculer une map slot→position pour éliminer la boucle 81 cellules (gain mineur désormais, priorité baissée par rapport au tour précédent) ; **ne pas** toucher l'asymétrie fuel/cooler sans validation balance.
+9. Extraire `AbstractReactorStatDisplaySource.drawGauge` pour dédupliquer les 5 copies identiques (§2.9).
 
 **Assigné Gio (priorité basse, à faire quand le temps le permet)**
-13. Tags `CNItemTags.FUEL`/`COOLER` → créer `TypeRodPredicate.isFuel/isCooled(stack, level)` basés sur `RodType.resolveRodType`, migrer `ReactorInputInventory`, `ReactorBluePrintMenu`, les `*DisplaySource`, `ReactorInputManager` ; restreindre les tags au craft (§2.9). Le site `DefaultHeatCalculator` nécessite d'abord d'ajouter `Level` à `IHeatCalculator.computeHeat` (§2.2) — à faire en premier sur ce fichier précis, indépendamment du chantier perf O(n²) déjà prévu au point 9 ci-dessus.
+10. Tags `CNItemTags.FUEL`/`COOLER` → créer `TypeRodPredicate.isFuel/isCooled(stack, level)` basés sur `RodType.resolveRodType`, migrer `ReactorRodInputInventory`, `ReactorBluePrintMenu`, les `*DisplaySource`, `ReactorInputManager` ; restreindre les tags au craft (§2.8). Le site `DefaultHeatCalculator` nécessite d'abord d'ajouter `Level` à `IHeatCalculator.computeHeat` — toujours en suspens, non commencé.
 
 **Décisions produit (choisir puis exécuter)**
-10. Collier teignable chat/loup : finir le câblage (`addLayer` + `render`) ou retirer `DyeItem`/`setCollarColor` (§4).
-11. `PlayerInteracteReactorFluidInput` / `ReactorOutput.SPEED` : terminer ou retirer le code commenté (§4).
+11. Collier teignable chat/loup : finir le câblage (`addLayer` + `render` + interaction `DyeItem` sur `IrradiatedWolf`) ou retirer toute la mécanique (§4).
+12. `PlayerInteracteReactorFluidInput` / `ReactorOutput.SPEED` : terminer ou retirer le code commenté (§4).
 
 **Chantier de fond (le plus rentable à long terme)**
-12. Démarrer une couverture de tests sur `DefaultHeatCalculator`, le pattern matcher (`ReactorPattern`/`CNMultiblock`) et `PersistentFluidLocks` — les trois zones où des bugs silencieux ont survécu à plusieurs audits.
+13. Démarrer une couverture de tests sur `DefaultHeatCalculator`, le pattern matcher (`ReactorPattern`/`CNMultiblock`) et `PersistentFluidLocks` — les trois zones où des bugs/inefficacités silencieuses ont survécu à plusieurs audits successifs.
+
+**À surveiller sans action immédiate**
+14. `RadiationCapability.tickRadiation` pour les `LivingEntity` non-joueurs : pas de dirty-check d'inventaire (recalcul à chaque tick) — compromis assumé par le commit `9ded502c`, à reconsidérer seulement si la densité de mobs équipés irradiés pose un problème de perf mesuré.
 
 **Explicitement retiré du plan (ne plus y revenir sans nouvel élément)**
-- Découpage supplémentaire de `ReactorControllerBlockEntity` (chantier clos).
+- Découpage supplémentaire de `ReactorControllerBlockEntity` (chantier clos, croissance maîtrisée).
 - « Correction » de l'inversion de dépendance `api/` (n'existe pas).
-- Fusion/suppression du pipeline multiblock (sain ; seule la garde d'exécution manque).
-- Coordinateur dédié au verrouillage fluide `ReactorFluidLockCoordinator` (non justifié).
+- Fusion/suppression du pipeline multiblock (sain).
+- Coordinateur dédié au verrouillage fluide (non justifié).
+- Spam de log `ReactorAssembler` (corrigé le 2026-06-26).
+- Anti-pattern try/catch `NuclearExplosionEntity` / B15 (corrigé).
