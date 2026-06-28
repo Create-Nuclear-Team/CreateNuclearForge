@@ -38,13 +38,6 @@ public class ReactorAlarm extends Block implements IBE<ReactorAlarmEntity> {
         MultiblockHelpers.handleOnPlace(pos, level, ReactorControllerBlockEntity::addAlarm);
     }
 
-    // Unregisters this alarm from the multiblock controller when destroyed by a player
-    @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
-        MultiblockHelpers.handleRemoval(pos, level, ReactorControllerBlockEntity::removeAlarm);
-    }
-
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, pPlacer, stack);

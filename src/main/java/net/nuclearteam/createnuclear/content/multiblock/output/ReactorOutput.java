@@ -68,12 +68,6 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
     }
 
     @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
-        MultiblockHelpers.handleRemoval(pos, level, ReactorControllerBlockEntity::removeOutput);
-    }
-
-    @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         MultiblockHelpers.handleRemoval(pPos, pLevel, ReactorControllerBlockEntity::removeOutput);

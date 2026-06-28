@@ -31,6 +31,8 @@ public final class ReactorAssembler {
     private ReactorAssembler() {}
 
     public static void assemble(BlockPos pos, Level level) {
+        if (level.isClientSide) return;
+
         ReactorControllerBlockEntity entity = getBlockEntity(level, pos);
         if (entity == null) return;
 
@@ -53,6 +55,8 @@ public final class ReactorAssembler {
     }
 
     public static void disassemble(BlockPos pos, Level level) {
+        if (level.isClientSide) return;
+
         ReactorControllerBlockEntity entity = getBlockEntity(level, pos);
         if (entity == null || !entity.isAssembled()) return;
 

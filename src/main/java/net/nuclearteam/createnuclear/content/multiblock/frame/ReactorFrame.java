@@ -119,12 +119,6 @@ public class ReactorFrame extends Block implements IWrenchable, IBE<ReactorFrame
         MultiblockHelpers.handleAdvancedPlacedBy(pos, level, pPlacer);
     }
 
-    @Override // called when the player destroys the block, with or without a tool
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
-        pattern.findController(pos, level, false);
-    }
-
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         super.onRemove(state, level, pos, newState, movedByPiston);
