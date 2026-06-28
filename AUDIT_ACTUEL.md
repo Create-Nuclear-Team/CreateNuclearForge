@@ -26,7 +26,6 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 |---|---|---|---|
 | **isNotDanger tautologie** | `content/multiblock/IHeat.java:88-90` | 🟠 | `return of(heat,size) != DANGER \|\| of(heat,size) != NONE;` — toujours `true`. Appelant unique confirmé `ReactorControllerBlockEntity.java:428` (la classe a grossi, la ligne a bougé). La garde « ne pas faire tourner les sorties en `DANGER` » reste **inopérante** : les sorties tournent même en surchauffe. Correctif d'1 ligne (`!= DANGER` seul), à confirmer côté balance. |
 | **ReactorInputFluidManager — sur-extraction** | `controller/manager/ReactorInputFluidManager.java:137-155` | 🟠 | `fluidNeeded` (paramètre de `extractFluids`) n'est **toujours jamais décrémenté** entre handlers (l.146-151) → chaque handler de la boucle tente d'extraire le besoin complet, sur-extraction possible avec plusieurs inputs. `if (toExtract > 1)` (l.147) ignore toujours les extractions de 1 unité. Toléré aujourd'hui (tank mono-slot), reste une violation de contrat latente. |
-| **InventoryHashUtil — resync durabilité** | `foundation/utility/InventoryHashUtil.java:90-91` | 🟡 | Toujours `h = 31*h + stack.getDamageValue()` pour tout item endommageable → resync à chaque variation de durabilité. |
 
 ---
 
@@ -96,8 +95,8 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 - `content/multiblock/output/ReactorOutput.java:43,52,93` — propriété `SPEED` toujours entièrement commentée (pas supprimée).
 - `foundation/data/recipe/CNStandardRecipeGen.java:226` — `// FIXME 5.1 refactor - recipe categories as markers...` toujours présent, à trancher.
 
-**Reliquats Git (`run/`)** — confirmé via `git ls-files run/` : il reste **6 fichiers de debug/env trackés** malgré `.gitignore` :
-`run/hs_err_pid21100.log`, `run/hs_err_pid27848.log`, `run/imgui.ini`, `run/servers.dat`, `run/servers.dat_old`, `run/mods/Jade-1.20.1-Forge-11.12.2.jar.disabled`.
+~~**Reliquats Git (`run/`)** — confirmé via `git ls-files run/` : il reste **6 fichiers de debug/env trackés** malgré `.gitignore` :
+`run/hs_err_pid21100.log`, `run/hs_err_pid27848.log`, `run/imgui.ini`, `run/servers.dat`, `run/servers.dat_old`, `run/mods/Jade-1.20.1-Forge-11.12.2.jar.disabled`.~~
 ⚠️ **Conserver** les 10 `run/schematics/*.nbt` (assets de gameplay légitimes).
 
 **Décisions produit (pas du pur dead code — choisir puis exécuter)**
@@ -133,6 +132,8 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 
 **Confirmé sain, nouveau code 2026-06-25/27** : `CNBuilderTransformers` (extraction propre des builders de modèles d'item/spawn-egg hors de `CNItems`, 97 lignes, SRP respectée) et l'item **Biome Restore Cell** (`BiomeRestoreCellItem`, 75 lignes, logique métier déléguée à `BiomeIrradiationService`, gardes serveur/client correctes) — aucun problème structurel à signaler, rien à ajouter au plan d'action.
 
+**Corrigé le 2026-06-28** : `InventoryHashUtil.stackHash` n'inclut plus `getDamageValue()` (`InventoryHashUtil.java:90-91` retiré). Vérifié : aucune implémentation de `IRadiationSource`/`RadiationRegistry` (`UraniumOreItem`, `RadiationItem`, `RadiationBucketItem`, `RadiationEffect`) ne lit la durabilité, donc l'inclure dans le hash ne faisait que déclencher `RadiationCapability.computeItemRadiation` (`RadiationCapability.java:91-95`) sans raison à chaque variation de durabilité (minage, combat) — précisément sur les hot paths que le cache devait protéger. Pour mémoire, le terme « resync » des audits précédents désignait ce recalcul serveur, pas un trafic réseau (`RadiationProvider` ne fait que sérialiser en NBT, aucun `RadiationSyncPacket` impliqué).
+
 **Corrigé le 2026-06-28** : garde `level.isClientSide` manquante sur la chaîne multiblock et double scan `playerDestroy`/`onRemove` (§2.1). Fix appliqué de façon centralisée plutôt que classe par classe : (1) `if (level.isClientSide) return;` ajouté en tête de `ReactorAssembler.assemble`/`disassemble` — point de convergence unique de toute la chaîne `onPlace/onRemove/playerDestroy → findController/findControllerPos → ReactorAssembler` ; (2) l'override `playerDestroy` a été supprimé de `ReactorCasing`, `ReactorCooler`, `ReactorFrame`, `ReactorAlarm`, `ReactorOutput` et `ReactorFluidInput`, généralisant le modèle déjà correct de `ReactorRodInput` (un seul appel de retrait, dans `onRemove`, qui se déclenche systématiquement y compris lors d'une casse joueur). Vérifié par lecture directe des 7 fichiers modifiés. Seul le court-circuit manquant de `findController` (perf pure) reste ouvert — voir §2.1 et §7.
 
 **Confirmé neutre** : le commit `20c1df0b` (*"IO blocks are now natively Casings in NBT"*) ne fusionne rien dans le code de jeu — nettoyage cosmétique d'une scène Ponder uniquement.
@@ -146,7 +147,7 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 2. ~~Garde `level.isClientSide()` en tête de `findController`/`findControllerPos`/`ReactorAssembler.assemble/disassemble`.~~ ✅ **fait le 2026-06-28** (garde centralisée dans `ReactorAssembler.assemble`/`disassemble`).
 3. ~~Généraliser le modèle `ReactorRodInput`...~~ ✅ **fait le 2026-06-28** — `playerDestroy` supprimé de `ReactorCasing`, `ReactorCooler`, `ReactorFrame`, `ReactorAlarm`, `ReactorOutput`, `ReactorFluidInput` ; la logique de retrait vit désormais uniquement dans `onRemove` pour ces 6 classes (comme `ReactorRodInput`). Point résiduel mineur non traité : `ReactorOutput`/`ReactorFluidInput` n'ont pas la garde `!state.is(newState.getBlock())` dans `onRemove` malgré leurs propriétés mutables `DIR`/`FACING` (cf. §2.1).
 4. `IHeat.HeatLevel.isNotDanger` : corriger la tautologie (`!= DANGER` seul), après confirmation balance.
-5. `git rm --cached` sur les 6 fichiers de debug `run/` (§4).
+5. ~~`git rm --cached` sur les 6 fichiers de debug `run/` (§4).~~ ✅ **fait le 2026-06-28**
 6. Retirer `SimpleMultiBlockPattern.test()` et `IrradiatedBiomes.monsters()`.
 
 **Corrections ciblées (risque faible à moyen)**
