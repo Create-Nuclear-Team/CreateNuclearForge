@@ -25,7 +25,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-public class PlayerInteracteReactorFluidInput {
+public class PlayerInteractReactorFluidInput {
     public static InteractionResult interact(Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack stack, boolean onClient, BlockHitResult ray) {
         FluidExchange exchange = null;
         ReactorFluidInputEntity be = (ReactorFluidInputEntity) level.getBlockEntity(pos);
@@ -53,23 +53,12 @@ public class PlayerInteracteReactorFluidInput {
                 .orElse(FluidStack.EMPTY);
 
         if (exchange == FluidExchange.ITEM_TO_TANK) {
-            if (player.isCreative() && !onClient) {
-                FluidStack fluidInItem = GenericItemEmptying.emptyItem(level, stack, true).getFirst();
-//                if (!fluidInItem.isEmpty() && fluidInInput instanceof ReactorLiquidInput) {
-//                    fluidInInput.set
-//                }
-            }
-
             Fluid fluid = fluidInInput.getFluid();
             fluidState = fluid.defaultFluidState().createLegacyBlock();
             soundEvent = FluidHelper.getEmptySound(fluidInInput);
         }
 
         if (exchange == FluidExchange.TANK_TO_ITEM) {
-            if ( player.isCreative() && !onClient) {
-
-            }
-
             Fluid fluid = prevFluidInInput.getFluid();
             fluidState = fluid.defaultFluidState().createLegacyBlock();
             soundEvent = FluidHelper.getFillSound(prevFluidInInput);
@@ -85,28 +74,26 @@ public class PlayerInteracteReactorFluidInput {
         }
 
         if (!fluidInInput.isFluidStackIdentical(prevFluidInInput)) {
-            if (be instanceof ReactorFluidInputEntity) {
-                if (fluidState != null && onClient) {
-                    BlockParticleOption blockParticleData =
-                            new BlockParticleOption(ParticleTypes.BLOCK, fluidState);
-                    float flevel = (float) fluidInInput.getAmount() / fluidInput.getTankCapacity(0);
+            if (fluidState != null && onClient) {
+                BlockParticleOption blockParticleData =
+                        new BlockParticleOption(ParticleTypes.BLOCK, fluidState);
+                float flevel = (float) fluidInInput.getAmount() / fluidInput.getTankCapacity(0);
 
-                    boolean reversed = fluidInInput.getFluid()
-                            .getFluidType()
-                            .isLighterThanAir();
-                    if (reversed)
-                        flevel = 1 - flevel;
+                boolean reversed = fluidInInput.getFluid()
+                        .getFluidType()
+                        .isLighterThanAir();
+                if (reversed)
+                    flevel = 1 - flevel;
 
-                    Vec3 vec = ray.getLocation();
-                    vec = new Vec3(vec.x, be.getBlockPos()
-                            .getY() + flevel * (1 - .5f) + .25f, vec.z);
-                    Vec3 motion = player.position()
-                            .subtract(vec)
-                            .scale(1 / 20f);
-                    vec = vec.add(motion);
-                    level.addParticle(blockParticleData, vec.x, vec.y, vec.z, motion.x, motion.y, motion.z);
-                    return InteractionResult.SUCCESS;
-                }
+                Vec3 vec = ray.getLocation();
+                vec = new Vec3(vec.x, be.getBlockPos()
+                        .getY() + flevel * (1 - .5f) + .25f, vec.z);
+                Vec3 motion = player.position()
+                        .subtract(vec)
+                        .scale(1 / 20f);
+                vec = vec.add(motion);
+                level.addParticle(blockParticleData, vec.x, vec.y, vec.z, motion.x, motion.y, motion.z);
+                return InteractionResult.SUCCESS;
             }
         }
         return InteractionResult.SUCCESS;

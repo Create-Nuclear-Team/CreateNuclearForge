@@ -92,8 +92,14 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 - **`IrradiatedBiomes.monsters()`** — corps toujours vide (`IrradiatedBiomes.java:17-18`), appelé avec des arguments (95, 5, 100) silencieusement ignorés (l.55). À retirer ou implémenter.
 
 **Code commencé puis abandonné (hygiène de fin de PR)**
-- `content/multiblock/input/fluid/PlayerInteracteReactorFluidInput.java:57-61` — bloc d'interaction fluide toujours commenté/inachevé (non touché par le récent nettoyage de `ReactorOutput`).
-- `content/multiblock/output/ReactorOutput.java:43,52,93` — propriété `SPEED` toujours entièrement commentée (pas supprimée).
+- `content/multiblock/input/fluid/PlayerInteractReactorFluidInput.java:57-61` *(fichier renommé — suppression du 'e' parasite dans "Interacte")* — quatre problèmes distincts, tous du dead code :
+  1. **L.57** : `FluidStack fluidInItem = GenericItemEmptying.emptyItem(level, stack, true).getFirst()` — variable calculée uniquement pour les lignes commentées en-dessous ; jamais utilisée ailleurs. L'appel simule (`true`) donc pas de mutation, mais le calcul est inutile.
+  2. **L.58-60** : bloc commenté qui référence `ReactorLiquidInput` — classe **inexistante** dans le projet (renommée en `ReactorFluidInputEntity`), avec une invocation tronquée `fluidInInput.set` jamais complétée. Code définitivement abandonné, non récupérable tel quel.
+  3. **L.69-71** : bloc `if (player.isCreative() && !onClient) { }` entièrement vide sous `TANK_TO_ITEM` — dead code pur.
+  4. **L.88** : `if (be instanceof ReactorFluidInputEntity)` — `be` est déjà casté en `ReactorFluidInputEntity` à la ligne 31 et null-checké à la ligne 32 ; ce `instanceof` est **toujours vrai**, branche morte. À simplifier en retirant la condition.
+  - Note de contexte : `ReactorFluidInput.use()` interdit déjà toute interaction non-creative avant d'appeler `interact()` → les gardes `player.isCreative()` à l'intérieur de `interact()` sont redondantes (toujours vraies).
+  - **Action** : supprimer les lignes 56-61 (bloc créatif ITEM_TO_TANK entier), supprimer les lignes 69-71 (bloc créatif TANK_TO_ITEM vide), simplifier la condition l.88.
+- `content/multiblock/output/ReactorOutput.java:43,52,87` — propriété `SPEED` toujours entièrement commentée (pas supprimée). *(Numéros de lignes mis à jour : l.93 → l.87 après décalage.)*
 - `foundation/data/recipe/CNStandardRecipeGen.java:226` — `// FIXME 5.1 refactor - recipe categories as markers...` toujours présent, à trancher.
 
 ~~**Reliquats Git (`run/`)** — confirmé via `git ls-files run/` : il reste **6 fichiers de debug/env trackés** malgré `.gitignore` :
@@ -160,7 +166,7 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 
 **Décisions produit (choisir puis exécuter)**
 10. Collier teignable chat/loup : finir le câblage (`addLayer` + `render` + interaction `DyeItem` sur `IrradiatedWolf`) ou retirer toute la mécanique (§4).
-11. `PlayerInteracteReactorFluidInput` / `ReactorOutput.SPEED` : terminer ou retirer le code commenté (§4).
+11. `PlayerInteractReactorFluidInput` *(renommé)* : retirer le bloc créatif ITEM_TO_TANK (l.56-61 : variable morte + référence à `ReactorLiquidInput` inexistant), le bloc créatif TANK_TO_ITEM (l.69-71 : vide), et simplifier l.88 (`instanceof` toujours vrai). `ReactorOutput.SPEED` : retirer les 3 commentaires (l.43, 52, 87) ou décider si la propriété doit être réactivée (§4).
 
 **Chantier de fond (le plus rentable à long terme)**
 12. Démarrer une couverture de tests sur `DefaultHeatCalculator`, le pattern matcher (`ReactorPattern`/`CNMultiblock`) et `PersistentFluidLocks` — les trois zones où des bugs/inefficacités silencieuses ont survécu à plusieurs audits successifs.

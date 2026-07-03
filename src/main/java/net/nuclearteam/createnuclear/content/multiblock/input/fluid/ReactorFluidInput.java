@@ -13,7 +13,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -25,7 +24,6 @@ import net.nuclearteam.createnuclear.CNBlockEntityTypes;
 import net.nuclearteam.createnuclear.CNShapes;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
-import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.block.MultiDirectionalReactorBlock;
 import org.jetbrains.annotations.NotNull;
 
@@ -87,7 +85,7 @@ public class ReactorFluidInput extends MultiDirectionalReactorBlock implements I
 		if (!player.isCreative())
 			return InteractionResult.PASS;
 
-		return PlayerInteracteReactorFluidInput.interact(world, pos, player, hand, heldItem, onClient, ray);
+		return PlayerInteractReactorFluidInput.interact(world, pos, player, hand, heldItem, onClient, ray);
 	}
 
 	@Override
