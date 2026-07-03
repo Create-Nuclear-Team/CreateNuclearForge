@@ -1,14 +1,10 @@
 package net.nuclearteam.createnuclear.content.multiblock.reactorLogic;
 
-import com.simibubi.create.content.logistics.BigItemStack;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
-import net.nuclearteam.createnuclear.CNTags;
-import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;

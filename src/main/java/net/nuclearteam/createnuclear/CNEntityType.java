@@ -25,23 +25,6 @@ import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorM
 
 public class CNEntityType {
 
-    public static final EntityEntry<Entity> NUCLEAR_EXPLOSION =
-        CreateNuclear.REGISTRATE
-            .entity(
-                    "nuclear_explosion",
-                    NuclearExplosionEntity::new,
-                    MobCategory.MISC
-            )
-            .properties(builder -> builder
-                    .sized(0.2F, 0.2F)
-                    .setTrackingRange(128)
-                    .setUpdateInterval(1)
-                    .setShouldReceiveVelocityUpdates(true)
-            )
-            // Utilise le renderer vide par défaut de Minecraft
-            .renderer(() -> NoopRenderer::new)
-            .register();
-
    public static final EntityEntry<IrradiatedCat> IRRADIATED_CAT = CreateNuclear.REGISTRATE
         .entity("irradiated_cat", IrradiatedCat::new, MobCategory.CREATURE)
         .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
@@ -72,14 +55,26 @@ public class CNEntityType {
         .attributes(IrradiatedWolf::createAttributes)
         .register();
 
-    public static final EntityEntry<IrradiatedCow> IRRADIATED_COW = CreateNuclear.REGISTRATE
-            .entity("irradiated_cow", IrradiatedCow::new, MobCategory.CREATURE)
-            .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
-            .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
-            .properties(p -> p.sized(0.6f, 0.85f))
-            .lang("Irradiated Cow")
-            .renderer(() -> IrradiatedCowRenderer::new)
-            .attributes(IrradiatedCow::createAttributes)
+   public static final EntityEntry<IrradiatedCow> IRRADIATED_COW = CreateNuclear.REGISTRATE
+    .entity("irradiated_cow", IrradiatedCow::new, MobCategory.CREATURE)
+    .loot((tb, e) -> tb.add(e, LootTable.lootTable()))
+    .tag(CNEntityTags.IRRADIATED_IMMUNE.tag)
+    .properties(p -> p.sized(0.6f, 0.85f))
+    .lang("Irradiated Cow")
+    .renderer(() -> IrradiatedCowRenderer::new)
+    .attributes(IrradiatedCow::createAttributes)
+    .register();
+
+    public static final EntityEntry<Entity> NUCLEAR_EXPLOSION =
+        CreateNuclear.REGISTRATE.entity("nuclear_explosion", NuclearExplosionEntity::new, MobCategory.MISC)
+            .properties(builder -> builder
+                .sized(0.2F, 0.2F)
+                .setTrackingRange(128)
+                .setUpdateInterval(1)
+                .setShouldReceiveVelocityUpdates(true)
+            )
+            // Utilise le renderer vide par défaut de Minecraft
+            .renderer(() -> NoopRenderer::new)
             .register();
 
    public static void registerModelLayer(EntityRenderersEvent.RegisterLayerDefinitions event) {

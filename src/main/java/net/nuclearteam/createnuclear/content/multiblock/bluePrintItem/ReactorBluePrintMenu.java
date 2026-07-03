@@ -14,11 +14,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.nuclearteam.createnuclear.CNMenus;
-import net.nuclearteam.createnuclear.CNTags.CNItemTags;
-import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRod;
-import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 import static net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem.getItemStorage;
 
