@@ -1,0 +1,322 @@
+plugins {
+    id("idea")
+    id("eclipse")
+    id("maven-publish")
+    id("net.kyori.blossom") version "2.1.0" // https://github.com/KyoriPowered/blossom
+    id("dev.ithundxr.silk") version "0.11.15" // https://github.com/ithundxr/silk
+    id("me.modmuss50.mod-publish-plugin") version "0.8.4" // https://github.com/modmuss50/mod-publish-plugin
+    id("net.neoforged.moddev.legacyforge") version "2.0.107" // https://projects.neoforged.net/neoforged/ModDevGradle
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.8" // https://github.com/JetBrains/gradle-idea-ext-plugin
+}
+
+apply(from: "./gradle/java.gradle")
+
+boolean dev = System.getenv("RELEASE") == null || System.getenv("RELEASE") == "false"
+ext.buildNumber = System.getenv("BUILD_NUMBER")
+String gitHash = calculateGitHash() + (hasUnstaged() ? "-modified" : "")
+
+base {
+    archivesName = "createnuclear-${artifact_minecraft_version}"
+    group = mod_group_id
+    version = 'forge' + (dev && buildNumber != null ? "-${buildNumber}" : "")
+}
+
+println "Java: ${System.getProperty 'java.version'}, " +
+        "JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), " +
+        "Arch: ${System.getProperty 'os.arch'}"
+
+
+Provider<RegularFile> refmap
+mixin {
+    refmap = add(sourceSets.main, "createnuclear.refmap.json")
+    config "createnuclear.forge.mixins.json"
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+legacyForge {
+    version = "$minecraft_version-$forge_version"
+
+    // TODO - Try turning this on later
+    validateAccessTransformers = false
+
+    if (file("src/main/resources/META-INF/accesstransformer.cfg").exists()) {
+        accessTransformers.from "src/main/resources/META-INF/accesstransformer.cfg"
+    }
+
+    parchment {
+        minecraftVersion = minecraft_version
+        mappingsVersion = mapping_version
+    }
+
+    mods {
+        createnuclear {
+            sourceSet(sourceSets.main)
+        }
+    }
+
+    runs {
+        // applies to all the run configs below
+        configureEach {
+            systemProperty("forge.logging.markers", "REGISTRIES")
+            systemProperty("forge.logging.console.level", "info")
+            jvmArguments = ["-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition"]
+            //jvmArgs("-XX:-OmitStackTraceInFastThrow") // uncomment when you get exceptions with null messages etc
+            //jvmArgs "-XX:+UnlockCommercialFeatures" // uncomment for profiling
+
+            systemProperty("mixin.debug.export", "true")
+            systemProperty("mixin.debug.verbose", "true")
+
+            programArgument("-mixin.config=createnuclear.forge.mixins.json")
+        }
+
+        client {
+            client()
+
+            gameDirectory = project.file("run")
+        }
+
+        server {
+            server()
+
+            gameDirectory = project.file("run/server")
+        }
+
+        data {
+            data()
+
+            gameDirectory = project.file("run")
+            systemProperty("forge.logging.markers", "REGISTRIES,REGISTRYDUMP")
+            systemProperty("forge.logging.console.level", "debug")
+            programArguments.addAll(
+                "--mod", mod_id as String,
+                "--all",
+                "--output", file("src/generated/resources/").getAbsolutePath(),
+                "--existing", file("src/main/resources").getAbsolutePath()
+            )
+        }
+    }
+}
+
+repositories {
+    maven {
+        // location of the maven that hosts JEI files before January 2023
+        name = "Progwml6's maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        // location of the maven that hosts JEI files since January 2023
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
+    maven {
+        url "https://cursemaven.com"
+    }
+
+    maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
+    maven { url = "https://maven.tterrag.com" } // Registrate
+    maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
+}
+
+dependencies {
+    /* other minecraft dependencies are here */
+    modImplementation("curse.maven:jade-324717:6106101")
+    
+    // compile against the JEI API but do not include it at runtime
+    modCompileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+    modCompileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
+    
+    // at runtime, use the full JEI jar for Forge
+    switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
+        case 'jei': modRuntimeOnly("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"); break
+        case "disabled": break
+        default: println("Unknown recipe viewer specified: $recipe_viewer. Must be JEI or disabled.")
+    }
+
+    modImplementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+    modImplementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+    modCompileOnly("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
+    modRuntimeOnly("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+    modImplementation("com.tterrag.registrate:Registrate:${registrate_version}")
+    
+    implementation("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}")
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
+
+    // https://discord.com/channels/313125603924639766/725850371834118214/910619168821354497
+    // Prevent Mixin annotation processor from getting into IntelliJ's annotation processor settings
+    // This allows 'Settings > Build, Execution, and Deployment > Build Tools > Gradle > Build and run using' set to IntelliJ to work correctly
+    if (!Boolean.getBoolean("idea.sync.active")) {
+        annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
+    }
+}
+
+sourceSets.main {
+    resources {
+        srcDir("src/generated/resources")
+        exclude(".cache/")
+    }
+
+    blossom.javaSources {
+        property("version", mod_version)
+        property("gitCommit", gitHash.toString())
+    }
+}
+
+processResources {
+    var replaceProperties = [
+        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+        forge_version: forge_version, forge_version_range: forge_version_range,
+        loader_version_range: loader_version_range,
+        mod_id: mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+        mod_authors: mod_authors, mod_description: mod_description,
+        create_version_range: create_version_range, ponder_version: ponder_version
+    ]
+
+    // Replaces FML's magic file.jarVersion string with the correct version at build time.
+    replaceProperties.put("file", [jarVersion: project.version])
+
+    filesMatching(["META-INF/mods.toml"]) {
+        expand(replaceProperties)
+    }
+}
+
+jar {
+    String name = base.archivesName.get()
+
+    from("LICENSE") {
+        rename { "${it}_${name}" }
+    }
+
+    manifest.attributes([
+            "MixinConfigs": "createnuclear.forge.mixins.json",
+            "Git-Hash"    : gitHash
+    ])
+}
+
+tasks.named("sourcesJar") {
+    manifest.attributes([
+            "Git-Hash": gitHash
+    ])
+}
+
+final slimJar = tasks.register("slimJar", Jar) {
+    archiveClassifier = "slim"
+    from(sourceSets.main.output)
+    from(refmap)
+    manifest.attributes([
+        "MixinConfigs": "createnuclear.forge.mixins.json",
+        "Git-Hash"    : gitHash
+    ])
+}
+obfuscation.reobfuscate(slimJar, sourceSets.main)
+
+project.publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId base.archivesName.get()
+            from components.java
+
+            artifact(tasks.reobfJar) {
+                classifier = "all"
+            }
+        }
+    }
+
+    repositories {
+        if (project.hasProperty("mavenUsername") && project.hasProperty("mavenPassword") && project.hasProperty("mavenURL")) {
+            project.logger.lifecycle("Adding maven from secrets")
+
+            maven {
+                credentials {
+                    username = project.property("mavenUsername") as String
+                    password = project.property("mavenPassword") as String
+                }
+                url = URI.create(project.property("mavenURL") as String)
+            }
+        }
+
+        if (project.hasProperty("mavendir")) {
+            maven { url mavendir }
+        }
+    }
+}
+
+publishMods {
+    file = reobfJar.archiveFile
+    changelog = file("CHANGELOG.md").text
+    type = STABLE
+    version = "$mod_version"
+    displayName = "$mod_name $mod_version for mc$minecraft_version"
+    modLoaders.add("forge")
+    // modLoaders.add("neoforge")
+
+    // curseforge {
+    //     accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+    //     projectId = ""
+    //     minecraftVersions.add(minecraft_version)
+
+    //     javaVersions.add(JavaVersion.VERSION_17)
+
+    //     clientRequired = true
+    //     serverRequired = true
+    // }
+
+    // modrinth {
+    //     accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+    //     projectId = ""
+    //     minecraftVersions.add(minecraft_version)
+
+    //     requires {
+    //         id = "LNytGWDc"
+    //         slug = "Create"
+    //     }
+    //     optional {
+    //         id = "u6dRKJwZ"
+    //         slug = "JEI"
+    //     }
+    // }
+
+    github {
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        repository = "Create-Nuclear-Team/CreateNuclearForge"
+        commitish = gitHash
+        tagName = "v${mod_version}-${gitHash.substring(0,7)}"
+
+        allowEmptyFiles = true
+    }
+}
+
+String calculateGitHash() {
+    try {
+        ExecOutput output = providers.exec {
+            commandLine("git", "rev-parse", "HEAD")
+        }
+        return output.standardOutput.asText.get().trim()
+    } catch (Throwable ignored) {
+        return "unknown"
+    }
+}
+
+boolean hasUnstaged() {
+    try {
+        ExecOutput output = providers.exec {
+            commandLine("git", "status", "--porcelain")
+        }
+        String result = output.standardOutput.asText.get().replace("/M gradlew(\\.bat)?/", "").trim()
+        if (!result.isEmpty())
+            println("Found stageable results:\n ${result}\n")
+        return !result.isEmpty()
+    } catch (Throwable ignored) {
+        return false
+    }
+}
