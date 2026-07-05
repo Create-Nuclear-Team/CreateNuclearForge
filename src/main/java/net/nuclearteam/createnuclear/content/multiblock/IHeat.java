@@ -87,7 +87,7 @@ public interface IHeat extends IWrenchable {
         }
 
         public static boolean isNotDanger(int heat, int reactorSize) {
-            return of(heat, reactorSize) != DANGER || of(heat, reactorSize) != NONE;
+            return of(heat, reactorSize) != DANGER;
         }
 
         public static LangBuilder getFormattedHeatText(int heat, int reactorSize) {

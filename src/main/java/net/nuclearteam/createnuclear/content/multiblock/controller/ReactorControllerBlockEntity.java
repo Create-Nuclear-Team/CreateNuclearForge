@@ -59,6 +59,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private int countCoolerRod;
     private int totalHeatRatio;
     private int heat;
+    private int lastAppliedOutputHeat;
     private boolean isExploding = false;
 
     /** Client-only looping "running" sound instance; never accessed server-side. */
@@ -426,6 +427,9 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         cycleManager.update(configuredPattern, level, inputManager, level.getGameTime() % 20 == 0);
 
         if (IHeat.HeatLevel.isNotDanger(heat, getMultiblockSize()) && !outputManager.getBlocksPosition(level).isEmpty()) {
+            if (Math.abs(heat - lastAppliedOutputHeat) >= ReactorOutputManager.RPM_DIVIDER / 2) {
+                lastAppliedOutputHeat = heat;
+            }
             outputManager.rotateOutputs(getLevel(), getAssembled(), heat);
         }
     }

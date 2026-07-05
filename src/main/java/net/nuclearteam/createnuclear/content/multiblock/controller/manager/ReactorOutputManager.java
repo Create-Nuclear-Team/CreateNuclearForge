@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class ReactorOutputManager extends AbstractReactorIOManager implements ReactorOutputManagerI {
     private static final String NBT_KEY = "ReactorOutputs";
-    private static final int RPM_DIVIDER = 32;
+    public static final int RPM_DIVIDER = 32;
 
     @Override
     public void write(CompoundTag compound) {
