@@ -11,4 +11,10 @@ public interface IRadiationCapability {
 
     ResourceLocation getLastBiomeLocation();
     void setLastBiomeLocation(ResourceLocation location);
+
+    double getContagionDose();
+    void setContagionDose(double dose);
+
+    int getContagionTicks();
+    void setContagionTicks(int ticks);
 }

@@ -12,21 +12,18 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.*;
 
-public class VicinityEffect extends MobEffect {
+public abstract class VicinityEffect extends MobEffect {
     private final UnaryOperator<Integer> areaSize;
     private final Predicate<LivingEntity> filter;
-    private final Supplier<MobEffectInstance>[] effects;
 
     // Stores the GameTime tick when the cooldown expires for each entity
     private final Map<UUID, Long> cooldowns = new HashMap<>();
 
-    @SafeVarargs
-    protected VicinityEffect(MobEffectCategory category, int color, UnaryOperator<Integer> areaSize, Predicate<LivingEntity> filter, Consumer<Integer> timer, Supplier<MobEffectInstance>... effects) {
+    protected VicinityEffect(MobEffectCategory category, int color, UnaryOperator<Integer> areaSize, Predicate<LivingEntity> filter, Consumer<Integer> timer) {
         super(category, color);
 
         this.areaSize = areaSize;
         this.filter = filter;
-        this.effects = effects;
     }
 
     @Override
@@ -45,16 +42,20 @@ public class VicinityEffect extends MobEffect {
 
             // Check if the cooldown has expired
             if (currentTime >= cooldowns.getOrDefault(entityUuid, 0L)) {
-
-                for (Supplier<MobEffectInstance> effect : effects) {
-                    nearby.addEffect(effect.get());
-                }
+                onContaminate(nearby);
 
                 // Set a 100-tick (5 seconds) cooldown before refreshing the effect again
                 cooldowns.put(entityUuid, currentTime + 100);
             }
         }
     }
+
+    /**
+     * Called for each eligible nearby entity once its cooldown expires. Chaque sous-classe
+     * décide comment elle transmet réellement l'effet (ex: RadiationEffect alimente la dose
+     * de RadiationCapability plutôt que d'ajouter un MobEffect directement).
+     */
+    protected abstract void onContaminate(LivingEntity nearby);
 
     @Override
     public boolean isDurationEffectTick(int duration, int amplifier) {

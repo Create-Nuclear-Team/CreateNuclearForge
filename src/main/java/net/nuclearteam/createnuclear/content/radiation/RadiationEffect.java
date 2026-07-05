@@ -1,7 +1,6 @@
 package net.nuclearteam.createnuclear.content.radiation;
 
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 
 import net.nuclearteam.createnuclear.CNEffects;
@@ -12,6 +11,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.nuclearteam.createnuclear.foundation.damageTypes.CNDamageSources;
 
 public class RadiationEffect extends VicinityEffect {
+    private static final int CONTAGION_DURATION_TICKS = 300;
 
     /**
      * Constructs the RadiationEffect with harmful category and color.
@@ -20,9 +20,8 @@ public class RadiationEffect extends VicinityEffect {
     public RadiationEffect() {
         super(MobEffectCategory.HARMFUL, 15453236,
                 amplifier -> 10,
-                e -> RadiationCapability.canBeIrradiated(e) && !e.hasEffect(CNEffects.RADIATION.get()),
-                timer -> {},
-                () -> new MobEffectInstance(CNEffects.RADIATION.get(), 300)); // Custom color (hex value)
+                RadiationCapability::canBeIrradiated,
+                timer -> {}); // Custom color (hex value)
 
         // Reduces movement speed by 20%
         this.addAttributeModifier(Attributes.MOVEMENT_SPEED,
@@ -48,6 +47,11 @@ public class RadiationEffect extends VicinityEffect {
     @Override
     public boolean isDurationEffectTick(int duration, int amplifier) {
         return true;
+    }
+
+    @Override
+    protected void onContaminate(LivingEntity nearby) {
+        RadiationCapability.applyContagion(nearby, 15D, CONTAGION_DURATION_TICKS);
     }
 
     @Override

@@ -32,6 +32,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteStoneTypes;
+import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.content.radiation.RadiationBucketItem;
 
@@ -42,6 +43,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class CNFluids {
+    private static final double URANIUM_FLUID_DOSE = 5.0D;
+
     public static final FluidEntry<ForgeFlowingFluid.Flowing> URANIUM =
         CreateNuclear.REGISTRATE.standardFluid("uranium", SolidRenderedPlaceableFluidtype.create(0x38FF08, () -> 1f / 32f))
             .lang("Liquid Uranium")
@@ -127,7 +130,7 @@ public class CNFluids {
         // 1. EFFET DE L'URANIUM (Radiation)
         if (entity.isInFluidType(URANIUM.getType())) {
             if (entity.tickCount % 20 == 0) {
-                entity.addEffect(new MobEffectInstance(CNEffects.RADIATION.get(), 100, 0));
+                RadiationCapability.applyContagion(entity, URANIUM_FLUID_DOSE, 100);
             }
         }
 

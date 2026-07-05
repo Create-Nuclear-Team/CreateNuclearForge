@@ -15,8 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNEffects;
@@ -24,12 +22,9 @@ import net.nuclearteam.createnuclear.CNTags;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.radiation.IRadiationSource;
 import net.nuclearteam.createnuclear.api.radiation.RadiationRegistry;
-import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.foundation.utility.ConfigValueResolver;
 import net.nuclearteam.createnuclear.foundation.utility.InventoryHashUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
-
-import static net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.RADIATION_VALUE;
 
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +35,8 @@ public class RadiationCapability implements IRadiationCapability {
     private double radiation;
     private long inventoryHash;
     private ResourceLocation lastBiomeLocation;
+    private double contagionDose;
+    private int contagionTicks;
 
     @Override
     public double getRadiation() {
@@ -71,6 +68,26 @@ public class RadiationCapability implements IRadiationCapability {
         this.lastBiomeLocation = location;
     }
 
+    @Override
+    public double getContagionDose() {
+        return this.contagionDose;
+    }
+
+    @Override
+    public void setContagionDose(double dose) {
+        this.contagionDose = dose;
+    }
+
+    @Override
+    public int getContagionTicks() {
+        return this.contagionTicks;
+    }
+
+    @Override
+    public void setContagionTicks(int ticks) {
+        this.contagionTicks = ticks;
+    }
+
     public static void attach(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof LivingEntity) {
             event.addCapability(CreateNuclear.asResource("irradiated_resistance"), new RadiationProvider());
@@ -81,10 +98,16 @@ public class RadiationCapability implements IRadiationCapability {
         tickRadiation(event.getEntity());
     }
 
+    public static void applyContagion(LivingEntity entity, double doseValue, int durationTicks) {
+        entity.getCapability(RadiationProvider.CAP).ifPresent(cap -> {
+            cap.setContagionDose(doseValue);
+            cap.setContagionTicks(durationTicks);
+        });
+    }
+
     public static void tickRadiation(LivingEntity entity) {
         Level level = entity.level();
         if (level.isClientSide) return;
-
 
         entity.getCapability(RadiationProvider.CAP).ifPresent(cap -> {
             if (entity instanceof Player player) {
@@ -97,7 +120,6 @@ public class RadiationCapability implements IRadiationCapability {
                 cap.setRadiation(Math.max(0, computeItemRadiation(entity)));
             }
 
-
             ResourceKey<Biome> biomeKey = level.getBiome(entity.blockPosition()).unwrapKey().orElse(null);
             ResourceLocation biomeLoc = biomeKey != null ? biomeKey.location() : null;
             if (!Objects.equals(biomeLoc, cap.getLastBiomeLocation())) {
@@ -106,7 +128,13 @@ public class RadiationCapability implements IRadiationCapability {
 
             if (!canBeIrradiated(entity)) return;
 
-            double totalRaw = cap.getRadiation() + getRawBiomeRadiation(biomeKey);
+            if (cap.getContagionTicks() > 0) {
+                cap.setContagionTicks(cap.getContagionTicks() - 1);
+            }
+
+            double contagionDose = cap.getContagionTicks() > 0 ? cap.getContagionDose() : 0;
+
+            double totalRaw = cap.getRadiation() + getRawBiomeRadiation(biomeKey) + contagionDose;
             double resistance = getRadiationResistance(entity);
             double totalRadiation = totalRaw * (1.0 - resistance);
 
