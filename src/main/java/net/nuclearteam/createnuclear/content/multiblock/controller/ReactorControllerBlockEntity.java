@@ -430,7 +430,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             if (Math.abs(heat - lastAppliedOutputHeat) >= ReactorOutputManager.RPM_DIVIDER / 2) {
                 lastAppliedOutputHeat = heat;
             }
-            outputManager.rotateOutputs(getLevel(), getAssembled(), heat);
+            outputManager.rotateOutputs(getLevel(), getAssembled(), lastAppliedOutputHeat);
         }
     }
 
