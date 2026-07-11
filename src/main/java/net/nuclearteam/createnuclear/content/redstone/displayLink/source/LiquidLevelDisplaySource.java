@@ -25,7 +25,7 @@ public class LiquidLevelDisplaySource extends NumericSingleLineDisplaySource {
 
         int mode = context.sourceConfig().getInt("display_mode");
         var fluidList = controller.getBigFluidStack();
-        int fluid = (fluidList != null && !fluidList.isEmpty()) ? (int) fluidList.get(0).amount : 0;
+        int fluid = (fluidList != null && !fluidList.isEmpty()) ? fluidList.get(0).amount : 0;
         int maxFluid = 16000;
 
         return label.append(switch (mode) {

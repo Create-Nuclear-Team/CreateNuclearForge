@@ -21,7 +21,6 @@ public class ReactorFrameDisplayManager implements ReactorFrameDisplayManagerI {
     private long frameFluidCacheTick = -1;
     private float frameFluidFillRatioCache = 0f;
 
-
     private FluidStack frameFluidCache = FluidStack.EMPTY;
 
     /**
@@ -128,7 +127,9 @@ public class ReactorFrameDisplayManager implements ReactorFrameDisplayManagerI {
 
     @Override
     public void write(CompoundTag compound) {
-        compound.putInt(COMPONENT_FRAME_COLUMN_MIN_Y, frameColumnMinY);
-        compound.putInt(COMPONENT_FRAME_COLUMN_MAX_Y, frameColumnMaxY);
+        if (hasFrameColumn()) {
+            compound.putInt(COMPONENT_FRAME_COLUMN_MIN_Y, frameColumnMinY);
+            compound.putInt(COMPONENT_FRAME_COLUMN_MAX_Y, frameColumnMaxY);
+        }
     }
 }
