@@ -10,50 +10,42 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
-public class LiquidLevelDisplaySource extends NumericSingleLineDisplaySource {
+import java.util.List;
+
+public class LiquidLevelDisplaySource extends AbstractReactorStatDisplaySource {
+    @Override
+    protected String getLabelKey() {
+        return "display_source.reactor.fluid";
+    }
 
     @Override
-    protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
-        ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(context.level(), context.getSourcePos());
-        if (controller == null || controller.isRemoved()) return ZERO.copy();
-
-        MutableComponent label = CreateNuclearLang.translateDirect("display_source.reactor.fluid").append(" ");
-
-        int mode = context.sourceConfig().getInt("display_mode");
-        var fluidList = controller.getBigFluidStack();
-        int fluid = (fluidList != null && !fluidList.isEmpty()) ? fluidList.get(0).amount : 0;
-        int maxFluid = 16000;
-
-        return label.append(switch (mode) {
-            case 1 -> Component.literal((fluid * 100 / maxFluid) + "%").withStyle(ChatFormatting.BLUE);
-            case 2 -> {
-                int gaugeWidth = 6;
-                yield drawGauge(fluid, maxFluid, ChatFormatting.BLUE, gaugeWidth);
-            }
-            default -> Component.literal(String.valueOf(fluid))
-                    .append(CreateNuclearLang.translateDirect("generic.unit.fluid.value"))
-                    .withStyle(ChatFormatting.BLUE);
-        });
+    protected int getMax() {
+        return 16000;
     }
-
-    private MutableComponent drawGauge(int current, int max, ChatFormatting color, int width) {
-        int filled = (int) (Mth.clamp((float) current / max, 0, 1) * width);
-        return Component.literal("█".repeat(filled) + "▒".repeat(Math.max(0, width - filled))).withStyle(color);
-    }
-
-    @Override protected String getTranslationKey() { return "liquid_level"; }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public void initConfigurationWidgets(DisplayLinkContext context, ModularGuiLineBuilder builder, boolean isFirstLine) {
-        if (isFirstLine) return;
-        builder.addSelectionScrollInput(0, 100, (selectionScrollInput, l) -> selectionScrollInput
-                .forOptions(CreateNuclearLang.translatedOptions("display_source.reactor.mode", "value", "percent", "gauge")), "display_mode");
+    protected ChatFormatting getColor(int value, ReactorControllerBlockEntity controller) {
+        return ChatFormatting.BLUE;
     }
 
-    @Override protected boolean allowsLabeling(DisplayLinkContext context) { return true; }
+    @Override
+    protected int computeValue(ReactorControllerBlockEntity controller, DisplayLinkContext context) {
+        List<BigFluidStack> fluidList = controller.getBigFluidStack();
+        return (fluidList != null && !fluidList.isEmpty()) ? fluidList.get(0).amount : 0;
+    }
+
+    @Override
+    protected MutableComponent getUnitSuffix() {
+        return CreateNuclearLang.translateDirect("generic.unit.fluid.value");
+    }
+
+    @Override
+    protected String getTranslationKey() {
+        return "liquid_level";
+    }
 }

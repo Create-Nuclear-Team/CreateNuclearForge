@@ -164,20 +164,15 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
     }
 
     private MutableComponent formatFluid(int current, int max, int mode, ChatFormatting color, int width) {
-        if (mode == 0 || mode == 3) return drawGauge(current, max, color, width);
+        if (mode == 0 || mode == 3) return ReactorGaugeRenderer.drawGauge(current, max, color, width);
         if (mode == 2) return Component.literal((current * 100 / max) + "%").withStyle(color);
         return Component.literal(String.valueOf(current)).append(" ").append(CreateNuclearLang.translateDirect("generic.unit.fluid.value")).withStyle(color);
     }
 
     private MutableComponent formatValue(int current, int max, int mode, boolean gaugeOnNormal, ChatFormatting color, int width) {
-        if (mode == 3 || (mode == 0 && gaugeOnNormal)) return drawGauge(current, max, color, width);
+        if (mode == 3 || (mode == 0 && gaugeOnNormal)) return ReactorGaugeRenderer.drawGauge(current, max, color, width);
         if (mode == 2) return Component.literal((current * 100 / max) + "%").withStyle(color);
         return Component.literal(String.valueOf(current)).withStyle(color);
-    }
-
-    private MutableComponent drawGauge(int current, int max, ChatFormatting color, int width) {
-        int filled = (int) (Mth.clamp((float) current / max, 0, 1) * width);
-        return Component.literal("█".repeat(filled) + "▒".repeat(Math.max(0, width - filled))).withStyle(color);
     }
 
     private int labelWidth() {
@@ -200,5 +195,8 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
                 .forOptions(CreateNuclearLang.translatedOptions("display_source.reactor.mode", "normal", "value", "percent", "gauge")), "display_mode");
     }
 
-    @Override protected String getTranslationKey() { return "reactor_summary"; }
+    @Override
+    protected String getTranslationKey() {
+        return "reactor_summary";
+    }
 }

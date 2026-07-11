@@ -22,6 +22,7 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.foundation.block.MultiDirectionalReactorBlock;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -143,7 +144,11 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
         if (!capability.isPresent()) refreshCapability();
-        if (cap == ForgeCapabilities.FLUID_HANDLER) return capability.cast();
+        if (cap == ForgeCapabilities.FLUID_HANDLER) {
+            if (side != null && side != getBlockState().getValue(MultiDirectionalReactorBlock.FACING))
+                return LazyOptional.empty();
+            return capability.cast();
+        }
 
         return super.getCapability(cap, side);
     }

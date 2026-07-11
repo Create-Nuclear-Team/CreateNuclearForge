@@ -18,6 +18,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
+import net.nuclearteam.createnuclear.foundation.block.MultiDirectionalReactorBlock;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -93,8 +94,12 @@ public class ReactorRodInputEntity extends SmartBlockEntity implements MenuProvi
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        if (isItemHandlerCap(cap))
+        if (isItemHandlerCap(cap)){
+            if (side != null && side != getBlockState().getValue(MultiDirectionalReactorBlock.FACING))
+                return LazyOptional.empty();
             return inventoryProvider.cast();
+        }
+
         return super.getCapability(cap, side);
     }
 
