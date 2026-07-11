@@ -14,7 +14,7 @@ public class HeatDisplaySource extends AbstractReactorStatDisplaySource {
 
     @Override
     protected int getMax() {
-        return 1000;
+        return ReactorDisplayConstants.MAX_HEAT;
     }
 
     @Override

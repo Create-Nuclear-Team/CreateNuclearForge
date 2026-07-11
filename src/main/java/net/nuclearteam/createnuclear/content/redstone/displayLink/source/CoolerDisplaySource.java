@@ -18,7 +18,7 @@ public class CoolerDisplaySource extends AbstractReactorStatDisplaySource {
 
     @Override
     protected int getMax() {
-        return 64;
+        return ReactorDisplayConstants.MAX_COOLER;
     }
 
     @Override

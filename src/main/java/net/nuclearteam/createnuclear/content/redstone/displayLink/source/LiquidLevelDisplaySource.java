@@ -25,7 +25,7 @@ public class LiquidLevelDisplaySource extends AbstractReactorStatDisplaySource {
 
     @Override
     protected int getMax() {
-        return 16000;
+        return ReactorDisplayConstants.MAX_FLUID;
     }
 
     @Override
