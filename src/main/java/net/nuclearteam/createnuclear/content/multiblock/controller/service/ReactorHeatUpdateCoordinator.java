@@ -40,7 +40,7 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
             if (countToUse > 0) {
                 RodType rodType = RodType.resolveRodType(item, level);
                 if (rodType != null && rodType.isNotEmptyItem()) {
-                    totalHeatRatio += rodType.heatRatio() * countToUse;
+                    totalHeatRatio += rodType.heatRatio().get() * countToUse;
                 }
             }
         }

@@ -131,15 +131,15 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
             if (isCooler) {
                 countCooledRod++;
-                totalCoolerTime += typeRod.rodTimer();
+                totalCoolerTime += typeRod.rodTimer().get();
             }
             if (isFuel) {
                 countFuelRod++;
-                totalFuelTime += typeRod.rodTimer();
+                totalFuelTime += typeRod.rodTimer().get();
             }
             
             if (isCooler || isFuel) {
-                totalHeatRatio += typeRod.heatRatio();
+                totalHeatRatio += typeRod.heatRatio().get();
             }
         }
 
