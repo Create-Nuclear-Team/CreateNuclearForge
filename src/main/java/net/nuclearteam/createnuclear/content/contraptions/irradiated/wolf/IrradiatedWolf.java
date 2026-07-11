@@ -35,7 +35,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -302,7 +301,7 @@ public class IrradiatedWolf extends TamableAnimal implements NeutralMob {
         ItemStack itemStack = player.getItemInHand(hand);
         Item item = itemStack.getItem();
         if (this.level().isClientSide) {
-            boolean bl = this.isOwnedBy(player) || this.isTame() || itemStack.is(Items.BONE) && !this.isTame() && !this.isAngry();
+            boolean bl = this.isOwnedBy(player) || this.isTame() || this.isFood(itemStack) && !this.isTame() && !this.isAngry();
             return bl ? InteractionResult.CONSUME : InteractionResult.PASS;
         } else {
             {
@@ -315,6 +314,8 @@ public class IrradiatedWolf extends TamableAnimal implements NeutralMob {
                         this.heal((float) item.getFoodProperties().getNutrition());
                         return InteractionResult.SUCCESS;
                     }
+                } else if (this.isFood(itemStack)) {
+                    return AnimalUtil.blockTamingWip(player, this.level());
                 }
 
                 return super.mobInteract(player, hand);

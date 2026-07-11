@@ -59,6 +59,7 @@ public class CreateNuclearDatagen {
             provideDefaultLang("potion", langConsumer);
             provideDefaultLang("tooltips", langConsumer);
             provideDefaultLang("reactor", langConsumer);
+            provideDefaultLang("irradiated", langConsumer);
             CNAdvancement.provideLang(langConsumer);
             CNSoundEvents.provideLang(langConsumer);
             providePonderLang(langConsumer);

@@ -39,6 +39,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.AnimalUtil;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -252,11 +253,6 @@ public class IrradiatedCat extends TamableAnimal {
             if (this.isTame()) {
                 cat.setOwnerUUID(this.getOwnerUUID());
                 cat.setTame(true);
-                if (this.random.nextBoolean()) {
-                    cat.setCollarColor(this.getCollarColor());
-                } else {
-                    cat.setCollarColor(cat2.getCollarColor());
-                }
             }
         }
 
@@ -300,44 +296,21 @@ public class IrradiatedCat extends TamableAnimal {
             InteractionResult interactionResult;
             if (this.isTame()) {
                 if (this.isOwnedBy(player)) {
-                    if (!(item instanceof DyeItem)) {
-                        if (item.isEdible() && this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
-                            this.usePlayerItem(player, hand, itemStack);
-                            this.heal((float)item.getFoodProperties().getNutrition());
-                            return InteractionResult.CONSUME;
-                        }
-
-                        interactionResult = super.mobInteract(player, hand);
-                        if (!interactionResult.consumesAction() || this.isBaby()) {
-                            this.setOrderedToSit(!this.isOrderedToSit());
-                        }
-
-                        return interactionResult;
-                    }
-
-                    DyeColor dyeColor = ((DyeItem)item).getDyeColor();
-                    if (dyeColor != this.getCollarColor()) {
-                        this.setCollarColor(dyeColor);
-                        if (!player.getAbilities().instabuild) {
-                            itemStack.shrink(1);
-                        }
-
-                        this.setPersistenceRequired();
+                    if (item.isEdible() && this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
+                        this.usePlayerItem(player, hand, itemStack);
+                        this.heal((float)item.getFoodProperties().getNutrition());
                         return InteractionResult.CONSUME;
                     }
-                }
-            } else if (this.isFood(itemStack)) {
-                this.usePlayerItem(player, hand, itemStack);
-                if (this.random.nextInt(3) == 0) {
-                    this.tame(player);
-                    this.setOrderedToSit(true);
-                    this.level().broadcastEntityEvent(this, (byte)7);
-                } else {
-                    this.level().broadcastEntityEvent(this, (byte)6);
-                }
 
-                this.setPersistenceRequired();
-                return InteractionResult.CONSUME;
+                    interactionResult = super.mobInteract(player, hand);
+                    if (!interactionResult.consumesAction() || this.isBaby()) {
+                        this.setOrderedToSit(!this.isOrderedToSit());
+                    }
+
+                    return interactionResult;
+                }
+            } else if (itemStack.is(CNItems.YELLOWCAKE.get())) {
+                return AnimalUtil.blockTamingWip(player, this.level());
             }
 
             interactionResult = super.mobInteract(player, hand);

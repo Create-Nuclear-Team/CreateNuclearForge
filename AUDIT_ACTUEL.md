@@ -106,9 +106,7 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 `run/hs_err_pid21100.log`, `run/hs_err_pid27848.log`, `run/imgui.ini`, `run/servers.dat`, `run/servers.dat_old`, `run/mods/Jade-1.20.1-Forge-11.12.2.jar.disabled`.~~
 ⚠️ **Conserver** les 10 `run/schematics/*.nbt` (assets de gameplay légitimes).
 
-**Décisions produit (pas du pur dead code — choisir puis exécuter)**
-
-- **Collier teignable chat/loup non câblé** *(inchangé)* : `IrradiatedWoldCollarLayer.render()` reste un corps vide ; `IrradiatedCatCollarLayer` n'est toujours pas enregistré via `addLayer(...)` dans `CNEntityType.java`. `IrradiatedWolf` ne câble toujours pas l'interaction `DyeItem`/`setCollarColor` (`mobInteract` sans logique dye), alors qu'`IrradiatedCat` câble entièrement `DyeItem → setCollarColor/getCollarColor`. Un joueur peut toujours teindre le collier d'un chat irradié sans effet visible. *Décision* : enregistrer le layer + implémenter `render`, ou retirer toute la mécanique `DyeItem`/`setCollarColor`.
+~~**Collier teignable chat/loup non câblé**~~ ✅ **Résolu le 2026-07-11** — décision prise : retrait complet de la mécanique plutôt que câblage. `IrradiatedCatCollarLayer.java` et `IrradiatedWoldCollarLayer.java` ont été supprimés (aucun appelant ne les référençait, confirmé par grep). Dans `IrradiatedCat.java`, le champ `DATA_COLLAR_COLOR`, les accesseurs `getCollarColor()`/`setCollarColor()` et le bloc `readAdditionalSaveData`/`addAdditionalSaveData` associé ont été retirés ; l'interaction `DyeItem` dans `mobInteract` a été retirée (le fix a complété une suppression partielle laissée par l'édition en cours, qui laissait `mobInteract` appeler des méthodes déjà supprimées — code non compilable en l'état intermédiaire). `IrradiatedWolf` n'avait de toute façon jamais câblé cette mécanique (`DATA_COLLAR_COLOR` déjà en commentaire). Note : `getBreedOffspring` (`IrradiatedCat.java:248-260`) appelle toujours `cat.setCollarColor(...)`/`cat2.getCollarColor()`, mais sur des `Cat` vanilla (API native Minecraft), sans rapport avec la mécanique retirée — laissé tel quel.
 
 **Worldgen « irradié » — template non terminé** *(inchangé)*
 - `IrradiatedBiomes.addDefaultIrradiatedOres`/`addDefaultSoftDisks` ajoutent toujours du contenu vanilla sans rapport (`BLUE_ICE`, `NETHER_CAVE`, `VOID_START_PLATFORM`).
@@ -172,7 +170,7 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 10. Flicker vitesse de sortie en fin de ressources (oscillateur `overHeat` × division entière `RPM_DIVIDER`) : ajouter une hystérésis sur le heat appliqué à `rotateOutputs`, seuil à valider (§1).
 
 **Décisions produit (choisir puis exécuter)**
-11. Collier teignable chat/loup : finir le câblage (`addLayer` + `render` + interaction `DyeItem` sur `IrradiatedWolf`) ou retirer toute la mécanique (§4).
+~~11. Collier teignable chat/loup : finir le câblage (`addLayer` + `render` + interaction `DyeItem` sur `IrradiatedWolf`) ou retirer toute la mécanique (§4).~~ ✅ **fait le 2026-07-11** — mécanique retirée entièrement (§4).
 12. `PlayerInteractReactorFluidInput` *(renommé)* : retirer le bloc créatif ITEM_TO_TANK (l.56-61 : variable morte + référence à `ReactorLiquidInput` inexistant), le bloc créatif TANK_TO_ITEM (l.69-71 : vide), et simplifier l.88 (`instanceof` toujours vrai). `ReactorOutput.SPEED` : retirer les 3 commentaires (l.43, 52, 87) ou décider si la propriété doit être réactivée (§4).
 
 **Chantier de fond (le plus rentable à long terme)**

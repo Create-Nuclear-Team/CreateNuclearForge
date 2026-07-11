@@ -1,8 +1,13 @@
 package net.nuclearteam.createnuclear.content.contraptions.irradiated;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.function.Predicate;
 
@@ -19,5 +24,17 @@ public class AnimalUtil {
         }
 
         return foodItems.test(stack) || extraTest.test(stack);
+    }
+
+    /**
+     * Taming for irradiated creatures is still work in progress: rather than actually
+     * taming the mob, this informs the player and consumes the interaction.
+     */
+    public static InteractionResult blockTamingWip(Player player, Level level) {
+        if (!level.isClientSide) {
+            player.sendSystemMessage(Component.translatable("irradiated.taming.wip"));
+        }
+
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 }
