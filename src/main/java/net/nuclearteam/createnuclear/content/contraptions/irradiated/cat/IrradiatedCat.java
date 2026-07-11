@@ -57,7 +57,6 @@ public class IrradiatedCat extends TamableAnimal {
     private static final Ingredient TEMPT_INGREDIENT;
     private static final EntityDataAccessor<Boolean> IS_LYING;
     private static final EntityDataAccessor<Boolean> RELAX_STATE_ONE;
-    private static final EntityDataAccessor<Integer> DATA_COLLAR_COLOR;
     private CatAvoidEntityGoal<Player> avoidPlayersGoal;
     @Nullable
     private TemptGoal temptGoal;
@@ -108,33 +107,18 @@ public class IrradiatedCat extends TamableAnimal {
         return this.entityData.get(RELAX_STATE_ONE);
     }
 
-    public DyeColor getCollarColor() {
-        return DyeColor.byId(this.entityData.get(DATA_COLLAR_COLOR));
-    }
-
-    public void setCollarColor(DyeColor color) {
-        this.entityData.set(DATA_COLLAR_COLOR, color.getId());
-    }
-
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(IS_LYING, false);
         this.entityData.define(RELAX_STATE_ONE, false);
-        this.entityData.define(DATA_COLLAR_COLOR, DyeColor.RED.getId());
     }
 
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
-        compound.putByte("CollarColor", (byte)this.getCollarColor().getId());
     }
 
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
-
-        if (compound.contains("CollarColor", 99)) {
-            this.setCollarColor(DyeColor.byId(compound.getInt("CollarColor")));
-        }
-
     }
 
     public void customServerAiStep() {
@@ -397,7 +381,6 @@ public class IrradiatedCat extends TamableAnimal {
         TEMPT_INGREDIENT = Ingredient.of(new ItemLike[]{Items.COD, Items.SALMON, CNItems.YELLOWCAKE});
         IS_LYING = SynchedEntityData.defineId(IrradiatedCat.class, EntityDataSerializers.BOOLEAN);
         RELAX_STATE_ONE = SynchedEntityData.defineId(IrradiatedCat.class, EntityDataSerializers.BOOLEAN);
-        DATA_COLLAR_COLOR = SynchedEntityData.defineId(IrradiatedCat.class, EntityDataSerializers.INT);
     }
 
 
