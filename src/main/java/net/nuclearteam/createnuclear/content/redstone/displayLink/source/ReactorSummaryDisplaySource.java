@@ -147,10 +147,10 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
                         CreateNuclearLang.translateDirect("display_source.reactor.active").withStyle(ChatFormatting.GOLD) :
                         CreateNuclearLang.translateDirect("display_source.reactor.idle").withStyle(ChatFormatting.GRAY)),
                 List.of(lSize, formatSize(size)),
-                List.of(lFuel,   formatValue(fuel, 64, mode, false, ChatFormatting.GREEN, gaugeWidth)),
-                List.of(lCooler, formatValue(cooler, 64, mode, false, ChatFormatting.AQUA, gaugeWidth)),
-                List.of(lFluid,  formatFluid(fluid, 16000, mode, ChatFormatting.BLUE, gaugeWidth)),
-                List.of(lHeat,   formatValue(heat, 1000, mode, true, IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor(), gaugeWidth))
+                List.of(lFuel,   formatValue(fuel, ReactorDisplayConstants.MAX_FUEL, mode, false, ChatFormatting.GREEN, gaugeWidth)),
+                List.of(lCooler, formatValue(cooler, ReactorDisplayConstants.MAX_COOLER, mode, false, ChatFormatting.AQUA, gaugeWidth)),
+                List.of(lFluid,  formatFluid(fluid, ReactorDisplayConstants.MAX_FLUID, mode, ChatFormatting.BLUE, gaugeWidth)),
+                List.of(lHeat,   formatValue(heat, ReactorDisplayConstants.MAX_HEAT, mode, true, IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor(), gaugeWidth))
         );
     }
 
