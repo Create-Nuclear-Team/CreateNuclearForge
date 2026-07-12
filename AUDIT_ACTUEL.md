@@ -99,15 +99,15 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 
 **Périmètre** : `src/main/java` (292 fichiers), recherche des commentaires/Javadoc non rédigés en anglais et des cas ambigus/incomplets indépendamment de la langue. Méthodologie : recherche par caractères accentués + vocabulaire français typique des commentaires, puis lecture manuelle des occurrences trouvées.
 
-**Décompte global** : **14 fichiers sur 292** (~5 %) contiennent du français détectable, pour environ **40 lignes** de commentaires/Javadoc concernées. **Aucun symbole de code** (nom de classe, méthode, champ) en français n'a été trouvé — le problème est **localisé aux commentaires et Javadoc**, pas à l'API elle-même. Le mélange est quasi systématique FR/EN **dans le même fichier**, parfois la même méthode — jamais un fichier intégralement en français.
+**Décompte global** *(mis à jour 2026-07-12, commit `3be6252a`)* : **12 fichiers sur 292** (~4 %) contiennent encore du français détectable, pour environ **25 lignes** de commentaires/Javadoc concernées. **Aucun symbole de code** (nom de classe, méthode, champ) en français n'a été trouvé — le problème est **localisé aux commentaires et Javadoc**, pas à l'API elle-même.
 
-**Cas les plus significatifs** :
+**Résolu** — les 4 cas de Javadoc public bilingue, seul sous-item classé 🟢 prioritaire au tour précédent, ont été traduits en intégralité (commit `3be6252a`, *"style: translate French comments and Javadoc to English in VicinityEffect and CNPonderReactorScenes"*) :
+- `content/effects/VicinityEffect.java:53-57` — Javadoc de `onContaminate(LivingEntity)` entièrement repassée en anglais.
+- `infrastructure/ponder/scenes/CNPonderReactorScenes.java` — fichier intégralement traduit : Javadoc de `Positions` (l.32), de `STATIC_POS` (l.50, reformulée en documentation stable plutôt qu'en note à soi-même) et de `positionsFor` (l.85), plus tous les commentaires inline restants (pedestal, exemples T1/T2/T3, fallback, positions devant/derrière/droite). Ce fichier ne contient plus aucun français.
 
-*Javadoc public sur API/points d'extension — le plus grave car visible par tout futur contributeur :*
-1. `content/effects/VicinityEffect.java:53-57` — Javadoc de `onContaminate(LivingEntity)`, point d'extension abstrait clé (`RadiationEffect` en dépend) : première phrase en anglais, puis bascule en français dans la même doc. Pire cas relevé : Javadoc public, méthode non triviale, bilingue au sein d'un seul bloc.
-2. `infrastructure/ponder/scenes/CNPonderReactorScenes.java:32` — Javadoc de la classe interne `Positions` entièrement en français, documentant une convention critique non répétée ailleurs (« Les BlockPos ici doivent être EN COORDONNÉES SCÈNE »).
-3. `infrastructure/ponder/scenes/CNPonderReactorScenes.java:50` — Javadoc de `STATIC_POS` rédigé comme une note à soi-même plutôt qu'une documentation (« adapte ces valeurs exactement comme dans ton NBT »).
-4. `infrastructure/ponder/scenes/CNPonderReactorScenes.java:85` — Javadoc de `positionsFor` en français ; bloque la lecture pour un contributeur non francophone d'une scène Ponder (bibliothèque Create, publique par nature).
+Ces deux fichiers sortent donc de la liste ci-dessous et sont déplacés dans la table de §8.1.
+
+**Cas les plus significatifs restants** :
 
 *Commentaires sur logique métier non triviale :*
 5. `CNFluids.java:139,153,156,159` — bloc de commentaires français documentant une correction fine de désynchronisation client/serveur des ticks de gel/dégel (compensation d'offset). Logique fragile, documentée uniquement en français.
@@ -123,15 +123,15 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 15. `foundation/mixin/GameRendererMixin.java:17` — commentaire français seul sur le mixin gérant l'assombrissement du ciel pendant l'explosion — même remarque que 7/8.
 
 **Ambiguïtés/incomplétudes indépendantes de la langue relevées au passage** :
-- `CNPonderReactorScenes.java:50,90` — formulations en forme de note de dev figée dans le code (« adapte ces valeurs... comme dans ton NBT », « si tu veux éviter un NPE ») plutôt qu'une documentation stable, à reformuler indépendamment de la traduction.
+- ~~`CNPonderReactorScenes.java:50,90`~~ — **résolu** (`3be6252a`) : les deux Javadoc ont été reformulées en documentation stable en même temps que leur traduction (voir ci-dessus).
 - `ReactorOutput.java` (§4) — propriété `SPEED` commentée sans décision documentée — ambiguïté fonctionnelle non résolue.
 - `CNStandardRecipeGen.java:226` (§4) — `FIXME` en anglais mais sans contexte suffisant pour un tiers.
 
-**Pattern récurrent** : le point « commentaires FR/EN mêlés » déjà signalé dans `AUDIT_V1.md` §5 (sans jamais être suivi comme item séparé) **reste d'actualité** et se concentre sur un noyau stable de fichiers : les mixins (`CameraAccessor`, `RadiationHeartMixin`, `GameRendererMixin`), le rendu Display Link (`ReactorSummaryDisplaySource`, `ReactorSizeDisplaySource`), les scènes Ponder (`CNPonderReactorScenes`), et `CNFluids`/`ClientEvents`. Aucun de ces fichiers n'a été assaini depuis. Point positif : le sous-ensemble concerné est petit et stable (14/292 fichiers, ~5 %) et n'a pas grossi récemment — les derniers commits (retrait de `monsters()`, retrait du collier teignable, sons Geiger) n'ont pas introduit de nouveau commentaire français.
+**Pattern récurrent** : le point « commentaires FR/EN mêlés » déjà signalé dans `AUDIT_V1.md` §5 (sans jamais être suivi comme item séparé) **reste d'actualité mais se réduit** : il se concentre désormais sur les mixins (`CameraAccessor`, `RadiationHeartMixin`, `GameRendererMixin`), le rendu Display Link (`ReactorSummaryDisplaySource`, `ReactorSizeDisplaySource`), et `CNFluids`/`ClientEvents`. Les scènes Ponder (`CNPonderReactorScenes`) sortent de cette liste, assainies cette session. Point positif : le sous-ensemble concerné continue de rétrécir (12/292 fichiers désormais, ~4 %) — les derniers commits (retrait de `monsters()`, retrait du collier teignable, sons Geiger) n'ont pas introduit de nouveau commentaire français.
 
-**Pourquoi ça doit être suivi** : ces commentaires portent presque toujours l'explication du *pourquoi* d'un choix non trivial (compat cross-mod, compensation de désync réseau, convention de coordonnées Ponder, garde défensive) — c'est-à-dire exactement le contenu qu'un commentaire doit porter selon les conventions du projet. Le laisser uniquement en français limite la relecture/contribution à l'équipe francophone actuelle et complique tout audit ou onboarding futur non francophone (y compris par un outil ou un contributeur externe à la communauté Create).
+**Pourquoi ça doit être suivi** : ces commentaires portent presque toujours l'explication du *pourquoi* d'un choix non trivial (compat cross-mod, compensation de désync réseau, garde défensive) — c'est-à-dire exactement le contenu qu'un commentaire doit porter selon les conventions du projet. Le laisser uniquement en français limite la relecture/contribution à l'équipe francophone actuelle et complique tout audit ou onboarding futur non francophone (y compris par un outil ou un contributeur externe à la communauté Create).
 
-**Priorité recommandée** : 🟢 **cosmétique, à faire au fil de l'eau — pas bloquant.** Aucun symbole d'API n'est en français, donc pas d'impact sur la lisibilité des signatures pour un contributeur externe. Traiter en priorité les 4 cas de Javadoc public (items 1-4 ci-dessus, notamment `VicinityEffect.java` et `CNPonderReactorScenes.java`, seuls vrais cas de Javadoc public bilingue) lors du prochain passage sur ces fichiers, plutôt que d'ouvrir un chantier de traduction dédié — le volume (~40 lignes) ne le justifie pas. Chaque futur commit touchant l'un des 14 fichiers devrait normaliser en anglais les commentaires qu'il modifie. **Suivi** : cet item reste en §6 jusqu'à ce que les 4 cas de Javadoc public soient traduits ; à re-scanner périodiquement (le pattern n'a pas grossi depuis le dernier audit, mais rien ne garantit que ça dure).
+**Priorité recommandée** : 🟢 **cosmétique, à faire au fil de l'eau — pas bloquant.** Aucun symbole d'API n'est en français, donc pas d'impact sur la lisibilité des signatures pour un contributeur externe. Les 4 cas de Javadoc public (`VicinityEffect.java` et `CNPonderReactorScenes.java` ×3, seuls vrais cas de Javadoc public bilingue) sont traduits et committés (`3be6252a`). Pas de chantier de traduction dédié à ouvrir pour le reste (~25 lignes restantes) : chaque futur commit touchant l'un des 12 fichiers restants devrait normaliser en anglais les commentaires qu'il modifie. **Suivi** : cet item reste en §6, à re-scanner périodiquement.
 
 ---
 
@@ -165,7 +165,7 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 - Worldgen « irradié » : retirer le contenu vanilla sans rapport (`BLUE_ICE`, `NETHER_CAVE`, `VOID_START_PLATFORM`) et choisir un bloc de remplissage cohérent à la place de `STEEL_BLOCK` (§4). **Justification** : n'affecte que la cohérence thématique du biome, pas de risque technique.
 
 **8. Documentation (nouveau, §6)**
-- Traduire en anglais les 4 cas de Javadoc public bilingue (`VicinityEffect.java`, `CNPonderReactorScenes.java` ×3) en priorité, puis les commentaires métier non triviaux listés en §6, au fil des prochains passages sur ces fichiers. **Justification** : cosmétique et non bloquant (aucun symbole d'API en français), mais ce sont typiquement des commentaires qui expliquent un « pourquoi » non trivial (compat, désync réseau, convention Ponder) — les laisser en français limite l'audit/onboarding futur.
+- ~~Traduire en anglais les 4 cas de Javadoc public bilingue (`VicinityEffect.java`, `CNPonderReactorScenes.java` ×3)~~ — **fait cette session** (working tree, à committer). Reste : les commentaires métier non triviaux listés en §6 (items 5-15, ~25 lignes sur 12 fichiers), au fil des prochains passages sur ces fichiers. **Justification** : cosmétique et non bloquant (aucun symbole d'API en français), mais ce sont typiquement des commentaires qui expliquent un « pourquoi » non trivial (compat, désync réseau) — les laisser en français limite l'audit/onboarding futur.
 
 **9. À surveiller sans action immédiate**
 - `RadiationCapability.tickRadiation` pour les `LivingEntity` non-joueurs : pas de dirty-check d'inventaire (§3). Compromis assumé, à reconsidérer seulement si la densité de mobs équipés irradiés pose un problème de perf mesuré.
@@ -187,6 +187,7 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 
 | Correction | Hash(es) | Date | Détail |
 |---|---|---|---|
+| Traduction en anglais des 4 cas de Javadoc public bilingue relevés en §6 (`VicinityEffect.onContaminate`, `CNPonderReactorScenes.Positions`/`STATIC_POS`/`positionsFor`), plus l'intégralité des commentaires inline restants de `CNPonderReactorScenes.java` | `3be6252a` | 2026-07-12 | `VicinityEffect.java` et `CNPonderReactorScenes.java` ne contiennent plus aucun français ; sortis de la liste §6 (14→12 fichiers concernés, ~40→~25 lignes). |
 | Retrait de `IrradiatedBiomes.monsters()` (corps vide, arguments ignorés) | `8b0428e3` | 2026-07-12 | Méthode et son unique site d'appel supprimés ; les réglages de spawn passent désormais uniquement par `MobSpawnSettings.Builder`. |
 | Blocage explicite (message "WIP") de l'apprivoisement des mobs irradiés (`AnimalUtil.blockTamingWip`) | `261b26d8` | 2026-07-11 | Remplace un apprivoisement cassé/incohérent (chat : collier non fonctionnel ; loup : aucun chemin d'apprivoisement) par un message explicite "pas encore implémenté". Ce même commit a aussi retiré la mécanique de collier (§8.3). |
 | Retrait de la mécanique de collier teignable jamais câblée (`IrradiatedCatCollarLayer`, `IrradiatedWoldCollarLayer`, `DATA_COLLAR_COLOR`) | `17b29aa3` | 2026-07-11 | Décision produit exécutée — voir §8.3 pour le contexte de la décision. |
