@@ -24,12 +24,12 @@ public class CNPonderReactorScenes {
     private static final int S_T3 = 9;
     private static final int H_T3 = 11;
 
-    private static final int PEDESTAL_Y = 0; // couche de piedestal (snow/concrete)
+    private static final int PEDESTAL_Y = 0; // pedestal layer (snow/concrete)
     private static final int MULTIBLOCK_BASE_Y = 1; // multiblock starts at y=1
     private static final int MARGIN = 2; // Create margin
     private static int plateSizeFor(int multiblockSize) { return multiblockSize + MARGIN * 2; }
 
-    /** * Conteneur simple pour stocker toutes les positions d'intérêt d'un multiblock. * Les BlockPos ici doivent être EN COORDONNÉES SCÈNE (0..plate-1 pour X/Z, 1..H pour Y). */
+    /** * Simple container for storing all positions of interest for a multiblock. * The BlockPos values here must be in SCENE COORDINATES (0..plate-1 for X/Z, 1..H for Y). */
     private static class Positions {
         final BlockPos controller, input1, input2, liquidInput, alarm, output;
         Positions(BlockPos controller, BlockPos input1, BlockPos input2, BlockPos liquidInput, BlockPos alarm, BlockPos output) {
@@ -47,11 +47,11 @@ public class CNPonderReactorScenes {
         }
     }
 
-    /** * Map statique – remplis/ajuste les coordonnées ici pour chaque taille (multiblockSize). * Exemple : clef = 5 pour S_T1 (5x5), 7 pour S_T2, 9 pour S_T3. * * Règle : x/z en 0..plate-1, y en 1..H ; adapte ces valeurs exactement comme dans ton NBT. */
+    /** * Static map of positions per multiblock size. * Key = multiblockSize (5 for S_T1, 7 for S_T2, 9 for S_T3). * * Rule: x/z in 0..plate-1, y in 1..H; these values must match the structure's actual NBT layout. */
     private static final Map<Integer, Positions> STATIC_POS = new HashMap<>();
     static {
-        // Exemple pour T1 (multiblockSize = 5)
-        // plate = 5 + 4 = 9 => x/z valides : 0..8 ; multiblock intérieur : 2..6
+        // Example for T1 (multiblockSize = 5)
+        // plate = 5 + 4 = 9 => valid x/z: 0..8; inner multiblock: 2..6
         STATIC_POS.put(5, new Positions(
                 new BlockPos(4, 4, 6),  // controller
                 new BlockPos(3, 2, 6),  // input1
@@ -61,7 +61,7 @@ public class CNPonderReactorScenes {
                 new BlockPos(5, 2, 6)   // output
         ));
 
-        // Exemple pour T2 (multiblockSize = 7)
+        // Example for T2 (multiblockSize = 7)
         STATIC_POS.put(7, new Positions(
                 new BlockPos(5, 5, 8),  // controller
                 new BlockPos(3, 3, 8),  // input1
@@ -71,7 +71,7 @@ public class CNPonderReactorScenes {
                 new BlockPos(7, 3, 8)   // output
         ));
 
-        // Exemple pour T3 (multiblockSize = 9)
+        // Example for T3 (multiblockSize = 9)
         STATIC_POS.put(9, new Positions(
                 new BlockPos(6, 6, 10),  // controller
                 new BlockPos(5, 4, 10), // input1
@@ -82,12 +82,12 @@ public class CNPonderReactorScenes {
         ));
     }
 
-    /** * Retourne les positions statiques pour la taille donnée. * Si aucune entrée statique n'existe, retourne des positions calculées "raisonnables". */
+    /** * Returns the static positions for the given size. * If no static entry exists, returns "reasonable" computed positions instead. */
     private static Positions positionsFor(int multiblockSize, int height) {
         Positions p = STATIC_POS.get(multiblockSize);
         if (p != null) return p;
 
-        // fallback : calcul simple centré (si tu veux éviter un NPE)
+        // fallback: simple centered calculation (avoids an NPE)
         int plate = plateSizeFor(multiblockSize);
         int offset = MARGIN;
         int cx = offset + (multiblockSize / 2);
@@ -95,11 +95,11 @@ public class CNPonderReactorScenes {
         int cy = MULTIBLOCK_BASE_Y + (height / 2);
         return new Positions(
                 new BlockPos(cx, cy, cz),               // controller
-                new BlockPos(cx, MULTIBLOCK_BASE_Y+1, offset + multiblockSize - 1), // input1 devant
+                new BlockPos(cx, MULTIBLOCK_BASE_Y+1, offset + multiblockSize - 1), // input1 front
                 new BlockPos(cx, Math.min(MULTIBLOCK_BASE_Y+height-1, MULTIBLOCK_BASE_Y+2), offset + multiblockSize - 1), // input2
-                new BlockPos(cx, cy, offset),          // liquidInput derrière
+                new BlockPos(cx, cy, offset),          // liquidInput back
                 new BlockPos(Math.max(offset, cx-1), cy, cz), // alarm
-                new BlockPos(offset + multiblockSize - 1, cy, cz) // output à droite
+                new BlockPos(offset + multiblockSize - 1, cy, cz) // output right
         );
     }
 

@@ -51,9 +51,9 @@ public abstract class VicinityEffect extends MobEffect {
     }
 
     /**
-     * Called for each eligible nearby entity once its cooldown expires. Chaque sous-classe
-     * décide comment elle transmet réellement l'effet (ex: RadiationEffect alimente la dose
-     * de RadiationCapability plutôt que d'ajouter un MobEffect directement).
+     * Called for each eligible nearby entity once its cooldown expires. Each subclass
+     * decides how it actually delivers the effect (e.g. RadiationEffect feeds the dose
+     * into RadiationCapability rather than adding a MobEffect directly).
      */
     protected abstract void onContaminate(LivingEntity nearby);
 
