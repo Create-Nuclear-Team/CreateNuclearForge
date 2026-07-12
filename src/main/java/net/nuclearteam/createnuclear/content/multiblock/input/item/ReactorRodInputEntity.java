@@ -61,11 +61,6 @@ public class ReactorRodInputEntity extends SmartBlockEntity implements MenuProvi
         }
     }
 
-    public void readInventory(CompoundTag compound) {
-        inventory.deserializeNBT(compound);
-    }
-
-
     @Nullable
     @Override
     public Level getLevel() {

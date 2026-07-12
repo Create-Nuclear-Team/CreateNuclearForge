@@ -1,17 +1,21 @@
 package net.nuclearteam.createnuclear.infrastructure.worldgen.biome;
 
 import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.Carvers;
 import net.minecraft.data.worldgen.placement.MiscOverworldPlacements;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.nuclearteam.createnuclear.CNSoundEvents;
 import net.nuclearteam.createnuclear.content.particles.IrradiatedParticlesData;
 
 public class IrradiatedBiomes {
-    public static Biome createPlain(HolderGetter<PlacedFeature> featureLookup, HolderGetter<ConfiguredWorldCarver<?>> carverLookup) {
-        return IrradiatedBiomes.irradiated(featureLookup, carverLookup, new BiomeGenerationSettings.Builder(featureLookup, carverLookup));
+    public static Biome createPlain(HolderGetter<PlacedFeature> featureLookup, HolderGetter<ConfiguredWorldCarver<?>> carverLookup, HolderGetter<SoundEvent> soundLookup) {
+        return IrradiatedBiomes.irradiated(featureLookup, carverLookup, soundLookup, new BiomeGenerationSettings.Builder(featureLookup, carverLookup));
     }
 
     public static void addDefaultIrradiatedOres(BiomeGenerationSettings.Builder builder) {
@@ -23,7 +27,7 @@ public class IrradiatedBiomes {
         builder.addFeature(GenerationStep.Decoration.SURFACE_STRUCTURES, MiscOverworldPlacements.VOID_START_PLATFORM);
     }
 
-    public static Biome irradiated(HolderGetter<PlacedFeature> featureGetter, HolderGetter<ConfiguredWorldCarver<?>> carverGetter, BiomeGenerationSettings.Builder generation) {
+    public static Biome irradiated(HolderGetter<PlacedFeature> featureGetter, HolderGetter<ConfiguredWorldCarver<?>> carverGetter, HolderGetter<SoundEvent> soundLookup, BiomeGenerationSettings.Builder generation) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeSpecialEffects.Builder effectBuilder = new BiomeSpecialEffects.Builder();
 
@@ -45,7 +49,13 @@ public class IrradiatedBiomes {
                 .foliageColorOverride(0x565E3E)
 
                 .ambientParticle(new AmbientParticleSettings(new IrradiatedParticlesData(), 0.025F))
-                .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS);
+                .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
+                .ambientLoopSound(soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.GEIGER_LOW.getId())))
+                .ambientAdditionsSound(new AmbientAdditionsSettings(
+                    soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.GEIGER_MEDIUM.getId())),
+                    0.0111
+                ))
+        ;
 
         IrradiatedBiomes.addDefaultIrradiatedOres(generation);
         IrradiatedBiomes.addDefaultSoftDisks(generation);

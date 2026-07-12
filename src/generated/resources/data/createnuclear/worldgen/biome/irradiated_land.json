@@ -4,6 +4,11 @@
   },
   "downfall": 0.0,
   "effects": {
+    "additions_sound": {
+      "sound": "createnuclear:geiger/medium",
+      "tick_chance": 0.0111
+    },
+    "ambient_sound": "createnuclear:geiger/low",
     "fog_color": 4742718,
     "foliage_color": 5660222,
     "grass_color": 9211739,

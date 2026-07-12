@@ -4,6 +4,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -18,8 +19,8 @@ public class CNBiomes {
     public static void bootstrapRegistries(BootstapContext<Biome> context) {
         HolderGetter<PlacedFeature> featureLookup = context.lookup(Registries.PLACED_FEATURE);
         HolderGetter<ConfiguredWorldCarver<?>> carverLookup = context.lookup(Registries.CONFIGURED_CARVER);
-
-        context.register(Irradiated.PLAIN, IrradiatedBiomes.createPlain(featureLookup, carverLookup));
+        HolderGetter<SoundEvent> soundLookup = context.lookup(Registries.SOUND_EVENT);
+        context.register(Irradiated.PLAIN, IrradiatedBiomes.createPlain(featureLookup, carverLookup, soundLookup));
     }
 
     public static @NotNull ResourceKey<Biome> key(String id) {
