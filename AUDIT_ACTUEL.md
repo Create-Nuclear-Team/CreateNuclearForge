@@ -1,6 +1,6 @@
 # Audit consolidé — CreateNuclearForge (branche V2-CorrectifAudit)
 
-**Dernière mise à jour : 2026-06-28 (après commits `2aaddb4d`, `562ce99d`, `30de52a7`).** Nouvel audit indépendant réalisé en repartant exclusivement du code actuel (`src/main/java`, **291 fichiers, ~25 070 lignes**, hors `src/generated` et `src/main/resources`). `AUDIT_V1.md` et l'historique de ce fichier (versions précédentes) n'ont servi qu'à comparer les résultats — chaque point a été **revérifié par lecture directe des fichiers cités** (et, pour les zones les plus actives, par `git show`/`git log` sur les commits du 2026-06-24 au 2026-06-28).
+**Dernière mise à jour : 2026-07-12 (après commits jusqu'à `8b0428e3` inclus).** Nouvel audit indépendant réalisé en repartant exclusivement du code actuel (`src/main/java`, **291 fichiers, ~25 070 lignes**, hors `src/generated` et `src/main/resources`). `AUDIT_V1.md` et l'historique de ce fichier (versions précédentes) n'ont servi qu'à comparer les résultats — chaque point a été **revérifié par lecture directe des fichiers cités** (et, pour les zones les plus actives, par `git show`/`git log` sur les commits du 2026-06-24 au 2026-06-28).
 
 > Ce document ne liste que **ce qui reste à corriger ou à décider**. Les bugs résolus sont récapitulés en §6 pour mémoire, puis ne sont plus repris.
 
@@ -89,16 +89,10 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 
 **Pur dead code (retrait sûr)**
 - ~~**`lib/multiblock/SimpleMultiBlockPattern.java` méthode `test()`**~~ ✅ **Retiré** — confirmé par `git diff` : la méthode a disparu du fichier de travail, aucun appelant n'était présent.
-- **`IrradiatedBiomes.monsters()`** — corps toujours vide (`IrradiatedBiomes.java:17-18`), appelé avec des arguments (95, 5, 100) silencieusement ignorés (l.55). À retirer ou implémenter.
+- ~~**`IrradiatedBiomes.monsters()`**~~ ✅ **Retiré le 2026-07-12** (`8b0428e3`) — la méthode (corps vide) et son unique site d'appel dans le builder du biome irradié ont été supprimés ; les réglages de spawn du biome irradié passent désormais uniquement par `MobSpawnSettings.Builder`.
 
 **Code commencé puis abandonné (hygiène de fin de PR)**
-- `content/multiblock/input/fluid/PlayerInteractReactorFluidInput.java:57-61` *(fichier renommé — suppression du 'e' parasite dans "Interacte")* — quatre problèmes distincts, tous du dead code :
-  1. **L.57** : `FluidStack fluidInItem = GenericItemEmptying.emptyItem(level, stack, true).getFirst()` — variable calculée uniquement pour les lignes commentées en-dessous ; jamais utilisée ailleurs. L'appel simule (`true`) donc pas de mutation, mais le calcul est inutile.
-  2. **L.58-60** : bloc commenté qui référence `ReactorLiquidInput` — classe **inexistante** dans le projet (renommée en `ReactorFluidInputEntity`), avec une invocation tronquée `fluidInInput.set` jamais complétée. Code définitivement abandonné, non récupérable tel quel.
-  3. **L.69-71** : bloc `if (player.isCreative() && !onClient) { }` entièrement vide sous `TANK_TO_ITEM` — dead code pur.
-  4. **L.88** : `if (be instanceof ReactorFluidInputEntity)` — `be` est déjà casté en `ReactorFluidInputEntity` à la ligne 31 et null-checké à la ligne 32 ; ce `instanceof` est **toujours vrai**, branche morte. À simplifier en retirant la condition.
-  - Note de contexte : `ReactorFluidInput.use()` interdit déjà toute interaction non-creative avant d'appeler `interact()` → les gardes `player.isCreative()` à l'intérieur de `interact()` sont redondantes (toujours vraies).
-  - **Action** : supprimer les lignes 56-61 (bloc créatif ITEM_TO_TANK entier), supprimer les lignes 69-71 (bloc créatif TANK_TO_ITEM vide), simplifier la condition l.88.
+- ~~`content/multiblock/input/fluid/PlayerInteractReactorFluidInput.java:57-61` — quatre problèmes de dead code~~ ✅ **Déjà corrigé le 2026-07-03** (`f2490469`) — **stale depuis la mise à jour précédente de ce document** : ce commit avait renommé le fichier (suppression du 'e' parasite dans "Interacte") et **supprimé** les 4 problèmes (variable morte `fluidInItem`, bloc commenté référençant `ReactorLiquidInput` inexistant, bloc vide `TANK_TO_ITEM`, `instanceof` toujours vrai) directement dans le `.java`, mais la description ci-dessus n'avait, par erreur, pas été retirée de l'audit — elle avait au contraire été détaillée davantage dans ce même commit. Vérifié par lecture directe du fichier actuel (`PlayerInteractReactorFluidInput.java`) : plus aucun des 4 problèmes n'est présent.
 - `content/multiblock/output/ReactorOutput.java:43,52,87` — propriété `SPEED` toujours entièrement commentée (pas supprimée). *(Numéros de lignes mis à jour : l.93 → l.87 après décalage.)*
 - `foundation/data/recipe/CNStandardRecipeGen.java:226` — `// FIXME 5.1 refactor - recipe categories as markers...` toujours présent, à trancher.
 
@@ -149,6 +143,10 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 
 **Corrigé le 2026-07-11** : `ReactorFrameDisplayManager.write` (ex-§2 point 7) persistait systématiquement les sentinelles `Integer.MAX_VALUE`/`MIN_VALUE` même quand `hasFrameColumn()` était faux. `write()` (`ReactorFrameDisplayManager.java:129-134`) n'écrit désormais `COMPONENT_FRAME_COLUMN_MIN_Y`/`MAX_Y` que si `hasFrameColumn()` est vrai. Sans risque de régression : `read()` (l.118-126) protège déjà chaque champ par `compound.contains(...)`, donc l'absence de clé laisse les champs à leurs valeurs par défaut (identique à l'état pré-assignation).
 
+**Corrigé le 2026-07-03** : `PlayerInteractReactorFluidInput` (ex-§4, renommage + 4 problèmes de dead code). Fichier renommé (`PlayerInteracteReactorFluidInput` → `PlayerInteractReactorFluidInput`, suppression du 'e' parasite) et nettoyé (`f2490469`) : variable morte `fluidInItem`, bloc commenté référençant la classe inexistante `ReactorLiquidInput`, bloc vide `TANK_TO_ITEM`, et `instanceof ReactorFluidInputEntity` toujours vrai (branche morte) — tous supprimés. *(Correction bien réelle dans le code depuis le 2026-07-03, mais était restée décrite comme non résolue dans ce document jusqu'au 2026-07-12 — staleness de documentation repérée et corrigée à cette date.)*
+
+**Corrigé le 2026-07-12** : `IrradiatedBiomes.monsters()` (ex-§4, `8b0428e3`) — méthode au corps vide et son unique site d'appel (arguments 95/5/100 silencieusement ignorés) supprimés ; les réglages de spawn du biome irradié passent désormais uniquement par `MobSpawnSettings.Builder`, sans couche de délégation morte.
+
 **Corrigé le 2026-07-11** : duplication `drawGauge` (ex-§2 point 8). Nouvelle classe `ReactorGaugeRenderer.drawGauge` centralise le rendu de jauge, jusque-là copié à l'identique dans 5 classes. `FuelDisplaySource`, `CoolerDisplaySource`, `HeatDisplaySource` et `LiquidLevelDisplaySource` héritent désormais d'un nouveau template `AbstractReactorStatDisplaySource extends NumericSingleLineDisplaySource` (`provideLine`, `initConfigurationWidgets`, `allowsLabeling` mutualisés ; chaque sous-classe ne fournit plus que `getLabelKey`, `getMax`, `computeValue`, `getColor`, et optionnellement `getUnitSuffix`). `ReactorSummaryDisplaySource` reste sur `DisplaySource` (structure multi-lignes non compatible avec le template single-line) mais appelle désormais `ReactorGaugeRenderer.drawGauge` au lieu de sa propre copie. Les magic numbers des 5 classes (les 4 sous-classes migrées **et** `ReactorSummaryDisplaySource`, l.150-153) sont désormais tous nommés dans `ReactorDisplayConstants`. Vérifié par lecture directe des 8 fichiers concernés et par `Grep` confirmant l'usage de `ReactorDisplayConstants.MAX_*` partout où figuraient auparavant `64`/`16000`/`1000` en dur. `ReactorSizeDisplaySource` a été délibérément exclue du template (jauge à 3 segments discrets par tier, sémantique incompatible avec un ratio `current/max`) — elle n'avait de toute façon pas de `drawGauge` dupliqué. Déduplication complète, aucun point résiduel.
 
 ---
@@ -161,7 +159,7 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 3. ~~Généraliser le modèle `ReactorRodInput`...~~ ✅ **fait le 2026-06-28** — `playerDestroy` supprimé de `ReactorCasing`, `ReactorCooler`, `ReactorFrame`, `ReactorAlarm`, `ReactorOutput`, `ReactorFluidInput` ; la logique de retrait vit désormais uniquement dans `onRemove` pour ces 6 classes (comme `ReactorRodInput`). Point résiduel mineur non traité : `ReactorOutput`/`ReactorFluidInput` n'ont pas la garde `!state.is(newState.getBlock())` dans `onRemove` malgré leurs propriétés mutables `DIR`/`FACING` (cf. §2.1).
 4. ~~`IHeat.HeatLevel.isNotDanger` : corriger la tautologie (`!= DANGER` seul), après confirmation balance.~~ ✅ **fait le 2026-07-05** — voir §6 pour le changement de comportement associé à valider en jeu.
 5. ~~`git rm --cached` sur les 6 fichiers de debug `run/` (§4).~~ ✅ **fait le 2026-06-28**
-6. ~~Retirer `SimpleMultiBlockPattern.test()`~~ ✅ **fait le 2026-06-28** (commit `2aaddb4d`) et retirer `IrradiatedBiomes.monsters()` (toujours à faire).
+6. ~~Retirer `SimpleMultiBlockPattern.test()`~~ ✅ **fait le 2026-06-28** (commit `2aaddb4d`) et ~~retirer `IrradiatedBiomes.monsters()`~~ ✅ **fait le 2026-07-12** (commit `8b0428e3`).
 
 **Corrections ciblées (risque faible à moyen)**
 7. `ReactorInputFluidManager` : décrémenter `fluidNeeded` entre handlers + gérer `toExtract == 1` (§1).
@@ -171,7 +169,7 @@ Vérifiés résolus dans le code actuel (cumul des tours précédents) : **B2, B
 
 **Décisions produit (choisir puis exécuter)**
 ~~11. Collier teignable chat/loup : finir le câblage (`addLayer` + `render` + interaction `DyeItem` sur `IrradiatedWolf`) ou retirer toute la mécanique (§4).~~ ✅ **fait le 2026-07-11** — mécanique retirée entièrement (§4).
-12. `PlayerInteractReactorFluidInput` *(renommé)* : retirer le bloc créatif ITEM_TO_TANK (l.56-61 : variable morte + référence à `ReactorLiquidInput` inexistant), le bloc créatif TANK_TO_ITEM (l.69-71 : vide), et simplifier l.88 (`instanceof` toujours vrai). `ReactorOutput.SPEED` : retirer les 3 commentaires (l.43, 52, 87) ou décider si la propriété doit être réactivée (§4).
+12. ~~`PlayerInteractReactorFluidInput` *(renommé)* : retirer le bloc créatif ITEM_TO_TANK...~~ ✅ **fait le 2026-07-03** (`f2490469`, staleness de documentation corrigée le 2026-07-12 — voir §6). *Reste ouvert* : `ReactorOutput.SPEED` — retirer les 3 commentaires (l.43, 52, 87) ou décider si la propriété doit être réactivée (§4).
 
 **Chantier de fond (le plus rentable à long terme)**
 13. Démarrer une couverture de tests sur `DefaultHeatCalculator`, le pattern matcher (`ReactorPattern`/`CNMultiblock`) et `PersistentFluidLocks` — les trois zones où des bugs/inefficacités silencieuses ont survécu à plusieurs audits successifs.
