@@ -14,9 +14,6 @@ public class IrradiatedBiomes {
         return IrradiatedBiomes.irradiated(featureLookup, carverLookup, new BiomeGenerationSettings.Builder(featureLookup, carverLookup));
     }
 
-    public static void monsters(MobSpawnSettings.Builder builder, int zombieWeight, int zombieVillagerWeight, int skeletonWeight) {
-    }
-
     public static void addDefaultIrradiatedOres(BiomeGenerationSettings.Builder builder) {
         builder.addFeature(GenerationStep.Decoration.UNDERGROUND_STRUCTURES, MiscOverworldPlacements.BLUE_ICE);
         builder.addCarver(GenerationStep.Carving.AIR, Carvers.NETHER_CAVE);
@@ -52,7 +49,6 @@ public class IrradiatedBiomes {
 
         IrradiatedBiomes.addDefaultIrradiatedOres(generation);
         IrradiatedBiomes.addDefaultSoftDisks(generation);
-        IrradiatedBiomes.monsters(spawnBuilder, 95, 5, 100);
 
         return new Biome.BiomeBuilder()
                 .mobSpawnSettings(spawnBuilder.build())
