@@ -29,25 +29,28 @@ public class CNPonderReactorScenes {
     private static final int MARGIN = 2; // Create margin
     private static int plateSizeFor(int multiblockSize) { return multiblockSize + MARGIN * 2; }
 
-    /** * Simple container for storing all positions of interest for a multiblock. * The BlockPos values here must be in SCENE COORDINATES (0..plate-1 for X/Z, 1..H for Y). */
-    private static class Positions {
-        final BlockPos controller, input1, input2, liquidInput, alarm, output;
-        Positions(BlockPos controller, BlockPos input1, BlockPos input2, BlockPos liquidInput, BlockPos alarm, BlockPos output) {
-            this.controller = controller;
-            this.input1 = input1;
-            this.input2 = input2;
-            this.liquidInput = liquidInput;
-            this.alarm = alarm;
-            this.output = output;
-        }
+    /**
+     * Simple container for storing all positions of interest for a multiblock. * The BlockPos values here must be in SCENE COORDINATES (0..plate-1 for X/Z, 1..H for Y).
+     */
+    private record Positions(BlockPos controller, BlockPos input1, BlockPos input2, BlockPos liquidInput,
+                             BlockPos alarm, BlockPos output) {
 
-        /** All blocks that carry an explanatory callout, so a section-based reveal can show them per layer. */
+        /**
+         * All blocks that carry an explanatory callout, so a section-based reveal can show them per layer.
+         */
         BlockPos[] specials() {
-            return new BlockPos[] { controller, input1, input2, liquidInput, alarm, output };
+            return new BlockPos[]{controller, input1, input2, liquidInput, alarm, output};
         }
     }
 
-    /** * Static map of positions per multiblock size. * Key = multiblockSize (5 for S_T1, 7 for S_T2, 9 for S_T3). * * Rule: x/z in 0..plate-1, y in 1..H; these values must match the structure's actual NBT layout. */
+    /** Describes a single callout: its text and the direction to point at. */
+    private record CalloutInfo(String text, Direction pointDirection, int fullDuration, int reducedDuration, int fullIdle, int reducedIdle) {}
+
+    /**
+     * Static map of positions per multiblock size.
+     * Key = multiblockSize (5 for S_T1, 7 for S_T2, 9 for S_T3).
+     * Rule: x/z in 0..plate-1, y in 1..H; these values must match the structure's actual NBT layout.
+     */
     private static final Map<Integer, Positions> STATIC_POS = new HashMap<>();
     static {
         // Example for T1 (multiblockSize = 5)
@@ -80,6 +83,25 @@ public class CNPonderReactorScenes {
                 new BlockPos(7, 6, 10),  // alarm
                 new BlockPos(7, 4, 10)   // output
         ));
+    }
+
+    /**
+     * Precomputes a BlockPos -> CalloutInfo map for O(1) lookup per cell instead of
+     * iterating pos.specials() and comparing coordinates for every (x, y, z) visited.
+     */
+    private static Map<BlockPos, CalloutInfo> buildCallouts(Positions pos) {
+        Map<BlockPos, CalloutInfo> callouts = new HashMap<>();
+        callouts.put(pos.controller, new CalloutInfo(
+        "Controller: brain of the reactor, and the place where the blueprint goes to start it",
+            Direction.DOWN,
+            130, 110,
+            140, 120
+        ));
+
+        // Extend here if input1/input2/liquidInput/alarm/output ever need a callout
+        // during structure reveal (they currently don't have one — see ioPlacement()
+        // for their dedicated explanations).
+        return callouts;
     }
 
     /** * Returns the static positions for the given size. * If no static entry exists, returns "reasonable" computed positions instead. */
@@ -115,6 +137,7 @@ public class CNPonderReactorScenes {
      */
     private static void showReactorStructure(SceneBuilder scene, SceneBuildingUtil util, int S, int H, int plate, boolean bySections) {
         Positions pos = positionsFor(S, H);
+        Map<BlockPos, CalloutInfo> callouts = buildCallouts(pos);
 
         int minX = MARGIN;
         int maxX = MARGIN + S - 1;
@@ -138,17 +161,21 @@ public class CNPonderReactorScenes {
                 // section per floor we must idle explicitly, otherwise callout-free floors flash
                 // by instantly and their "Floor N" labels overlap each other.
                 scene.idle(50);
-                for (BlockPos sp : pos.specials()) {
-                    if (sp.getY() == y) {
-                        tryShowCallout(scene, util, pos, sp.getX(), sp.getY(), sp.getZ(), bySections);
+                for (Map.Entry<BlockPos, CalloutInfo> entry : callouts.entrySet()) {
+                    if (entry.getKey().getY() == y) {
+                        showCallout(scene, util, entry.getKey(), entry.getValue(), bySections);
                     }
                 }
             } else {
                 for (int x = 0; x < plate; x++) {
                     for (int z = 0; z < plate; z++) {
+                        BlockPos cell = new BlockPos(x, y, z);
                         scene.world().showSection(util.select().position(x, y, z), Direction.NORTH);
                         scene.idle(4);
-                        tryShowCallout(scene, util, pos, x, y, z, bySections);
+                        CalloutInfo info = callouts.get(cell);
+                        if (info != null) {
+                            showCallout(scene, util, cell, info, bySections);
+                        }
                     }
                 }
             }
@@ -174,21 +201,17 @@ public class CNPonderReactorScenes {
         scene.idle(130);
     }
 
-    private static void tryShowCallout(SceneBuilder scene, SceneBuildingUtil util, Positions pos, int x, int y, int z, boolean reduced) {
-        BlockPos controller = pos.controller;
-
-        if (x == controller.getX() && y == controller.getY() && z == controller.getZ()) {
-            scene.overlay().showText(reduced ? 110 : 130)
-                    .text("Controller: brain of the reactor, and the place where the blueprint goes to start it")
-                    .pointAt(util.vector().blockSurface(controller, Direction.DOWN))
-                    .attachKeyFrame()
-                    .placeNearTarget();
-            scene.idle(reduced ? 120 : 140);
-        }
+    private static void showCallout(SceneBuilder scene, SceneBuildingUtil util, BlockPos at, CalloutInfo info, boolean reduced) {
+        scene.overlay().showText(reduced ? info.reducedDuration() : info.fullDuration())
+                .text(info.text())
+                .pointAt(util.vector().blockSurface(at, info.pointDirection()))
+                .attachKeyFrame()
+                .placeNearTarget();
+        scene.idle(reduced ? info.reducedIdle() : info.fullIdle());
     }
 
     public static void t1(SceneBuilder scene, SceneBuildingUtil util) {
-        int S = S_T1, H = H_T1;
+        int S = S_T1;
         int plate = plateSizeFor(S);
         scene.title("reactor_t1","Reactor T1");
         scene.configureBasePlate(0, 0, plate);
@@ -196,11 +219,11 @@ public class CNPonderReactorScenes {
         scene.showBasePlate();
         scene.rotateCameraY(180);
         scene.scaleSceneView(0.55f);
-        showReactorStructure(scene, util, S, H, plate, true);
+        showReactorStructure(scene, util, S, H_T1, plate, true);
     }
 
     public static void t2(SceneBuilder scene, SceneBuildingUtil util) {
-        int S = S_T2, H = H_T2;
+        int S = S_T2;
         int plate = plateSizeFor(S);
         scene.title("reactor_t2","Reactor T2");
         scene.configureBasePlate(0, 0, plate);
@@ -208,11 +231,11 @@ public class CNPonderReactorScenes {
         scene.showBasePlate();
         scene.rotateCameraY(180);
         scene.scaleSceneView(0.45f);
-        showReactorStructure(scene, util, S, H, plate, true);
+        showReactorStructure(scene, util, S, H_T2, plate, true);
     }
 
     public static void t3(SceneBuilder scene, SceneBuildingUtil util) {
-        int S = S_T3, H = H_T3;
+        int S = S_T3;
         int plate = plateSizeFor(S);
         scene.title("reactor_t3","Reactor T3");
         scene.configureBasePlate(0, 0, plate);
@@ -221,13 +244,13 @@ public class CNPonderReactorScenes {
         scene.rotateCameraY(180);
         scene.scaleSceneView(0.35f);
         // T3 reveals floor-by-floor (section-based) so the largest tier doesn't lag; T1/T2 stay block-by-block.
-        showReactorStructure(scene, util, S, H, plate, true);
+        showReactorStructure(scene, util, S, H_T3, plate, true);
     }
 
     public static void ioPlacement(SceneBuilder scene, SceneBuildingUtil util) {
-        int S = S_T1, H = H_T1;
+        int S = S_T1;
         int plate = plateSizeFor(S);
-        Positions pos = positionsFor(S, H);
+        Positions pos = positionsFor(S, H_T1);
         
         scene.title("reactor_io_placement", "Reactor I/O: Function & Placement");
         scene.configureBasePlate(0, 0, plate);
