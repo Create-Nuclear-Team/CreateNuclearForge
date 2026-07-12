@@ -1,6 +1,6 @@
 # Audit consolidé — CreateNuclearForge (branche V2-CorrectifAudit)
 
-**Réorganisation du 2026-07-12 (HEAD `8b0428e3`).** Ce document a été restructuré pour ne conserver dans ses sections principales (§1 à §7) **que les problèmes encore ouverts**. Tout ce qui est corrigé, réfuté ou décidé (produit) a été déplacé en **§8 Mémoire**, avec le hash du commit correspondant quand il a pu être déterminé avec certitude par archéologie Git (`git log -S`, `git show`, `git blame`) — sinon c'est indiqué explicitement, sans hash inventé.
+**Réorganisation du 2026-07-12 (HEAD `cc532f83`).** Ce document a été restructuré pour ne conserver dans ses sections principales (§1 à §7) **que les problèmes encore ouverts**. Tout ce qui est corrigé, réfuté ou décidé (produit) a été déplacé en **§8 Mémoire**, avec le hash du commit correspondant quand il a pu être déterminé avec certitude par archéologie Git (`git log -S`, `git show`, `git blame`) — sinon c'est indiqué explicitement, sans hash inventé.
 
 **Méthodologie de cette réorganisation** : nouvelle relecture complète du code actuel (`src/main/java`, **292 fichiers**, hors `src/generated`/`src/main/resources`), croisée avec `AUDIT_V1.md`, les versions précédentes de ce fichier, et l'historique Git (`git log`, 1437 commits au total sur le dépôt) — aucun des deux audits n'a été pris comme vérité absolue : plusieurs points ont été revérifiés directement dans le code et un point s'est avéré **périmé** (voir §0).
 
@@ -10,7 +10,7 @@
 
 ## 0. Constat global
 
-Depuis la dernière consolidation (2026-06-28), le projet a continué d'évoluer : retrait de `IrradiatedBiomes.monsters()` (`8b0428e3`), blocage explicite (message "WIP") de l'apprivoisement des mobs irradiés (`261b26d8`), retrait complet de la mécanique de collier teignable jamais câblée (`17b29aa3`), correction de la tautologie `IHeat.isNotDanger` et ajout d'une hystérésis sur le heat appliqué aux sorties (`fb0897d3`, `a18038db`), guard NBT sur `ReactorFrameDisplayManager.write` (`381c7a5f`), et déduplication complète de `drawGauge` via `ReactorGaugeRenderer`/`AbstractReactorStatDisplaySource` (`35e474e3`, `d0da13d1`, `a8b6b23f`). Détail de chaque correction en §8.1.
+Depuis la dernière consolidation (2026-06-28), le projet a continué d'évoluer : retrait de `IrradiatedBiomes.monsters()` (`8b0428e3`), blocage explicite (message "WIP") de l'apprivoisement des mobs irradiés (`261b26d8`), retrait complet de la mécanique de collier teignable jamais câblée (`17b29aa3`), correction de la tautologie `IHeat.isNotDanger` et ajout d'une hystérésis sur le heat appliqué aux sorties (`fb0897d3`, `a18038db`), guard NBT sur `ReactorFrameDisplayManager.write` (`381c7a5f`), déduplication complète de `drawGauge` via `ReactorGaugeRenderer`/`AbstractReactorStatDisplaySource` (`35e474e3`, `d0da13d1`, `a8b6b23f`), traduction en anglais des scènes Ponder (`3be6252a`), et — le jour même de cette réorganisation — remplacement de la sentinelle de taille/accès positionnels fragiles de `ReactorSummaryDisplaySource` par un `record ReactorSummary` typé (`cc532f83`), qui clôt du même coup le dernier commentaire français de ce fichier. Détail de chaque correction en §8.1.
 
 **Point périmé trouvé lors de cette réorganisation** : l'item « Flicker vitesse de sortie en fin de ressources » était encore documenté en §1 comme un bug entièrement ouvert, proposant comme correction l'ajout d'un champ `lastAppliedOutputHeat` avec hystérésis sur `RPM_DIVIDER/2. **Cette correction a en réalité déjà été appliquée** par le commit `a18038db` (2026-07-05) — vérifié par lecture directe : `ReactorControllerBlockEntity.java:62` (champ `lastAppliedOutputHeat`), `:430-433` (comparaison au seuil et appel à `rotateOutputs` avec la valeur bufferisée). Le commit lui-même documente que le point reste partiellement ouvert : l'oscillateur `overHeat` sous-jacent (+1/-2 par tick) n'est pas supprimé, seul son symptôme visible (flicker RPM) est amorti, et le seuil de l'hystérésis n'a pas été validé en jeu. L'item est donc reclassé en §1 comme **partiellement résolu, validation en jeu restante** plutôt que comme bug non traité — voir §1.
 
@@ -44,8 +44,7 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
    Le neighbor lookup est passé de O(n) à O(1) (map `actualRods`, déjà corrigé — voir §8.1), mais chaque rod continue de boucler sur toute la grille `formattedPattern` (9×9=81 cellules) pour retrouver sa propre position — non remplacée par une map slot→position précalculée (coût ~57×81 ≈ 4617 itérations/tick sur réacteur plein). **Recommandation** : précalculer une `Map<Integer slot, int[] position>` — gain mineur, risque nul, priorité basse.
    - **Asymétrie toujours présente** : l'examen des voisins ne se fait que si `"fuel".equals(currentRod)` ; un cooler ne déclenche jamais l'examen de ses voisins, et `heat += rod.baseRodHeat() / neighborRod.proximityRodHeat()` (division) côté fuel→cooler-voisin vs addition côté fuel→fuel-voisin. **Ne pas toucher sans confirmation balance** — c'est potentiellement voulu.
 
-3. **`ReactorSummaryDisplaySource` — sentinelle de taille + accès positionnel fragiles** *(inchangé)*
-   `getComponents()` retourne toujours une liste de taille 1 (pas de contrôleur) ou 6 (normal) ; les appelants gardent `if (components.size() < 6)` avant un accès positionnel `components.get(2).get(1)` (ligne « fuel »). Toujours fragile à tout réordonnancement de ligne.
+3. ~~`ReactorSummaryDisplaySource` — sentinelle de taille + accès positionnel fragiles~~ — **résolu**, voir §8.1 (`cc532f83`).
 
 4. **`ReactorSummaryDisplaySource.formatValue` — incohérence de mode** *(inchangé)*
    `HeatDisplaySource` affiche `"500 °C"` en mode normal alors que `ReactorSummaryDisplaySource` force une jauge pour le heat dans le même mode (`gaugeOnNormal=true` pour heat uniquement) — incohérence visuelle toujours présente.
@@ -99,13 +98,15 @@ La dette la plus structurelle reste **l'absence totale de tests** (`src/test` to
 
 **Périmètre** : `src/main/java` (292 fichiers), recherche des commentaires/Javadoc non rédigés en anglais et des cas ambigus/incomplets indépendamment de la langue. Méthodologie : recherche par caractères accentués + vocabulaire français typique des commentaires, puis lecture manuelle des occurrences trouvées.
 
-**Décompte global** *(mis à jour 2026-07-12, commit `3be6252a`)* : **12 fichiers sur 292** (~4 %) contiennent encore du français détectable, pour environ **25 lignes** de commentaires/Javadoc concernées. **Aucun symbole de code** (nom de classe, méthode, champ) en français n'a été trouvé — le problème est **localisé aux commentaires et Javadoc**, pas à l'API elle-même.
+**Décompte global** *(mis à jour 2026-07-12, commit `cc532f83`)* : **11 fichiers sur 292** (~3,8 %) contiennent encore du français détectable, pour environ **22 lignes** de commentaires/Javadoc concernées. **Aucun symbole de code** (nom de classe, méthode, champ) en français n'a été trouvé — le problème est **localisé aux commentaires et Javadoc**, pas à l'API elle-même.
 
-**Résolu** — les 4 cas de Javadoc public bilingue, seul sous-item classé 🟢 prioritaire au tour précédent, ont été traduits en intégralité (commit `3be6252a`, *"style: translate French comments and Javadoc to English in VicinityEffect and CNPonderReactorScenes"*) :
-- `content/effects/VicinityEffect.java:53-57` — Javadoc de `onContaminate(LivingEntity)` entièrement repassée en anglais.
-- `infrastructure/ponder/scenes/CNPonderReactorScenes.java` — fichier intégralement traduit : Javadoc de `Positions` (l.32), de `STATIC_POS` (l.50, reformulée en documentation stable plutôt qu'en note à soi-même) et de `positionsFor` (l.85), plus tous les commentaires inline restants (pedestal, exemples T1/T2/T3, fallback, positions devant/derrière/droite). Ce fichier ne contient plus aucun français.
+**Résolu** :
+- Les 4 cas de Javadoc public bilingue, seul sous-item classé 🟢 prioritaire au tour précédent, ont été traduits en intégralité (commit `3be6252a`, *"style: translate French comments and Javadoc to English in VicinityEffect and CNPonderReactorScenes"*) :
+  - `content/effects/VicinityEffect.java:53-57` — Javadoc de `onContaminate(LivingEntity)` entièrement repassée en anglais.
+  - `infrastructure/ponder/scenes/CNPonderReactorScenes.java` — fichier intégralement traduit : Javadoc de `Positions` (l.32), de `STATIC_POS` (l.50, reformulée en documentation stable plutôt qu'en note à soi-même) et de `positionsFor` (l.85), plus tous les commentaires inline restants (pedestal, exemples T1/T2/T3, fallback, positions devant/derrière/droite). Ce fichier ne contient plus aucun français.
+- Les 3 commentaires français de garde défensive (« Sécurité Triple-Check ») de `content/redstone/displayLink/source/ReactorSummaryDisplaySource.java:51,75,114` (ex-item 9) ont disparu avec le refactor `ReactorSummary` (commit `cc532f83`) : le fichier a été réécrit avec un Javadoc anglais complet sur la classe et chacune de ses méthodes publiques/privées, et ne contient plus aucun français (revérifié par grep accents, 2026-07-12).
 
-Ces deux fichiers sortent donc de la liste ci-dessous et sont déplacés dans la table de §8.1.
+Ces fichiers sortent donc de la liste ci-dessous et sont déplacés dans la table de §8.1.
 
 **Cas les plus significatifs restants** :
 
@@ -114,20 +115,19 @@ Ces deux fichiers sortent donc de la liste ci-dessous et sont déplacés dans la
 6. `ClientEvents.java:24,60-78` — logique de tremblement de caméra liée à l'explosion nucléaire, entièrement commentée en français, y compris la formule de puissance ; non documentée en anglais du tout.
 7. `foundation/mixin/RadiationHeartMixin.java:13,21,32` — mixin overridant le rendu du cœur HUD vanilla, commentaires français expliquant le ciblage. Les mixins sont le code le plus fragile aux montées de version MC/Forge — mérite une documentation claire et bilingue a minima.
 8. `foundation/mixin/CameraAccessor.java:9` — accessor mixin, commentaire français isolé sur le pattern « invoker » Mixin.
-9. `content/redstone/displayLink/source/ReactorSummaryDisplaySource.java:51,75,114` — trois commentaires français de garde défensive (« Sécurité Triple-Check ») sur le chemin d'affichage, seule trace de documentation de cette logique de garde.
-10. `content/explosion/NuclearExplosionEntity.java:45,50` — commentaire français expliquant un contournement de compatibilité addon (cast en `Object` pour éviter un crash `ClassNotFoundError` si Alex's Caves est absent) : information cruciale sur une dépendance optionnelle, uniquement en français, à l'endroit le plus délicat du fichier.
-11. `content/decoration/palettes/PalettesVariantEntry.java:54` — commentaire français sur un changement d'architecture de rendu déjà effectué ailleurs, utile pour éviter une régression, en français uniquement.
-12. `infrastructure/worldgen/biome/IrradiatedBiomes.java:39-48` — 4 commentaires français sur des choix esthétiques de biome ; mineur, mais dans un fichier déjà pointé par §4 comme « template non terminé ».
-13. `content/equipment/armor/AntiRadiationArmorItem.java:48` — commentaire français sur `getArmorTexture` (override d'API Forge publique) ; trivial sur le fond, à harmoniser en anglais par cohérence.
-14. `content/redstone/displayLink/source/ReactorSizeDisplaySource.java:33` — commentaire français isolé, sur une classe explicitement exclue du refactor de mutualisation `drawGauge` (§8.1) — bon candidat à documenter proprement au prochain passage sur ce fichier.
-15. `foundation/mixin/GameRendererMixin.java:17` — commentaire français seul sur le mixin gérant l'assombrissement du ciel pendant l'explosion — même remarque que 7/8.
+9. `content/explosion/NuclearExplosionEntity.java:45,50` — commentaire français expliquant un contournement de compatibilité addon (cast en `Object` pour éviter un crash `ClassNotFoundError` si Alex's Caves est absent) : information cruciale sur une dépendance optionnelle, uniquement en français, à l'endroit le plus délicat du fichier.
+10. `content/decoration/palettes/PalettesVariantEntry.java:54` — commentaire français sur un changement d'architecture de rendu déjà effectué ailleurs, utile pour éviter une régression, en français uniquement.
+11. `infrastructure/worldgen/biome/IrradiatedBiomes.java:39-48` — 4 commentaires français sur des choix esthétiques de biome ; mineur, mais dans un fichier déjà pointé par §4 comme « template non terminé ».
+12. `content/equipment/armor/AntiRadiationArmorItem.java:48` — commentaire français sur `getArmorTexture` (override d'API Forge publique) ; trivial sur le fond, à harmoniser en anglais par cohérence.
+13. `content/redstone/displayLink/source/ReactorSizeDisplaySource.java:33` — commentaire français isolé, sur une classe explicitement exclue du refactor de mutualisation `drawGauge` (§8.1) — bon candidat à documenter proprement au prochain passage sur ce fichier.
+14. `foundation/mixin/GameRendererMixin.java:17` — commentaire français seul sur le mixin gérant l'assombrissement du ciel pendant l'explosion — même remarque que 7/8.
 
 **Ambiguïtés/incomplétudes indépendantes de la langue relevées au passage** :
 - ~~`CNPonderReactorScenes.java:50,90`~~ — **résolu** (`3be6252a`) : les deux Javadoc ont été reformulées en documentation stable en même temps que leur traduction (voir ci-dessus).
 - `ReactorOutput.java` (§4) — propriété `SPEED` commentée sans décision documentée — ambiguïté fonctionnelle non résolue.
 - `CNStandardRecipeGen.java:226` (§4) — `FIXME` en anglais mais sans contexte suffisant pour un tiers.
 
-**Pattern récurrent** : le point « commentaires FR/EN mêlés » déjà signalé dans `AUDIT_V1.md` §5 (sans jamais être suivi comme item séparé) **reste d'actualité mais se réduit** : il se concentre désormais sur les mixins (`CameraAccessor`, `RadiationHeartMixin`, `GameRendererMixin`), le rendu Display Link (`ReactorSummaryDisplaySource`, `ReactorSizeDisplaySource`), et `CNFluids`/`ClientEvents`. Les scènes Ponder (`CNPonderReactorScenes`) sortent de cette liste, assainies cette session. Point positif : le sous-ensemble concerné continue de rétrécir (12/292 fichiers désormais, ~4 %) — les derniers commits (retrait de `monsters()`, retrait du collier teignable, sons Geiger) n'ont pas introduit de nouveau commentaire français.
+**Pattern récurrent** : le point « commentaires FR/EN mêlés » déjà signalé dans `AUDIT_V1.md` §5 (sans jamais être suivi comme item séparé) **reste d'actualité mais se réduit** : il se concentre désormais sur les mixins (`CameraAccessor`, `RadiationHeartMixin`, `GameRendererMixin`), le rendu Display Link (`ReactorSizeDisplaySource` uniquement désormais), et `CNFluids`/`ClientEvents`. Les scènes Ponder (`CNPonderReactorScenes`) et `ReactorSummaryDisplaySource` sortent de cette liste, assainies respectivement par `3be6252a` et `cc532f83`. Point positif : le sous-ensemble concerné continue de rétrécir (11/292 fichiers désormais, ~3,8 %) — les derniers commits (retrait de `monsters()`, retrait du collier teignable, sons Geiger, refactor `ReactorSummary`) n'ont pas introduit de nouveau commentaire français.
 
 **Pourquoi ça doit être suivi** : ces commentaires portent presque toujours l'explication du *pourquoi* d'un choix non trivial (compat cross-mod, compensation de désync réseau, garde défensive) — c'est-à-dire exactement le contenu qu'un commentaire doit porter selon les conventions du projet. Le laisser uniquement en français limite la relecture/contribution à l'équipe francophone actuelle et complique tout audit ou onboarding futur non francophone (y compris par un outil ou un contributeur externe à la communauté Create).
 
@@ -153,7 +153,7 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 
 **5. Amélioration de conception / cohérence UX**
 - `ReactorSummaryDisplaySource.formatValue` : harmoniser le mode d'affichage du heat avec `HeatDisplaySource` (§2.4). **Justification** : incohérence visible par le joueur, mais purement cosmétique, aucun risque fonctionnel.
-- `ReactorSummaryDisplaySource` : remplacer l'accès positionnel fragile (`components.get(2).get(1)`) par un accès nommé/typé (§2.3). **Justification** : dette de conception qui ne casse rien aujourd'hui mais rendra toute évolution de l'ordre des lignes affichées dangereuse sans le vouloir.
+- ~~`ReactorSummaryDisplaySource` : remplacer l'accès positionnel fragile~~ — **fait**, voir §8.1 (`cc532f83`).
 
 **6. Optimisation mineure (gain faible, risque nul)**
 - `DefaultHeatCalculator` : précalculer une map slot→position pour éliminer la boucle O(81) restante (§2.2, §5). **Ne pas** toucher à l'asymétrie fuel/cooler sans validation balance.
@@ -165,7 +165,9 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 - Worldgen « irradié » : retirer le contenu vanilla sans rapport (`BLUE_ICE`, `NETHER_CAVE`, `VOID_START_PLATFORM`) et choisir un bloc de remplissage cohérent à la place de `STEEL_BLOCK` (§4). **Justification** : n'affecte que la cohérence thématique du biome, pas de risque technique.
 
 **8. Documentation (nouveau, §6)**
-- ~~Traduire en anglais les 4 cas de Javadoc public bilingue (`VicinityEffect.java`, `CNPonderReactorScenes.java` ×3)~~ — **fait cette session** (working tree, à committer). Reste : les commentaires métier non triviaux listés en §6 (items 5-15, ~25 lignes sur 12 fichiers), au fil des prochains passages sur ces fichiers. **Justification** : cosmétique et non bloquant (aucun symbole d'API en français), mais ce sont typiquement des commentaires qui expliquent un « pourquoi » non trivial (compat, désync réseau) — les laisser en français limite l'audit/onboarding futur.
+- ~~Traduire en anglais les 4 cas de Javadoc public bilingue (`VicinityEffect.java`, `CNPonderReactorScenes.java` ×3)~~ — **fait**, commit `3be6252a`.
+- ~~Traduire/documenter en anglais les 3 commentaires de garde défensive de `ReactorSummaryDisplaySource`~~ — **fait**, commit `cc532f83` (Javadoc anglais complet ajouté sur la classe et ses méthodes en même temps que le refactor `ReactorSummary`).
+- Reste : les commentaires métier non triviaux listés en §6 (items 5-14, ~22 lignes sur 11 fichiers), au fil des prochains passages sur ces fichiers. **Justification** : cosmétique et non bloquant (aucun symbole d'API en français), mais ce sont typiquement des commentaires qui expliquent un « pourquoi » non trivial (compat, désync réseau) — les laisser en français limite l'audit/onboarding futur.
 
 **9. À surveiller sans action immédiate**
 - `RadiationCapability.tickRadiation` pour les `LivingEntity` non-joueurs : pas de dirty-check d'inventaire (§3). Compromis assumé, à reconsidérer seulement si la densité de mobs équipés irradiés pose un problème de perf mesuré.
@@ -187,6 +189,7 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 
 | Correction | Hash(es) | Date | Détail |
 |---|---|---|---|
+| `ReactorSummaryDisplaySource` — remplacement de la sentinelle de taille (liste 1/6 éléments) et des accès positionnels fragiles (`components.get(2).get(1)`) par un `record ReactorSummary` typé (`ReactorSummaryRow` + `Builder` validant les 6 champs requis) ; `getComponents()` → `getReactorSummary()` retournant `Optional<ReactorSummary>` ; remplacement de `joptsimple.internal.Strings.repeat` (dépendance transitive non déclarée) par `String.repeat` natif ; Javadoc anglais ajouté sur la classe et ses méthodes, retirant au passage les 3 commentaires français "Sécurité Triple-Check" (§6) | `cc532f83` | 2026-07-12 | Nouveau fichier `ReactorSummary.java` (§2.3 et §6, item ex-9, tous deux clos). `toRows()` reste le seul point de conversion vers le format positionnel `List<List<MutableComponent>>` exigé par l'API `DisplaySource` de Create. |
 | Traduction en anglais des 4 cas de Javadoc public bilingue relevés en §6 (`VicinityEffect.onContaminate`, `CNPonderReactorScenes.Positions`/`STATIC_POS`/`positionsFor`), plus l'intégralité des commentaires inline restants de `CNPonderReactorScenes.java` | `3be6252a` | 2026-07-12 | `VicinityEffect.java` et `CNPonderReactorScenes.java` ne contiennent plus aucun français ; sortis de la liste §6 (14→12 fichiers concernés, ~40→~25 lignes). |
 | Retrait de `IrradiatedBiomes.monsters()` (corps vide, arguments ignorés) | `8b0428e3` | 2026-07-12 | Méthode et son unique site d'appel supprimés ; les réglages de spawn passent désormais uniquement par `MobSpawnSettings.Builder`. |
 | Blocage explicite (message "WIP") de l'apprivoisement des mobs irradiés (`AnimalUtil.blockTamingWip`) | `261b26d8` | 2026-07-11 | Remplace un apprivoisement cassé/incohérent (chat : collier non fonctionnel ; loup : aucun chemin d'apprivoisement) par un message explicite "pas encore implémenté". Ce même commit a aussi retiré la mécanique de collier (§8.3). |
