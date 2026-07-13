@@ -78,7 +78,7 @@ public class NuclearMushroomCloudParticle extends Particle {
                     playSound(large ? nuclear_explosions[0] : nuclear_explosions[1], lifetime - 20, lifetime, 0.2F, false);
                 } else {
                     CreateNuclear.LOGGER.info("EXPLOSIOOOOOON, (WITHOUT Alex's Cave)");
-                    playSound(large ? CNSoundEvents.LARGE_NUCLEAR_EXPLOSION.getMainEvent() : CNSoundEvents.NUCLEAR_EXPLOSION.getMainEvent(), lifetime - 20, lifetime, 0.2F, false);
+                    playSound(large ? CNSoundEvents.NUCLEAR_EXPLOSION_LARGE.getMainEvent() : CNSoundEvents.NUCLEAR_EXPLOSION.getMainEvent(), lifetime - 20, lifetime, 0.2F, false);
                 }
             }
         }

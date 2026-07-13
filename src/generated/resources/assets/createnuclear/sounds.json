@@ -17,6 +17,15 @@
     ],
     "subtitle": "createnuclear.subtitle.alarm/reactor_alarm"
   },
+  "biomes/wasteland": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:biomes/wasteland"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.biomes/wasteland"
+  },
   "explosion/large_nuclear_explosion": {
     "sounds": [
       {
@@ -115,6 +124,24 @@
       }
     ],
     "subtitle": "createnuclear.subtitle.reacteur/activation"
+  },
+  "reacteur/assemble_deassemble/motor_assemble": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reacteur/assemble_deassemble/motor_assemble"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reacteur/assemble_deassemble/motor_assemble"
+  },
+  "reacteur/assemble_deassemble/motor_disassemble": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:reacteur/assemble_deassemble/motor_disassemble"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.reacteur/assemble_deassemble/motor_disassemble"
   },
   "reacteur/casing_break": {
     "sounds": [

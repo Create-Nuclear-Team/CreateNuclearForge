@@ -35,7 +35,7 @@ public class CNSoundEvents {
     public static final Map<ResourceLocation, SoundEntry> ALL = new HashMap<>();
 
     public static final SoundEntry
-        REACTOR_CASING_BREAD = create("reacteur/casing", "break")
+        REACTOR_CASING_BREAK = create("reacteur/casing", "break")
             .subtitle("Break Reactor Casing")
             .category(SoundSource.BLOCKS)
             .build(),
@@ -75,13 +75,13 @@ public class CNSoundEvents {
             .category(SoundSource.BLOCKS)
             .build(),
 
-        REACTOR_ALARM = create("alarm/reactor", "alarm")
+        REACTOR_ALARM_ONESHOT = create("alarm/reactor", "alarm")
             .subtitle("Reactor Alarm")
             .category(SoundSource.BLOCKS)
             .build(),
 
-        REACTOR_ALARM_2 = create("alarm/alarm")
-            .subtitle("Reactor Alarm")
+        REACTOR_ALARM_LOOP = create("alarm/alarm")
+            .subtitle("Reactor Alarm Loop")
             .category(SoundSource.BLOCKS)
             .build(),
 
@@ -90,7 +90,7 @@ public class CNSoundEvents {
             .category(SoundSource.AMBIENT)
             .build(),
 
-        LARGE_NUCLEAR_EXPLOSION = create("explosion/large_nuclear_explosion")
+        NUCLEAR_EXPLOSION_LARGE = create("explosion/large_nuclear_explosion")
             .subtitle("Large Nuclear Explosion")
             .category(SoundSource.AMBIENT)
             .build(),
@@ -103,6 +103,16 @@ public class CNSoundEvents {
         NUCLEAR_EXPLOSION_RUMBLE = create("explosion/nuclear_explosion_rumble")
             .subtitle("Nuclear Explosion Rumble")
             .category(SoundSource.AMBIENT)
+            .build(),
+
+        MOTOR_ASSEMBLE = create("reacteur/assemble_deassemble/motor_assemble")
+            .subtitle("Motor Assemble")
+            .category(SoundSource.BLOCKS)
+            .build(),
+
+        MOTOR_DISASSEMBLE = create("reacteur/assemble_deassemble/motor_disassemble")
+            .subtitle("Motor Disassemble")
+            .category(SoundSource.BLOCKS)
             .build(),
 
         NUCLEAR_EXPLOSION_RUMBLE_2 = create("explosion/rumble")
@@ -131,7 +141,12 @@ public class CNSoundEvents {
             .build(),
 
         GEIGER_MEDIUM = create("geiger/medium")
-            .subtitle("GeiGer Medium")
+            .subtitle("Geiger Medium")
+            .category(SoundSource.AMBIENT)
+            .build(),
+
+        BIOME_WASTELAND = create("biomes/wasteland")
+            .subtitle("Wasteland")
             .category(SoundSource.AMBIENT)
             .build()
     ;

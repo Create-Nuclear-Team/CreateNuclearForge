@@ -32,29 +32,25 @@ public class IrradiatedBiomes {
         BiomeSpecialEffects.Builder effectBuilder = new BiomeSpecialEffects.Builder();
 
         effectBuilder
-                // Eau : Verte croupie
-                .waterColor(0x3B5133)
-                .waterFogColor(0x0A0E0A)
+            // Eau : Verte croupie
+            .waterColor(0x3B5133)
+            .waterFogColor(0x0A0E0A)
 
-                // BROUILLARD : Vert radioactif maladif (plus vif pour être visible)
-                .fogColor(0x485E3E)
+            // BROUILLARD : Vert radioactif maladif (plus vif pour être visible)
+            .fogColor(0x485E3E)
 
-                // CIEL : Gris-vert délavé (permet de voir le soleil/lune et le cycle jour/nuit)
-                .skyColor(0x324132)
+            // CIEL : Gris-vert délavé (permet de voir le soleil/lune et le cycle jour/nuit)
+            .skyColor(0x324132)
 
-                // HERBE : Jaune "soufre" / Brûlée
-                .grassColorOverride(0x8C8F5B)
+            // HERBE : Jaune "soufre" / Brûlée
+            .grassColorOverride(0x8C8F5B)
 
-                // FEUILLES : Olive desséché
-                .foliageColorOverride(0x565E3E)
+            // FEUILLES : Olive desséché
+            .foliageColorOverride(0x565E3E)
 
-                .ambientParticle(new AmbientParticleSettings(new IrradiatedParticlesData(), 0.025F))
-                .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
-                .ambientLoopSound(soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.GEIGER_LOW.getId())))
-                .ambientAdditionsSound(new AmbientAdditionsSettings(
-                    soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.GEIGER_MEDIUM.getId())),
-                    0.0111
-                ))
+            .ambientParticle(new AmbientParticleSettings(new IrradiatedParticlesData(), 0.025F))
+            .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
+            .ambientLoopSound(soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.BIOME_WASTELAND.getId())))
         ;
 
         IrradiatedBiomes.addDefaultIrradiatedOres(generation);

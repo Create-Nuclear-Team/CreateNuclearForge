@@ -54,7 +54,7 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
         if (soundInstance == null || soundInstance.isStopped()) {
             Minecraft minecraft = Minecraft.getInstance();
             try {
-                soundInstance = new ReactorAlarmSoundInstance(level, worldPosition, CNSoundEvents.REACTOR_ALARM_2.getMainEvent());
+                soundInstance = new ReactorAlarmSoundInstance(level, worldPosition, CNSoundEvents.REACTOR_ALARM_LOOP.getMainEvent());
                 minecraft.getSoundManager().play(soundInstance);
             } catch (Exception e) {
                 CreateNuclear.LOGGER.warn("Failed to start alarm sound: " + e.getMessage());
