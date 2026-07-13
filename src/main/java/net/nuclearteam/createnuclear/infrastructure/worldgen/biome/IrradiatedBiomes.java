@@ -19,12 +19,7 @@ public class IrradiatedBiomes {
     }
 
     public static void addDefaultIrradiatedOres(BiomeGenerationSettings.Builder builder) {
-        builder.addFeature(GenerationStep.Decoration.UNDERGROUND_STRUCTURES, MiscOverworldPlacements.BLUE_ICE);
         builder.addCarver(GenerationStep.Carving.AIR, Carvers.NETHER_CAVE);
-    }
-
-    public static void addDefaultSoftDisks(BiomeGenerationSettings.Builder builder) {
-        builder.addFeature(GenerationStep.Decoration.SURFACE_STRUCTURES, MiscOverworldPlacements.VOID_START_PLATFORM);
     }
 
     public static Biome irradiated(HolderGetter<PlacedFeature> featureGetter, HolderGetter<ConfiguredWorldCarver<?>> carverGetter, HolderGetter<SoundEvent> soundLookup, BiomeGenerationSettings.Builder generation) {
@@ -54,7 +49,6 @@ public class IrradiatedBiomes {
         ;
 
         IrradiatedBiomes.addDefaultIrradiatedOres(generation);
-        IrradiatedBiomes.addDefaultSoftDisks(generation);
 
         return new Biome.BiomeBuilder()
                 .mobSpawnSettings(spawnBuilder.build())

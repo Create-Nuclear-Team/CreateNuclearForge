@@ -37,15 +37,15 @@ import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Predicate;
 
-
+@ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ReactorOutput extends DirectionalKineticBlock implements IWrenchable, IBE<ReactorOutputEntity> {
     public static final IntegerProperty DIR = IntegerProperty.create("dir", 0, 2);
 
     private static final int placementHelperId = PlacementHelpers.register(new PlacementHelper());
-
 
     public ReactorOutput(Properties properties) {
         super(properties);
@@ -53,7 +53,6 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        //builder.add(SPEED);
         builder.add(DIR);
         super.createBlockStateDefinition(builder);
     }
@@ -78,7 +77,7 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
     }
 
     @Override
-    public @NotNull VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         return CNShapes.REACTOR_OUTPUT.get(state.getValue(FACING));
     }
 
@@ -88,7 +87,7 @@ public class ReactorOutput extends DirectionalKineticBlock implements IWrenchabl
         if ((context.getPlayer() != null && context.getPlayer()
                 .isShiftKeyDown()) || preferred == null)
             return super.getStateForPlacement(context);
-        return defaultBlockState().setValue(FACING, preferred)/*.setValue(SPEED, 0)*/.setValue(DIR, 0);
+        return defaultBlockState().setValue(FACING, preferred).setValue(DIR, 0);
     }
 
     @Override
