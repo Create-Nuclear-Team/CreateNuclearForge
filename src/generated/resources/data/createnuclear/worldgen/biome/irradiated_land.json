@@ -1,7 +1,5 @@
 {
-  "carvers": {
-    "air": "minecraft:nether_cave"
-  },
+  "carvers": {},
   "downfall": 0.0,
   "effects": {
     "ambient_sound": "createnuclear:biomes/wasteland",

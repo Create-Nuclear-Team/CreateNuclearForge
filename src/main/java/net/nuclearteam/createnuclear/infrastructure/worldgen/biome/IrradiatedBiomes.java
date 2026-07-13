@@ -17,11 +17,7 @@ public class IrradiatedBiomes {
     public static Biome createPlain(HolderGetter<PlacedFeature> featureLookup, HolderGetter<ConfiguredWorldCarver<?>> carverLookup, HolderGetter<SoundEvent> soundLookup) {
         return IrradiatedBiomes.irradiated(featureLookup, carverLookup, soundLookup, new BiomeGenerationSettings.Builder(featureLookup, carverLookup));
     }
-
-    public static void addDefaultIrradiatedOres(BiomeGenerationSettings.Builder builder) {
-        builder.addCarver(GenerationStep.Carving.AIR, Carvers.NETHER_CAVE);
-    }
-
+    
     public static Biome irradiated(HolderGetter<PlacedFeature> featureGetter, HolderGetter<ConfiguredWorldCarver<?>> carverGetter, HolderGetter<SoundEvent> soundLookup, BiomeGenerationSettings.Builder generation) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
         BiomeSpecialEffects.Builder effectBuilder = new BiomeSpecialEffects.Builder();
@@ -47,8 +43,6 @@ public class IrradiatedBiomes {
             .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
             .ambientLoopSound(soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.BIOME_WASTELAND.getId())))
         ;
-
-        IrradiatedBiomes.addDefaultIrradiatedOres(generation);
 
         return new Biome.BiomeBuilder()
                 .mobSpawnSettings(spawnBuilder.build())
