@@ -25,17 +25,7 @@
     "water_color": 3887411,
     "water_fog_color": 658954
   },
-  "features": [
-    [],
-    [],
-    [],
-    [
-      "minecraft:blue_ice"
-    ],
-    [
-      "minecraft:void_start_platform"
-    ]
-  ],
+  "features": [],
   "has_precipitation": false,
   "spawn_costs": {},
   "spawners": {

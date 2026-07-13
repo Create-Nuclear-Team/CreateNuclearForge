@@ -20,6 +20,8 @@ Depuis la dernière consolidation (2026-06-28), le projet a continué d'évoluer
 
 La dette la plus structurelle reste **l'absence de tests sur la majorité du code** (`src/test` toujours vide — la mécanique JUnit classique n'est pas utilisable ici, voir ci-dessus — et seuls deux composants ont une suite `GameTest`) — précisément là où des bugs/incohérences silencieux (sur-extraction fluide, ex-tautologie `IHeat`, scan non court-circuité, doc devenue obsolète sans que personne ne le remarque) survivent à plusieurs passes d'audit. Le pattern matcher (`ReactorPattern`/`CNMultiblock`) et `PersistentFluidLocks` restent entièrement sans couverture. Voir §3 et §7.
 
+**Mise à jour (`ae1e394d`, 2026-07-13)** : nettoyage de trois points du §4/§7 en une seule fois — retrait complet des références commentées à la propriété `SPEED` de `ReactorOutput` (§4/§7 item 7, désormais clos), retrait de `BLUE_ICE` et de `addDefaultSoftDisks()`/`VOID_START_PLATFORM` d'`IrradiatedBiomes` (§4 « worldgen irradié », **partiellement clos** — `NETHER_CAVE` reste volontairement conservé, sans justification documentée dans le commit), et suppression de `OriginalBiomeLookup.java`, une classe de résolution de biome jamais appelée qui n'avait encore jamais été repérée par cet audit. Détail en §8.1.
+
 ---
 
 ## 1. 🐛 Bugs confirmés ouverts
@@ -75,14 +77,14 @@ La dette la plus structurelle reste **l'absence de tests sur la majorité du cod
 > **⚠️ Faux positifs à NE PAS supprimer** : `CNTabulaModelRenderUtils` (rendu vivant du champignon atomique) ; `ReactorOutputEntity.outputPos` (lu/écrit en NBT) ; `setRotateAngle` (appelé par `NuclearMushroomCloudModel`).
 
 **Code commencé puis abandonné (hygiène de fin de PR)**
-- `content/multiblock/output/ReactorOutput.java:56,91` — propriété `SPEED` toujours entièrement commentée (pas supprimée). *(Lignes revérifiées 2026-07-12 : `//builder.add(SPEED);` l.56, `/*.setValue(SPEED, 0)*/` l.91 — décalage mineur par rapport aux anciens numéros de ligne l.43/52/87.)*
+- ~~`content/multiblock/output/ReactorOutput.java` — propriété `SPEED` toujours entièrement commentée~~ — **résolu** (`ae1e394d`, 2026-07-13) : les références commentées (`//builder.add(SPEED);`, `/*.setValue(SPEED, 0)*/`) ont été retirées, voir §8.1.
 - `foundation/data/recipe/CNStandardRecipeGen.java:226` — `// FIXME 5.1 refactor - recipe categories as markers...` toujours présent, à trancher.
 
-**Worldgen « irradié » — template non terminé** *(revérifié 2026-07-12, inchangé)*
-- `IrradiatedBiomes.java:22-27` ajoute toujours du contenu vanilla sans rapport avec le biome irradié (`BLUE_ICE`, `NETHER_CAVE`, `VOID_START_PLATFORM`).
+**Worldgen « irradié » — template non terminé** *(mis à jour 2026-07-13, `ae1e394d`)*
+- `IrradiatedBiomes.java:22` — **partiellement résolu** : `BLUE_ICE` et l'aide `addDefaultSoftDisks()`/`VOID_START_PLATFORM` (plus son unique site d'appel) ont été retirés. `NETHER_CAVE` reste présent (`addDefaultIrradiatedOres`, l.22) — le commit ne documente pas si ce choix est volontaire (carver de grottes potentiellement pertinent thématiquement) ou un oubli ; à trancher explicitement au prochain passage sur ce fichier.
 - `CNNoiseGeneratorSettings.java:25` utilise toujours `STEEL_BLOCK` comme bloc de remplissage par défaut du biome irradié.
 
-*(Le dead code pur déjà retiré — `SimpleMultiBlockPattern.test()`, `IrradiatedBiomes.monsters()`, le nettoyage de `PlayerInteractReactorFluidInput`, les fichiers de debug `run/`, la mécanique de collier teignable — est en §8.1/§8.3 avec ses hash.)*
+*(Le dead code pur déjà retiré — `SimpleMultiBlockPattern.test()`, `IrradiatedBiomes.monsters()`, le nettoyage de `PlayerInteractReactorFluidInput`, les fichiers de debug `run/`, la mécanique de collier teignable, `OriginalBiomeLookup.java` — est en §8.1/§8.3 avec ses hash.)*
 
 ---
 
@@ -120,7 +122,7 @@ Ces fichiers sortent donc de la liste ci-dessous et sont déplacés dans la tabl
 8. `foundation/mixin/CameraAccessor.java:9` — accessor mixin, commentaire français isolé sur le pattern « invoker » Mixin.
 9. `content/explosion/NuclearExplosionEntity.java:45,50` — commentaire français expliquant un contournement de compatibilité addon (cast en `Object` pour éviter un crash `ClassNotFoundError` si Alex's Caves est absent) : information cruciale sur une dépendance optionnelle, uniquement en français, à l'endroit le plus délicat du fichier.
 10. `content/decoration/palettes/PalettesVariantEntry.java:54` — commentaire français sur un changement d'architecture de rendu déjà effectué ailleurs, utile pour éviter une régression, en français uniquement.
-11. `infrastructure/worldgen/biome/IrradiatedBiomes.java:39-48` — 4 commentaires français sur des choix esthétiques de biome ; mineur, mais dans un fichier déjà pointé par §4 comme « template non terminé ».
+11. `infrastructure/worldgen/biome/IrradiatedBiomes.java:30-44` — 5 commentaires français sur des choix esthétiques de biome (numéros de ligne décalés par le retrait de code du §4 dans `ae1e394d`, contenu inchangé) ; mineur, mais dans un fichier déjà pointé par §4 comme « template non terminé ».
 12. `content/equipment/armor/AntiRadiationArmorItem.java:48` — commentaire français sur `getArmorTexture` (override d'API Forge publique) ; trivial sur le fond, à harmoniser en anglais par cohérence.
 13. `content/redstone/displayLink/source/ReactorSizeDisplaySource.java:33` — commentaire français isolé, sur une classe explicitement exclue du refactor de mutualisation `drawGauge` (§8.1) — bon candidat à documenter proprement au prochain passage sur ce fichier.
 14. `foundation/mixin/GameRendererMixin.java:17` — commentaire français seul sur le mixin gérant l'assombrissement du ciel pendant l'explosion — même remarque que 7/8.
@@ -163,9 +165,9 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 - `CNPonderReactorScenes.showReactorStructure` : remplacer la boucle triple par une map précalculée (§2.6). Coût ponctuel (ouverture d'un ponder), gain marginal.
 
 **7. Nettoyage / décisions produit à trancher**
-- `ReactorOutput.SPEED` : retirer les commentaires ou décider de réactiver la propriété (§4).
+- ~~`ReactorOutput.SPEED` : retirer les commentaires ou décider de réactiver la propriété~~ — **fait**, commit `ae1e394d` (§4/§8.1).
 - `CNStandardRecipeGen.java:226` : trancher le `FIXME` sur les catégories de recette (§4).
-- Worldgen « irradié » : retirer le contenu vanilla sans rapport (`BLUE_ICE`, `NETHER_CAVE`, `VOID_START_PLATFORM`) et choisir un bloc de remplissage cohérent à la place de `STEEL_BLOCK` (§4). **Justification** : n'affecte que la cohérence thématique du biome, pas de risque technique.
+- Worldgen « irradié » : **partiellement fait** (`ae1e394d`) — `BLUE_ICE` et `VOID_START_PLATFORM` retirés ; reste à trancher si `NETHER_CAVE` doit rester, et à choisir un bloc de remplissage cohérent à la place de `STEEL_BLOCK` (§4). **Justification** : n'affecte que la cohérence thématique du biome, pas de risque technique.
 
 **8. Documentation (nouveau, §6)**
 - ~~Traduire en anglais les 4 cas de Javadoc public bilingue (`VicinityEffect.java`, `CNPonderReactorScenes.java` ×3)~~ — **fait**, commit `3be6252a`.
@@ -192,6 +194,7 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 
 | Correction | Hash(es) | Date | Détail |
 |---|---|---|---|
+| Retrait des références commentées à `SPEED` dans `ReactorOutput` (`createBlockStateDefinition`, `getStateForPlacement`) ; retrait de `BLUE_ICE` et de `addDefaultSoftDisks()`/`VOID_START_PLATFORM` (+ son unique site d'appel) dans `IrradiatedBiomes` ; suppression de `OriginalBiomeLookup.java` (classe de résolution de biome jamais appelée, non repérée jusqu'ici par cet audit) ; ajout de `@ParametersAreNonnullByDefault` sur `ReactorOutput` et retrait du `@NotNull` désormais redondant sur `getShape()` | `ae1e394d` | 2026-07-13 | Clôt le premier bullet de §4/§7 item 7 (`SPEED`). Résout partiellement le second (« worldgen irradié ») : `NETHER_CAVE` est explicitement conservé dans `addDefaultIrradiatedOres`, sans justification documentée — reste à trancher. `OriginalBiomeLookup` est un bonus hors-périmètre de l'audit courant (jamais listé en §4). |
 | Ajout de `DefaultHeatCalculatorGameTest` (3 cas : fuel isolé, cooler isolé, asymétrie de voisinage fuel/cooler) — première couverture de test pour `DefaultHeatCalculator.computeHeat` (§3/§7 priorité 1) | `498f9dc6` | 2026-07-13 | Écrit en `GameTest` (real `ServerLevel`/`ReactorControllerBlockEntity`/items enregistrés) après rejet d'une première tentative JUnit+Mockito : mocker `Item`/`ItemStack`/`Level` échoue hors jeu démarré (static init Minecraft), ce qui confirme empiriquement le choix `GameTest` déjà fait pour `ReactorInputFluidManagerGameTest`. Valeurs attendues dérivées de `CNConfigs.server().rods.*` en direct (pas de valeurs codées en dur), donc robuste à un changement de balance. |
 | Ajout de `ReactorInputFluidManagerGameTest` (couvre `read`/`write`/`clearInvalid`/`getBlocksPosition`/`getFuildHandlers`/`getInventory`/`extractFluids`, dont des marqueurs de régression `*_expectedContract` pour le bug de sur-extraction du §1) — **jamais documenté dans cet audit jusqu'ici**, omission corrigée à l'occasion de la mise à jour ci-dessus | `200df62f` | 2026-07-12 (avant la réorganisation issue de ce même jour, retrouvé par `git log`) | Deux tests `*_expectedContract` échouent intentionnellement aujourd'hui (documentent le comportement souhaité, pas encore implémenté) ; le reste passe et caractérise le comportement actuel. |
 | `ReactorSummaryDisplaySource` — remplacement de la sentinelle de taille (liste 1/6 éléments) et des accès positionnels fragiles (`components.get(2).get(1)`) par un `record ReactorSummary` typé (`ReactorSummaryRow` + `Builder` validant les 6 champs requis) ; `getComponents()` → `getReactorSummary()` retournant `Optional<ReactorSummary>` ; remplacement de `joptsimple.internal.Strings.repeat` (dépendance transitive non déclarée) par `String.repeat` natif ; Javadoc anglais ajouté sur la classe et ses méthodes, retirant au passage les 3 commentaires français "Sécurité Triple-Check" (§6) | `cc532f83` | 2026-07-12 | Nouveau fichier `ReactorSummary.java` (§2.3 et §6, item ex-9, tous deux clos). `toRows()` reste le seul point de conversion vers le format positionnel `List<List<MutableComponent>>` exigé par l'API `DisplaySource` de Create. |
