@@ -24,6 +24,8 @@ La dette la plus structurelle reste **l'absence de tests sur la majorité du cod
 
 **Mise à jour (`6bc20956`, 2026-07-13)** : suite immédiate de la précédente — retrait de `NETHER_CAVE` (dernier contenu vanilla sans rapport identifié dans `IrradiatedBiomes`, via la suppression de `addDefaultIrradiatedOres()` et de son unique site d'appel), régénération de `irradiated_land.json` (bloc `carvers` désormais vide). **L'item « worldgen irradié » du §4/§7 est donc maintenant entièrement clos** ; seul reste `CNNoiseGeneratorSettings.java:25` (bloc de remplissage `STEEL_BLOCK`) côté §4. Détail en §8.1.
 
+**Mise à jour (`e7900959`, 2026-07-13)** : deux items de plus tranchés. (1) `CreateNuclearJEI` : le champ statique mutable `Categories` (§2 mineurs item 5) devient un champ d'instance `allCategories`, enfilé explicitement dans `CategoryBuilder` — le risque de contamination entre instances lors d'un reload JEI est éliminé ; au passage, `IJeiRuntime` est désormais exposé via `onRuntimeAvailable`. (2) Le `FIXME` de `CNStandardRecipeGen.java:226` (§4/§6/§7) est tranché : retiré, décision actée que les catégories de recette restent des marqueurs plutôt que des sections. Détail en §8.1.
+
 ---
 
 ## 1. 🐛 Bugs confirmés ouverts
@@ -57,7 +59,7 @@ La dette la plus structurelle reste **l'absence de tests sur la majorité du cod
 
 ### 🟡 Mineurs
 
-5. **`CreateNuclearJEI`** — champ statique mutable `Categories`, vidé/reconstruit à chaque `registerCategories` ; risque si JEI ré-appelle le cycle (reload ressources). *(non revérifié ce tour, signal inchangé depuis plusieurs audits)*
+5. ~~**`CreateNuclearJEI`** — champ statique mutable `Categories`~~ — **résolu** (`e7900959`, 2026-07-13) : converti en champ d'instance `allCategories`, enfilé explicitement dans `CategoryBuilder`. Voir §8.1.
 6. **`CNPonderReactorScenes.showReactorStructure`** — boucle triple (~11×13×13) avec comparaisons positionnelles ; coût ponctuel (ouverture ponder), remplaçable par une `Map` précalculée.
 
 ---
@@ -80,7 +82,7 @@ La dette la plus structurelle reste **l'absence de tests sur la majorité du cod
 
 **Code commencé puis abandonné (hygiène de fin de PR)**
 - ~~`content/multiblock/output/ReactorOutput.java` — propriété `SPEED` toujours entièrement commentée~~ — **résolu** (`ae1e394d`, 2026-07-13) : les références commentées (`//builder.add(SPEED);`, `/*.setValue(SPEED, 0)*/`) ont été retirées, voir §8.1.
-- `foundation/data/recipe/CNStandardRecipeGen.java:226` — `// FIXME 5.1 refactor - recipe categories as markers...` toujours présent, à trancher.
+- ~~`foundation/data/recipe/CNStandardRecipeGen.java:226` — `// FIXME 5.1 refactor - recipe categories as markers...`~~ — **résolu** (`e7900959`, 2026-07-13) : commentaire retiré, décision actée que les catégories de recette restent des marqueurs plutôt que des sections. Voir §8.1.
 
 **Worldgen « irradié » — template non terminé**
 - ~~`IrradiatedBiomes.java` ajoutait du contenu vanilla sans rapport (`BLUE_ICE`, `NETHER_CAVE`, `VOID_START_PLATFORM`)~~ — **résolu** (`ae1e394d` puis `6bc20956`, 2026-07-13) : les trois ont été retirés (dont `addDefaultIrradiatedOres()`/`addDefaultSoftDisks()` et leurs sites d'appel), `irradiated_land.json` régénéré avec un bloc `carvers` vide. Le fichier ne référence plus que ses propres effets de biome (couleurs, sons, particules). Voir §8.1.
@@ -133,7 +135,7 @@ Ces fichiers sortent donc de la liste ci-dessous et sont déplacés dans la tabl
 **Ambiguïtés/incomplétudes indépendantes de la langue relevées au passage** :
 - ~~`CNPonderReactorScenes.java:50,90`~~ — **résolu** (`3be6252a`) : les deux Javadoc ont été reformulées en documentation stable en même temps que leur traduction (voir ci-dessus).
 - `ReactorOutput.java` (§4) — propriété `SPEED` commentée sans décision documentée — ambiguïté fonctionnelle non résolue.
-- `CNStandardRecipeGen.java:226` (§4) — `FIXME` en anglais mais sans contexte suffisant pour un tiers.
+- ~~`CNStandardRecipeGen.java:226` (§4) — `FIXME` en anglais mais sans contexte suffisant pour un tiers~~ — **résolu** (`e7900959`, 2026-07-13), voir §4/§8.1.
 
 **Pattern récurrent** : le point « commentaires FR/EN mêlés » déjà signalé dans `AUDIT_V1.md` §5 (sans jamais être suivi comme item séparé) **reste d'actualité mais se réduit** : il se concentre désormais sur les mixins (`CameraAccessor`, `RadiationHeartMixin`, `GameRendererMixin`), le rendu Display Link (`ReactorSizeDisplaySource` uniquement désormais), et `CNFluids`/`ClientEvents`. Les scènes Ponder (`CNPonderReactorScenes`) et `ReactorSummaryDisplaySource` sortent de cette liste, assainies respectivement par `3be6252a` et `cc532f83`. Point positif : le sous-ensemble concerné continue de rétrécir (11/292 fichiers désormais, ~3,8 %) — les derniers commits (retrait de `monsters()`, retrait du collier teignable, sons Geiger, refactor `ReactorSummary`) n'ont pas introduit de nouveau commentaire français.
 
@@ -169,7 +171,7 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 
 **7. Nettoyage / décisions produit à trancher**
 - ~~`ReactorOutput.SPEED` : retirer les commentaires ou décider de réactiver la propriété~~ — **fait**, commit `ae1e394d` (§4/§8.1).
-- `CNStandardRecipeGen.java:226` : trancher le `FIXME` sur les catégories de recette (§4).
+- ~~`CNStandardRecipeGen.java:226` : trancher le `FIXME` sur les catégories de recette~~ — **fait**, commit `e7900959` (§4/§8.1).
 - ~~Worldgen « irradié » : retirer le contenu vanilla sans rapport (`BLUE_ICE`, `NETHER_CAVE`, `VOID_START_PLATFORM`)~~ — **fait**, commits `ae1e394d` puis `6bc20956` (§4/§8.1). Reste : choisir un bloc de remplissage cohérent à la place de `STEEL_BLOCK` dans `CNNoiseGeneratorSettings.java:25` (§4). **Justification** : n'affecte que la cohérence thématique du biome, pas de risque technique.
 
 **8. Documentation (nouveau, §6)**
@@ -180,7 +182,7 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 **9. À surveiller sans action immédiate**
 - `RadiationCapability.tickRadiation` pour les `LivingEntity` non-joueurs : pas de dirty-check d'inventaire (§3). Compromis assumé, à reconsidérer seulement si la densité de mobs équipés irradiés pose un problème de perf mesuré.
 - `ReactorOutput`/`ReactorFluidInput` : garde `!state.is(newState.getBlock())` absente dans `onRemove` malgré des propriétés mutables (§2.1). Pas un bug confirmé, à surveiller.
-- `CreateNuclearJEI` : champ statique mutable `Categories`, non revérifié récemment (§2.5).
+- ~~`CreateNuclearJEI` : champ statique mutable `Categories`~~ — **fait**, commit `e7900959` (§2.5/§8.1).
 
 **Explicitement retiré du plan (ne plus y revenir sans nouvel élément)** — détail et justification en §8.2/§8.3 :
 - Découpage supplémentaire de `ReactorControllerBlockEntity` (chantier clos, croissance maîtrisée).
@@ -197,6 +199,7 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 
 | Correction | Hash(es) | Date | Détail |
 |---|---|---|---|
+| `CreateNuclearJEI` : champ statique mutable `Categories` converti en champ d'instance `allCategories`, enfilé explicitement dans `CategoryBuilder` (nouveau paramètre `targetCategories`) ; exposition d'`IJeiRuntime` via `onRuntimeAvailable` ; retrait du `FIXME` de `CNStandardRecipeGen.java:226` (décision actée : catégories de recette = marqueurs, pas des sections) | `e7900959` | 2026-07-13 | Clôt §2 mineurs item 5, §4/§6/§7 (`CNStandardRecipeGen` FIXME) et §7 item 9 (surveillance `CreateNuclearJEI`). Aucun changement de comportement observable pour le FIXME (retrait de commentaire + décision documentée dans le message de commit) ; pour `CreateNuclearJEI`, chaque instance du plugin a désormais sa propre liste, éliminant le risque de contamination inter-instances en cas de reload JEI. |
 | Retrait de `addDefaultIrradiatedOres()` (dernier contenu : le carver `NETHER_CAVE`) et de son unique site d'appel dans `IrradiatedBiomes.irradiated()` ; régénération de `irradiated_land.json`/`.cache` (bloc `carvers` désormais vide) | `6bc20956` | 2026-07-13 | **Clôt entièrement** l'item « worldgen irradié » du §4/§7 (`BLUE_ICE`/`VOID_START_PLATFORM` déjà retirés par `ae1e394d` juste avant). Seul point restant sur ce sujet : `CNNoiseGeneratorSettings.java:25` (`STEEL_BLOCK`), sans rapport avec ce commit. |
 | Retrait des références commentées à `SPEED` dans `ReactorOutput` (`createBlockStateDefinition`, `getStateForPlacement`) ; retrait de `BLUE_ICE` et de `addDefaultSoftDisks()`/`VOID_START_PLATFORM` (+ son unique site d'appel) dans `IrradiatedBiomes` ; suppression de `OriginalBiomeLookup.java` (classe de résolution de biome jamais appelée, non repérée jusqu'ici par cet audit) ; ajout de `@ParametersAreNonnullByDefault` sur `ReactorOutput` et retrait du `@NotNull` désormais redondant sur `getShape()` | `ae1e394d` | 2026-07-13 | Clôt le premier bullet de §4/§7 item 7 (`SPEED`). Entame le second (« worldgen irradié »), achevé juste après par `6bc20956` (ci-dessus). `OriginalBiomeLookup` est un bonus hors-périmètre de l'audit courant (jamais listé en §4). |
 | Ajout de `DefaultHeatCalculatorGameTest` (3 cas : fuel isolé, cooler isolé, asymétrie de voisinage fuel/cooler) — première couverture de test pour `DefaultHeatCalculator.computeHeat` (§3/§7 priorité 1) | `498f9dc6` | 2026-07-13 | Écrit en `GameTest` (real `ServerLevel`/`ReactorControllerBlockEntity`/items enregistrés) après rejet d'une première tentative JUnit+Mockito : mocker `Item`/`ItemStack`/`Level` échoue hors jeu démarré (static init Minecraft), ce qui confirme empiriquement le choix `GameTest` déjà fait pour `ReactorInputFluidManagerGameTest`. Valeurs attendues dérivées de `CNConfigs.server().rods.*` en direct (pas de valeurs codées en dur), donc robuste à un changement de balance. |
