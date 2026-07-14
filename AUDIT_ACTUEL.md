@@ -28,6 +28,8 @@ La dette la plus structurelle reste **l'absence de tests sur la majorité du cod
 
 **Mise à jour (`9e8abe92`, 2026-07-14)** : traduction en anglais des 9 des 10 fichiers restants du §6 (items 6, 7, 8, 10, 11, 12, 13, 14, plus l'essentiel de 5 — `CNFluids.java` traduit en intégralité). Seul l'item 9 (`NuclearExplosionEntity.java:45,50`, compat Alex's Caves) reste ouvert, non touché par ce commit. Au passage, un fichier jusque-là non repéré par cet audit a été trouvé avec un commentaire français résiduel : `CNEntityType.java:76`. Détail en §6 et §8.1.
 
+**Mise à jour (2026-07-14, pas de commit — décision documentaire seule)** : le point §2.4/§7 priorité 5 (« harmoniser le mode d'affichage du heat de `ReactorSummaryDisplaySource` avec `HeatDisplaySource` ») est **réfuté et clos** après analyse approfondie — ce n'est pas une incohérence mais un choix de design volontaire du widget de synthèse (`fluid` et `heat` en jauge par défaut car plus lisibles en vue d'ensemble, `fuel`/`cooler` en texte), sans rapport avec le mode par défaut de l'affichage individuel `HeatDisplaySource`. Détail complet en §8.2.
+
 **Mise à jour (`eeffe4fe`, 2026-07-14)** : les 2 derniers fichiers du §6 sont traduits — `NuclearExplosionEntity.java` (commentaires de compat Alex's Caves : typage `Object` du handler, instanciation conditionnelle, immunité Raycat/Tremorzilla, et clarification du commentaire déjà anglais mais devenu incohérent sur `destroyBlock`) et `CNEntityType.java` (commentaire sur le renderer no-op de l'entité d'explosion, reformulé pour expliquer que c'est la particule qui fait le rendu visuel). **Confirmé par grep sur tout `src/main/java` (292 fichiers) : plus aucun caractère accentué français, §6 est intégralement clos.** Détail en §6 et §8.1.
 
 ---
@@ -58,8 +60,7 @@ La dette la plus structurelle reste **l'absence de tests sur la majorité du cod
 
 3. ~~`ReactorSummaryDisplaySource` — sentinelle de taille + accès positionnel fragiles~~ — **résolu**, voir §8.1 (`cc532f83`).
 
-4. **`ReactorSummaryDisplaySource.formatValue` — incohérence de mode** *(inchangé)*
-   `HeatDisplaySource` affiche `"500 °C"` en mode normal alors que `ReactorSummaryDisplaySource` force une jauge pour le heat dans le même mode (`gaugeOnNormal=true` pour heat uniquement) — incohérence visuelle toujours présente.
+4. ~~`ReactorSummaryDisplaySource.formatValue` — incohérence de mode~~ — **réfuté, clos sans code** (2026-07-14) : voir §8.2.
 
 ### 🟡 Mineurs
 
@@ -152,7 +153,7 @@ Classement par catégorie et impact, du plus important au plus cosmétique. Chaq
 - Flicker de vitesse de sortie : valider en jeu que le seuil d'hystérésis (`RPM_DIVIDER/2`, déjà implémenté par `a18038db`) supprime bien la perception du flicker en fin de ressources (§1). **Justification** : le code est déjà en place, il ne reste qu'une validation de gameplay — priorité basse en effort mais à ne pas oublier, sinon le point restera indéfiniment « à moitié fait » dans la mémoire du projet.
 
 **5. Amélioration de conception / cohérence UX**
-- `ReactorSummaryDisplaySource.formatValue` : harmoniser le mode d'affichage du heat avec `HeatDisplaySource` (§2.4). **Justification** : incohérence visible par le joueur, mais purement cosmétique, aucun risque fonctionnel.
+- ~~`ReactorSummaryDisplaySource.formatValue` : harmoniser le mode d'affichage du heat avec `HeatDisplaySource`~~ — **réfuté, clos sans code** (2026-07-14) : voir §8.2.
 - ~~`ReactorSummaryDisplaySource` : remplacer l'accès positionnel fragile~~ — **fait**, voir §8.1 (`cc532f83`).
 
 **6. Optimisation mineure (gain faible, risque nul)**
@@ -228,6 +229,7 @@ Ces affirmations historiques ont été vérifiées comme **fausses ou déjà clo
 - **God class `ReactorControllerBlockEntity`** — ✅ chantier clos, croissance maîtrisée : **533 lignes** (886 dans `AUDIT_V1.md`, 492 puis 529 aux tours intermédiaires), délégation à 34 fichiers de support (`service/` 14, `manager/` 12, `consumable/` 6, `display/` 2). *Pas de hash unique — résultat cumulatif de dizaines de commits d'extraction progressive vers `manager/service/consumable`, non attribuable avec certitude à un commit isolé.*
 - **Coordinateur de verrou fluide dédié** — ✅ toujours non justifié : `PersistentFluidLocks` reste le seul système ; pas de `FluidLockManager` concurrent retrouvé (celui décrit en `AUDIT_V1.md` B14 a disparu, hash non déterminé — voir §8.4). `clearLockIfAllInputsEmpty` utilise `getFuildHandlers(level)` (pas de scan 3D), double itération mineure sans gravité.
 - **`clearLockIfAllInputsEmpty` : pas de scan cubique O(n³)** — ✅ acceptable, confirmé sain.
+- **`ReactorSummaryDisplaySource.formatValue` — "incohérence" de mode d'affichage du heat vs `HeatDisplaySource`** — ❌ réfuté, ce n'est pas un bug : c'est un choix de design volontaire du widget de synthèse, mal formulé par l'audit initial. Analyse détaillée : `formatValue` force une jauge en mode "normal" pour `heat` (`gaugeOnNormal=true`), mais `formatFluid` (`ReactorSummaryDisplaySource.java:203-207`) fait exactement la même chose pour `fluid` (`mode == 0 || mode == 3` → jauge) — ce n'est donc pas une exception isolée sur `heat`, mais un pattern cohérent et répété : les deux stats les plus critiques à lire d'un coup d'œil dans une vue de synthèse (`fluid`, `heat`) sont en jauge par défaut, `fuel`/`cooler` restent en texte. `HeatDisplaySource`, à l'inverse, est un affichage individuel une-ligne où la jauge occuperait toute la largeur disponible pour une seule information — un défaut texte y est tout aussi légitime. Les deux widgets ont des contraintes d'espace et des objectifs différents ; il n'y a jamais eu de règle implicite selon laquelle un mode par défaut devait être identique entre les deux. **Pas de hash applicable** — aucun changement de code, décision de clôture actée après clarification du comportement voulu. Écarté aussi : la création d'une classe utilitaire `ReactorDisplayFormatting` pour mutualiser les 3 mappings mode→rendu existants (`AbstractReactorStatDisplaySource.provideLine`, `ReactorSummaryDisplaySource.formatValue`, `ReactorSummaryDisplaySource.formatFluid`) — ces 3 mappings ont des sémantiques différentes (3 modes vs 4 modes, flag `gaugeOnNormal` par stat, suffixe d'unité optionnel), donc les unifier demanderait un enum de mode partagé mal aligné entre appelants (le type même de fragilité par index déjà corrigée en `cc532f83`) ou une fonction à autant de paramètres que de sources de divergence — coût supérieur au gain pour un point cosmétique sans risque fonctionnel.
 
 ### 8.3 Décisions produit exécutées
 
