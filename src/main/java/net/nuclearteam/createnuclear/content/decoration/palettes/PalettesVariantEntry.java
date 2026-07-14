@@ -50,9 +50,6 @@ public class PalettesVariantEntry {
 
             itemBuilder.tag(paletteStoneVariants.materialTag);
 
-            if (pattern.isTranslucent()) {
-                // Le RenderType est maintenant géré directement dans la génération du modèle json (via PaletteBlockPattern)
-            }
             pattern.createCTBehaviour(name)
                     .ifPresent(b -> builder.onRegister(CreateRegistrate.<Block>connectedTextures(b)));
 

@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.foundation.mixin; // Ton package mixin
+package net.nuclearteam.createnuclear.foundation.mixin;
 
 import net.minecraft.client.Camera;
 import org.spongepowered.asm.mixin.Mixin;
@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(Camera.class)
 public interface CameraAccessor {
-    // L'invoker permet de "débloquer" l'accès à la méthode move
+    // Exposes the private Camera#move so it can be called from outside the class
     @Invoker("move")
     void callMove(double distanceOffset, double verticalOffset, double horizontalOffset);
 }

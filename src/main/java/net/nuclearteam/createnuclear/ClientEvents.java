@@ -20,50 +20,46 @@ import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 public class ClientEvents {
 
     /**
-     * GESTION DU TICK (LOGIQUE)
-     * Ce code s'exécute 20 fois par seconde pour faire descendre les compteurs.
+     * Ticks down the nuke flash/darken timers, once per client tick.
      */
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
 
-            // On enregistre l'ancienne valeur pour l'interpolation fluide (Flash)
+            // Store the previous value for smooth interpolation of the flash
             CNClientProxy.prevNukeFlashAmount = CNClientProxy.nukeFlashAmount;
 
-            // Gestion du décompte de l'obscurité du ciel
+            // Count down the sky-darkening timer
             if (CNClientProxy.renderNukeSkyDarkFor > 0) {
                 CNClientProxy.renderNukeSkyDarkFor--;
             }
 
-            // Gestion de la puissance du Flash blanc
+            // Ramp the white flash up while active, then fade it back out
             if (CNClientProxy.renderNukeFlashFor > 0) {
                 if (CNClientProxy.nukeFlashAmount < 1F) {
                     CNClientProxy.nukeFlashAmount = Math.min(CNClientProxy.nukeFlashAmount + 0.4F, 1F);
                 }
                 CNClientProxy.renderNukeFlashFor--;
             } else if (CNClientProxy.nukeFlashAmount > 0F) {
-                // Le flash s'estompe progressivement
                 CNClientProxy.nukeFlashAmount = Math.max(CNClientProxy.nukeFlashAmount - 0.05F, 0F);
             }
         }
     }
 
     /**
-     * GESTION DU SCREEN SHAKE (TREMBLEMENT DE CAMÉRA)
-     * Ce code fait vibrer la vue du joueur pendant l'explosion.
+     * Shakes the player's camera while a nuke explosion is active.
      */
     @SubscribeEvent
     public static void computeCameraAngles(ViewportEvent.ComputeCameraAngles event) {
         Entity player = Minecraft.getInstance().getCameraEntity();
         float partialTick = Minecraft.getInstance().getPartialTick();
 
-        // On définit la puissance du tremblement.
-        // Si le ciel est sombre (nuke active), on fait trembler à 1.5F.
+        // Shake at 1.5F while the sky is darkened (nuke active), otherwise no shake
         float tremorAmount = CNClientProxy.renderNukeSkyDarkFor > 0 ? 1.5F : 0F;
 
         if (player != null && CNConfigs.client().screenShaking.get()) {
             if (tremorAmount > 0) {
-                // On génère des offsets aléatoires pour la vibration
+                // Generate random offsets for the shake, once per tick
                 if (CNClientProxy.lastTremorTick != player.tickCount) {
                     RandomSource rng = player.level().random;
                     CNClientProxy.randomTremorOffsets[0] = rng.nextFloat();
@@ -72,10 +68,10 @@ public class ClientEvents {
                     CNClientProxy.lastTremorTick = player.tickCount;
                 }
 
-                // Intensité basée sur les réglages d'accessibilité de Minecraft
+                // Scale by Minecraft's screen-effect accessibility setting
                 double intensity = tremorAmount * Minecraft.getInstance().options.screenEffectScale().get();
 
-                // On déplace physiquement la caméra
+                // Physically offset the camera
                 ((CameraAccessor) event.getCamera()).callMove(
                         CNClientProxy.randomTremorOffsets[0] * 0.2F * intensity,
                         CNClientProxy.randomTremorOffsets[1] * 0.2F * intensity,

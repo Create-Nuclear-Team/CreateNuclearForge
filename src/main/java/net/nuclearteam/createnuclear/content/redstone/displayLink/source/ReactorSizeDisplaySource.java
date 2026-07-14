@@ -20,7 +20,7 @@ public class ReactorSizeDisplaySource extends NumericSingleLineDisplaySource {
         ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(context.level(), context.getSourcePos());
         if (controller == null || controller.isRemoved()) return ZERO.copy();
 
-        // Label + Espace
+        // Label + trailing space
         MutableComponent label = CreateNuclearLang.translateDirect("display_source.reactor.size").append(" ");
 
         int mode = context.sourceConfig().getInt("display_mode");
@@ -30,7 +30,7 @@ public class ReactorSizeDisplaySource extends NumericSingleLineDisplaySource {
         return label.append(switch (mode) {
             case 1 -> Component.literal((tier * 100 / 3) + "%").withStyle(ChatFormatting.BLUE);
             case 2 -> {
-                // Jauge courte de 3 segments représentant les Tiers
+                // Short 3-segment gauge representing the tier
                 yield Component.literal("█".repeat(tier) + "▒".repeat(3 - tier)).withStyle(ChatFormatting.BLUE);
             }
             default -> {

@@ -45,7 +45,7 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
         return builder.build();
     }
 
-    // Cette méthode indique au jeu où trouver la texture PNG de l'armure
+    // Tells the game where to find the armor's PNG texture
     @Override
     public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
         return ClothTagHelper.getArmorTexturePath(stack, "anti_radiation_suit.png");

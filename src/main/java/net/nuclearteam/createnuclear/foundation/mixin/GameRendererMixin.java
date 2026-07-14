@@ -14,7 +14,7 @@ public abstract class GameRendererMixin {
     @Shadow
     private float darkenWorldAmount;
 
-    // Cette partie gère l'assombrissement du ciel/monde lors de l'explosion
+    // Handles darkening the sky/world during a nuclear explosion
     @Inject(
             method = {"Lnet/minecraft/client/renderer/GameRenderer;tick()V"},
             remap = true,
@@ -26,7 +26,7 @@ public abstract class GameRendererMixin {
         }
     }
 
-    // Cette partie appelle le rendu du flash blanc (preScreenRender)
+    // Triggers the white flash render (preScreenRender)
     @Inject(
             method = {"Lnet/minecraft/client/renderer/GameRenderer;render(FJZ)V"},
             remap = true,
