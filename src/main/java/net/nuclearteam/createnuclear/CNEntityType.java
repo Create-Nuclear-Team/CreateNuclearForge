@@ -73,7 +73,7 @@ public class CNEntityType {
                 .setUpdateInterval(1)
                 .setShouldReceiveVelocityUpdates(true)
             )
-            // Utilise le renderer vide par défaut de Minecraft
+            // Invisible entity: the mushroom cloud particle does the actual rendering
             .renderer(() -> NoopRenderer::new)
             .register();
 
