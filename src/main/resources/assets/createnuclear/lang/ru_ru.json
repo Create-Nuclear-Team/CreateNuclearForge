@@ -294,7 +294,7 @@
   "createnuclear.subtitle.reacteur/shut_off": "Reactor Shut Off",
   "createnuclear.tooltip.baseRodHeat": "Base Rod Heat: %d Q",
   "createnuclear.tooltip.fluid": "Fluid: %s ",
-  "createnuclear.tooltip.fluid.amount": "%d mb",
+  "createnuclear.tooltip.fluid.amount": "%d Мб",
   "createnuclear.tooltip.fluid.none": "Fluid: None ",
   "createnuclear.tooltip.heatLevel": "Уровень тепла",
   "createnuclear.tooltip.heatLevel.caution": "Осторожность",
