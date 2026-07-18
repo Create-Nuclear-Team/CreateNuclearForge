@@ -15,7 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.nuclearteam.createnuclear.CNClientProxy;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
-import net.nuclearteam.createnuclear.foundation.mixin.CameraAccessor;
+import net.nuclearteam.createnuclear.foundation.mixin.client.CameraAccessor;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 @Mod.EventBusSubscriber(modid = CreateNuclear.MOD_ID, value = Dist.CLIENT)

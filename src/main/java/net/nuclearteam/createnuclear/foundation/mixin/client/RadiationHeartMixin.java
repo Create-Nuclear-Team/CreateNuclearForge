@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.foundation.mixin;
+package net.nuclearteam.createnuclear.foundation.mixin.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public class RadiationHeartMixin {
 
     private static final ResourceLocation RADIATION_ICONS = CreateNuclear.asResource("textures/gui/icons.png");
-    private static final ResourceLocation VANILLA_ICONS = new ResourceLocation("minecraft", "textures/gui/icons.png");
+    private static final ResourceLocation VANILLA_ICONS = new ResourceLocation("textures/gui/icons.png");
 
     @ModifyArg(
             method = "renderHeart", // The single-heart method that actually draws each heart icon
@@ -25,7 +25,7 @@ public class RadiationHeartMixin {
             ),
             index = 0
     )
-    private ResourceLocation createnuclear$changeHeartTexture(ResourceLocation originalTexture) {
+    private ResourceLocation CN$changeHeartTexture(ResourceLocation originalTexture) {
         if (originalTexture.equals(VANILLA_ICONS)) {
             Player player = Minecraft.getInstance().player;
 

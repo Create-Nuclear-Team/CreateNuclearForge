@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.foundation.mixin;
+package net.nuclearteam.createnuclear.foundation.mixin.client;
 
 import net.minecraft.client.renderer.GameRenderer;
 import net.nuclearteam.createnuclear.CNClientProxy;
@@ -20,7 +20,7 @@ public abstract class GameRendererMixin {
             remap = true,
             at = @At(value = "TAIL")
     )
-    public void cn_tick(CallbackInfo ci) {
+    public void CN$tick(CallbackInfo ci) {
         if (CNClientProxy.renderNukeSkyDarkFor > 0 && darkenWorldAmount < 1.0F) {
             darkenWorldAmount = Math.min(darkenWorldAmount + 0.3F, 1.0F);
         }
@@ -36,7 +36,7 @@ public abstract class GameRendererMixin {
                     shift = At.Shift.AFTER
             )
     )
-    public void cn_render(float partialTick, long nanos, boolean idk, CallbackInfo ci) {
+    public void CN$render(float partialTick, long nanos, boolean idk, CallbackInfo ci) {
         CNClientProxy.preScreenRender(partialTick);
     }
 }

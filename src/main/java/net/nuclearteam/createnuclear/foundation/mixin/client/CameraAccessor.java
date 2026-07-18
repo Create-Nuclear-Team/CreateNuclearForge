@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear.foundation.mixin;
+package net.nuclearteam.createnuclear.foundation.mixin.client;
 
 import net.minecraft.client.Camera;
 import org.spongepowered.asm.mixin.Mixin;
