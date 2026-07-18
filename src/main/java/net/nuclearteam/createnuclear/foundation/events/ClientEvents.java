@@ -1,4 +1,4 @@
-package net.nuclearteam.createnuclear;
+package net.nuclearteam.createnuclear.foundation.events;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.RandomSource;
@@ -12,6 +12,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.nuclearteam.createnuclear.CNClientProxy;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem;
 import net.nuclearteam.createnuclear.foundation.mixin.CameraAccessor;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
