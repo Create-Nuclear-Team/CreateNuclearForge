@@ -567,7 +567,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         currentHeat = isEmptyConfiguredPattern() ? 0 : (int) this.getConfiguredPatternTag().getDouble("heat");
 
         // Récupération des configs pour l'utilitaire
-        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        int configRadius = CNConfigs.server().notify.warningDistance.get();
         boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
         if (isDanger) {
@@ -749,7 +749,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         isExploding = true;
 
         BlockPos explosionPos = getBlockPos().above(5);
-        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        int configRadius = CNConfigs.server().notify.warningDistance.get();
         boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
         if (level instanceof ServerLevel serverLevel) {

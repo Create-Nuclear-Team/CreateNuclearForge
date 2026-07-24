@@ -236,8 +236,8 @@ public record RodType(HolderSet<Item> items,
         if (!useConfig) return baseRodHeat;
         try {
             return switch (type) {
-                case FUEL -> CNConfigs.server().rods.baseValueUranium.get();
-                case COOLER -> CNConfigs.server().rods.baseValueGraphite.get();
+                case FUEL -> CNConfigs.server().rods.uraniumBaseValue.get();
+                case COOLER -> CNConfigs.server().rods.graphiteBaseValue.get();
                 default -> baseRodHeat;
             };
         } catch (IllegalStateException e) {
@@ -250,8 +250,8 @@ public record RodType(HolderSet<Item> items,
         if (!useConfig) return proximityRodHeat;
         try {
             return switch (type) {
-                case FUEL -> CNConfigs.server().rods.uraniumProxyBonus.get();
-                case COOLER -> CNConfigs.server().rods.graphiteProxyMalus.getF();
+                case FUEL -> CNConfigs.server().rods.uraniumProximityBonus.get();
+                case COOLER -> CNConfigs.server().rods.graphiteProximityMalus.getF();
                 default -> proximityRodHeat;
             };
         } catch (IllegalStateException e) {

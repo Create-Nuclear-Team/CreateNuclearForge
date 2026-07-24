@@ -147,7 +147,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
           if (!state.getValue(ASSEMBLED))
             return;
 
-        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        int configRadius = CNConfigs.server().notify.warningDistance.get();
         boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
         NotifyUtil.sendActionBar(worldIn, pos,
                 CreateNuclearLang.translate("notification.reactor.disassembled"),

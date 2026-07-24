@@ -4,8 +4,8 @@ import net.createmod.catnip.config.ConfigBase;
 
 public class CNotify extends ConfigBase {
 
-    public final ConfigBool warnAllPlayers = b(false, "Warn all players", Comments.warning);
-    public final ConfigInt distanceOfWarning = i(100, 30, 5000, "Distance of warning", Comments.rangeOfWarning);
+    public final ConfigBool warnAllPlayers = b(false, "warn_all_players", Comments.warning);
+    public final ConfigInt warningDistance = i(100, 30, 5000, "warning_distance_blocks", Comments.rangeOfWarning);
 
     @Override
     public String getName() {
@@ -13,7 +13,7 @@ public class CNotify extends ConfigBase {
     }
 
     private static class Comments {
-        static String warning = "This is a warning before the reactor explodes";
-        static String rangeOfWarning = "distance to check for players to warn of the imminent explosion";
+        static String warning = "When true, broadcast a warning to nearby players before a reactor explosion.";
+        static String rangeOfWarning = "Distance (in blocks) to search for players to warn about impending explosion.";
     }
 }

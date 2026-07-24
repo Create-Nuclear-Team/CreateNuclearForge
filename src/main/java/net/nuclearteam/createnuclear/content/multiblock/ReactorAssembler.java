@@ -3,8 +3,6 @@ package net.nuclearteam.createnuclear.content.multiblock;
 import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -26,7 +24,7 @@ import java.util.List;
 
 public final class ReactorAssembler {
 
-    public static final int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+    public static final int configRadius = CNConfigs.server().notify.warningDistance.get();
     public static final boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
     private ReactorAssembler() {}
