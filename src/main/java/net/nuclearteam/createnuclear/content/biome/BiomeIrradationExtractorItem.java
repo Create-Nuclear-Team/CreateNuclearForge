@@ -1,6 +1,8 @@
 package net.nuclearteam.createnuclear.content.biome;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -8,15 +10,19 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.BiomeIrradiationService;
 
-public class BiomeRestoreCellItem extends Item {
+import java.util.List;
+
+public class BiomeIrradationExtractorItem extends Item {
     public static final String TAG = "biome_restore";
     private static final int CHARGE_PER_CLICK = 1;
 
-    public BiomeRestoreCellItem(Properties pProperties) {
+    public BiomeIrradationExtractorItem(Properties pProperties) {
         super(pProperties);
     }
 
@@ -33,14 +39,33 @@ public class BiomeRestoreCellItem extends Item {
         boolean restored = BiomeIrradiationService.restoreArea(serverLevel, player.blockPosition());
         if (!restored) return InteractionResultHolder.pass(stack);
 
-        addCharge(stack, CHARGE_PER_CLICK);
+        ItemStack charged = stack.copyWithCount(1);
+        addCharge(charged, CHARGE_PER_CLICK);
 
+        stack.shrink(1);
+        if (stack.isEmpty()) {
+            return InteractionResultHolder.success(charged);
+        }
+
+        if (!player.getInventory().add(charged)) {
+            player.drop(charged, false);
+        }
         return InteractionResultHolder.success(stack);
     }
 
     @Override
-    public boolean isBarVisible(ItemStack stack) {
-        return CNConfigs.server().biomeRestore.alwaysShowBar.get() || getCharge(stack) > 0;
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, level, tooltip, tooltipFlag);
+        if (tooltipFlag.isAdvanced() && getCharge(stack) > 0) {
+            tooltip
+                .add(CreateNuclearLang.translateDirect("tooltip.biome_irradiation_extractor." + TAG,  getCharge(stack), getMaxCharge())
+                .withStyle(ChatFormatting.GRAY));
+        }
+    }
+
+    @Override
+    public int getMaxStackSize(ItemStack stack) {
+        return getCharge(stack) > 0 ? 1 : this.getMaxStackSize();
     }
 
     @Override

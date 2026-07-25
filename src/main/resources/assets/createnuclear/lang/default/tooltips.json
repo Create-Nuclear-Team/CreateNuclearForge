@@ -51,6 +51,8 @@
 
   "block.createnuclear.enriched_soul_soil.tooltip.summary": "The _only_ block who create _enriched fire_.Can be used to _craft_ enriched campfire or just to make a _green fire_.",
 
+  "item.createnuclear.biome_irradiation_extractor.tooltip.summary": "This item is currently in _beta_ and will change it's form & texture in the next update.",
+  "createnuclear.tooltip.biome_irradiation_extractor.biome_restore": "Restorations: %d / %d",
 
   "createnuclear.tooltip.statRod": "Rod Stat Pattern:",
   "createnuclear.tooltip.baseRodHeat": "Base Rod Heat: %d Q",
@@ -73,8 +75,6 @@
   "tag.item.minecraft.campfires": "Campfires",
 
   "tag.item.trinkets.head.face": "Head Face",
-
-
 
   "attribute.name.createnuclear.generic.irradiated_resistance": "Radiation Resistance"
 }

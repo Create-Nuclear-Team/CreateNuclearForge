@@ -12,7 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.content.biome.BiomeRestoreCellItem;
+import net.nuclearteam.createnuclear.content.biome.BiomeIrradationExtractorItem;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -65,7 +65,7 @@ public class CNBuilderTransformers {
      */
     public static <T extends Item> NonNullBiConsumer<DataGenContext<Item, T>, RegistrateItemModelProvider> biomeRestoreModel() {
         return (c, p) -> {
-            ItemModelBuilder outer = p.generated(c, CreateNuclear.asResource("item/biome_restore_cell/empty"));
+            ItemModelBuilder outer = p.generated(c, CreateNuclear.asResource("item/biome_irradiation_extractor/empty"));
 
             record Tier(String name, float threshold) {}
             List<Tier> tiers = List.of(
@@ -76,13 +76,13 @@ public class CNBuilderTransformers {
             );
 
             for (Tier tier : tiers) {
-                ItemModelBuilder child = p.withExistingParent("item/biome_restore_cell/" + tier.name(), p.mcLoc("item/generated"))
-                        .texture("layer0", CreateNuclear.asResource("item/biome_restore_cell/" + tier.name()));
+                ItemModelBuilder child = p.withExistingParent("item/biome_irradiation_extractor/" + tier.name(), p.mcLoc("item/generated"))
+                    .texture("layer0", CreateNuclear.asResource("item/biome_irradiation_extractor/" + tier.name()));
 
                 outer.override()
-                        .predicate(CreateNuclear.asResource(BiomeRestoreCellItem.TAG), tier.threshold())
-                        .model(child)
-                        .end();
+                    .predicate(CreateNuclear.asResource(BiomeIrradationExtractorItem.TAG), tier.threshold())
+                    .model(child)
+                    .end();
             }
         };
     }

@@ -14,7 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.nuclearteam.createnuclear.content.biome.BiomeRestoreCellItem;
+import net.nuclearteam.createnuclear.content.biome.BiomeIrradationExtractorItem;
 import net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
@@ -364,8 +364,8 @@ public class CNItems {
             .tag(CNItemTags.CLOTH.tag)
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get())
                     .unlockedBy("has_white_cloth", RegistrateRecipeProvider.has(ClothItem.Cloths.WHITE_CLOTH.getItem()))
-                    // Accept any cloth EXCEPT one already of the target colour, otherwise the
-                    // recipe would let you "dye" a cloth into the colour it already is.
+                    // Accept any cloth EXCEPT one already of the target color, otherwise the
+                    // recipe would let you "dye" a cloth into the color it already is.
                     .requires(Ingredient.of(Arrays.stream(DyeColor.values())
                             .filter(other -> other != color)
                             .map(other -> ClothItem.Cloths.getByColor(other).get())
@@ -405,10 +405,30 @@ public class CNItems {
         .properties(p -> p.stacksTo(1))
         .register();
 
-    public static final ItemEntry<BiomeRestoreCellItem> BIOME_RESTORE_CELL = CreateNuclear.REGISTRATE
-        .item("biome_restore_cell", BiomeRestoreCellItem::new)
-        .lang("Biome Restore Cell")
-        .properties(p -> p.stacksTo(1).fireResistant().setNoRepair())
+    public static final ItemEntry<Item> REINFORCED_GLASS_BOTTLE = CreateNuclear.REGISTRATE
+        .item("reinforced_glass_bottle", Item::new)
+        .lang("Reinforced Glass Bottle")
+        .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.BREWING, c.get(), 3)
+            .unlockedBy("has_reinforced_glass", RegistrateRecipeProvider.has(CNBlocks.REINFORCED_GLASS.get()))
+            .define('G', CNBlocks.REINFORCED_GLASS)
+            .pattern("G G")
+            .pattern(" G ")
+            .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
+        .properties(p -> p.stacksTo(16))
+        .register();
+
+    public static final ItemEntry<BiomeIrradationExtractorItem> IRRADIATION_BIOME_EXTRACTOR = CreateNuclear.REGISTRATE
+        .item("biome_irradiation_extractor", BiomeIrradationExtractorItem::new)
+        .lang("Biome Irradiation Extractor")
+        .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 8)
+            .unlockedBy("has_reinforced_glass_bottle", RegistrateRecipeProvider.has(CNItems.REINFORCED_GLASS_BOTTLE.get()))
+            .define('B', CNItems.REINFORCED_GLASS_BOTTLE)
+            .define('S', Items.NETHER_STAR)
+            .pattern("BBB")
+            .pattern("BSB")
+            .pattern("BBB")
+            .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
+        .properties(p -> p.stacksTo(16).fireResistant().setNoRepair())
         .model(biomeRestoreModel())
         .register();
 

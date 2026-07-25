@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "createnuclear:item/biome_restore_cell/full"
+    "layer0": "createnuclear:item/reinforced_glass_bottle"
   }
 }
