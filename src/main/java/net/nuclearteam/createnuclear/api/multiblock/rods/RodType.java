@@ -5,15 +5,17 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Holder.Reference;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.RegistryFixedCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.nuclearteam.createnuclear.api.CreateNuclearRegistries;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 
@@ -27,35 +29,35 @@ import java.util.function.Supplier;
 /**
  * Represents a rod type used by the mod's multiblock.
  * <p>
- * A {@code RodType} holds a set of items that can represent this rod type,
+ * A {@code RodType} holds the single item that represents this rod type,
  * heat-related values, a timing value, and a {@link TypeRod} indicating the
  * category (fuel, cooler, or mixed).
  */
 @MethodsReturnNonnullByDefault
-public record RodType(HolderSet<Item> items,
+public record RodType(Holder<Item> item,
                       Supplier<Integer> baseRodHeat,
                       Supplier<Float> proximityRodHeat,
                       Supplier<Integer> rodTimer,
                       Supplier<Integer> heatRatio,
                       TypeRod type) {
 
-    public RodType(HolderSet<Item> items,
+    public RodType(Holder<Item> item,
                    int baseRodHeat, float proximityRodHeat,
                    int rodTimer, TypeRod type) {
-        this(items, baseRodHeat, proximityRodHeat, rodTimer, type, 1);
+        this(item, baseRodHeat, proximityRodHeat, rodTimer, type, 1);
     }
 
-    public RodType(HolderSet<Item> items,
+    public RodType(Holder<Item> item,
                    int baseRodHeat, float proximityRodHeat,
                    int rodTimer, TypeRod type, int heatRatio) {
-        this(items, () -> baseRodHeat, () -> proximityRodHeat, () -> rodTimer, () -> heatRatio, type);
+        this(item, () -> baseRodHeat, () -> proximityRodHeat, () -> rodTimer, () -> heatRatio, type);
     }
 
     /**
      * Serialization codec for saving/loading {@link RodType} instances.
      */
     public static final Codec<RodType> CODEC = RecordCodecBuilder.create(i -> i.group(
-            RegistryCodecs.homogeneousList(Registries.ITEM).fieldOf("items").forGetter(RodType::items),
+            RegistryFixedCodec.create(Registries.ITEM).fieldOf("item").forGetter(RodType::item),
             Codec.INT.fieldOf("baseRodHeat").forGetter(rt -> rt.baseRodHeat().get()),
             Codec.FLOAT.fieldOf("proximityRodHeat").forGetter(rt -> rt.proximityRodHeat().get()),
             Codec.INT.fieldOf("rodTimer").forGetter(rt -> rt.rodTimer().get()),
@@ -75,7 +77,7 @@ public record RodType(HolderSet<Item> items,
     public static Optional<Reference<RodType>> getTypeForItem(RegistryAccess registryAccess, Item item) {
         return registryAccess.lookupOrThrow(CreateNuclearRegistries.ROD_TYPE)
             .listElements()
-            .filter(ref -> ref.value().items.contains(item.builtInRegistryHolder()))
+            .filter(ref -> ref.value().item.equals(item.builtInRegistryHolder()))
             .findFirst();
     }
 
@@ -103,12 +105,13 @@ public record RodType(HolderSet<Item> items,
     }
 
     /**
-     * Returns whether this {@code RodType} has no associated items.
+     * Returns whether this {@code RodType} has an associated item (i.e. is
+     * not the empty/sentinel item).
      *
-     * @return {@code true} if no items are defined, {@code false} otherwise
+     * @return {@code true} if a real item is defined, {@code false} otherwise
      */
     public boolean isNotEmptyItem() {
-        return this.items.size() >= 1;
+        return this.item.value() != Items.AIR;
     }
 
     /**
@@ -125,13 +128,13 @@ public record RodType(HolderSet<Item> items,
      * such as a config option (see {@code CNItems} for examples), so that
      * changes are picked up without rebuilding the {@code RodType}.
      * <p>
-     * {@code items}, {@code type}, {@code baseRodHeat}, {@code proximityRodHeat}
+     * {@code item}, {@code type}, {@code baseRodHeat}, {@code proximityRodHeat}
      * and {@code rodTimer} are required; {@code heatRatio} defaults to a
      * constant {@code 1} and never needs to be set explicitly. Call
      * {@link #build()} once all required values are configured.
      */
     public static class Builder {
-        private final List<Holder<Item>> items = new ArrayList<>();
+        private Holder<Item> item = null;
         private Supplier<Integer> baseRodHeat = null;
         private Supplier<Float> proximityRodHeat = null;
         private Supplier<Integer> rodTimer = null;
@@ -267,27 +270,25 @@ public record RodType(HolderSet<Item> items,
         }
 
         /**
-         * Adds one or more items that represent this rod type. Can be called
-         * multiple times; items accumulate rather than replace one another.
-         * At least one item must be added before {@link #build()}.
+         * Sets the item that represents this rod type. Calling this again
+         * replaces the previously set item.
          *
-         * @param items array of {@link ItemLike} elements to associate
+         * @param item the item to associate with this rod type
          * @return this builder
          */
-        public Builder addItems(ItemLike... items) {
-            for (ItemLike provider : items)
-                this.items.add(provider.asItem().builtInRegistryHolder());
+        public Builder item(ItemLike item) {
+            this.item = item.asItem().builtInRegistryHolder();
             return this;
         }
 
         /**
          * Builds the immutable {@link RodType} instance.
          * <p>
-         * Validates that {@code items} is non-empty and that {@code type},
-         * {@code baseRodHeat}, {@code proximityRodHeat} and {@code rodTimer}
-         * have all been set (either as a fixed value or as a dynamic
-         * {@link Supplier}); {@code heatRatio} is exempt since it defaults
-         * to a constant {@code 1}.
+         * Validates that {@code item} and {@code type}, {@code baseRodHeat},
+         * {@code proximityRodHeat} and {@code rodTimer} have all been set
+         * (either as a fixed value or as a dynamic {@link Supplier});
+         * {@code heatRatio} is exempt since it defaults to a constant
+         * {@code 1}.
          *
          * @throws IllegalStateException if one or more required fields are missing,
          *         naming every missing field in the exception message
@@ -295,7 +296,7 @@ public record RodType(HolderSet<Item> items,
          */
         public RodType build() {
             List<String> missing = new ArrayList<>();
-            if (items.isEmpty()) missing.add("items");
+            if (item == null) missing.add("item");
             if (type == null) missing.add("type");
             if (baseRodHeat == null) missing.add("baseRodHeat");
             if (proximityRodHeat == null) missing.add("proximityRodHeat");
@@ -304,7 +305,7 @@ public record RodType(HolderSet<Item> items,
             if (!missing.isEmpty())
                 throw new IllegalStateException("Missing required RodType fields: " + String.join(", ", missing));
 
-            return new RodType(HolderSet.direct(items), baseRodHeat, proximityRodHeat, rodTimer, heatRatio, type);
+            return new RodType(item, baseRodHeat, proximityRodHeat, rodTimer, heatRatio, type);
         }
     }
 
@@ -350,7 +351,14 @@ public record RodType(HolderSet<Item> items,
 
     @Override
     public String toString() {
-        return "RodType [items: " + this.items() +
+        String itemName = this.item.unwrapKey()
+            .map(k -> k.location().toString())
+            .orElseGet(() -> {
+                ResourceLocation rl = ForgeRegistries.ITEMS.getKey(this.item.value());
+                return rl != null ? rl.toString() : this.item.value().toString();
+            });
+
+        return "RodType [item: " + itemName +
                 ", baseRodHeat: " + this.baseRodHeat().get() +
                 ", proximityRodHeat: " + this.proximityRodHeat().get() +
                 ", rodTimer: " + this.rodTimer().get() +

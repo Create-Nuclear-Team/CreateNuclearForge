@@ -55,10 +55,10 @@ public class DefaultHeatCalculator implements IHeatCalculator {
             ItemStack currentStack = entry.getValue();
             RodType rod = RodType.resolveRodType(currentStack.getItem(), level);
             String currentRod = "";
-            if (rod.items().size() > 0 && rod.type() == RodType.TypeRod.FUEL) {
+            if (rod.isNotEmptyItem() && rod.type() == RodType.TypeRod.FUEL) {
                 heat += rod.baseRodHeat().get();
                 currentRod = "fuel";
-            } else if (rod.items().size() > 0 && rod.type() == RodType.TypeRod.COOLER) {
+            } else if (rod.isNotEmptyItem() && rod.type() == RodType.TypeRod.COOLER) {
                 heat += rod.baseRodHeat().get();
                 currentRod = "cooler";
             }
@@ -79,9 +79,9 @@ public class DefaultHeatCalculator implements IHeatCalculator {
                             if ("fuel".equals(currentRod)) {
                                 ItemStack stack = actualRods.get(neighborSlot);
                                 RodType neighborRod = RodType.resolveRodType(stack.getItem(), level);
-                                if (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.FUEL) {
+                                if (neighborRod.isNotEmptyItem() && neighborRod.type() == RodType.TypeRod.FUEL) {
                                     heat += rod.proximityRodHeat().get();
-                                } else if (neighborRod.items().size() > 0 && neighborRod.type() == RodType.TypeRod.COOLER) {
+                                } else if (neighborRod.isNotEmptyItem() && neighborRod.type() == RodType.TypeRod.COOLER) {
                                     heat += rod.baseRodHeat().get() / neighborRod.proximityRodHeat().get();
                                 }
                             }
