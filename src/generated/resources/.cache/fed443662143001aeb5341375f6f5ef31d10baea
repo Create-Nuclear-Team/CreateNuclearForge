@@ -1,4 +1,4 @@
-// 1.20.1	2026-07-25T12:28:12.5162369	CreateNuclear Generated Registry Entries
+// 1.20.1	2026-07-25T13:29:59.5906396	CreateNuclear Generated Registry Entries
 46e263393c1672a180bc12b99f9e39adf22e66b5 data/createnuclear/createnuclear/fluids/type/fallback.json
 2837d5ecbd5735f39c1fac545469486e09c502e0 data/createnuclear/createnuclear/fluids/type/nitrogen.json
 152a58adb9f86e1c9fac62fd2095ba8413142568 data/createnuclear/createnuclear/fluids/type/water.json
@@ -11,7 +11,7 @@
 1d15657126bab7c0b4355d0dcb9addc2d417ed01 data/createnuclear/forge/biome_modifier/thorium_ore.json
 fa32145101dc12ec914684fec8c5cbb995d2c051 data/createnuclear/forge/biome_modifier/uranium_ore.json
 a3399faccac4549c2c7d41a5863883ecea074e99 data/createnuclear/worldgen/biome/irradiated_land.json
-211d1391981d173b8bc490e5af1471441e1df37f data/createnuclear/worldgen/configured_feature/lead_ore.json
+d9a89f0f1804d33867b4e0c28cbe0cf69ce131f5 data/createnuclear/worldgen/configured_feature/lead_ore.json
 c3bb421f6bf5a02b09a178d4d1f003679b86c919 data/createnuclear/worldgen/configured_feature/nitrate_ore.json
 4f11c0a518c0de7857919983fc638ba551c6630a data/createnuclear/worldgen/configured_feature/striated_ores_overworld.json
 aaa284a4e57635bf05f4539125b33a2f9176ed5b data/createnuclear/worldgen/configured_feature/thorium_ore.json
@@ -22,6 +22,6 @@ b0e1ee7314412507fd7346cb48b29d105f6186ad data/createnuclear/worldgen/configured_
 ea836bafce53bcb743cb2de5ba38271291483865 data/createnuclear/worldgen/noise_settings/irradiated_noise.json
 f11d981e79cf92130a47ad564925d7be26ffbc0b data/createnuclear/worldgen/placed_feature/lead_ore.json
 e69f61cbb4bf2c50a6123ddc87c024c801bb78d1 data/createnuclear/worldgen/placed_feature/nitrate_ore.json
-b46fca88702d24526baa96e08b6b09b7c43e0563 data/createnuclear/worldgen/placed_feature/striated_ores_overworld.json
-403caabb9eefec1012db63d6cbd5c1f22ac9e88d data/createnuclear/worldgen/placed_feature/thorium_ore.json
-3ecef6758d08745789d07e23377e348cf1ddb126 data/createnuclear/worldgen/placed_feature/uranium_ore.json
+d0e47433fc86ee2acd9dde56f0465aae54fe5fe0 data/createnuclear/worldgen/placed_feature/striated_ores_overworld.json
+5e64cf339847e8c89e4bbb94a2382262a0ce66ac data/createnuclear/worldgen/placed_feature/thorium_ore.json
+148db47005efc228a743e41fd60011b8bff8e78a data/createnuclear/worldgen/placed_feature/uranium_ore.json

@@ -76,6 +76,10 @@ La dette la plus structurelle reste **l'absence de tests sur la majorité du cod
 5. ~~**`CreateNuclearJEI`** — champ statique mutable `Categories`~~ — **résolu** (`e7900959`, 2026-07-13) : converti en champ d'instance `allCategories`, enfilé explicitement dans `CategoryBuilder`. Voir §8.1.
 6. **`CNPonderReactorScenes.showReactorStructure`** — boucle triple (~11×13×13) avec comparaisons positionnelles ; coût ponctuel (ouverture ponder), remplaçable par une `Map` précalculée.
 
+### ⏸️ Worldgen minerais — écarts relevés, **mis en attente à la demande de l'utilisateur (2026-07-25), à trancher plus tard**
+
+7. **Nitrate Ore — mécanisme de drop incohérent avec Thorium/Uranium** ([nitrate_ore.json](src/generated/resources/data/createnuclear/loot_tables/blocks/nitrate_ore.json)) : utilise la formule vanilla `minecraft:ore_drops` (bonus probabiliste façon charbon/diamant, count de base implicite = 1) alors que Thorium et Uranium utilisent `set_count` (min/max explicite) + `uniform_bonus_count` (`bonusMultiplier` fixe). Pas forcément un bug — peut être volontaire — mais rupture de pattern à trancher : soit harmoniser Nitrate sur le même système, soit documenter que c'est intentionnel.
+
 ---
 
 ## 3. 🏗️ Architecture — points encore ouverts
