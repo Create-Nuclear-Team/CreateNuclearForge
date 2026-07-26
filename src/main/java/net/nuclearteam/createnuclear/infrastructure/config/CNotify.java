@@ -3,8 +3,8 @@ package net.nuclearteam.createnuclear.infrastructure.config;
 import net.createmod.catnip.config.ConfigBase;
 
 public class CNotify extends ConfigBase {
-    public final ConfigBool warnAllPlayers = b(false, "Warn all players", Comments.warning);
-    public final ConfigInt warningDistance = i(100, 30, 5000, "Distance of warning", Comments.rangeOfWarning);
+    public final ConfigBool warnAllPlayers = b(false, "warn_all_players", Comments.warning);
+    public final ConfigInt warningDistance = i(100, 30, 5000, "warning_distance_blocks", Comments.rangeOfWarning);
 
     @Override
     public String getName() {

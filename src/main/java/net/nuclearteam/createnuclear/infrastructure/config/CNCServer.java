@@ -9,6 +9,7 @@ public class CNCServer extends ConfigBase {
     public final CReactorHeat reactorHeat = nested(0, CReactorHeat::new, Comments.reactorHeat);
     public final CBiomeRestore biomeRestore = nested(0, CBiomeRestore::new, Comments.biomeRestore);
 
+
     @Override
     public String getName() {
         return "Server";
@@ -20,5 +21,6 @@ public class CNCServer extends ConfigBase {
         static String notify = "Notification settings for reactor warnings.";
         static String reactorHeat = "Heat thresholds for different reactor sizes";
         static String biomeRestore = "";
+
     }
 }

@@ -8,13 +8,13 @@ import java.util.List;
 
 @MethodsReturnNonnullByDefault
 public class CRadiation extends ConfigBase {
-    public final ConfigBool enabledItemRadiation = b(true, "enabledItemRadiation", Comments.enabled);
-    public final ConfigInt radiationLevel1 = i(10, 0, 50, "radiationLevel1", Comments.radiationLevel1);
-    public final ConfigInt radiationLevel2 = i(25, 0, 50, "radiationLevel2", Comments.radiationLevel2);
-    public final ConfigInt radiationLevel3 = i(50, 0, 50, "radiationLevel3", Comments.radiationLevel3);
-    public final ConfigInt amplifierLevel0 = i(0, 0, 10, "amplifierLevel0", Comments.amplifierLevel0);
-    public final ConfigInt amplifierLevel1 = i(1, 0, 10, "amplifierLevel1", Comments.amplifierLevel1);
-    public final ConfigInt amplifierLevel2 = i(2, 0, 10, "amplifierLevel2", Comments.amplifierLevel2);
+    public final ConfigBool enabledItemRadiation = b(true, "enabled_item_radiation", Comments.enabled);
+    public final ConfigInt radiationLevel1 = i(10, 0, 50, "radiation_level_1", Comments.radiationLevel1);
+    public final ConfigInt radiationLevel2 = i(25, 0, 50, "radiation_level_2", Comments.radiationLevel2);
+    public final ConfigInt radiationLevel3 = i(50, 0, 50, "radiation_level_3", Comments.radiationLevel3);
+    public final ConfigInt amplifierLevel0 = i(0, 0, 10, "amplifier_level_0", Comments.amplifierLevel0);
+    public final ConfigInt amplifierLevel1 = i(1, 0, 10, "amplifier_level_1", Comments.amplifierLevel1);
+    public final ConfigInt amplifierLevel2 = i(2, 0, 10, "amplifier_level_2", Comments.amplifierLevel2);
     public final ConfiguredLists configuredLists = nested(0, ConfiguredLists::new, Comments.list);
 
     @Override

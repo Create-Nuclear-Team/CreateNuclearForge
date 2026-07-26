@@ -1,12 +1,11 @@
 package net.nuclearteam.createnuclear.infrastructure.config;
 
 import net.createmod.catnip.config.ConfigBase;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.nuclearteam.createnuclear.CNParticleTypes;
 
 public class CNCClient extends ConfigBase {
     public final ConfigBool nuclearBombFlash = b(true, "nuclear_bomb_flash", Comments.nuclearBombFlash);
     public final ConfigBool screenShaking = b(true, "screen_shake", Comments.screenShaking);
+
 
     @Override
     public String getName() { return "Client"; }
