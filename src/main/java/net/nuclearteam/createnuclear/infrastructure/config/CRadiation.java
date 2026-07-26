@@ -3,6 +3,7 @@ package net.nuclearteam.createnuclear.infrastructure.config;
 import net.createmod.catnip.config.ConfigBase;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class CRadiation extends ConfigBase {
     }
 
     public static class ConfiguredLists extends ConfigBase {
-        private static ForgeConfigSpec.ConfigValue<List<? extends String>> ENTITY_BLACKLIST = null;
+        private static ConfigValue<List<? extends String>> ENTITY_BLACKLIST = null;
 
         @Override
         public void registerAll(ForgeConfigSpec.Builder builder) {
