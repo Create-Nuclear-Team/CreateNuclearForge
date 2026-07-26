@@ -101,14 +101,14 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
 
     @Override
     public int updateHeatOnly(ItemStack configuredPattern, ReactorDisplayState displayState, BigFluidStack fluidStack,
-                              int totalHeatRatio, ReactorControllerInventory inventory, Level level, boolean assembled) {
+                              int totalHeatRatio, int previousHeat, ReactorControllerInventory inventory, Level level, boolean assembled) {
         int heat = 0;
         boolean emptyPattern = configuredPattern.isEmpty() || configuredPattern.getOrCreateTag().isEmpty();
         if (!emptyPattern && assembled) {
             boolean allAvailable = checkPatternAvailability(configuredPattern, displayState,
                     (item, requiredCount, availableCount) -> availableCount >= requiredCount);
             if (allAvailable) {
-                heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, inventory, level, displayState);
+                heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, previousHeat, inventory, level, displayState);
             }
         }
         configuredPattern.getOrCreateTag().putDouble("heat", heat);
@@ -116,9 +116,9 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
     }
 
     @Override
-    public int calculateAndWriteHeat(ItemStack configuredPattern, BigFluidStack fluidStack, int totalHeatRatio,
+    public int calculateAndWriteHeat(ItemStack configuredPattern, BigFluidStack fluidStack, int totalHeatRatio, int previousHeat,
                                      ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
-        int heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, inventory, level, displayState);
+        int heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, previousHeat, inventory, level, displayState);
         configuredPattern.getOrCreateTag().putDouble("heat", heat);
         return heat;
     }

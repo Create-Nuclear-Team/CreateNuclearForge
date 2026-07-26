@@ -1,15 +1,10 @@
 package net.nuclearteam.createnuclear.content.multiblock.reactorLogic;
 
-import com.simibubi.create.content.logistics.BigItemStack;
 import net.minecraft.world.level.Level;
-import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
-import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
-import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
 /**
  * HeatManager facade delegating to extracted components (in separate files).
@@ -27,9 +22,9 @@ public class HeatManager {
         this(new DefaultHeatCalculator(), new DefaultOverheatController());
     }
 
-    public double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
+    public double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, int previousHeat, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
         ReactorFluidType type = bigFluidStack == null ? null : bigFluidStack.getFluidtype(level);
-        overheatController.updateState(totalHeatRatio, bigFluidStack, type);
+        overheatController.updateState(totalHeatRatio, previousHeat, bigFluidStack, type);
 
         return calculator.computeHeat(bigFluidStack, type, inventory, overheatController.getOverHeat(), displayState, level);
     }

@@ -19,7 +19,7 @@ public class DefaultHeatService implements IHeatService {
     }
 
     @Override
-    public double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
-        return impl.calculateHeat(bigFluidStack, totalHeatRatio, inventory, level, displayState);
+    public double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, int previousHeat, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
+        return impl.calculateHeat(bigFluidStack, totalHeatRatio, previousHeat, inventory, level, displayState);
     }
 }

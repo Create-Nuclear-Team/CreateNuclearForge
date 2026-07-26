@@ -31,7 +31,7 @@ public interface IReactorHeatUpdateCoordinator {
      * @return the calculated heat, also written to the configured pattern's tag
      */
     int updateHeatOnly(ItemStack configuredPattern, ReactorDisplayState displayState, BigFluidStack fluidStack,
-                       int totalHeatRatio, ReactorControllerInventory inventory, Level level, boolean assembled);
+                       int totalHeatRatio, int previousHeat, ReactorControllerInventory inventory, Level level, boolean assembled);
 
     /**
      * Calculates the reactor's heat during normal operation and writes it to
@@ -39,6 +39,6 @@ public interface IReactorHeatUpdateCoordinator {
      *
      * @return the calculated heat
      */
-    int calculateAndWriteHeat(ItemStack configuredPattern, BigFluidStack fluidStack, int totalHeatRatio,
+    int calculateAndWriteHeat(ItemStack configuredPattern, BigFluidStack fluidStack, int totalHeatRatio, int previousHeat,
                               ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState);
 }

@@ -8,5 +8,5 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.display.React
 public interface IHeatService {
     int getLiquidTimer();
 
-    double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState);
+    double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, int previousHeat, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState);
 }

@@ -11,10 +11,12 @@ class DefaultOverheatController implements IOverheatController {
     private final int liquidTimer = 3600;
 
     @Override
-    public void updateState(int totalHeatRatio, BigFluidStack bigFluidStack, ReactorFluidType type) {
+    public void updateState(int totalHeatRatio, int currentHeat, BigFluidStack bigFluidStack, ReactorFluidType type) {
         int fluidAmount = bigFluidStack == null ? 0 : bigFluidStack.amount;
         int fluidEfficiency = type == null ? -1 : type.efficiency();
-        if (totalHeatRatio > 0 || fluidEfficiency == -1 || fluidAmount < fluidEfficiency) {
+        boolean exceedsFluidMaxHeat = type != null && Math.abs(currentHeat) > type.maxHeat();
+
+        if (totalHeatRatio > 0 || fluidEfficiency == -1 || fluidAmount < fluidEfficiency || exceedsFluidMaxHeat) {
             overFlowHeatTimer++;
             if (overFlowHeatTimer >= overFlowLimiter) {
                 overHeat += 1;

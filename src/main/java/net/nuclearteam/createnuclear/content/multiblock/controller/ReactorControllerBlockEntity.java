@@ -409,7 +409,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
      */
     private void handleAssembledState() {
         if (!heatCoordinator.canRun(configuredPattern, displayState, inputFluidManager, level, isAssembled())) {
-            heatCoordinator.updateHeatOnly(configuredPattern, displayState, currentFluidStack(), totalHeatRatio, inventory, level, isAssembled());
+            heatCoordinator.updateHeatOnly(configuredPattern, displayState, currentFluidStack(), totalHeatRatio, heat, inventory, level, isAssembled());
             if (!outputManager.getBlocksPosition(getLevel()).isEmpty()) {
                 outputManager.rotateOutputs(getLevel(), getAssembled(), 0);
             }
@@ -423,7 +423,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         notifyUpdate();
 
         BigFluidStack fluidStack = currentFluidStack();
-        heat = heatCoordinator.calculateAndWriteHeat(configuredPattern, fluidStack, totalHeatRatio, inventory, level, displayState);
+        heat = heatCoordinator.calculateAndWriteHeat(configuredPattern, fluidStack, totalHeatRatio, heat, inventory, level, displayState);
         fluidBuffer = fluidRateCalculator.tick(fluidStack, reactorSize, level, inputFluidManager, fluidBuffer);
         cycleManager.update(configuredPattern, level, inputManager, level.getGameTime() % 20 == 0);
 

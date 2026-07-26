@@ -337,8 +337,16 @@ public record RodType(Holder<Item> item,
             return IS_NOT_NULL.test(stack) && RodType.resolveRodType(stack.getItem(), level).type == TypeRod.FUEL;
         }
 
+        public static boolean isFuel(RodType rodType) {
+            return rodType != null && rodType.type() == TypeRod.FUEL;
+        }
+
         public static boolean isCooled(ItemStack stack, Level level) {
             return IS_NOT_NULL.test(stack) && RodType.resolveRodType(stack.getItem(), level).type == TypeRod.COOLER;
+        }
+
+        public static boolean isCooled(RodType rodType) {
+            return rodType != null && rodType.type() == TypeRod.COOLER;
         }
 
         public static String tooltipKey(ItemStack stack, Level level) {
