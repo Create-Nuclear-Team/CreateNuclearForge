@@ -13,11 +13,13 @@ import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBlu
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DefaultHeatCalculator implements IHeatCalculator {
-    private final int[][] formattedPattern = new int[][]{
+    private static final int[][] FORMATTED_PATTERN = new int[][]{
             {99,99,99,0,1,2,99,99,99},
             {99,99,3,4,5,6,7,99,99},
             {99,8,9,10,11,12,13,14,99},
@@ -28,7 +30,34 @@ public class DefaultHeatCalculator implements IHeatCalculator {
             {99,99,49,50,51,52,53,99,99},
             {99,99,99,54,55,56,99,99,99}
     };
-    private final int[][] offsets = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
+    private static final int[][] OFFSETS = { {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
+
+    private static final Map<Integer, List<Integer>> NEIGHBORS_BY_SLOT = buildNeighborsBySlot();
+
+    private static Map<Integer, List<Integer>> buildNeighborsBySlot() {
+        Map<Integer, List<Integer>> result = new HashMap<>();
+        for (int row = 0; row < FORMATTED_PATTERN.length; row++) {
+            for (int col = 0; col < FORMATTED_PATTERN[row].length; col++) {
+                int slot = FORMATTED_PATTERN[row][col];
+                if (slot == 99) continue;
+
+                List<Integer> neighbors = new ArrayList<>();
+                for (int[] offset : OFFSETS) {
+                    int nj = row + offset[0];
+                    int nk = col + offset[1];
+
+                    if (nj < 0 || nj >= FORMATTED_PATTERN.length || nk < 0 || nk >= FORMATTED_PATTERN[nj].length) continue;
+
+                    int neighborSlot = FORMATTED_PATTERN[nj][nk];
+                    if (neighborSlot != 99) neighbors.add(neighborSlot);
+                }
+
+                result.put(slot, neighbors);
+            }
+        }
+
+        return result;
+    }
 
     @Override
     public double computeHeat(BigFluidStack bigFluidStack, ReactorFluidType type, ReactorControllerInventory inventory, double overHeat, ReactorDisplayState displayState, Level level) {
@@ -63,27 +92,17 @@ public class DefaultHeatCalculator implements IHeatCalculator {
             heat += rod.baseRodHeat().get();
 
             // find position in formattedPattern and check neighbors
-            for (int j = 0; j < formattedPattern.length; j++) {
-                for (int k = 0; k < formattedPattern[j].length; k++) {
-                    if (slot != formattedPattern[j][k]) continue;
+            for (int neighborSlot : NEIGHBORS_BY_SLOT.getOrDefault(slot, List.of())) {
+                ItemStack neighborStack = actualRods.get(neighborSlot);
+                if (neighborStack == null) continue;
 
-                    for (int[] offset : offsets) {
-                        int nj = j + offset[0];
-                        int nk = k + offset[1];
-                        if (nj < 0 || nj >= formattedPattern.length || nk < 0 || nk >= formattedPattern[j].length) continue;
+                RodType neighborRod = RodType.resolveRodType(neighborStack.getItem(), level);
+                if (!neighborRod.isNotEmptyItem()) continue;
 
-                        ItemStack neighborStack = actualRods.get(formattedPattern[nj][nk]);
-                        if (neighborStack == null) continue;
-
-                        RodType neighborRod = RodType.resolveRodType(neighborStack.getItem(), level);
-                        if (!neighborRod.isNotEmptyItem()) continue;
-
-                        if (TypeRodPredicate.isFuel(rod) && TypeRodPredicate.isFuel(neighborRod)) {
-                            heat += rod.proximityRodHeat().get();
-                        } else if (TypeRodPredicate.isCooled(rod) && TypeRodPredicate.isFuel(neighborRod)) {
-                            heat += neighborRod.baseRodHeat().get() * rod.proximityRodHeat().get();
-                        }
-                    }
+                if (TypeRodPredicate.isFuel(rod) && TypeRodPredicate.isFuel(neighborRod)) {
+                    heat += rod.proximityRodHeat().get();
+                } else if (TypeRodPredicate.isCooled(rod) && TypeRodPredicate.isFuel(neighborRod)) {
+                    heat += neighborRod.baseRodHeat().get() * rod.proximityRodHeat().get();
                 }
             }
         }
