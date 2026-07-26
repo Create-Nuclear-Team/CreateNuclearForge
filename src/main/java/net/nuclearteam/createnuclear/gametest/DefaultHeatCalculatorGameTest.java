@@ -102,34 +102,42 @@ public class DefaultHeatCalculatorGameTest {
 
         ReactorDisplayState displayState = new ReactorDisplayState(Map.of(graphite, 1), List.of(), 0);
 
-        double heat = CALCULATOR.computeHeat(null, null, inventory, /*overHeat*/ 0.0, displayState, helper.getLevel());
+        // computeHeat clamps its result to a minimum of 0 (Math.max(0, heat+overHeat)); an isolated
+        // cooler's own baseRodHeat is negative by default, so a large overHeat is added here to keep
+        // the total positive and actually observe baseRodHeat's contribution instead of it being
+        // swallowed by the floor.
+        double overHeat = 50.0;
 
-        helper.assertTrue(Math.abs(heat - baseRodHeat) < DELTA,
+        double heat = CALCULATOR.computeHeat(null, null, inventory, overHeat, displayState, helper.getLevel());
+
+        helper.assertTrue(Math.abs(heat - (baseRodHeat + overHeat)) < DELTA,
                 "a cooler contributes its own baseRodHeat exactly like a fuel rod would, when isolated: expected "
-                        + baseRodHeat + ", got " + heat);
+                        + (baseRodHeat + overHeat) + ", got " + heat);
         helper.succeed();
     }
 
     // ================================================================
-    // 3. fuel/cooler mix adjacency: documents the fuel<->cooler asymmetry (AUDIT_ACTUEL.md §2.2)
+    // 3. fuel/cooler mix adjacency: cooler scans its own fuel neighbors symmetrically
+    //    to a fuel rod (AUDIT_ACTUEL.md §2.2, fixed 2026-07-26 to match the wiki
+    //    calculator / external spec: "Graphite extra: -1/4Q of the heating rod")
     // ================================================================
 
     /**
      * Layout (row 3 of {@code formattedPattern}, three consecutive slots):
      * uranium A (18) - thorium B (19) - graphite C (20).
      * <p>
-     * Expected total = sum of each rod's own baseRodHeat, PLUS proximity contributions that only
-     * ever originate from a FUEL rod's own neighbor scan (a cooler's scan never contributes,
-     * even though its neighbor is a fuel rod):
+     * Expected total = sum of each rod's own baseRodHeat, PLUS proximity contributions from
+     * both fuel-fuel and cooler-fuel adjacency (cooler-cooler and fuel-cooler-from-the-fuel-side
+     * contribute nothing):
      * <ul>
      *   <li>A's scan (fuel, neighbor B is fuel) -&gt; + A.proximityRodHeat()</li>
      *   <li>B's scan (fuel, neighbor A is fuel) -&gt; + B.proximityRodHeat()</li>
-     *   <li>B's scan (fuel, neighbor C is cooler) -&gt; + B.baseRodHeat() / C.proximityRodHeat()</li>
-     *   <li>C's scan (cooler) -&gt; nothing at all, regardless of its fuel neighbor B</li>
+     *   <li>B's scan (fuel, neighbor C is cooler) -&gt; contributes nothing (fuel only scores against fuel neighbors)</li>
+     *   <li>C's scan (cooler, neighbor B is fuel) -&gt; + B.baseRodHeat() * C.proximityRodHeat()</li>
      * </ul>
      */
     @GameTest(template = STRUCTURE)
-    public static void fuelCoolerMix_onlyFuelScansContributeProximityHeat_coolerAdjacencyIsAsymmetric(GameTestHelper helper) {
+    public static void fuelCoolerMix_coolerScansItsOwnFuelNeighborsSymmetrically(GameTestHelper helper) {
         Item uranium = CNItems.URANIUM_ROD.get();
         Item thorium = CNItems.THORIUM_ROD.get();
         Item graphite = CNItems.GRAPHITE_ROD.get();
@@ -150,15 +158,76 @@ public class DefaultHeatCalculatorGameTest {
         double heat = CALCULATOR.computeHeat(null, null, inventory, /*overHeat*/ 0.0, displayState, helper.getLevel());
 
         double expected = (uraniumBase + thoriumBase + graphiteBase)  // each rod's own baseRodHeat
-                + uraniumProxy    // A's scan: fuel neighbor B (thorium) -> addition
-                + thoriumProxy    // B's scan: fuel neighbor A (uranium) -> addition
-                + (thoriumBase / graphiteProxy);
-                // B's scan: cooler neighbor C -> division (fuel.base / cooler.proximity)
-                // C's scan contributes 0: a cooler never examines its own neighbors
+                + uraniumProxy              // A's scan: fuel neighbor B (thorium) -> addition
+                + thoriumProxy              // B's scan: fuel neighbor A (uranium) -> addition
+                + (thoriumBase * graphiteProxy);
+                // C's scan: fuel neighbor B (thorium) -> multiplication (neighbor's base * cooler's own proximity)
+                // B's scan towards C contributes 0: fuel only scores against fuel neighbors
 
         helper.assertTrue(Math.abs(heat - expected) < DELTA,
-                "cooler-side proximity must not contribute anything, even though C is adjacent to fuel rod B: expected "
+                "cooler must score its own malus against its fuel neighbor: expected "
                         + expected + ", got " + heat);
+        helper.succeed();
+    }
+
+    // ================================================================
+    // 4. 3x3 diamond of rods: cross-checked against the community wiki calculator
+    // ================================================================
+
+    /**
+     * Layout (rows 3-5, columns 3-5 of {@code formattedPattern} — a fully interior 3x3 block,
+     * every position outside it stays empty so neighbor counts match an isolated 3x3 grid):
+     * <pre>
+     * graphite(18) thorium(19) graphite(20)
+     * thorium(27)  uranium(28) thorium(29)
+     * graphite(36) thorium(37) graphite(38)
+     * </pre>
+     * With the mod's default balance values this totals {@code 128}, matching the value produced
+     * by the community wiki calculator for the same pattern (verified by hand during the JS/Java
+     * comparison audit, see AUDIT_ACTUEL.md §0/§2.2) — but the assertion below is derived from the
+     * live config, not hardcoded, so it stays correct if the default balance changes:
+     * <ul>
+     *   <li>4 corner graphites, each with 2 thorium neighbors -&gt;
+     *       {@code graphiteBase + 2 * (thoriumBase * graphiteProxy)} each</li>
+     *   <li>4 edge thoriums, each with 2 graphite neighbors (ignored, cooler) + 1 uranium neighbor (fuel) -&gt;
+     *       {@code thoriumBase + thoriumProxy} each</li>
+     *   <li>1 center uranium, with 4 thorium neighbors (all fuel) -&gt;
+     *       {@code uraniumBase + 4 * uraniumProxy}</li>
+     * </ul>
+     */
+    @GameTest(template = STRUCTURE)
+    public static void threeByThreeDiamond_matchesWikiCalculatorReferenceValue(GameTestHelper helper) {
+        Item uranium = CNItems.URANIUM_ROD.get();
+        Item thorium = CNItems.THORIUM_ROD.get();
+        Item graphite = CNItems.GRAPHITE_ROD.get();
+
+        int uraniumBase = CNConfigs.server().rods.uraniumBaseValue.get();
+        float uraniumProxy = CNConfigs.server().rods.uraniumProximityBonus.get();
+        int thoriumBase = CNConfigs.server().rods.baseValueThorium.get();
+        float thoriumProxy = CNConfigs.server().rods.thoriumProxyBonus.get();
+        int graphiteBase = CNConfigs.server().rods.graphiteBaseValue.get();
+        float graphiteProxy = CNConfigs.server().rods.graphiteProximityMalus.getF();
+
+        ReactorControllerInventory inventory = placeController(helper, new BlockPos(1, 1, 1));
+        loadPattern(inventory, Map.ofEntries(
+                Map.entry(18, graphite), Map.entry(19, thorium), Map.entry(20, graphite),
+                Map.entry(27, thorium), Map.entry(28, uranium), Map.entry(29, thorium),
+                Map.entry(36, graphite), Map.entry(37, thorium), Map.entry(38, graphite)
+        ));
+
+        ReactorDisplayState displayState = new ReactorDisplayState(
+                Map.of(uranium, 1, thorium, 4, graphite, 4), List.of(), 0);
+
+        double heat = CALCULATOR.computeHeat(null, null, inventory, /*overHeat*/ 0.0, displayState, helper.getLevel());
+
+        double cornerGraphite = graphiteBase + 2 * (thoriumBase * graphiteProxy);
+        double edgeThorium = thoriumBase + thoriumProxy;
+        double centerUranium = uraniumBase + 4 * uraniumProxy;
+        double expected = 4 * cornerGraphite + 4 * edgeThorium + centerUranium;
+
+        helper.assertTrue(Math.abs(heat - expected) < DELTA,
+                "3x3 diamond should match the wiki calculator's reference value for this pattern: expected "
+                        + expected + " (128 with default balance), got " + heat);
         helper.succeed();
     }
 }
