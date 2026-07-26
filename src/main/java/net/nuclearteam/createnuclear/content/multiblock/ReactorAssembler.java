@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
@@ -25,7 +24,7 @@ import java.util.List;
 
 public final class ReactorAssembler {
 
-    public static final int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+    public static final int configRadius = CNConfigs.server().notify.warningDistance.get();
     public static final boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
     private ReactorAssembler() {}

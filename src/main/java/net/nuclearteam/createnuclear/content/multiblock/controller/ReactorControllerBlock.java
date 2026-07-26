@@ -31,7 +31,6 @@ import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.ReactorAssembler;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
-import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
@@ -151,7 +150,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
           if (!state.getValue(ASSEMBLED))
             return;
 
-        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        int configRadius = CNConfigs.server().notify.warningDistance.get();
         boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
         NotifyUtil.sendActionBar(worldIn, pos,
                 CreateNuclearLang.translate("notification.reactor.disassembled"),

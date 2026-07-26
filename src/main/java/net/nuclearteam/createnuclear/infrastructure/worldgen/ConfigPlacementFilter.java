@@ -14,7 +14,7 @@ public class ConfigPlacementFilter extends PlacementFilter {
 
     @Override
     protected boolean shouldPlace(PlacementContext pContext, RandomSource pRandom, BlockPos pPos) {
-        return !CNConfigs.common().worldGen.disable.get();
+        return CNConfigs.common().worldGen.enable.get();
     }
 
     @Override

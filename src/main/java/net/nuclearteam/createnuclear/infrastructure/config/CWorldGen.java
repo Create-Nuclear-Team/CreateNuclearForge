@@ -3,7 +3,7 @@ package net.nuclearteam.createnuclear.infrastructure.config;
 import net.createmod.catnip.config.ConfigBase;
 
 public class CWorldGen extends ConfigBase {
-    public final ConfigBool disable = b(false, "disableWorldGen", Comments.disable);
+    public final ConfigBool enable = b(true, "EnableWorldGen", Comments.enable);
 
     @Override
     public String getName() {
@@ -11,6 +11,6 @@ public class CWorldGen extends ConfigBase {
     }
 
     private static class Comments {
-        static String disable = "Prevents all worldgen added by Create from taking effect";
+        static String enable = "When true, CreateNuclear world generation features are active. Set to false to disable all added ores/structures.";
     }
 }

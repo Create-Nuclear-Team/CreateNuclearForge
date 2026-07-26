@@ -95,7 +95,7 @@ public class DefaultHeatCalculatorGameTest {
     @GameTest(template = STRUCTURE)
     public static void singleCoolerRod_noNeighbors_addsOnlyItsOwnBaseRodHeat(GameTestHelper helper) {
         Item graphite = CNItems.GRAPHITE_ROD.get();
-        int baseRodHeat = CNConfigs.server().rods.baseValueGraphite.get();
+        int baseRodHeat = CNConfigs.server().rods.graphiteBaseValue.get();
 
         ReactorControllerInventory inventory = placeController(helper, new BlockPos(1, 1, 1));
         loadPattern(inventory, Map.of(18, graphite));
@@ -134,12 +134,12 @@ public class DefaultHeatCalculatorGameTest {
         Item thorium = CNItems.THORIUM_ROD.get();
         Item graphite = CNItems.GRAPHITE_ROD.get();
 
-        int uraniumBase = CNConfigs.server().rods.baseValueUranium.get();
-        float uraniumProxy = CNConfigs.server().rods.uraniumProxyBonus.get();
+        int uraniumBase = CNConfigs.server().rods.uraniumBaseValue.get();
+        float uraniumProxy = CNConfigs.server().rods.uraniumProximityBonus.get();
         int thoriumBase = CNConfigs.server().rods.baseValueThorium.get();
         float thoriumProxy = CNConfigs.server().rods.thoriumProxyBonus.get();
-        int graphiteBase = CNConfigs.server().rods.baseValueGraphite.get();
-        float graphiteProxy = CNConfigs.server().rods.graphiteProxyMalus.getF();
+        int graphiteBase = CNConfigs.server().rods.graphiteBaseValue.get();
+        float graphiteProxy = CNConfigs.server().rods.graphiteProximityMalus.getF();
 
         ReactorControllerInventory inventory = placeController(helper, new BlockPos(1, 1, 1));
         loadPattern(inventory, Map.of(18, uranium, 19, thorium, 20, graphite));

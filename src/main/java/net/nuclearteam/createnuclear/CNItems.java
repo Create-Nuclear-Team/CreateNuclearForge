@@ -122,8 +122,8 @@ public class CNItems {
         GRAPHITE_ROD = CreateNuclear.REGISTRATE
             .item("graphite_rod", Item::new)
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .baseRodHeat(() -> CNConfigs.server().rods.baseValueGraphite.get())
-                .proximityRodHeat(() -> CNConfigs.server().rods.graphiteProxyMalus.getF())
+                .baseRodHeat(() -> CNConfigs.server().rods.graphiteBaseValue.get())
+                .proximityRodHeat(() -> CNConfigs.server().rods.graphiteProximityMalus.getF())
                 .rodTimer(() -> CNConfigs.server().rods.graphiteRodLifetime.get())
                 .heatRatio(() -> CNConfigs.server().rods.graphiteHeatRatio.get())
                 .coolerRodType()))
@@ -165,8 +165,8 @@ public class CNItems {
         URANIUM_ROD = CreateNuclear.REGISTRATE
             .item("uranium_rod", p -> new RadiationItem(p, 100))
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .baseRodHeat(() -> CNConfigs.server().rods.baseValueUranium.get())
-                .proximityRodHeat(() ->(float) CNConfigs.server().rods.uraniumProxyBonus.get())
+                .baseRodHeat(() -> CNConfigs.server().rods.uraniumBaseValue.get())
+                .proximityRodHeat(() ->(float) CNConfigs.server().rods.uraniumProximityBonus.get())
                 .rodTimer(() -> CNConfigs.server().rods.uraniumRodLifetime.get())
                 .heatRatio(() -> CNConfigs.server().rods.uraniumHeatRatio.get())
                 .fuelRodType()))

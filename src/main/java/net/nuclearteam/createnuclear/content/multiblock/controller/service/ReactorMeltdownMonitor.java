@@ -22,7 +22,7 @@ public class ReactorMeltdownMonitor implements IReactorMeltdownMonitor {
 
     @Override
     public MeltdownState tick(Level level, BlockPos pos, boolean isDanger) {
-        int configRadius = CNConfigs.server().notify.distanceOfWarning.get();
+        int configRadius = CNConfigs.server().notify.warningDistance.get();
         boolean configWarnAll = CNConfigs.server().notify.warnAllPlayers.get();
 
         if (!isDanger) {

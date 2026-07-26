@@ -10,7 +10,7 @@ public interface IExplosionService {
 
     default void triggerExplosion(ServerLevel level, BlockPos controllerPos, int reactorSize, int countFuelRod) {
         triggerExplosion(level, controllerPos, reactorSize,
-                            countFuelRod, CNConfigs.server().notify.distanceOfWarning.get(),
+                            countFuelRod, CNConfigs.server().notify.warningDistance.get(),
                             CNConfigs.server().notify.warnAllPlayers.get()
         );
     }
