@@ -80,7 +80,7 @@ public class DefaultHeatCalculator implements IHeatCalculator {
 
                         if (TypeRodPredicate.isFuel(rod) && TypeRodPredicate.isFuel(neighborRod)) {
                             heat += rod.proximityRodHeat().get();
-                        } else if (TypeRodPredicate.isCooled(rod) && TypeRodPredicate.isCooled(neighborRod)) {
+                        } else if (TypeRodPredicate.isCooled(rod) && TypeRodPredicate.isFuel(neighborRod)) {
                             heat += neighborRod.baseRodHeat().get() * rod.proximityRodHeat().get();
                         }
                     }
