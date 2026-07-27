@@ -53,15 +53,6 @@
     ],
     "subtitle": "createnuclear.subtitle.explosion/nuclear_explosion"
   },
-  "explosion/nuclear_explosion_ringing": {
-    "sounds": [
-      {
-        "type": "file",
-        "name": "createnuclear:explosion/nuclear_explosion_ringing"
-      }
-    ],
-    "subtitle": "createnuclear.subtitle.explosion/nuclear_explosion_ringing"
-  },
   "explosion/nuclear_explosion_rumble": {
     "sounds": [
       {
@@ -70,6 +61,15 @@
       }
     ],
     "subtitle": "createnuclear.subtitle.explosion/nuclear_explosion_rumble"
+  },
+  "explosion/ringing": {
+    "sounds": [
+      {
+        "type": "file",
+        "name": "createnuclear:explosion/ringing"
+      }
+    ],
+    "subtitle": "createnuclear.subtitle.explosion/ringing"
   },
   "explosion/rumble": {
     "sounds": [

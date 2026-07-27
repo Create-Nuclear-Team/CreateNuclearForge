@@ -95,7 +95,7 @@ public class CNSoundEvents {
             .category(SoundSource.AMBIENT)
             .build(),
 
-        NUCLEAR_EXPLOSION_RINGING = create("explosion/nuclear_explosion_ringing")
+        NUCLEAR_EXPLOSION_RINGING = create("explosion/ringing")
             .subtitle("Nuclear Explosion Ringing")
             .category(SoundSource.AMBIENT)
             .build(),

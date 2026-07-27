@@ -92,7 +92,8 @@ public class NuclearMushroomCloudParticle extends Particle {
             } else {
                 if (!playedRinging && CNConfigs.client().nuclearBombFlash.get()) {
                     playedRinging = true;
-                    playSound(CNSoundEvents.NUCLEAR_EXPLOSION_SHOCKWAVE.getMainEvent(), 100, 50, 0.05F, true);
+                    playSound(CNSoundEvents.NUCLEAR_EXPLOSION_RINGING.getMainEvent(), 100, 50, 0.05F, true);
+                    // playSound(CNSoundEvents.NUCLEAR_EXPLOSION_SHOCKWAVE.getMainEvent(), 100, 50, 0.05F, true);
                 }
                 CNClientProxy.renderNukeFlashFor = 16;
             }
