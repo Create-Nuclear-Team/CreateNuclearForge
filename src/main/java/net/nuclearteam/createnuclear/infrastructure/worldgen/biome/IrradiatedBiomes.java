@@ -5,6 +5,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.Carvers;
 import net.minecraft.data.worldgen.placement.MiscOverworldPlacements;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -41,7 +42,12 @@ public class IrradiatedBiomes {
 
             .ambientParticle(new AmbientParticleSettings(new IrradiatedParticlesData(), 0.025F))
             .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
-            .ambientLoopSound(soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.BIOME_WASTELAND.getId())))
+            .backgroundMusic(new Music(
+                    soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.BIOME_WASTELAND.getId())),
+                    0, 300,
+                    true
+            ))
+            .ambientLoopSound(soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.BIOME_WASTELAND.getId())))// Disabled pending a dedicated ambient-loop sound distinct from the background music (see .backgroundMusic below).
         ;
 
         return new Biome.BiomeBuilder()
