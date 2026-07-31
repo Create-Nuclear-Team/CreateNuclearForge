@@ -9,6 +9,7 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorContro
 import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.PatternReader;
 import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
 import net.nuclearteam.createnuclear.content.multiblock.controller.manager.ReactorInputFluidManagerI;
+import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatBalance;
 
 import java.util.Collections;
 import java.util.Map;
@@ -25,26 +26,31 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
         this.heatService = heatService;
     }
 
-    public static int calculateActualTotalHeatRatio(ItemStack configuredPattern, ReactorDisplayState displayState, Level level) {
+    @Override
+    public HeatBalance calculateHeatBalance(ItemStack configuredPattern, ReactorDisplayState displayState, Level level) {
         Map<Item, Integer> patternCounts = PatternReader.readItemCounts(configuredPattern);
         Map<Item, Integer> currentItems = displayState != null && displayState.items() != null
                 ? displayState.items() : Collections.emptyMap();
 
-        int totalHeatRatio = 0;
+        int heatPoints = 0;
+        int coolingPoints = 0;
+
         for (Map.Entry<Item, Integer> entry : patternCounts.entrySet()) {
             Item item = entry.getKey();
             int requiredCount = entry.getValue();
             int availableCount = currentItems.getOrDefault(item, 0);
             int countToUse = Math.min(requiredCount, availableCount);
+            if (countToUse <= 0) continue;
 
-            if (countToUse > 0) {
-                RodType rodType = RodType.resolveRodType(item, level);
-                if (rodType != null && rodType.isNotEmptyItem()) {
-                    totalHeatRatio += rodType.heatRatio().get() * countToUse;
-                }
-            }
+            RodType rodType = RodType.resolveRodType(item, level);
+            if (rodType == null || !rodType.isNotEmptyItem()) continue;
+
+            int weighted = rodType.ratio().get() * countToUse;
+            if (rodType.type() == RodType.TypeRod.FUEL) heatPoints += weighted;
+            else if (rodType.type() == RodType.TypeRod.COOLER) coolingPoints += weighted;
         }
-        return totalHeatRatio;
+
+        return new HeatBalance(heatPoints, coolingPoints);
     }
 
     /** Predicate applied to each pattern entry when checking availability. */
@@ -101,14 +107,14 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
 
     @Override
     public int updateHeatOnly(ItemStack configuredPattern, ReactorDisplayState displayState, BigFluidStack fluidStack,
-                              int totalHeatRatio, int previousHeat, ReactorControllerInventory inventory, Level level, boolean assembled) {
+                              HeatBalance heatBalance, int previousHeat, ReactorControllerInventory inventory, Level level, boolean assembled) {
         int heat = 0;
         boolean emptyPattern = configuredPattern.isEmpty() || configuredPattern.getOrCreateTag().isEmpty();
         if (!emptyPattern && assembled) {
             boolean allAvailable = checkPatternAvailability(configuredPattern, displayState,
                     (item, requiredCount, availableCount) -> availableCount >= requiredCount);
             if (allAvailable) {
-                heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, previousHeat, inventory, level, displayState);
+                heat = (int) heatService.calculateHeat(fluidStack, heatBalance, previousHeat, inventory, level, displayState);
             }
         }
         configuredPattern.getOrCreateTag().putDouble("heat", heat);
@@ -116,9 +122,9 @@ public class ReactorHeatUpdateCoordinator implements IReactorHeatUpdateCoordinat
     }
 
     @Override
-    public int calculateAndWriteHeat(ItemStack configuredPattern, BigFluidStack fluidStack, int totalHeatRatio, int previousHeat,
+    public int calculateAndWriteHeat(ItemStack configuredPattern, BigFluidStack fluidStack, HeatBalance heatBalance, int previousHeat,
                                      ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
-        int heat = (int) heatService.calculateHeat(fluidStack, totalHeatRatio, previousHeat, inventory, level, displayState);
+        int heat = (int) heatService.calculateHeat(fluidStack, heatBalance, previousHeat, inventory, level, displayState);
         configuredPattern.getOrCreateTag().putDouble("heat", heat);
         return heat;
     }

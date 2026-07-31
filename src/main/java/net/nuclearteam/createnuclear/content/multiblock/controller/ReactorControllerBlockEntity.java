@@ -30,6 +30,7 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.service.*;
 import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshot;
 import net.nuclearteam.createnuclear.content.multiblock.controller.snapshot.ReactorInputSnapshotBuilder;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatBalance;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.content.multiblock.controller.consumable.ConsumptionCycleManager;
@@ -57,7 +58,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
     private final ReactorControllerInventory inventory;
     private int countFuelRod;
     private int countCoolerRod;
-    private int totalHeatRatio;
+    private HeatBalance heatBalance;
     private int heat;
     private int lastAppliedOutputHeat;
     private boolean isExploding = false;
@@ -209,6 +210,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         super(type, pos, state);
         this.inventory = new ReactorControllerInventory(this);
         this.configuredPattern = ItemStack.EMPTY;
+        this.heatBalance = new HeatBalance(0, 0);
 
         this.inputManager = new ReactorInputManager();
         this.outputManager = new ReactorOutputManager();
@@ -353,7 +355,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             int heat = (int) this.getConfiguredPatternTag().getDouble("heat");
             countCoolerRod = this.getConfiguredPatternTag().getInt("countCoolerRod");
             countFuelRod = this.getConfiguredPatternTag().getInt("countFuelRod");
-            totalHeatRatio = ReactorHeatUpdateCoordinator.calculateActualTotalHeatRatio(configuredPattern, displayState, level);
+            heatBalance = heatCoordinator.calculateHeatBalance(configuredPattern, displayState, level);
         }
         resolveEntitiesIfNeeded();
 
@@ -409,7 +411,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
      */
     private void handleAssembledState() {
         if (!heatCoordinator.canRun(configuredPattern, displayState, inputFluidManager, level, isAssembled())) {
-            heatCoordinator.updateHeatOnly(configuredPattern, displayState, currentFluidStack(), totalHeatRatio, heat, inventory, level, isAssembled());
+            heatCoordinator.updateHeatOnly(configuredPattern, displayState, currentFluidStack(), heatBalance, heat, inventory, level, isAssembled());
             if (!outputManager.getBlocksPosition(getLevel()).isEmpty()) {
                 outputManager.rotateOutputs(getLevel(), getAssembled(), 0);
             }
@@ -423,7 +425,7 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         notifyUpdate();
 
         BigFluidStack fluidStack = currentFluidStack();
-        heat = heatCoordinator.calculateAndWriteHeat(configuredPattern, fluidStack, totalHeatRatio, heat, inventory, level, displayState);
+        heat = heatCoordinator.calculateAndWriteHeat(configuredPattern, fluidStack, heatBalance, heat, inventory, level, displayState);
         fluidBuffer = fluidRateCalculator.tick(fluidStack, reactorSize, level, inputFluidManager, fluidBuffer);
         cycleManager.update(configuredPattern, level, inputManager, level.getGameTime() % 20 == 0);
 

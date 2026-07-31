@@ -38,7 +38,7 @@ public record RodType(Holder<Item> item,
                       Supplier<Integer> baseRodHeat,
                       Supplier<Float> proximityRodHeat,
                       Supplier<Integer> rodTimer,
-                      Supplier<Integer> heatRatio,
+                      Supplier<Integer> ratio,
                       TypeRod type) {
 
     public RodType(Holder<Item> item,
@@ -49,8 +49,8 @@ public record RodType(Holder<Item> item,
 
     public RodType(Holder<Item> item,
                    int baseRodHeat, float proximityRodHeat,
-                   int rodTimer, TypeRod type, int heatRatio) {
-        this(item, () -> baseRodHeat, () -> proximityRodHeat, () -> rodTimer, () -> heatRatio, type);
+                   int rodTimer, TypeRod type, int ratio) {
+        this(item, () -> baseRodHeat, () -> proximityRodHeat, () -> rodTimer, () -> ratio, type);
     }
 
     /**
@@ -62,7 +62,7 @@ public record RodType(Holder<Item> item,
             Codec.FLOAT.fieldOf("proximityRodHeat").forGetter(rt -> rt.proximityRodHeat().get()),
             Codec.INT.fieldOf("rodTimer").forGetter(rt -> rt.rodTimer().get()),
             StringRepresentable.fromEnum(TypeRod::values).fieldOf("type").forGetter(RodType::type),
-            Codec.INT.optionalFieldOf("heatRatio", 1).forGetter(rt -> rt.heatRatio().get())
+            Codec.INT.optionalFieldOf("ratio", 1).forGetter(rt -> rt.ratio().get())
     ).apply(i, RodType::new));
 
     /**
@@ -118,7 +118,7 @@ public record RodType(Holder<Item> item,
      * Fluent builder for creating an immutable {@link RodType} instance.
      * <p>
      * Every heat/timing value ({@code baseRodHeat}, {@code proximityRodHeat},
-     * {@code rodTimer}, {@code heatRatio}) can be set either as a fixed
+     * {@code rodTimer}, {@code ratio}) can be set either as a fixed
      * primitive (evaluated once, at build time) or as a {@link Supplier}
      * (re-evaluated on every call to the corresponding {@link RodType}
      * accessor). The primitive overloads are pure convenience: they simply
@@ -129,7 +129,7 @@ public record RodType(Holder<Item> item,
      * changes are picked up without rebuilding the {@code RodType}.
      * <p>
      * {@code item}, {@code type}, {@code baseRodHeat}, {@code proximityRodHeat}
-     * and {@code rodTimer} are required; {@code heatRatio} defaults to a
+     * and {@code rodTimer} are required; {@code ratio} defaults to a
      * constant {@code 1} and never needs to be set explicitly. Call
      * {@link #build()} once all required values are configured.
      */
@@ -138,7 +138,7 @@ public record RodType(Holder<Item> item,
         private Supplier<Integer> baseRodHeat = null;
         private Supplier<Float> proximityRodHeat = null;
         private Supplier<Integer> rodTimer = null;
-        private Supplier<Integer> heatRatio = () -> 1;
+        private Supplier<Integer> ratio = () -> 1;
         private TypeRod type = TypeRod.NONE;
 
         /**
@@ -215,25 +215,25 @@ public record RodType(Holder<Item> item,
         /**
          * Sets a fixed heat ratio, evaluated once at build time. Optional:
          * defaults to a constant {@code 1} if never called.
-         * Equivalent to {@code heatRatio(() -> heatRatio)}.
+         * Equivalent to {@code ratio(() -> ratio)}.
          *
-         * @param heatRatio constant heat ratio value
+         * @param ratio constant heat ratio value
          * @return this builder
          */
-        public Builder heatRatio(int heatRatio) {
-            return heatRatio(() -> heatRatio);
+        public Builder ratio(int ratio) {
+            return ratio(() -> ratio);
         }
 
         /**
          * Sets a dynamic heat ratio, re-evaluated every time
-         * {@link RodType#heatRatio()} is called. Optional: defaults to a
+         * {@link RodType#ratio()} is called. Optional: defaults to a
          * constant {@code 1} if never called.
          *
-         * @param heatRatio supplier producing the heat ratio on demand
+         * @param ratio supplier producing the heat ratio on demand
          * @return this builder
          */
-        public Builder heatRatio(Supplier<Integer> heatRatio) {
-            this.heatRatio = heatRatio;
+        public Builder ratio(Supplier<Integer> ratio) {
+            this.ratio = ratio;
             return this;
         }
 
@@ -287,7 +287,7 @@ public record RodType(Holder<Item> item,
          * Validates that {@code item} and {@code type}, {@code baseRodHeat},
          * {@code proximityRodHeat} and {@code rodTimer} have all been set
          * (either as a fixed value or as a dynamic {@link Supplier});
-         * {@code heatRatio} is exempt since it defaults to a constant
+         * {@code ratio} is exempt since it defaults to a constant
          * {@code 1}.
          *
          * @throws IllegalStateException if one or more required fields are missing,
@@ -305,7 +305,7 @@ public record RodType(Holder<Item> item,
             if (!missing.isEmpty())
                 throw new IllegalStateException("Missing required RodType fields: " + String.join(", ", missing));
 
-            return new RodType(item, baseRodHeat, proximityRodHeat, rodTimer, heatRatio, type);
+            return new RodType(item, baseRodHeat, proximityRodHeat, rodTimer, ratio, type);
         }
     }
 
@@ -370,7 +370,7 @@ public record RodType(Holder<Item> item,
                 ", baseRodHeat: " + this.baseRodHeat().get() +
                 ", proximityRodHeat: " + this.proximityRodHeat().get() +
                 ", rodTimer: " + this.rodTimer().get() +
-                ", heatRatio: " + this.heatRatio().get() +
+                ", ratio: " + this.ratio().get() +
                 ", type: " + this.type() + "]";
     }
 }

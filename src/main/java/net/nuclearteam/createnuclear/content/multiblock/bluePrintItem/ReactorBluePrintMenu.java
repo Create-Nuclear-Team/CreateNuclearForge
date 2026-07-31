@@ -113,7 +113,7 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
     protected void saveData(ItemStack contentHolder) {
         countFuelRod = 0;
         countCooledRod = 0;
-        int totalHeatRatio = 0;
+        int totalRatio = 0;
         int totalFuelTime = 0;
         int totalCoolerTime = 0;
 
@@ -139,14 +139,14 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
             }
             
             if (isCooler || isFuel) {
-                totalHeatRatio += typeRod.heatRatio().get();
+                totalRatio += typeRod.ratio().get();
             }
         }
 
         contentHolder.getOrCreateTag().put("pattern", ghostInventory.serializeNBT());
         contentHolder.getOrCreateTag().putInt("countCoolerRod", countCooledRod);
         contentHolder.getOrCreateTag().putInt("countFuelRod", countFuelRod);
-        contentHolder.getOrCreateTag().putInt("totalHeatRatio", totalHeatRatio);
+        contentHolder.getOrCreateTag().putInt("totalRatio", totalRatio);
         contentHolder.getOrCreateTag().putInt("fuelTime", countFuelRod > 0 ? totalFuelTime / countFuelRod : 0);
         contentHolder.getOrCreateTag().putInt("coolerTime", countCooledRod > 0 ? totalCoolerTime / countCooledRod : 0);
 

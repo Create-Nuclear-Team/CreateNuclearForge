@@ -125,7 +125,7 @@ public class CNItems {
                 .baseRodHeat(() -> CNConfigs.server().rods.graphiteBaseValue.get())
                 .proximityRodHeat(() -> CNConfigs.server().rods.graphiteProximityMalus.getF())
                 .rodTimer(() -> CNConfigs.server().rods.graphiteRodLifetime.get())
-                .heatRatio(() -> CNConfigs.server().rods.graphiteHeatRatio.get())
+                .ratio(() -> CNConfigs.server().rods.graphiteHeatRatio.get())
                 .coolerRodType()))
             .tag(CNTags.forgeItemTag("rods"), CNItemTags.COOLER.tag)
             .register(),
@@ -168,7 +168,7 @@ public class CNItems {
                 .baseRodHeat(() -> CNConfigs.server().rods.uraniumBaseValue.get())
                 .proximityRodHeat(() ->(float) CNConfigs.server().rods.uraniumProximityBonus.get())
                 .rodTimer(() -> CNConfigs.server().rods.uraniumRodLifetime.get())
-                .heatRatio(() -> CNConfigs.server().rods.uraniumHeatRatio.get())
+                .ratio(() -> CNConfigs.server().rods.uraniumHeatRatio.get())
                 .fuelRodType()))
             .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register(),
@@ -215,7 +215,7 @@ public class CNItems {
                 .baseRodHeat(() -> CNConfigs.server().rods.baseValueThorium.get())
                 .proximityRodHeat(() -> (float) CNConfigs.server().rods.thoriumProxyBonus.get())
                 .rodTimer(() -> CNConfigs.server().rods.thoriumRodLifetime.get())
-                .heatRatio(() -> CNConfigs.server().rods.thoriumHeatRatio.get())
+                .ratio(() -> CNConfigs.server().rods.thoriumHeatRatio.get())
                 .fuelRodType()))
             .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register()

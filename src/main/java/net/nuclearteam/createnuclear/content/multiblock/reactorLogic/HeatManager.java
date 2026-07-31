@@ -22,9 +22,9 @@ public class HeatManager {
         this(new DefaultHeatCalculator(), new DefaultOverheatController());
     }
 
-    public double calculateHeat(BigFluidStack bigFluidStack, int totalHeatRatio, int previousHeat, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
+    public double calculateHeat(BigFluidStack bigFluidStack, HeatBalance heatBalance, int previousHeat, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
         ReactorFluidType type = bigFluidStack == null ? null : bigFluidStack.getFluidtype(level);
-        overheatController.updateState(totalHeatRatio, previousHeat, bigFluidStack, type);
+        overheatController.updateState(heatBalance, previousHeat, bigFluidStack, type);
 
         return calculator.computeHeat(bigFluidStack, type, inventory, overheatController.getOverHeat(), displayState, level);
     }
