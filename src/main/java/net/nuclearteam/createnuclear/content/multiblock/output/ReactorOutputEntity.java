@@ -12,41 +12,27 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.util.Mth;
-import net.nuclearteam.createnuclear.CNBlocks;
 
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import java.util.List;
-
-import static net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput.DIR;
-
 
 public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     public int speed = 0;
     public float heat = 0;
 
     protected ReactorPattern pattern =  new ReactorPattern();
-    ReactorControllerBlockEntity controllerEntity = null;
-    public ReactorControllerBlock controller = null;
 
-
-    // protected ScrollValueBehaviour generatedSpeed;
     protected float generatedSpeed;
-
 
     public ReactorOutputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
@@ -55,7 +41,6 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     }
 
     @Override
-
     public void lazyTick() {
         super.lazyTick();
 
@@ -105,23 +90,6 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
         }
     }
 
-    @Override
-    public void tick() {
-        super.tick();
-        BlockGetter level = getLevel();
-
-        if (level.getBlockState(getBlockPos().above(3)).getBlock() == CNBlocks.REACTOR_CONTROLLER.get()) {
-            controller = (ReactorControllerBlock) level.getBlockState(getBlockPos().above(3)).getBlock();
-            controllerEntity = (ReactorControllerBlockEntity) level.getBlockEntity(getBlockPos().above(3));
-            if (controllerEntity != null) {
-                if (!controllerEntity.getAssembled() && getSpeed() != 0) {
-                    setSpeed(0);
-                }
-            }
-        } else setSpeed(0);
-    }
-
-
      @Override
      public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
 
@@ -159,29 +127,12 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
         }
     }
 
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    public int getDir() {
-        BlockState state = getBlockState();
-        return state.getValue(DIR);
-    }
-
-    public void setDir(int dir, Level level, BlockPos pos) {
-        BlockState state = getBlockState();
-        level.setBlockAndUpdate(pos, state.setValue(DIR, dir));
-    }
-
     @Override
     public float getGeneratedSpeed() {
-        // if (!CNBlocks.REACTOR_OUTPUT.has(getBlockState()))
-        //     return 0;
-        // return speed; //convertToDirection(speed, getBlockState().getValue(ReactorOutput.FACING));
         return Mth.clamp(generatedSpeed, 0, 1500000);
     }
 
-    class ReactorOutputValue extends ValueBoxTransform.Sided {
+    static class ReactorOutputValue extends ValueBoxTransform.Sided {
 
         @Override
         protected Vec3 getSouthLocation() {
@@ -215,9 +166,5 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
             return direction.getAxis() != facing.getAxis();
         }
 
-    }
-
-    public void setController(ReactorControllerBlock controller) {
-        this.controller = controller;
     }
 }
