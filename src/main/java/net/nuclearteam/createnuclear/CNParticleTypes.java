@@ -2,7 +2,6 @@ package net.nuclearteam.createnuclear;
 
 import com.simibubi.create.foundation.particle.ICustomParticleData;
 import net.createmod.catnip.lang.Lang;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;

@@ -20,6 +20,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.nuclearteam.createnuclear.CNEntityType;
+import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.AnimalUtil;
 
 import javax.annotation.Nullable;
 
@@ -37,6 +39,15 @@ public class IrradiatedCow extends Animal {
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+    }
+
+    // Define the base food of the animal (e.g., Wheat for Cows)
+    private static final Ingredient FOOD_ITEMS = Ingredient.of(CNItems.YELLOWCAKE);
+
+    @Override
+    public boolean isFood(ItemStack stack) {
+        // Check if the stack is a valid Yellowcake or the base food
+        return AnimalUtil.isFood(stack, FOOD_ITEMS);
     }
 
     public static AttributeSupplier.Builder createAttributes() {

@@ -169,7 +169,7 @@
         "if_true": {
           "type": "minecraft:biome",
           "biome_is": [
-            "createnuclear:irradiated_plain"
+            "createnuclear:irradiated_land"
           ]
         },
         "then_run": {
@@ -260,37 +260,19 @@
                 "surface_type": "floor"
               },
               "then_run": {
-                "type": "minecraft:sequence",
-                "sequence": [
-                  {
-                    "type": "minecraft:condition",
-                    "if_true": {
-                      "type": "minecraft:biome",
-                      "biome_is": [
-                        "createnuclear:irradiated_plain"
-                      ]
-                    },
-                    "then_run": {
-                      "type": "minecraft:block",
-                      "result_state": {
-                        "Name": "createnuclear:raw_lead_block"
-                      }
-                    }
-                  },
-                  {
-                    "type": "minecraft:condition",
-                    "if_true": {
-                      "type": "minecraft:biome",
-                      "biome_is": []
-                    },
-                    "then_run": {
-                      "type": "minecraft:block",
-                      "result_state": {
-                        "Name": "createnuclear:lead_ore"
-                      }
-                    }
+                "type": "minecraft:condition",
+                "if_true": {
+                  "type": "minecraft:biome",
+                  "biome_is": [
+                    "createnuclear:irradiated_land"
+                  ]
+                },
+                "then_run": {
+                  "type": "minecraft:block",
+                  "result_state": {
+                    "Name": "createnuclear:raw_lead_block"
                   }
-                ]
+                }
               }
             },
             {
@@ -303,37 +285,19 @@
                 "surface_type": "floor"
               },
               "then_run": {
-                "type": "minecraft:sequence",
-                "sequence": [
-                  {
-                    "type": "minecraft:condition",
-                    "if_true": {
-                      "type": "minecraft:biome",
-                      "biome_is": [
-                        "createnuclear:irradiated_plain"
-                      ]
-                    },
-                    "then_run": {
-                      "type": "minecraft:block",
-                      "result_state": {
-                        "Name": "createnuclear:raw_lead_block"
-                      }
-                    }
-                  },
-                  {
-                    "type": "minecraft:condition",
-                    "if_true": {
-                      "type": "minecraft:biome",
-                      "biome_is": []
-                    },
-                    "then_run": {
-                      "type": "minecraft:block",
-                      "result_state": {
-                        "Name": "createnuclear:steel_block"
-                      }
-                    }
+                "type": "minecraft:condition",
+                "if_true": {
+                  "type": "minecraft:biome",
+                  "biome_is": [
+                    "createnuclear:irradiated_land"
+                  ]
+                },
+                "then_run": {
+                  "type": "minecraft:block",
+                  "result_state": {
+                    "Name": "createnuclear:raw_lead_block"
                   }
-                ]
+                }
               }
             }
           ]

@@ -2,12 +2,7 @@ package net.nuclearteam.createnuclear.content.equipment.armor;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import com.simibubi.create.AllKeys;
-import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -17,19 +12,10 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 
-import net.minecraft.Util;
-import net.minecraft.network.chat.Component;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.*;
 import net.nuclearteam.createnuclear.CNAttributes;
 import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
-import net.nuclearteam.createnuclear.foundation.util.ClothTagHelper;
-import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+import net.nuclearteam.createnuclear.foundation.utility.ClothTagHelper;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -59,38 +45,10 @@ public abstract class AntiRadiationArmorItem extends ArmorItem {
         return builder.build();
     }
 
-    // Cette méthode indique au jeu où trouver la texture PNG de l'armure
+    // Tells the game where to find the armor's PNG texture
     @Override
     public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
         return ClothTagHelper.getArmorTexturePath(stack, "anti_radiation_suit.png");
-    }
-
-    @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> tooltip, TooltipFlag pIsAdvanced) {
-        if (AllKeys.shiftDown()) return;
-
-        List<Component> makeSummary = makeSummary(pStack);
-        if (makeSummary.isEmpty()) return;
-
-        tooltip.add(CommonComponents.SPACE);
-        tooltip.addAll(makeSummary);
-    }
-
-
-    public List<Component> makeSummary(ItemStack item) {
-        if (!item.hasTag()) return Collections.emptyList();
-
-        CompoundTag tag = item.getTag();
-        ItemStack cloth = ItemStack.of(tag.getCompound(ClothTagHelper.ITEM));
-        if (!(cloth.getItem() instanceof ClothItem clothItem)) return Collections.emptyList();
-
-        List<Component> list = new ArrayList<>();
-        CreateNuclearLang.translate("tooltip.cloth.color", clothItem.getColor().getSerializedName())
-            .color(clothItem.getColor().getTextColor())
-            .style(ChatFormatting.ITALIC)
-            .addTo(list);
-
-        return list;
     }
 
     @Override

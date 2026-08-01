@@ -2,16 +2,9 @@ package net.nuclearteam.createnuclear.api;
 
 import com.simibubi.create.api.registry.SimpleRegistry;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
-import net.minecraft.core.HolderSet;
 import net.minecraft.world.level.material.Fluid;
-import net.nuclearteam.createnuclear.CreateNuclear;
+import net.minecraft.world.level.material.Fluids;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.util.Map;
-import net.minecraftforge.registries.ForgeRegistries;
-import java.util.Collections;
 
 /**
  * Registry-backed accessors for {@link ReactorFluidType} mappings.
@@ -31,7 +24,7 @@ public class ReactorFluidTypesValue {
      * Default {@link ReactorFluidType} returned when no mapping exists in the
      * registry. Constructed once to avoid allocating a new instance on each lookup.
      */
-    public static final ReactorFluidType DEFAULT_REACTOR_FLUID_TYPE = new ReactorFluidType(HolderSet.direct(Collections.emptyList()), -1, -1);
+    public static final ReactorFluidType DEFAULT_REACTOR_FLUID_TYPE = new ReactorFluidType(Fluids.EMPTY.builtInRegistryHolder(), -1, -1);
 
     /**
      * Get the {@link ReactorFluidType} associated with the given {@link Fluid}.

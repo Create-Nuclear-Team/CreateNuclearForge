@@ -3,7 +3,6 @@
     "createnuclear:uranium_ore",
     "createnuclear:lead_ore",
     "createnuclear:thorium_ore",
-    "createnuclear:nitrate_ore",
-    "createnuclear:thorium_block"
+    "createnuclear:nitrate_ore"
   ]
 }

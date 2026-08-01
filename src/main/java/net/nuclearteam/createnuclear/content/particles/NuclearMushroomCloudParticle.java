@@ -78,7 +78,7 @@ public class NuclearMushroomCloudParticle extends Particle {
                     playSound(large ? nuclear_explosions[0] : nuclear_explosions[1], lifetime - 20, lifetime, 0.2F, false);
                 } else {
                     CreateNuclear.LOGGER.info("EXPLOSIOOOOOON, (WITHOUT Alex's Cave)");
-                    playSound(large ? CNSoundEvents.LARGE_NUCLEAR_EXPLOSION.getMainEvent() : CNSoundEvents.NUCLEAR_EXPLOSION.getMainEvent(), lifetime - 20, lifetime, 0.2F, false);
+                    playSound(CNSoundEvents.NUCLEAR_EXPLOSION_MAIN.getMainEvent(), lifetime - 20, lifetime, 0.2F, false);
                 }
             }
         }
@@ -93,6 +93,7 @@ public class NuclearMushroomCloudParticle extends Particle {
                 if (!playedRinging && CNConfigs.client().nuclearBombFlash.get()) {
                     playedRinging = true;
                     playSound(CNSoundEvents.NUCLEAR_EXPLOSION_RINGING.getMainEvent(), 100, 50, 0.05F, true);
+                    // playSound(CNSoundEvents.NUCLEAR_EXPLOSION_SHOCKWAVE.getMainEvent(), 100, 50, 0.05F, true);
                 }
                 CNClientProxy.renderNukeFlashFor = 16;
             }
@@ -115,7 +116,7 @@ public class NuclearMushroomCloudParticle extends Particle {
                     if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null) {
                         playSound(((AlexscaveCompat)alexscaveHandler).GetACSounds()[3], lifetime + 100, lifetime, 0.1F, true);
                     } else {
-                        playSound(CNSoundEvents.NUCLEAR_EXPLOSION_RUMBLE.getMainEvent(), lifetime + 100, lifetime, 0.1F, true);
+                        playSound(CNSoundEvents.NUCLEAR_EXPLOSION_RUMBLE_2.getMainEvent(), lifetime + 100, lifetime, 0.1F, true);
 
                     }
                 }

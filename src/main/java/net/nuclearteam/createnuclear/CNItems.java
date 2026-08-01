@@ -1,7 +1,5 @@
 package net.nuclearteam.createnuclear;
 
-import com.simibubi.create.AllTags;
-import com.simibubi.create.foundation.data.AssetLookup;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
@@ -9,26 +7,22 @@ import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.data.recipes.SmithingTransformRecipeBuilder;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.nuclearteam.createnuclear.content.biome.BiomeIrradationExtractorItem;
+import net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers;
+import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
-import net.nuclearteam.createnuclear.foundation.item.radiation.RadiationItem;
+import net.nuclearteam.createnuclear.content.radiation.RadiationItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem.Cloths;
 import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
 import net.nuclearteam.createnuclear.foundation.utility.TextUtils;
-import java.util.function.Supplier;
 import net.minecraft.world.item.Items;
 import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
@@ -42,6 +36,9 @@ import net.nuclearteam.createnuclear.foundation.item.DyedItemsList;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers.biomeRestoreModel;
+import static net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers.coloredArmorModel;
 
 @SuppressWarnings({"unused", "deprecation"})
 public class CNItems {
@@ -125,7 +122,10 @@ public class CNItems {
         GRAPHITE_ROD = CreateNuclear.REGISTRATE
             .item("graphite_rod", Item::new)
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .setRodConfig()
+                .baseRodHeat(() -> CNConfigs.server().rods.graphiteBaseValue.get())
+                .proximityRodHeat(() -> CNConfigs.server().rods.graphiteProximityMalus.getF())
+                .rodTimer(() -> CNConfigs.server().rods.graphiteRodLifetime.get())
+                .ratio(() -> CNConfigs.server().rods.graphiteHeatRatio.get())
                 .coolerRodType()))
             .tag(CNTags.forgeItemTag("rods"), CNItemTags.COOLER.tag)
             .register(),
@@ -165,7 +165,10 @@ public class CNItems {
         URANIUM_ROD = CreateNuclear.REGISTRATE
             .item("uranium_rod", p -> new RadiationItem(p, 100))
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .setRodConfig()
+                .baseRodHeat(() -> CNConfigs.server().rods.uraniumBaseValue.get())
+                .proximityRodHeat(() ->(float) CNConfigs.server().rods.uraniumProximityBonus.get())
+                .rodTimer(() -> CNConfigs.server().rods.uraniumRodLifetime.get())
+                .ratio(() -> CNConfigs.server().rods.uraniumHeatRatio.get())
                 .fuelRodType()))
             .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register(),
@@ -209,11 +212,12 @@ public class CNItems {
         THORIUM_ROD = CreateNuclear.REGISTRATE
             .item("thorium_rod", Item::new)
             .onRegister(ItemRodTypesValue.setRodTypeInfos(new RodType.Builder()
-                .rodTimer(3600)
-                .baseRodHeat(16)
-                .proximityRodHeat(8)
+                .baseRodHeat(() -> CNConfigs.server().rods.baseValueThorium.get())
+                .proximityRodHeat(() -> (float) CNConfigs.server().rods.thoriumProxyBonus.get())
+                .rodTimer(() -> CNConfigs.server().rods.thoriumRodLifetime.get())
+                .ratio(() -> CNConfigs.server().rods.thoriumHeatRatio.get())
                 .fuelRodType()))
-            .tag(CNTags.forgeItemTag("rods"))
+            .tag(CNTags.forgeItemTag("rods"), CNItemTags.FUEL.tag)
             .register()
     ;
 
@@ -227,7 +231,7 @@ public class CNItems {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                 .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                 .define('X', CNTags.forgeItemTag("ingots/lead"))
-                .define('Y', Ingredient.of(ItemTags.create(new ResourceLocation("forge", "ingots/brass"))))
+                .define('Y', CNTags.forgeItemTag("ingots/brass"))
                 .define('Z', CNBlocks.REINFORCED_GLASS.asItem())
                 .pattern("YXY")
                 .pattern("XZX")
@@ -248,7 +252,7 @@ public class CNItems {
             }
         })
         .lang("Anti Radiation Helmet")
-        .model(AssetLookup.itemModelWithPartials())
+        .model(coloredArmorModel("helmet", "layer0", "particle"))
         .register();
 
     public static final ItemEntry<Chestplate> ANTI_RADIATION_CHESTPLATES = CreateNuclear.REGISTRATE
@@ -261,7 +265,7 @@ public class CNItems {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                     .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                     .define('X', CNTags.forgeItemTag("ingots/lead"))
-                    .define('Y', Ingredient.of(ItemTags.create(new ResourceLocation("forge", "ingots/brass"))))
+                    .define('Y', CNTags.forgeItemTag("ingots/brass"))
                     .define('Z', CNItems.GRAPHITE_ROD)
                     .pattern("Y Y")
                     .pattern("XXX")
@@ -282,7 +286,7 @@ public class CNItems {
             }
         })
         .lang("Anti Radiation Chestplate")
-        .model(AssetLookup.itemModelWithPartials())
+        .model(coloredArmorModel("chestplate", "14"))
         .register();
 
     public static final ItemEntry<Leggings> ANTI_RADIATION_LEGGINGS = CreateNuclear.REGISTRATE
@@ -295,7 +299,7 @@ public class CNItems {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                 .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                 .define('X', CNTags.forgeItemTag("ingots/lead"))
-                .define('Y', Ingredient.of(ItemTags.create(new ResourceLocation("forge", "ingots/brass"))))
+                .define('Y', CNTags.forgeItemTag("ingots/brass"))
                 .pattern("YXY")
                 .pattern("X X")
                 .pattern("Y Y")
@@ -316,7 +320,7 @@ public class CNItems {
             }
         })
         .lang("Anti Radiation Leggings")
-        .model(AssetLookup.itemModelWithPartials())
+        .model(coloredArmorModel("leggings", "14"))
         .register();
 
     public static final ItemEntry<Boot> ANTI_RADIATION_BOOTS = CreateNuclear.REGISTRATE
@@ -329,7 +333,7 @@ public class CNItems {
             ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, c.get())
                 .unlockedBy("has_cloth", RegistrateRecipeProvider.has(CNItemTags.CLOTH.tag))
                 .define('X', CNTags.forgeItemTag("ingots/lead"))
-                .define('Y', Ingredient.of(ItemTags.create(new ResourceLocation("forge", "ingots/brass"))))
+                .define('Y', CNTags.forgeItemTag("ingots/brass"))
                 .pattern("Y Y")
                 .pattern("X X")
                 .showNotification(true)
@@ -349,7 +353,7 @@ public class CNItems {
             }
         })
         .lang("Anti Radiation Boots")
-        .model(AssetLookup.itemModelWithPartials())
+        .model(coloredArmorModel("boots", "14"))
         .register();
 
     public static final DyedItemsList<ClothItem> CLOTHS = new DyedItemsList<>(color -> {
@@ -360,7 +364,12 @@ public class CNItems {
             .tag(CNItemTags.CLOTH.tag)
             .recipe((c, p) -> ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, c.get())
                     .unlockedBy("has_white_cloth", RegistrateRecipeProvider.has(ClothItem.Cloths.WHITE_CLOTH.getItem()))
-                    .requires(CNItemTags.CLOTH.tag)
+                    // Accept any cloth EXCEPT one already of the target color, otherwise the
+                    // recipe would let you "dye" a cloth into the color it already is.
+                    .requires(Ingredient.of(Arrays.stream(DyeColor.values())
+                            .filter(other -> other != color)
+                            .map(other -> ClothItem.Cloths.getByColor(other).get())
+                            .toArray(ClothItem[]::new)))
                     .requires(ingredients.get(color.ordinal()))
                     .save(p, CreateNuclear.asResource("shapeless/cloth/" + c.getName()))
             )
@@ -369,10 +378,9 @@ public class CNItems {
             .register();
     });
 
-
-    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_WOLF = registerSpawnEgg("wolf_irradiated_spawn_egg", CNEntityType.IRRADIATED_WOLF, 0x42452B,0x4C422B, "Irradiated Wolf Spawn Egg");
-    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_CAT = registerSpawnEgg("cat_irradiated_spawn_egg", CNEntityType.IRRADIATED_CAT, 0x382C19, 0x742728, "Irradiated Cat Spawn Egg");
-    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_CHICKEN = registerSpawnEgg("chicken_irradiated_spawn_egg", CNEntityType.IRRADIATED_CHICKEN, 0x6B9455, 0x95393C, "Irradiated Chicken Spawn Egg");
+    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_WOLF = CNBuilderTransformers.spawnEgg("wolf_irradiated_spawn_egg", CNEntityType.IRRADIATED_WOLF, 0x42452B, 0x4C422B, "Irradiated Wolf Spawn Egg");
+    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_CAT = CNBuilderTransformers.spawnEgg("cat_irradiated_spawn_egg", CNEntityType.IRRADIATED_CAT, 0x382C19, 0x742728, "Irradiated Cat Spawn Egg");
+    public static final ItemEntry<ForgeSpawnEggItem> SPAWN_CHICKEN = CNBuilderTransformers.spawnEgg("chicken_irradiated_spawn_egg", CNEntityType.IRRADIATED_CHICKEN, 0x6B9455, 0x95393C, "Irradiated Chicken Spawn Egg");
 
     public static final ItemEntry<ReactorBluePrintItem> REACTOR_BLUEPRINT = CreateNuclear.REGISTRATE
         .item("reactor_blueprint_item", ReactorBluePrintItem::new)
@@ -397,15 +405,32 @@ public class CNItems {
         .properties(p -> p.stacksTo(1))
         .register();
 
+    public static final ItemEntry<Item> REINFORCED_GLASS_BOTTLE = CreateNuclear.REGISTRATE
+        .item("reinforced_glass_bottle", Item::new)
+        .lang("Reinforced Glass Bottle")
+        .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.BREWING, c.get(), 3)
+            .unlockedBy("has_reinforced_glass", RegistrateRecipeProvider.has(CNBlocks.REINFORCED_GLASS.get()))
+            .define('G', CNBlocks.REINFORCED_GLASS)
+            .pattern("G G")
+            .pattern(" G ")
+            .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
+        .properties(p -> p.stacksTo(16))
+        .register();
 
-    private static ItemEntry<ForgeSpawnEggItem> registerSpawnEgg(String name, Supplier<? extends EntityType<? extends Mob>> entity, int backgroundColor, int highlightColor, String nameItems) {
-        return CreateNuclear.REGISTRATE
-            .item(name, p -> new ForgeSpawnEggItem(entity, backgroundColor, highlightColor, p))
-            .lang(nameItems)
-            .model((c, p) -> p.withExistingParent(c.getName(), new ResourceLocation("item/template_spawn_egg")))
-            .register();
-
-    }
+    public static final ItemEntry<BiomeIrradationExtractorItem> IRRADIATION_BIOME_EXTRACTOR = CreateNuclear.REGISTRATE
+        .item("biome_irradiation_extractor", BiomeIrradationExtractorItem::new)
+        .lang("Biome Irradiation Extractor")
+        .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 8)
+            .unlockedBy("has_reinforced_glass_bottle", RegistrateRecipeProvider.has(CNItems.REINFORCED_GLASS_BOTTLE.get()))
+            .define('B', CNItems.REINFORCED_GLASS_BOTTLE)
+            .define('S', Items.NETHER_STAR)
+            .pattern("BBB")
+            .pattern("BSB")
+            .pattern("BBB")
+            .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
+        .properties(p -> p.stacksTo(16).fireResistant().setNoRepair())
+        .model(biomeRestoreModel())
+        .register();
 
     public static void register() {}
 }

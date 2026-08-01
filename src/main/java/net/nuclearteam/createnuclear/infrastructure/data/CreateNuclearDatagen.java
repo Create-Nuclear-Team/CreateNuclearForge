@@ -15,7 +15,6 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.data.recipe.CNMechanicalCraftingRecipeGen;
 import net.nuclearteam.createnuclear.foundation.data.recipe.CNProcessingRecipeGen;
-import net.nuclearteam.createnuclear.foundation.data.recipe.CNShapelessRecipeGen;
 import net.nuclearteam.createnuclear.foundation.data.recipe.CNStandardRecipeGen;
 import net.nuclearteam.createnuclear.foundation.ponder.CreateNuclearPonderPlugin;
 
@@ -39,10 +38,8 @@ public class CreateNuclearDatagen {
         lookupProvider = generatedEntriesProvider.getRegistryProvider();
         generator.addProvider(event.includeClient(), generatedEntriesProvider);
         generator.addProvider(event.includeClient(), new CNStandardRecipeGen(output));
-    //        generator.addProvider(event.includeClient(), new CNShapelessRecipeGen(output));
         generator.addProvider(event.includeClient(), new CNMechanicalCraftingRecipeGen(output));
         generator.addProvider(event.includeClient(), new CNAdvancement(output));
-
         /*if (event.includeClient()) {
 
         }*/
@@ -62,6 +59,7 @@ public class CreateNuclearDatagen {
             provideDefaultLang("potion", langConsumer);
             provideDefaultLang("tooltips", langConsumer);
             provideDefaultLang("reactor", langConsumer);
+            provideDefaultLang("irradiated", langConsumer);
             CNAdvancement.provideLang(langConsumer);
             CNSoundEvents.provideLang(langConsumer);
             providePonderLang(langConsumer);

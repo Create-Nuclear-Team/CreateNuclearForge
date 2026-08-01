@@ -25,7 +25,6 @@ public class HelmetOverlay  implements HudOverlay {
             CreateNuclear.asResource("textures/misc/helmet_vision/helmet_crack2.png"),
             CreateNuclear.asResource("textures/misc/helmet_vision/helmet_almost_broken.png")
     };
-    private static final float[] COVERAGE_FACTORS = {.5f, 1f, 1.05f, 1.45f, 1.98f};
     private static final int BASE_PRIORITY = 50;
 
     @Override
@@ -63,9 +62,6 @@ public class HelmetOverlay  implements HudOverlay {
                 : durabilityRatio >= 0.60f ? 2
                 : durabilityRatio >= 0.25f ? 3
                 : 4;
-
-        // Update radiation coverage based on helmet condition
-        RadiationOverlay.setCoverage(COVERAGE_FACTORS[index]);
 
         // Render helmet overlay texture
         RenderHelper.renderFirstPersonOverlay(graphics, HELMET_TEXTURES[index], 1f, 1f);

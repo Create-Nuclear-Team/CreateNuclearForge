@@ -21,7 +21,6 @@ import net.nuclearteam.createnuclear.content.kinetics.fan.processing.SnowPowderR
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 @SuppressWarnings({"unused", "unchecked"})
@@ -29,10 +28,6 @@ public enum CNRecipeTypes implements IRecipeTypeInfo {
         ENRICHED(EnrichedRecipe::new),
         SNOW_POWDER(SnowPowderRecipe::new)
     ;
-
-    public static final Predicate<? super Recipe<?>> CAN_BE_AUTOMATED = r -> !r.getId()
-        .getPath()
-        .endsWith("_manual_only");
 
     private final ResourceLocation id;
     private final RegistryObject<RecipeSerializer<?>> serializerObject;

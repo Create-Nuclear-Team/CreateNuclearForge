@@ -5,19 +5,19 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
 
 /**
  * Manager for a reactor's outputs (`ReactorOutput`).
- * Handles serialization of output positions and distribution
- * of energy via `distributeSU`.
+ * Handles serialization of output positions.
  */
 public class ReactorOutputManager extends AbstractReactorIOManager implements ReactorOutputManagerI {
     private static final String NBT_KEY = "ReactorOutputs";
+    public static final int RPM_DIVIDER = 32;
 
     @Override
     public void write(CompoundTag compound) {
@@ -42,79 +42,10 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
     }
 
     /**
-     * Example usage:
-     * double totalSUToDistribute = this.reactorPower; // or another value depending on logic
-     * if (!reactorOutputEntityList.isEmpty() && totalSUToDistribute > 0) {
-     *     double remaining = outputManager.distributeSU(totalSUToDistribute, reactorOutputEntityList, (outEntity, amount) -> {
-     *         // Inserter: apply `amount` to the output and return the amount not accepted.
-     *         // Here we accept everything and apply the corresponding speed (rounded)
-     *         int speed = (int) Math.round(amount);
-     *         try {
-     *             outEntity.setSpeed(speed);
-     *             outEntity.heat = speed; // adjust heat if needed
-     *             outEntity.updateSpeed = true;
-     *             outEntity.updateGeneratedRotation();
-     *             return 0.0; // all accepted
-     *         } catch (Exception e) {
-     *             return amount; // nothing accepted on error
-     *         }
-     *     });
-     *     // `remaining` contains the SU that couldn't be inserted — you can store or drop it
-     *     this.reactorPower = (float) remaining; // example: keep the remainder
-     * }
-     * @param totalSU total SU to distribute
-     * @param level world level (may be null)
-     * @param inserter function that applies an amount to an output and returns not accepted amount
-     * @return amount of SU not inserted
+     * {@inheritDoc}
+     * A tracked position is dropped if its chunk isn't loaded or the block
+     * entity at that position is no longer a {@link ReactorOutputEntity}.
      */
-    public double distributeSU(double totalSU, Level level, BiFunction<ReactorOutputEntity, Double, Double> inserter) {
-        if (totalSU <= 0 || inserter == null) return totalSU;
-        List<ReactorOutputEntity> validOutputs = new ArrayList<>();
-        for (BlockPos p : new ArrayList<>(positions)) {
-            if (level == null || !level.isLoaded(p)) continue;
-            BlockEntity be = level.getBlockEntity(p);
-            if (be instanceof ReactorOutputEntity out) validOutputs.add(out);
-        }
-        if (validOutputs.isEmpty()) return totalSU;
-
-        double remaining = totalSU;
-        List<ReactorOutputEntity> active = new ArrayList<>(validOutputs);
-        final double MIN_ACCEPTED_SU = 1e-6;
-
-        // Distribute evenly and reallocate the remainder among outputs still able to accept
-        boolean progress = true;
-        while (remaining > MIN_ACCEPTED_SU && !active.isEmpty() && progress) {
-            progress = false;
-            double share = remaining / active.size();
-            List<ReactorOutputEntity> stillActive = new ArrayList<>();
-
-            for (ReactorOutputEntity out : active) {
-                double toInsert = share;
-                double notAccepted;
-                try {
-                    notAccepted = inserter.apply(out, toInsert);
-                } catch (Exception e) {
-                    notAccepted = toInsert;
-                }
-                if (Double.isNaN(notAccepted) || notAccepted < 0) notAccepted = 0;
-                if (notAccepted > toInsert) notAccepted = toInsert;
-                double inserted = toInsert - notAccepted;
-
-                if (inserted > MIN_ACCEPTED_SU) {
-                    progress = true;
-                    remaining -= inserted;
-                    // keep this output active; it may accept more in the next round
-                    stillActive.add(out);
-                }
-                // if inserted == 0, remove it (do not attempt to send more)
-            }
-
-            active = stillActive;
-        }
-
-        return remaining;
-    }
-
     @Override
     public void clearInvalid(Level level) {
         List<BlockPos> toRemove = new ArrayList<>();
@@ -129,6 +60,11 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
         positions.removeAll(toRemove);
     }
 
+    /**
+     * {@inheritDoc}
+     * Filters the tracked positions down to those currently backed by a
+     * loaded {@link ReactorOutputEntity}.
+     */
     @Override
     public List<BlockPos> getBlocksPosition(Level level) {
         List<BlockPos> positions = new ArrayList<>();
@@ -137,5 +73,42 @@ public class ReactorOutputManager extends AbstractReactorIOManager implements Re
             if (level.getBlockEntity(p) instanceof ReactorOutputEntity) positions.add(p);
         }
         return List.copyOf(positions);
+    }
+
+    /**
+     * {@inheritDoc}
+     * The total rotation (in RPM, divided down by {@link #RPM_DIVIDER}) is
+     * split as evenly as possible across the tracked outputs, with the
+     * remainder distributed to the first outputs. Each output is set to its
+     * share of the rotation speed if the reactor is assembled, otherwise
+     * stopped.
+     */
+    @Override
+    public void rotateOutputs(Level level, boolean assembled, int rotation) {
+        if (positions.isEmpty()) return;
+
+        int totalRpm = rotation / RPM_DIVIDER;
+        int size = positions.size();
+        int remainingRotation = totalRpm % size;
+
+        for (int i = 0; i < size; i++) {
+            int dividedRotation = (totalRpm / size) + (i < remainingRotation ? 1 : 0);
+            BlockPos pos = positions.get(i);
+
+            if (!(level.getBlockState(pos).getBlock() instanceof ReactorOutput block)) continue;
+            ReactorOutputEntity entity = block.getBlockEntityType().getBlockEntity(level, pos);
+            if (entity == null) continue;
+
+            if (dividedRotation > 0) {
+                entity.speed = assembled ? dividedRotation : 0;
+                entity.updateSpeed = true;
+                entity.setSpeedAndUpdate(dividedRotation);
+                entity.updateGeneratedRotation();
+            } else {
+                entity.setSpeedAndUpdate(0);
+                entity.updateSpeed = true;
+                entity.updateGeneratedRotation();
+            }
+        }
     }
 }

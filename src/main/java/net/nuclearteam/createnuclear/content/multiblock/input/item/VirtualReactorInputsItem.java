@@ -9,13 +9,7 @@ public record VirtualReactorInputsItem(int fuel, int cooler) {
         this(0,0);
     }
 
-    public BigItemStack getBigFuelRod() {
-        return new BigItemStack(CNItems.URANIUM_ROD.asStack(), fuel);
-    }
 
-    public BigItemStack getBigCooledRod() {
-        return new BigItemStack(CNItems.GRAPHITE_ROD.asStack(), cooler);
-    }
 
     @Override
     public @NotNull String toString() {

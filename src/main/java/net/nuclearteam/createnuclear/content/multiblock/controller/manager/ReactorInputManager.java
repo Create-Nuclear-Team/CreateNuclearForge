@@ -11,11 +11,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
-import net.nuclearteam.createnuclear.CNTags;
-import net.nuclearteam.createnuclear.CNTags.CNItemTags;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.content.multiblock.input.item.VirtualReactorInputsItem;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,8 +82,8 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
             for (int s = 0; s < slots; s++) {
                 ItemStack st = h.getStackInSlot(s);
 
-                if (TypeRodPredicate.IS_FUEL.test(st)) totalFuel += st.getCount();
-                else if (TypeRodPredicate.IS_COOLED.test(st)) totalCooler += st.getCount();
+                if (TypeRodPredicate.isFuel(st, level)) totalFuel += st.getCount();
+                else if (TypeRodPredicate.isCooled(st, level)) totalCooler += st.getCount();
             }
         }
 
@@ -107,11 +106,11 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
                 if (stack.isEmpty()) continue;
 
 
-                if (fuelRemaining > 0 && TypeRodPredicate.IS_FUEL.test(stack)) {
+                if (fuelRemaining > 0 && TypeRodPredicate.isFuel(stack, level)) {
                     int toExtract = Math.min(fuelRemaining, stack.getCount());
                     handler.extractItem(s, toExtract, false);
                     fuelRemaining -= toExtract;
-                } else if (coolerRemaining > 0 && TypeRodPredicate.IS_COOLED.test(stack)) {
+                } else if (coolerRemaining > 0 && TypeRodPredicate.isCooled(stack, level)) {
                     int toExtract = Math.min(coolerRemaining, stack.getCount());
                     handler.extractItem(s, toExtract, false);
                     coolerRemaining -= toExtract;
@@ -135,15 +134,15 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
                 ItemStack stack = handler.getStackInSlot(s);
                 if (stack.isEmpty()) continue;
 
-                // On récupère le nom de l'item (ex: "uranium_rod")
-                String registryPath = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).getPath();
+                // Resolve the item's registry name (e.g. "uranium_rod")
+                String registryPath = ForgeRegistries.ITEMS.getKey(stack.getItem()).getPath();
 
-                // Comparaison intelligente : on ignore la casse et les underscores (_)
+                // Lenient comparison: ignores case and underscores (_)
                 if (isMatching(registryPath, itemName)) {
-                    // On tente d'extraire 1 unité
+                    // Attempt to extract 1 unit
                     ItemStack extracted = handler.extractItem(s, 1, false);
 
-                    // Si l'extraction a réussi, on s'arrête là et on renvoie true
+                    // If extraction succeeded, stop here and return true
                     if (!extracted.isEmpty()) {
                         return true;
                     }
@@ -151,11 +150,12 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
             }
         }
 
-        return false; // On n'a pas trouvé l'item demandé
+        return false; // The requested item was not found
     }
 
     /**
-     * Helper pour comparer "GraphiteRod" avec "graphite_rod"
+     * Helper to compare names like "GraphiteRod" against "graphite_rod"
+     * (case-insensitive, underscore-insensitive).
      */
     private boolean isMatching(String registryPath, String configName) {
         String cleanPath = registryPath.replace("_", "").toLowerCase();
@@ -188,7 +188,7 @@ public class ReactorInputManager extends AbstractReactorIOManager implements Rea
         List<BlockPos> positions = new ArrayList<>();
 
         for (BlockPos p : this.getBlocksPosition()) {
-            if (level.getBlockEntity(p) instanceof ReactorInputEntity) positions.add(p);
+            if (level.getBlockEntity(p) instanceof ReactorRodInputEntity) positions.add(p);
         }
         return List.copyOf(positions);
     }

@@ -1,5 +1,5 @@
 {
   "efficiency": 100,
-  "fluids": "createnuclear:nitrogen",
+  "fluid": "createnuclear:nitrogen",
   "maxHeat": 8196
 }

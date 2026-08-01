@@ -1,14 +1,10 @@
 package net.nuclearteam.createnuclear.content.multiblock.reactorLogic;
 
-import com.simibubi.create.content.logistics.BigItemStack;
 import net.minecraft.world.level.Level;
-import net.nuclearteam.createnuclear.CreateNuclear;
-import net.nuclearteam.createnuclear.api.ItemRodTypesValue;
 import net.nuclearteam.createnuclear.api.multiblock.fluid.ReactorFluidType;
-import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerInventory;
-import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
+import net.nuclearteam.createnuclear.content.multiblock.controller.display.ReactorDisplayState;
 
 /**
  * HeatManager facade delegating to extracted components (in separate files).
@@ -26,17 +22,12 @@ public class HeatManager {
         this(new DefaultHeatCalculator(), new DefaultOverheatController());
     }
 
-    public double calculateHeat(BigItemStack fuel, BigItemStack cooler, BigFluidStack bigFluidStack, int graphiteCount, int uraniumCount, ReactorControllerInventory inventory, Level level) {
-        if (fuel == null || cooler == null) return 0;
-        if (fuel.count <= 0 || cooler.count <= 0) return 0;
-
+    public double calculateHeat(BigFluidStack bigFluidStack, HeatBalance heatBalance, int previousHeat, ReactorControllerInventory inventory, Level level, ReactorDisplayState displayState) {
         ReactorFluidType type = bigFluidStack == null ? null : bigFluidStack.getFluidtype(level);
-        overheatController.updateState(graphiteCount, uraniumCount, bigFluidStack, type);
+        overheatController.updateState(heatBalance, previousHeat, bigFluidStack, type);
 
-        return calculator.computeHeat(fuel, cooler, bigFluidStack, type, graphiteCount, uraniumCount, inventory, overheatController.getOverHeat());
+        return calculator.computeHeat(bigFluidStack, type, inventory, overheatController.getOverHeat(), displayState, level);
     }
 
-    public int getGraphiteTimer() { return overheatController.getGraphiteTimer(); }
-    public int getUraniumTimer() { return overheatController.getUraniumTimer(); }
     public int getLiquidTimer() { return  overheatController.getLiquidTimer();}
 }

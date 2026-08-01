@@ -3,6 +3,7 @@ package net.nuclearteam.createnuclear.infrastructure.config;
 import net.createmod.catnip.config.ConfigBase;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class CRadiation extends ConfigBase {
 
     @Override
     public String getName() {
-        return "radiation";
+        return "Radiation";
     }
 
     private static class Comments {
@@ -31,7 +32,6 @@ public class CRadiation extends ConfigBase {
         static String amplifierLevel1 = "Effect amplifier for Radiation II (1 = level II).";
         static String amplifierLevel2 = "Effect amplifier for Radiation III (2 = level III).";
         static String list = "Lists related to radiation configuration, for example the entity blacklist.";
-
         static String blackListEntity =
                 "List of entity IDs excluded from radiation effects. Use registry names like \"minecraft:armor_stand\".\n\n"
                         + "How to edit:\n"
@@ -41,7 +41,7 @@ public class CRadiation extends ConfigBase {
     }
 
     public static class ConfiguredLists extends ConfigBase {
-        private static ForgeConfigSpec.ConfigValue<List<? extends String>> ENTITY_BLACKLIST = null;
+        private static ConfigValue<List<? extends String>> ENTITY_BLACKLIST = null;
 
         @Override
         public void registerAll(ForgeConfigSpec.Builder builder) {
@@ -49,7 +49,7 @@ public class CRadiation extends ConfigBase {
             ENTITY_BLACKLIST = builder
                     .comment(Comments.blackListEntity)
                     .defineListAllowEmpty(
-                            "entity_blacklist",
+                            List.of("entity_blacklist"),
                             () -> List.of(
                                     "minecraft:armor_stand",
                                     "minecraft:item_frame",
@@ -57,8 +57,6 @@ public class CRadiation extends ConfigBase {
                             ),
                             obj -> obj instanceof String
                     );
-
-            builder.pop();
         }
 
         @Override

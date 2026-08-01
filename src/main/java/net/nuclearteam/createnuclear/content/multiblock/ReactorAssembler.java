@@ -3,13 +3,12 @@ package net.nuclearteam.createnuclear.content.multiblock;
 import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.nuclearteam.createnuclear.CNBlocks;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
@@ -20,6 +19,7 @@ import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class ReactorAssembler {
@@ -30,14 +30,13 @@ public final class ReactorAssembler {
     private ReactorAssembler() {}
 
     public static void assemble(BlockPos pos, Level level) {
+        if (level.isClientSide) return;
+
         ReactorControllerBlockEntity entity = getBlockEntity(level, pos);
         if (entity == null) return;
 
         BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity);
         if (result == null) return;
-
-        CreateNuclear.LOGGER.warn("ReactorAssembler#assemble id: {}, size: {}, name: {}",
-                result.id(), result.data().getSize(), result.data().getName());
 
         sendMessageToPlayer(level, pos, CreateNuclearLang.translate("notification.reactor.assembled"), !entity.isAssembled());
 
@@ -49,12 +48,14 @@ public final class ReactorAssembler {
 
         entity.setMultiblockSize(result.data().getSize());
         entity.setAssembled(true);
-        entity.setMultiblockStructure(entity.getStructureBounds(pos, entity.getMultiblockSize(), entity.getMultiblockFacing()));
+        entity.setMultiblockStructure(ReactorAssembler.getStructureBound(pos, entity.getMultiblockSize(), entity.getMultiblockFacing()));
 
         findAndRegisterSpecialBlocks(entity.getMultiblockPos(), entity, level);
     }
 
     public static void disassemble(BlockPos pos, Level level) {
+        if (level.isClientSide) return;
+
         ReactorControllerBlockEntity entity = getBlockEntity(level, pos);
         if (entity == null || !entity.isAssembled()) return;
 
@@ -67,14 +68,14 @@ public final class ReactorAssembler {
         entity.removeIOAll();
     }
 
-    public static void findAndRegisterSpecialBlocks(int[] reactorPos, ReactorControllerBlockEntity entity, Level level) {
-        int xMin = reactorPos[0], xMax = reactorPos[1];
-        int yMin = reactorPos[2], yMax = reactorPos[3];
-        int zMin = reactorPos[4], zMax = reactorPos[5];
+    public static void findAndRegisterSpecialBlocks(BoundingBox reactorPos, ReactorControllerBlockEntity entity, Level level) {
+        int xMin = reactorPos.minX(), xMax = reactorPos.maxX();
+        int yMin = reactorPos.minY(), yMax = reactorPos.maxY();
+        int zMin = reactorPos.minZ(), zMax = reactorPos.maxZ();
 
         final Block reactorOutputBlock = CNBlocks.REACTOR_OUTPUT.get();
-        final Block reactorInputBlock = CNBlocks.REACTOR_INPUT.get();
-        final Block reactorInputFluidBlock = CNBlocks.REACTOR_LIQUID_INPUT.get();
+        final Block reactorRodInputBlock = CNBlocks.REACTOR_ROD_INPUT.get();
+        final Block reactorInputFluidBlock = CNBlocks.REACTOR_FLUID_INPUT.get();
         final Block reactorAlarmBlock = CNBlocks.REACTOR_ALARM.get();
         final Block reactorFrameBlock = CNBlocks.REACTOR_FRAME.get();
 
@@ -82,6 +83,10 @@ public final class ReactorAssembler {
 
         int frameMinY = Integer.MAX_VALUE;
         int frameMaxY = Integer.MIN_VALUE;
+
+        // Collected here and assigned their capacity after the scan: the reactor-size capacity is a
+        // single TOTAL shared across every fluid input, so we split it once we know how many there are.
+        List<ReactorFluidInputEntity> fluidInputs = new ArrayList<>();
 
         for (int y = yMin; y <= yMax; y++) {
             boolean isYBoundary = (y == yMin || y == yMax);
@@ -97,12 +102,12 @@ public final class ReactorAssembler {
 
                     if (blockState.is(reactorOutputBlock)) {
                         entity.addOutput(mutablePos.immutable());
-                    } else if (blockState.is(reactorInputBlock)) {
+                    } else if (blockState.is(reactorRodInputBlock)) {
                         entity.addInput(mutablePos.immutable());
                     } else if (blockState.is(reactorInputFluidBlock)) {
                         entity.addInputFluid(mutablePos.immutable());
                         if (level.getBlockEntity(mutablePos) instanceof ReactorFluidInputEntity fluidInput) {
-                            fluidInput.applyReactorTierCapacity(entity.getMultiblockSize());
+                            fluidInputs.add(fluidInput);
                         }
                     } else if (blockState.is(reactorAlarmBlock)) {
                         entity.addAlarm(mutablePos.immutable());
@@ -118,7 +123,27 @@ public final class ReactorAssembler {
         }
 
         if (frameMinY != Integer.MAX_VALUE) {
-            entity.setFrameColumn(frameMinY, frameMaxY);
+            entity.getFrameDisplayManager().setFrameColumn(frameMinY, frameMaxY, entity::notifyUpdate);
+        }
+
+        distributeFluidInputCapacity(fluidInputs, entity.getMultiblockSize());
+    }
+
+    /**
+     * Splits the reactor-size total fluid capacity evenly across all fluid inputs so the combined
+     * max capacity always equals the configured value, regardless of how many inputs were placed.
+     * The integer remainder is spread one unit at a time over the first inputs so the sum stays exact.
+     */
+    private static void distributeFluidInputCapacity(List<ReactorFluidInputEntity> fluidInputs, int reactorSize) {
+        int count = fluidInputs.size();
+        if (count == 0) return;
+
+        int total = ReactorFluidInputEntity.getCapacityForReactorSize(reactorSize);
+        int base = total / count;
+        int remainder = total % count;
+
+        for (int i = 0; i < count; i++) {
+            fluidInputs.get(i).applyCapacity(base + (i < remainder ? 1 : 0));
         }
     }
 
@@ -129,12 +154,6 @@ public final class ReactorAssembler {
         return null;
     }
 
-    @Deprecated
-    private static List<Player> getPlayersInRadius(Level level, BlockPos center, double radius) {
-        AABB box = new AABB(center).inflate(radius);
-        return level.getEntitiesOfClass(Player.class, box);
-    }
-
     private static void sendMessageToPlayer(Level level, BlockPos pos, LangBuilder component, boolean condition) {
         if (!condition) return;
 
@@ -142,5 +161,23 @@ public final class ReactorAssembler {
                 component,
                 ChatFormatting.GOLD, configRadius, configWarnAll
         );
+    }
+
+    public static BoundingBox getStructureBound(BlockPos center, int size, Direction facing) {
+        int radius = (size - 1) / 2;
+        int height = radius + 1;
+        int depth = size - 1;
+        Direction into = facing.getOpposite();
+
+        int axisX = into.getStepX() * depth;
+        int axisZ = into.getStepZ() * depth;
+
+        int minX = center.getX() + Math.min(0, axisX) - (axisX == 0 ? radius : 0);
+        int maxX = center.getX() + Math.max(0, axisX) + (axisX == 0 ? radius : 0);
+        int minZ = center.getZ() + Math.min(0, axisZ) - (axisZ == 0 ? radius : 0);
+        int maxZ = center.getZ() + Math.max(0, axisZ) + (axisZ == 0 ? radius : 0);
+
+        return new BoundingBox(minX, center.getY() - height, minZ,
+                maxX, center.getY() + height, maxZ);
     }
 }

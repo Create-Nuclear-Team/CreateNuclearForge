@@ -11,7 +11,6 @@ import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.surfacerule.IrradiatedSurfaceRules;
-import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.surfacerule.IrradiatedSurfaceRules2;
 import org.jetbrains.annotations.NotNull;
 
 public class CNNoiseGeneratorSettings {
@@ -26,7 +25,7 @@ public class CNNoiseGeneratorSettings {
                 CNBlocks.STEEL_BLOCK.get().defaultBlockState(),
                 Blocks.AIR.defaultBlockState(),
                 CNNoiseGeneratorSettings.irradiated(densityLookup, noiseLookup),
-                IrradiatedSurfaceRules2.DEFAULT_RULE,
+                IrradiatedSurfaceRules.DEFAULT_RULE,
                 new OverworldBiomeBuilder().spawnTarget(),
                 32,
                 false,

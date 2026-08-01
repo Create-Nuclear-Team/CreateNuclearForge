@@ -10,8 +10,6 @@ import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.damagesource.DamageEffects;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +22,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.feature.SnowAndFreezeFeature;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.SoundActions;
@@ -35,8 +32,9 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteStoneTypes;
+import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
-import net.nuclearteam.createnuclear.foundation.item.radiation.RadiationBucketItem;
+import net.nuclearteam.createnuclear.content.radiation.RadiationBucketItem;
 
 import org.joml.Vector3f;
 import net.nuclearteam.createnuclear.CNTags.CNFluidTags;
@@ -45,6 +43,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class CNFluids {
+    private static final double URANIUM_FLUID_DOSE = 5.0D;
+
     public static final FluidEntry<ForgeFlowingFluid.Flowing> URANIUM =
         CreateNuclear.REGISTRATE.standardFluid("uranium", SolidRenderedPlaceableFluidtype.create(0x38FF08, () -> 1f / 32f))
             .lang("Liquid Uranium")
@@ -98,7 +98,7 @@ public class CNFluids {
             .lang("Liquid Nitrogen")
             .tag(CNFluidTags.NITROGEN.tag)
             .properties(p -> p.viscosity(1000)
-                .density(0)
+                .density(1000)
                 .canSwim(true)
                 .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_AXOLOTL)
                 .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_FISH)
@@ -127,16 +127,16 @@ public class CNFluids {
 
         Level level = entity.level();
 
-        // 1. EFFET DE L'URANIUM (Radiation)
+        // 1. Uranium: applies radiation contagion
         if (entity.isInFluidType(URANIUM.getType())) {
             if (entity.tickCount % 20 == 0) {
-                entity.addEffect(new MobEffectInstance(CNEffects.RADIATION.get(), 100, 0));
+                RadiationCapability.applyContagion(entity, URANIUM_FLUID_DOSE, 100);
             }
         }
 
-        // 2. EFFET DE L'AZOTE LIQUIDE (Gel type Neige Poudreuse)
+        // 2. Liquid nitrogen: freezes the entity like powder snow
         else if (entity.isInFluidType(LIQUID_NITROGEN.getType())) {
-            // PROBLÈME 1 RÉSOLU : Si l'entité est en feu, on l'éteint immédiatement
+            // Extinguish fire immediately on contact
             if (entity.isOnFire()) {
                 entity.clearFire();
             }
@@ -150,13 +150,13 @@ public class CNFluids {
             int freezeSpeed = 3;
 
             if (level.isClientSide) {
-                // On vise maxTicks + 1 pour que la baisse de -1 du client ramène pile à maxTicks
+                // Target maxTicks + 1 so vanilla's client-side -1 decay settles exactly at maxTicks
                 entity.setTicksFrozen(Math.min(maxTicks + 1, currentTicks + freezeSpeed + 1));
             } else {
-                // On vise maxTicks + 2 pour que la baisse de -2 du serveur ramène pile à maxTicks
+                // Target maxTicks + 2 so vanilla's server-side -2 decay settles exactly at maxTicks
                 entity.setTicksFrozen(Math.min(maxTicks + 2, currentTicks + freezeSpeed + 2));
 
-                // PROBLÈME 2 RÉSOLU : On vérifie le gel APRÈS modification ou avec la compensation
+                // Check the freeze state after applying the compensation above
                 if (entity.getTicksFrozen() >= maxTicks && entity.tickCount % 10 == 0) {
                     entity.hurt(entity.damageSources().freeze(), 2.0F);
                 }
@@ -165,7 +165,7 @@ public class CNFluids {
             }
         }
 
-        // 3. EFFET DU THORIUM (Brûlure)
+        // 3. Thorium: burns the entity like lava
         else if (entity.isInFluidType(THORIUM.getType())) {
             entity.lavaHurt();
         }

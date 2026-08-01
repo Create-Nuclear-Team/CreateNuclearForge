@@ -21,7 +21,7 @@ public class ItemConsumable implements IConsumable {
 
     @Override
     public int computeTimer(int count) {
-        int base = Math.max(1, rodType.rodTimer());
+        int base = Math.max(1, rodType.rodTimer().get());
         return Math.max(1, (int) (base / Math.max(1, count)));
     }
 

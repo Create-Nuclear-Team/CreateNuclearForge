@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.nuclearteam.createnuclear.CNBlockEntityTypes;
+import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
@@ -115,21 +116,15 @@ public class ReactorFrame extends Block implements IWrenchable, IBE<ReactorFrame
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @javax.annotation.Nullable LivingEntity pPlacer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, pPlacer, stack);
-        CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
-    }
-
-    @Override // called when the player destroys the block, with or without a tool
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
-        pattern.findController(pos, level, false);
+        MultiblockHelpers.handleAdvancedPlacedBy(pos, level, pPlacer);
     }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         super.onRemove(state, level, pos, newState, movedByPiston);
-        // playerDestroy n'est PAS appelé en créatif : on doit aussi réévaluer ici.
-        // On ne réagit qu'à une vraie suppression/remplacement du bloc (type différent),
-        // pas à un simple changement de la propriété PART (même bloc, via setBlock).
+        // playerDestroy is NOT called in creative mode, so the structure must also be
+        // re-evaluated here. Only react to an actual block removal/replacement (different
+        // block type), not to a simple PART property change (same block, via setBlock).
         if (!state.is(newState.getBlock())) {
             pattern.findController(pos, level, false);
         }

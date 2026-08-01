@@ -11,9 +11,8 @@
       "item": "createnuclear:thorium_dust"
     },
     {
-      "chance": 0.5,
-      "count": 8,
-      "item": "createnuclear:thorium_dust"
+      "chance": 0.75,
+      "item": "create:experience_nugget"
     }
   ]
 }

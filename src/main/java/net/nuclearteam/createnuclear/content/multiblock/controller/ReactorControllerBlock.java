@@ -6,8 +6,10 @@ import com.simibubi.create.foundation.item.ItemHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -25,11 +27,10 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.ReactorAssembler;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.FluidLockManager;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
-import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancementBehaviour;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 import net.nuclearteam.createnuclear.foundation.utility.NotifyUtil;
@@ -48,9 +49,9 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     public ReactorControllerBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()
-                .setValue(FACING, net.minecraft.core.Direction.NORTH)
+                .setValue(FACING, Direction.NORTH)
                 .setValue(ASSEMBLED, false)
-                .setValue(ACTIVE, false) // Par défaut inactif
+                .setValue(ACTIVE, false) // Inactive by default
         );
     }
 
@@ -72,11 +73,11 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                                 boolean isMoving) {
         if (worldIn.isClientSide)
             return;
-        // Un voisin direct du controller a changé. On ne désassemble PAS aveuglément :
-        // on ne le fait que si la structure est réellement cassée. Sinon, poser/remplacer
-        // un bloc adjacent au controller (frame au-dessus/en-dessous, input/alarm sur les
-        // côtés, cooler derrière) annulerait l'assemblage qui vient juste d'être validé.
-        // disassemble() vérifie findStructure et ne fait rien si la structure est complète.
+        // A direct neighbor of the controller has changed. Do NOT blindly disassemble:
+        // only do so if the structure is actually broken. Otherwise, placing/replacing a
+        // block adjacent to the controller (frame above/below, input/alarm on the sides,
+        // cooler behind) would invalidate the assembly that was just validated.
+        // disassemble() checks findStructure and does nothing if the structure is complete.
         if (state.getValue(ASSEMBLED))
             ReactorAssembler.disassemble(pos, worldIn);
     }
@@ -90,12 +91,11 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         if (!(blockEntity instanceof ReactorControllerBlockEntity controllerBlockEntity)) return InteractionResult.PASS;
 
         ItemStack heldItem = player.getItemInHand(handIn);
-        if (heldItem.is(Items.PAPER)) {
-            withBlockEntityDo(worldIn, pos, ReactorControllerBlockEntity::logReactorConnections);
+        if (heldItem.is(Items.DEBUG_STICK)) {
+            withBlockEntityDo(worldIn, pos, be -> be.logReactorConnections(player));
         }
 
         if (!state.getValue(ASSEMBLED)) {
-            // player.sendSystemMessage(Component.translatable("reactor.info.assembled.none").withStyle(ChatFormatting.RED));
         }
         else {
             if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty() && heldItem.getTag() != null){
@@ -105,22 +105,25 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
 
                     player.setItemInHand(handIn, ItemStack.EMPTY);
                 });
+                // One-shot played server-side (null player) so it broadcasts to nearby clients.
+                worldIn.playSound(null, pos, CNSoundEvents.MOTOR_ASSEMBLE.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
                 return InteractionResult.SUCCESS;
 
             }
             else if (heldItem.isEmpty() && !controllerBlockEntity.getInventoryObject().getItem(0).isEmpty()) {
                 withBlockEntityDo(worldIn, pos, be -> {
-                    if (IHeat.HeatLevel.of(be.getInventoryObject().getItem(0).getOrCreateTag().getInt("heat")) == IHeat.HeatLevel.DANGER) {
+                    if (IHeat.HeatLevel.of(be.getInventoryObject().getItem(0).getOrCreateTag().getInt("heat"), be.getMultiblockSize()) == IHeat.HeatLevel.DANGER) {
                         be.getAdvancement().setPlayer(player.getUUID());
                         be.getAdvancement().awardPlayer(CNAdvancement.NO_TIME_TO_DIE);
                     }
                     player.setItemInHand(handIn, be.getInventoryObject().getItem(0));
                     be.getInventoryObject().setStackInSlot(0, ItemStack.EMPTY);
                     be.setConfiguredPattern(ItemStack.EMPTY);
-                    //be.clearTimers(); // retirer le commentaire si on veux que le timer se reset quand le reacteur s'arrete
-                    be.rotate(be.getBlockState(), be.getLevel(), 0);
+                    //be.clearTimers(); // uncomment if the timer should reset when the reactor stops
+                    be.getOutputManager().rotateOutputs(be.getLevel(), be.getAssembled(), 0);
                     be.notifyUpdate();
                 });
+                worldIn.playSound(null, pos, CNSoundEvents.MOTOR_DISASSEMBLE.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
                 state.setValue(ASSEMBLED, false);
                 return InteractionResult.SUCCESS;
 
@@ -140,9 +143,9 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         withBlockEntityDo(worldIn, pos, be -> ItemHelper.dropContents(worldIn, pos, be.getInventoryObject()));
         worldIn.removeBlockEntity(pos);
 
-        if (!worldIn.isClientSide && worldIn instanceof ServerLevel serverLevel) {
+        if (worldIn instanceof ServerLevel serverLevel) {
             PersistentFluidLocks.get(serverLevel).clearLock(pos);
-        } else FluidLockManager.clearLock(pos);
+        }
 
           if (!state.getValue(ASSEMBLED))
             return;
@@ -158,7 +161,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity pPlacer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, pPlacer, stack);
-        CNAdvancementBehaviour.setPlacedBy(level, pos, pPlacer);
+        MultiblockHelpers.handleAdvancedPlacedBy(pos, level, pPlacer);
         if (state.getValue(ASSEMBLED))
             return;
         ReactorAssembler.assemble(pos, level);

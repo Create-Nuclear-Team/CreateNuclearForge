@@ -14,7 +14,6 @@ public class ReactorControllerInventory extends SmartInventory {
         this.be = be;
     }
 
-
     @Override
     public ItemStack removeItemNoUpdate(int index) {
         be.setChanged();

@@ -47,7 +47,7 @@ public class CNMechanicalCraftingRecipeGen extends MechanicalCraftingRecipeGen {
             .recipe(b -> b
                 .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
                 .key('G', Ingredient.of(CNBlocks.REINFORCED_GLASS))
-                .key('B', Ingredient.of(CNFluids.URANIUM.get().getBucket()))
+                .key('B', Ingredient.of(Items.BUCKET))
                 .key('S', Ingredient.of(CNTags.forgeItemTag("ingots/steel")))
                 .patternLine("CCCCC")
                 .patternLine("CSGSC")
@@ -56,46 +56,59 @@ public class CNMechanicalCraftingRecipeGen extends MechanicalCraftingRecipeGen {
                 .patternLine("CCCCC")
         ),
 
-    REACTOR_CONTROLLER = create(CNBlocks.REACTOR_CONTROLLER::get)
-        .recipe(b -> b
-            .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
-            .key('V', Ingredient.of(AllBlocks.ITEM_VAULT))
-            .key('O', Ingredient.of(AllBlocks.SMART_OBSERVER))
-            .key('T', Ingredient.of(AllItems.ELECTRON_TUBE))
-            .key('N', Ingredient.of(Items.NETHERITE_INGOT))
-            .key('X', Ingredient.of(Items.NETHER_STAR))
-            .patternLine("CCCCC")
-            .patternLine("CNONC")
-            .patternLine("CTXTC")
-            .patternLine("CNVNC")
-            .patternLine("CCCCC")
-    ),
+        REACTOR_CONTROLLER = create(CNBlocks.REACTOR_CONTROLLER::get)
+            .recipe(b -> b
+                .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
+                .key('V', Ingredient.of(AllBlocks.ITEM_VAULT))
+                .key('O', Ingredient.of(AllBlocks.SMART_OBSERVER))
+                .key('T', Ingredient.of(AllItems.ELECTRON_TUBE))
+                .key('N', Ingredient.of(Items.NETHERITE_INGOT))
+                .key('X', Ingredient.of(Items.NETHER_STAR))
+                .patternLine("CCCCC")
+                .patternLine("CNONC")
+                .patternLine("CTXTC")
+                .patternLine("CNVNC")
+                .patternLine("CCCCC")
+        ),
 
-    REACTOR_COOLING_FRAME= create(CNBlocks.REACTOR_COOLER::get)
-        .recipe(b -> b
-            .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
-            .key('I', Ingredient.of(Blocks.BLUE_ICE))
-            .key('G', Ingredient.of(CNBlocks.REINFORCED_GLASS))
-            .key('S', Ingredient.of(CNTags.forgeItemTag("ingots/steel")))
-            .patternLine("CCCCC")
-            .patternLine("CSGSC")
-            .patternLine("CIGIC")
-            .patternLine("CSGSC")
-            .patternLine("CCCCC")
-    ),
+        REACTOR_COOLING_FRAME= create(CNBlocks.REACTOR_COOLER::get)
+            .recipe(b -> b
+                .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
+                .key('I', Ingredient.of(Blocks.BLUE_ICE))
+                .key('G', Ingredient.of(CNBlocks.REINFORCED_GLASS))
+                .key('S', Ingredient.of(CNTags.forgeItemTag("ingots/steel")))
+                .patternLine("CCCCC")
+                .patternLine("CSGSC")
+                .patternLine("CIGIC")
+                .patternLine("CSGSC")
+                .patternLine("CCCCC")
+        ),
 
-    REACTOR_CORE = create(CNBlocks.REACTOR_CORE::get)
-        .recipe(b -> b
-            .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
-            .key('P', Ingredient.of(AllItems.PRECISION_MECHANISM))
-            .key('B', Ingredient.of(CNFluids.URANIUM.get().getBucket()))
-            .key('S', Ingredient.of(CNTags.forgeItemTag("ingots/steel")))
-            .patternLine("CCCCC")
-            .patternLine("CPSPC")
-            .patternLine("CSBSC")
-            .patternLine("CPSPC")
-            .patternLine("CCCCC")
-    );
+        REACTOR_CORE = create(CNBlocks.REACTOR_CORE::get)
+            .recipe(b -> b
+                .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
+                .key('P', Ingredient.of(AllItems.PRECISION_MECHANISM))
+                .key('B', Ingredient.of(CNFluids.URANIUM.get().getBucket()))
+                .key('S', Ingredient.of(CNTags.forgeItemTag("ingots/steel")))
+                .patternLine("CCCCC")
+                .patternLine("CPSPC")
+                .patternLine("CSBSC")
+                .patternLine("CPSPC")
+                .patternLine("CCCCC")
+        ),
+
+        REACTOR_ALARM = create(CNBlocks.REACTOR_ALARM::get)
+            .recipe(b -> b
+                .key('C', Ingredient.of(CNBlocks.REACTOR_CASING))
+                .key('N', Ingredient.of(Blocks.NOTE_BLOCK))
+                .key('R', Ingredient.of(Blocks.REPEATER))
+                .key('L', Ingredient.of(Items.CLOCK))
+                .patternLine("CCCCC")
+                .patternLine("CNRNC")
+                .patternLine("CRLRC")
+                .patternLine("CNRNC")
+                .patternLine("CCCCC")
+        );
 
 
     public CNMechanicalCraftingRecipeGen(PackOutput output) {

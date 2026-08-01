@@ -17,8 +17,9 @@ import net.minecraft.world.item.ItemStack;
  * <p>Implementation details:
  * - Empty stacks contribute {@code 0}.
  * - Each non-empty stack contributes a value computed from the numeric item id,
- *   stack count, optional damage value (for damageable items), and the NBT tag's
- *   {@code hashCode()} when present.
+ *   stack count, and the NBT tag's {@code hashCode()} when present. Damage value
+ *   is intentionally excluded: no radiation source reads it, so including it would
+ *   only cause needless recomputation on every durability change.
  * - Per-stack contributions are combined using a 31-multiplicative rolling scheme
  *   (similar to {@link String#hashCode()}).</p>
  *
@@ -45,7 +46,7 @@ public class InventoryHashUtil {
      *         detection but is not collision-resistant.
      * @throws NullPointerException if {@code player} is {@code null}
      * @implNote The algorithm uses {@link Item#getId(net.minecraft.world.item.Item)}
-     *           and basic stack properties (count, damage, tag.hashCode()). It is
+     *           and basic stack properties (count, tag.hashCode()). It is
      *           intentionally simple and optimized for speed rather than
      *           cryptographic strength.
      */
@@ -73,7 +74,7 @@ public class InventoryHashUtil {
      *
      * <p>Empty stacks return {@code 0}. For non-empty stacks the returned value
      * encodes the numeric item id, the stack count, and, when applicable, the
-     * damage value and the NBT tag's {@code hashCode()}.</p>
+     * NBT tag's {@code hashCode()}.</p>
      *
      * @param stack the item stack to hash; must not be {@code null}
      * @return a {@code long} representing the stack's contribution; {@code 0}
@@ -86,10 +87,6 @@ public class InventoryHashUtil {
 
         long h = Item.getId(stack.getItem());
         h = 31 * h + stack.getCount();
-
-        if (stack.isDamageableItem()) {
-            h = 31 * h + stack.getDamageValue();
-        }
 
         if (stack.hasTag()) {
             h = 31 * h + stack.getTag().hashCode();

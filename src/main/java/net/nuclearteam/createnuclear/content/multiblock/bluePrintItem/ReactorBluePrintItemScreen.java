@@ -39,7 +39,7 @@ public class ReactorBluePrintItemScreen extends AbstractSimiContainerScreen<Reac
         BG.render(guiGraphics, x+23, y-19);
         renderPlayerInventory(guiGraphics, x+23, y+175);
 
-        guiGraphics.drawString(font, title, x+26, y-12, 0x592424, false); //ici pour le titre
+        guiGraphics.drawString(font, title, x+26, y-12, 0x592424, false); // renders the screen title
 
     }
 
@@ -50,23 +50,19 @@ public class ReactorBluePrintItemScreen extends AbstractSimiContainerScreen<Reac
             menu.player.closeContainer();
         }
 
-        float coef = 0.1F;
-
         CompoundTag tag = menu.contentHolder.getOrCreateTag();
-
-        sendValueUpdate(tag, coef,
-                tag.getInt("graphiteTime"),
-                tag.getInt("uraniumTime"),
-                tag.getInt("countUraniumRod"),
-                tag.getInt("countGraphiteRod")
-        );
-
-
+        if (tag.contains("pattern")) {
+            sendValueUpdate(tag, tag.getFloat("heat"),
+                    tag.getInt("coolerTime"),
+                    tag.getInt("fuelTime"),
+                    tag.getInt("countCoolerRod"),
+                    tag.getInt("countFuelRod")
+            );
+        }
     }
 
 
-    private static void sendValueUpdate(CompoundTag tag, float heat, int graphiteTime, int uraniumTime, int countGraphiteRod, int countUraniumRod) {
-        CNPackets.getChannel()
-                .sendToServer(new ReactorBluePrintItemPacket(tag, heat, graphiteTime, uraniumTime, countGraphiteRod, countGraphiteRod));
+    private static void sendValueUpdate(CompoundTag tag, float heat, int coolerTime, int fuelTime, int countCoolerRod, int countFuelRod) {
+        CNPackets.getChannel().sendToServer(new ReactorBluePrintItemPacket(tag, heat, coolerTime, fuelTime, countCoolerRod, countFuelRod));
     }
 }

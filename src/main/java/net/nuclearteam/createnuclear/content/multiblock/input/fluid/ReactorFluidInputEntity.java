@@ -22,13 +22,14 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.foundation.block.MultiDirectionalReactorBlock;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGoggleInformation {
 
-    /** Capacité par défaut tant que l'input n'est rattaché à aucun réacteur assemblé. */
+    /** Default tank capacity while this input is not attached to any assembled reactor. */
     public static final int DEFAULT_CAPACITY = 16000;
 
     private final FluidTank internalTank;
@@ -44,7 +45,7 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
     }
 
     /**
-     * Capacité du tank en fonction de la taille du réacteur (tier).
+     * Returns the tank capacity for the given reactor size (tier).
      * 5x5 -> tier 1, 7x7 -> tier 2, 9x9 -> tier 3.
      */
     public static int getCapacityForReactorSize(int reactorSize) {
@@ -56,9 +57,15 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
         };
     }
 
-    /** Applique la capacité correspondant à la taille du réacteur à laquelle cet input appartient. */
-    public void applyReactorTierCapacity(int reactorSize) {
-        int capacity = getCapacityForReactorSize(reactorSize);
+    /**
+     * Applies an explicit tank capacity to this input.
+     * <p>
+     * The per-reactor-size capacity ({@link #getCapacityForReactorSize(int)}) is the TOTAL the
+     * reactor should hold, split across all fluid inputs by {@code ReactorAssembler}, so the sum
+     * of every input's capacity stays equal to the configured value no matter how many inputs the
+     * player places.
+     */
+    public void applyCapacity(int capacity) {
         if (internalTank.getCapacity() == capacity) return;
         internalTank.setCapacity(capacity);
         if (level != null && !level.isClientSide) {
@@ -137,7 +144,11 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
         if (!capability.isPresent()) refreshCapability();
-        if (cap == ForgeCapabilities.FLUID_HANDLER) return capability.cast();
+        if (cap == ForgeCapabilities.FLUID_HANDLER) {
+            if (side != null && side != getBlockState().getValue(MultiDirectionalReactorBlock.FACING))
+                return LazyOptional.empty();
+            return capability.cast();
+        }
 
         return super.getCapability(cap, side);
     }
@@ -177,20 +188,16 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
             ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(level, worldPosition);
             BlockPos controllerPos = controller != null ? controller.getBlockPos() : null;
 
-            if (controllerPos != null && level instanceof ServerLevel serverLevel) {
-                PersistentFluidLocks lock = PersistentFluidLocks.get(serverLevel);
-                if (!lock.canAccept(controllerPos, resource.getFluid())) return 0;
-            } else if (controllerPos != null) {
-                if (!FluidLockManager.canAccept(controllerPos, resource)) return 0;
+            // Fluid locks are server-authoritative (persisted per-level via PersistentFluidLocks).
+            // The client stays permissive; the server syncs the real tank state back.
+            if (controllerPos != null && level instanceof ServerLevel serverLevel
+                    && !PersistentFluidLocks.get(serverLevel).canAccept(controllerPos, resource.getFluid())) {
+                return 0;
             }
 
             int filled = delegate.fill(resource, action);
-            if (filled > 0 && action.execute() && controllerPos != null ){
-                if (level instanceof ServerLevel serverLevel) {
-                    PersistentFluidLocks.get(serverLevel).tryLock(controllerPos, resource.getFluid());
-                } else {
-                    FluidLockManager.tryLock(controllerPos, resource.getFluid());
-                }
+            if (filled > 0 && action.execute() && controllerPos != null && level instanceof ServerLevel serverLevel) {
+                PersistentFluidLocks.get(serverLevel).tryLock(controllerPos, resource.getFluid());
             }
             return filled;
         }
@@ -198,39 +205,31 @@ public class ReactorFluidInputEntity extends SmartBlockEntity implements IHaveGo
         @Override
         public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
             FluidStack drained = delegate.drain(resource, action);
-            if (!drained.isEmpty() && action.execute()) {
-                ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(level, worldPosition);
-                if (controller != null) {
-                    BlockPos controllerPos = controller.getBlockPos();
-                    if (delegate.getFluidInTank(0).isEmpty()) {
-                        if (level instanceof ServerLevel serverLevel) {
-                            PersistentFluidLocks.get(serverLevel).clearLock(controllerPos);
-                        } else {
-                            FluidLockManager.clearLock(controllerPos);
-                        }
-                    }
-                }
-            }
+            clearLockIfEmptied(drained, action);
             return drained;
         }
 
         @Override
         public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
             FluidStack drained = delegate.drain(maxDrain, action);
-            if (!drained.isEmpty() && action.execute()) {
-                ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(level, worldPosition);
-                if (controller != null) {
-                    BlockPos controllerPos = controller.getBlockPos();
-                    if (delegate.getFluidInTank(0).isEmpty()) {
-                        if (level instanceof ServerLevel serverLevel) {
-                            PersistentFluidLocks.get(serverLevel).clearLock(controllerPos);
-                        } else {
-                            FluidLockManager.clearLock(controllerPos);
-                        }
-                    }
-                }
-            }
+            clearLockIfEmptied(drained, action);
             return drained;
+        }
+
+        /**
+         * Releases the controller's fluid lock once this input has been fully drained.
+         * Server-authoritative: the lock lives in {@link PersistentFluidLocks}, so this is
+         * a no-op on the client.
+         */
+        private void clearLockIfEmptied(FluidStack drained, FluidAction action) {
+            if (drained.isEmpty() || !action.execute() || !(level instanceof ServerLevel serverLevel))
+                return;
+            if (!delegate.getFluidInTank(0).isEmpty())
+                return;
+
+            ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(level, worldPosition);
+            if (controller != null)
+                PersistentFluidLocks.get(serverLevel).clearLock(controller.getBlockPos());
         }
     }
 }

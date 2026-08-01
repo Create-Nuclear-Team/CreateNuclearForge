@@ -44,13 +44,16 @@ public record RodsStats(Item item) implements TooltipModifier {
                 .addTo(components);
 
             CreateNuclearLang.builder()
-                .add(CreateNuclearLang.translate("tooltip.baseRodHeat", rodType.baseRodHeat()))
+                .add(CreateNuclearLang.translate("tooltip.baseRodHeat", rodType.baseRodHeat().get()))
                 .addTo(components);
             CreateNuclearLang.builder()
-                .add(CreateNuclearLang.translate("tooltip.proximityRodHeat", rodType.proximityRodHeat()))
+                .add(CreateNuclearLang.translate("tooltip.proximityRodHeat", rodType.proximityRodHeat().get()))
                 .addTo(components);
             CreateNuclearLang.builder()
-                .add(CreateNuclearLang.translate("tooltip.rodTimer", rodType.rodTimer()))
+                .add(CreateNuclearLang.translate("tooltip.rodTimer", rodType.rodTimer().get()))
+                .addTo(components);
+            CreateNuclearLang.builder()
+                .add(CreateNuclearLang.translate("tooltip.ratio", rodType.ratio().get()))
                 .addTo(components);
             CreateNuclearLang.builder()
                 .add(CreateNuclearLang.translate("tooltip.typeRod", rodType.type().name()))

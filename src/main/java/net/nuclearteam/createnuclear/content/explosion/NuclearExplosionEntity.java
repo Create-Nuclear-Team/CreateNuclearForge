@@ -42,12 +42,13 @@ public class NuclearExplosionEntity extends Entity {
 
     private Explosion dummyExplosion;
 
-    // Changé en Object pour éviter le crash ClassNotFound si Alex's Caves n'est pas installé
+    // Typed as Object (not AlexscaveCompat) so this field can exist even when Alex's Caves
+    // isn't installed and its classes are unavailable on the classpath
     private Object alexscaveHandler;
 
     public NuclearExplosionEntity(EntityType<?> entityType, Level level) {
         super(entityType, level);
-        // On instancie la compatibilité SEULEMENT si le mod est présent
+        // Only instantiate the compat handler when the addon is actually loaded
         if (Mods.ALEXS_CAVE.isLoaded()) {
             this.alexscaveHandler = new AlexscaveCompat();
         }
@@ -112,9 +113,8 @@ public class NuclearExplosionEntity extends Entity {
                 float playerFling = entity instanceof Player ? 0.5F * flingStrength : flingStrength;
 
                 if (damage > 0) {
-                    // Gestion Raycat (Avec accolades obligatoires)
+                    // Raycat (Alex's Caves) is immune to the explosion
                     if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null) {
-                        // isRaycat doit retourner un boolean dans votre Compat
                         if (((AlexscaveCompat) alexscaveHandler).isRaycat(entity)) {
                             damage = 0;
                         }
@@ -124,9 +124,8 @@ public class NuclearExplosionEntity extends Entity {
                         damage *= 0.25F;
                         playerFling *= 0.1F;
 
-                        // Gestion Tremorzilla
+                        // Tremorzilla (Alex's Caves) is fully immune, on top of the irradiated-immune reduction above
                         if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null) {
-                            // isTremorzilla doit retourner un boolean dans votre Compat
                             if (((AlexscaveCompat) alexscaveHandler).isTremorzilla(entity)) {
                                 CreateNuclear.LOGGER.warn("Entity explosion compatibility with Alex's Cave");
                                 damage = 0;
@@ -210,21 +209,24 @@ public class NuclearExplosionEntity extends Entity {
                             carveBelow.set(carve.getX(), carve.getY() - 1, carve.getZ());
                             canSetToFire = true;
 
-                            // GESTION SPAWN MOBS / compat Alex's Caves
+                            // ALEX'S CAVES compatibility handling
                             boolean handledByAlex = false;
                             if (Mods.ALEXS_CAVE.isLoaded() && alexscaveHandler != null){
                                 handledByAlex = ((AlexscaveCompat) alexscaveHandler).MobSpawn(state, level(), carve, itemDropModifier, dummyExplosion);
                             }
 
-                            // Si Alex a géré (oeuf éclot), on skip
                             if (handledByAlex) continue;
 
-                            // Nouveau : destruction standard quand Alex's Caves n'est pas présent
-                            // On essaye d'abord d'appeler le comportement d'explosion du block, sinon fallback sur destroyBlock
-                            try {
-                                state.onBlockExploded(level(), carve, dummyExplosion);
-                            } catch (Exception e) {
-                                level().destroyBlock(carve, true);
+                            // 1. Create an immutable copy of the position
+                            BlockPos immutablePos = carve.immutable();
+
+                            // 2. Call the explosion behavior
+                            state.onBlockExploded(level(), immutablePos, dummyExplosion);
+
+                            // 3. onBlockExploded() doesn't remove plain vanilla blocks (e.g. stone/dirt) by
+                            //    itself, so force removal here and let items drop normally
+                            if (level().getBlockState(immutablePos).is(state.getBlock())) {
+                                level().destroyBlock(immutablePos, true);
                             }
                         }
                     }

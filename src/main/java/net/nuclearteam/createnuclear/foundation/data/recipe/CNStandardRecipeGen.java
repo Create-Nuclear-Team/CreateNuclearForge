@@ -70,8 +70,8 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
 
     private final String BLAST_FURNACE = enterFolder("blast_furnace");
     GeneratedRecipe
-        URANIUM_ORE_TO_URANIUM_POWDER = blastFurnaceRecipeTags(() -> CNItems.RAW_URANIUM::get, () -> CNItemTags.URANIUM_ORES.tag, "_for_uranium_ore", 4),
-        RAW_LEAD_ORES = blastFurnaceRecipeTags(() -> CNItems.LEAD_INGOT::get, () -> CNItemTags.LEAD_ORES.tag, "_for_lead_ore", 1),
+        URANIUM_ORE_TO_URANIUM_POWDER = blastFurnaceRecipeTags(() -> CNItems.RAW_URANIUM::get, () -> CNTags.forgeItemTag("ores/uranium"), "_for_uranium_ore", 4),
+        RAW_LEAD_ORES = blastFurnaceRecipeTags(() -> CNItems.LEAD_INGOT::get, () -> CNTags.forgeItemTag("ores/lead"), "_for_lead_ore", 1),
         RAW_LEAD = blastFurnaceRecipeTags(CNItems.LEAD_INGOT::get, () -> CNTags.forgeItemTag("raw_materials/lead"), "_for_raw_lead", 1),
         CRUSHED_RAW_LEAD_TO_LEAD_BLAST_FURNACE = blastFurnaceRecipe(CNItems.LEAD_INGOT::get, AllItems.CRUSHED_LEAD::get, "_for_lead", 1),
             NITROGEN_CONCENTRATE = blastFurnaceRecipe(CNItems.NITROGEN_CONCENTRATE::get, CNItems.NITRATE::get, "_for_nitrogen_concentrate", 1)
@@ -223,7 +223,6 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
             return this;
         }
 
-        // FIXME 5.1 refactor - recipe categories as markers instead of sections?
         GeneratedRecipe viaShaped(UnaryOperator<ShapedRecipeBuilder> builder) {
             return register(consumer -> {
                 ShapedRecipeBuilder b = builder.apply(ShapedRecipeBuilder.shaped(category, result.get(), amount));
@@ -348,7 +347,7 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
 
                     b.save(result -> {
                         consumer.accept(
-                                isOtherMod ? new ModdedCookingRecipeResult(result, compatDatagenOutput, null )
+                                isOtherMod ? new ModdedCookingRecipeResult(result, compatDatagenOutput, List.of())
                                         : result);
                     }, createSimpleLocation(CatnipServices.REGISTRIES.getKeyOrThrow(serializer)
                             .getPath()));
@@ -387,9 +386,11 @@ public class CNStandardRecipeGen extends BaseRecipeProvider {
             wrapped.serializeRecipeData(object);
             object.addProperty("result", outputOverride.toString());
 
-            JsonArray conds = new JsonArray();
-            conditions.forEach(c -> conds.add(CraftingHelper.serialize(c)));
-            object.add("conditions", conds);
+            if (conditions != null && !conditions.isEmpty()) {
+                JsonArray conds = new JsonArray();
+                conditions.forEach(c -> conds.add(CraftingHelper.serialize(c)));
+                object.add("conditions", conds);
+            }
         }
     }
 

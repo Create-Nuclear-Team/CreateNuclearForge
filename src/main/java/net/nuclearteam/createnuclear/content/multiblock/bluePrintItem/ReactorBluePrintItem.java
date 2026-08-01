@@ -42,7 +42,7 @@ public class ReactorBluePrintItem extends Item implements MenuProvider {
         tooltip.add(Component.translatable("item.createnuclear.reactor_blueprint.tooltip")
                 .withStyle(ChatFormatting.GRAY));
 
-        // On adapte le texte pour indiquer l'action au joueur
+        // Adjust the tooltip text to hint at the available action
         tooltip.add(Component.translatable("item.createnuclear.reactor_blueprint.tooltip_hint")
                 .withStyle(ChatFormatting.DARK_GRAY));
     }
@@ -69,13 +69,13 @@ public class ReactorBluePrintItem extends Item implements MenuProvider {
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack heldItem = player.getItemInHand(hand);
 
-        // Clic Droit Normal -> Ouvre l'interface du Blueprint (ton code d'origine)
+        // Plain right-click -> Opens the Blueprint screen
         if (!player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
             if (!world.isClientSide && player instanceof ServerPlayer)
                 NetworkHooks.openScreen((ServerPlayer) player, this, buf -> buf.writeItem(heldItem));
             return InteractionResultHolder.success(heldItem);
         }
-        // Shift + Clic Droit -> Envoie le lien cliquable dans le Chat !
+        // Shift + right-click -> Sends a clickable link in chat!
         else if (player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
             if (!world.isClientSide) {
                 MutableComponent message = Component.translatable("item.createnuclear.reactor_blueprint.chat_info")

@@ -2,6 +2,8 @@ package net.nuclearteam.createnuclear.content.equipment.armor;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -15,43 +17,16 @@ public final class AntiRadiationArmorClientExtensions implements IClientItemExte
     @Override
     public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
         if (this.model == null) {
-            var entityModelSet = Minecraft.getInstance().getEntityModels();
-            var root = entityModelSet.bakeLayer(CNModelLayers.ANTI_IRRADIATION_ARMOR);
+            EntityModelSet entityModelSet = Minecraft.getInstance().getEntityModels();
+            ModelPart root = entityModelSet.bakeLayer(CNModelLayers.ANTI_IRRADIATION_ARMOR);
             this.model = new AntiRadiationArmorModel(root);
         }
 
+        // Forge copies the body pose + standard part visibility from `original` onto the
+        // model after this returns, but it can't tell LEGS from FEET (both make the vanilla
+        // legs visible) and knows nothing about our custom boot parts. We pass the slot so
+        // renderToBuffer can show legs for leggings vs. only boots for the FEET slot.
         this.model.currentSlot = equipmentSlot;
-        this.model.setAllVisible(false);
-//        this.model.right_leg_armor.visible = false;
-//        this.model.right_boot.visible = false;
-//        this.model.left_leg_armor.visible = false;
-//        this.model.left_boot.visible = false;
-
-        switch (equipmentSlot) {
-            case HEAD -> {
-                this.model.getHead().visible = true;
-                this.model.hat.visible = true;
-//                this.model.right_boot.visible = false;
-//                this.model.left_boot.visible = false;
-            }
-            case CHEST -> {
-                this.model.body.visible = true;
-                this.model.rightArm.visible = true;
-                this.model.leftArm.visible = true;
-            }
-            default -> {
-                this.model.getHead().visible = false;
-                this.model.hat.visible = false;
-                this.model.body.visible = false;
-                this.model.rightArm.visible = false;
-                this.model.leftArm.visible = false;
-                this.model.rightLeg.visible = false;
-                this.model.leftLeg.visible = false;
-                this.model.right_leg.visible = false;
-                this.model.left_leg.visible = false;
-            }
-        }
-
         return this.model;
     }
 }

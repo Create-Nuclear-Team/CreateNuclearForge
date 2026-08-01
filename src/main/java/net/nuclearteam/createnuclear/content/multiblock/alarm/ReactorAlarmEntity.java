@@ -20,7 +20,7 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
 
     public ReactorControllerBlockEntity controller = null;
     private CNAdvancementBehaviour advancement;
-    private boolean advancementAwarded = false; // Anti-spam réseau
+    private boolean advancementAwarded = false; // Prevents repeatedly awarding the advancement on every tick
 
     @OnlyIn(Dist.CLIENT)
     protected ReactorAlarmSoundInstance soundInstance;
@@ -35,7 +35,7 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
         if (level == null || !(getBlockState().getBlock() instanceof ReactorAlarm)) return;
 
         if (level.isClientSide) {
-            tickAudio(); // Plus besoin de DistExecutor ici, le check de level suffit et évite le lag de thread
+            tickAudio(); // DistExecutor is unnecessary here; the level-side check is enough and avoids thread overhead
         } else {
             tickServer();
         }
@@ -54,10 +54,10 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
         if (soundInstance == null || soundInstance.isStopped()) {
             Minecraft minecraft = Minecraft.getInstance();
             try {
-                soundInstance = new ReactorAlarmSoundInstance(level, worldPosition, CNSoundEvents.REACTOR_ALARM_2.getMainEvent());
+                soundInstance = new ReactorAlarmSoundInstance(level, worldPosition, CNSoundEvents.REACTOR_ALARM_LOOP.getMainEvent());
                 minecraft.getSoundManager().play(soundInstance);
             } catch (Exception e) {
-                CreateNuclear.LOGGER.warn("Échec du lancement du son d'alarme: " + e.getMessage());
+                CreateNuclear.LOGGER.warn("Failed to start alarm sound: " + e.getMessage());
             }
         }
     }
@@ -68,7 +68,7 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
             try {
                 soundInstance.fadeOut();
             } catch (Exception e) {
-                CreateNuclear.LOGGER.warn("Erreur lors de l'arrêt du son : " + e.getMessage());
+                CreateNuclear.LOGGER.warn("Error while stopping the sound: " + e.getMessage());
             }
             soundInstance = null;
         }
@@ -81,12 +81,12 @@ public class ReactorAlarmEntity extends SmartBlockEntity {
         boolean powered = state.getValue(ReactorAlarm.POWERED);
 
         if (powered) {
-            if (!advancementAwarded) { // On l'envoie UNE SEULE FOIS au front montant
+            if (!advancementAwarded) { // Award it only once, on the rising edge
                 this.advancement.awardPlayer(CNAdvancement.SILENCE_THE_CORE);
                 advancementAwarded = true;
             }
         } else {
-            advancementAwarded = false; // Reset quand l'alarme s'éteint
+            advancementAwarded = false; // Reset when the alarm turns off
         }
     }
 

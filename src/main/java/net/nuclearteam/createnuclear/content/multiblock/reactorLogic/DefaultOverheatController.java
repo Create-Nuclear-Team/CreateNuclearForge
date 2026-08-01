@@ -8,21 +8,25 @@ class DefaultOverheatController implements IOverheatController {
     private int overFlowLimiter = 30;
     private double overHeat = 0;
 
-    private final int maxUraniumPerGraphite = 3;
-    private final int graphiteTimer = 3600;
-    private final int uraniumTimer = 3600;
     private final int liquidTimer = 3600;
 
     @Override
-    public void updateState(int countGraphiteRod, int countUraniumRod, BigFluidStack bigFluidStack, ReactorFluidType type) {
+    public void updateState(HeatBalance heatBalance, int currentHeat, BigFluidStack bigFluidStack, ReactorFluidType type) {
         int fluidAmount = bigFluidStack == null ? 0 : bigFluidStack.amount;
         int fluidEfficiency = type == null ? -1 : type.efficiency();
-        if (countUraniumRod > countGraphiteRod * maxUraniumPerGraphite || fluidEfficiency == -1 || fluidAmount < fluidEfficiency) {
+        boolean exceedsFluidMaxHeat = type != null && Math.abs(currentHeat) > type.maxHeat();
+
+        boolean rodMalus = heatBalance.resolve() == EquilibriumState.OVERHEATING;
+        boolean fluidMalus = fluidEfficiency == -1 || fluidAmount < fluidEfficiency || exceedsFluidMaxHeat;
+
+        int malusPoints = (rodMalus ? 1 : 0) + (fluidMalus ? 1 : 0);
+
+        if (malusPoints > 0) {
             overFlowHeatTimer++;
             if (overFlowHeatTimer >= overFlowLimiter) {
-                overHeat += 1;
+                overHeat += malusPoints;
                 overFlowHeatTimer = 0;
-                if (overFlowLimiter > 2) overFlowLimiter -= 1;
+                overFlowLimiter = Math.max(2, overFlowLimiter - malusPoints);
             }
         } else {
             overFlowHeatTimer = 0;
@@ -35,11 +39,6 @@ class DefaultOverheatController implements IOverheatController {
     @Override
     public double getOverHeat() { return overHeat; }
 
-    @Override
-    public int getGraphiteTimer() { return graphiteTimer; }
-
-    @Override
-    public int getUraniumTimer() { return uraniumTimer; }
 
     @Override
     public int getLiquidTimer()  { return liquidTimer; }

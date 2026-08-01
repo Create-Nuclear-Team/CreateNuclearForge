@@ -20,9 +20,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -43,24 +40,19 @@ import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfir
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
 import net.minecraftforge.common.Tags;
 
-import net.minecraftforge.common.util.ForgeSoundType;
-import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
-import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
-import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasing;
 import net.nuclearteam.createnuclear.CNTags.CNBlockTags;
-import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.cooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCore;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrame;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorframeItem;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorInputGenerator;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorLiquidInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorLiquidInputGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
@@ -153,31 +145,31 @@ public class CNBlocks {
             .transform(pickaxeOnly())
             .register();
 
-    public static final BlockEntry<ReactorInput> REACTOR_INPUT = CreateNuclear.REGISTRATE
-            .block("reactor_input", ReactorInput::new)
+    public static final BlockEntry<ReactorRodInput> REACTOR_ROD_INPUT = CreateNuclear.REGISTRATE
+            .block("reactor_rod_input", ReactorRodInput::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(2F))
             .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-            .blockstate(new ReactorInputGenerator()::generate)
+            .blockstate(new ReactorRodInputGenerator()::generate)
             .item()
-            .transform(customItemModel("reactor", "input", "item"))
+            .transform(customItemModel("reactor", "rod_input", "item"))
             .register();
 
 
-    public static final BlockEntry<ReactorLiquidInput> REACTOR_LIQUID_INPUT =
-        CreateNuclear.REGISTRATE.block("reactor_liquid_input", ReactorLiquidInput::new)
+    public static final BlockEntry<ReactorFluidInput> REACTOR_FLUID_INPUT =
+        CreateNuclear.REGISTRATE.block("reactor_fluid_input", ReactorFluidInput::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(2F))
             .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-            .blockstate(new ReactorLiquidInputGenerator()::generate)
+            .blockstate(new ReactorFluidInputGenerator()::generate)
             .item()
-            .transform(customItemModel("reactor", "liquid_input", "item"))
+            .transform(customItemModel("reactor", "fluid_input", "item"))
             .register();
 
     public static final BlockEntry<ReactorOutput> REACTOR_OUTPUT =
@@ -188,7 +180,7 @@ public class CNBlocks {
             .tag(AllTags.AllBlockTags.SAFE_NBT.tag, BlockTags.NEEDS_DIAMOND_TOOL)
             .transform(pickaxeOnly())
             .blockstate(new ReactorOutputGenerator()::generate)
-            .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 10240.0))
+            .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 64000.0))
             .item()
             .transform(customItemModel("reactor", "output", "item"))
             .register();
@@ -214,7 +206,7 @@ public class CNBlocks {
     public static final BlockEntry<ReinforcedGlassBlock> REINFORCED_GLASS = CreateNuclear.REGISTRATE
         .block("reinforced_glass", ReinforcedGlassBlock::new)
         .initialProperties(() -> Blocks.GLASS)
-        .properties(p -> p.explosionResistance(7.0F).destroyTime(2F))
+        .properties(p -> p.explosionResistance(1200.0F).destroyTime(2F))
         .onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(CNSpriteShifts.REACTOR_GLASS)))
         .onRegister(casingConnectivity((block,cc) -> cc.makeCasing(block, CNSpriteShifts.REACTOR_GLASS)))
         .loot(RegistrateBlockLootTables::dropWhenSilkTouch)
@@ -381,11 +373,10 @@ public class CNBlocks {
                 BlockTags.NEEDS_IRON_TOOL,
                 CNTags.forgeBlockTag("ores"),
                 CNTags.forgeBlockTag("ores_in_ground/deepslate"),
-                CNTags.forgeBlockTag("ores/uranium"),
-                CNBlockTags.URANIUM_ORES.tag
+                CNTags.forgeBlockTag("ores/uranium")
             )
             .item((b, p) -> new UraniumOreItem(b, p, 3))
-            .tag(CNItemTags.URANIUM_ORES.tag, CNTags.forgeItemTag("ores/uranium"))
+            .tag(CNTags.forgeItemTag("ores/uranium"))
             .build()
             .register();
 
@@ -403,11 +394,10 @@ public class CNBlocks {
             .tag(BlockTags.NEEDS_IRON_TOOL,
                     CNTags.forgeBlockTag("ores"),
                     CNTags.forgeBlockTag("ores_in_ground/deepslate"),
-                    CNTags.forgeBlockTag("ores/lead"),
-                    CNBlockTags.LEAD_ORES.tag)
+                    CNTags.forgeBlockTag("ores/lead")
+            )
             .item()
-            .tag(CNItemTags.LEAD_ORES.tag,
-                    CNTags.forgeItemTag("ores/lead"))
+            .tag(CNTags.forgeItemTag("ores/lead"))
             .build()
             .register();
     
@@ -423,6 +413,7 @@ public class CNBlocks {
                         .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 5))
             ))))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL,
+                BlockTags.NEEDS_IRON_TOOL,
                 CNTags.forgeBlockTag("ores"),
                 CNTags.forgeBlockTag("ores_in_ground/deepslate"),
                 CNTags.forgeBlockTag("ores/thorium")
@@ -448,11 +439,10 @@ public class CNBlocks {
                 BlockTags.NEEDS_IRON_TOOL,
                 CNTags.forgeBlockTag("ores"),
                 CNTags.forgeBlockTag("ores_in_ground/stone"),
-                CNTags.forgeBlockTag("ores/uranium"),
-                CNBlockTags.URANIUM_ORES.tag
+                CNTags.forgeBlockTag("ores/uranium")
             )
             .item((b, p) -> new UraniumOreItem(b, p, 3))
-            .tag(CNItemTags.URANIUM_ORES.tag, CNTags.forgeItemTag("ores/uranium"))
+            .tag(CNTags.forgeItemTag("ores/uranium"))
             .build()
             .register();
 
@@ -469,11 +459,10 @@ public class CNBlocks {
             .tag(BlockTags.NEEDS_IRON_TOOL,
                     CNTags.forgeBlockTag("ores"),
                     CNTags.forgeBlockTag("ores_in_ground/stone"),
-                    CNTags.forgeBlockTag("ores/lead"),
-                    CNBlockTags.LEAD_ORES.tag)
+                    CNTags.forgeBlockTag("ores/lead")
+            )
             .item()
-            .tag(CNItemTags.LEAD_ORES.tag,
-                    CNTags.forgeItemTag("ores/lead"))
+            .tag(CNTags.forgeItemTag("ores/lead"))
             .build()
             .register();
 
@@ -489,7 +478,8 @@ public class CNBlocks {
                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
                         .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 5))
             ))))
-            .tag(BlockTags.NEEDS_IRON_TOOL,
+            .tag(BlockTags.NEEDS_DIAMOND_TOOL,
+                BlockTags.NEEDS_IRON_TOOL,
                 CNTags.forgeBlockTag("ores"),
                 CNTags.forgeBlockTag("ores_in_ground/stone"),
                 CNTags.forgeBlockTag("ores/thorium")
@@ -577,7 +567,7 @@ public class CNBlocks {
         CreateNuclear.REGISTRATE.block("raw_thorium_block", Block::new)
             .initialProperties(SharedProperties::stone)
             .transform(pickaxeOnly())
-            .tag(CNTags.forgeBlockTag("storage_blocks/raw_thorium"))
+            .tag(BlockTags.NEEDS_DIAMOND_TOOL, CNTags.forgeBlockTag("storage_blocks/raw_thorium"))
             .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, c.get())
                     .unlockedBy("has_raw_materials_thorium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("raw_materials/thorium")))
                     .define('R', CNTags.forgeItemTag("raw_materials/thorium"))
@@ -604,20 +594,9 @@ public class CNBlocks {
         CreateNuclear.REGISTRATE.block("thorium_block", Block::new)
             .initialProperties(SharedProperties::stone)
             .transform(pickaxeOnly())
-            .loot((lt, b) -> lt.add(b,
-                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                        lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                                .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))))))
-            .tag(BlockTags.NEEDS_DIAMOND_TOOL,
-                    BlockTags.NEEDS_IRON_TOOL,
-                    CNTags.forgeBlockTag("ores"),
-                    CNTags.forgeBlockTag("ores_in_ground/stone"),
-                    CNTags.forgeBlockTag("ores/thorium"),
-                    CNBlockTags.THORIUM_ORES.tag)
+            .tag(CNTags.forgeBlockTag("storage_blocks/thorium"))
             .item()
-            .tag(CNItemTags.THORIUM_ORES.tag,
-                CNTags.forgeItemTag("ores/thorium"),
-                CNTags.forgeItemTag("storage_blocks/thorium"))
+            .tag(CNTags.forgeItemTag("storage_blocks/thorium"))
             .build()
             .register();
 
@@ -638,23 +617,6 @@ public class CNBlocks {
             .build()
             .register();
 
-    /*public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK = CreateNuclear.REGISTRATE.block("test_event_trigger_block", EventTriggerBlock::new)
-            .defaultBlockstate()
-            .defaultLang()
-            .simpleItem()
-            .register();*/
-
-
-
-
-
-
-    /*public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK =
-        CreateNuclear.REGISTRATE.block("test_event_trigger_block", EventTriggerBlock::new)
-                .defaultBlockstate()
-                .defaultLang()
-                .simpleItem()
-                .register();*/
 
     public static void register() {
         CreateNuclear.LOGGER.info("Registering ModBlocks for " + CreateNuclear.MOD_ID);

@@ -7,11 +7,10 @@ public class CNCCommon extends ConfigBase {
 
     @Override
     public String getName() {
-        return "common";
+        return "Common";
     }
 
     private static class Comments {
         static String worldGen = "Modify how CreateNuclear affects world generation.";
-        static String explode = "Modify explosion parameters.";
     }
 }

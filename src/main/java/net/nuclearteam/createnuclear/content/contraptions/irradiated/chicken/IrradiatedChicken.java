@@ -30,6 +30,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.CNEntityType;
+import net.nuclearteam.createnuclear.CNItems;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.AnimalUtil;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +43,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
     private static final Ingredient FOOD_ITEMS = Ingredient.of(
             Items.WHEAT_SEEDS, Items.MELON_SEEDS, Items.PUMPKIN_SEEDS,
-            Items.BEETROOT_SEEDS, Items.TORCHFLOWER_SEEDS, Items.PITCHER_POD
+            Items.BEETROOT_SEEDS, Items.TORCHFLOWER_SEEDS, Items.PITCHER_POD,
+            CNItems.YELLOWCAKE
     );
     public float flap;
     public float flapSpeed;
@@ -82,12 +84,6 @@ public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
     @Override
     protected float getStandingEyeHeight(Pose pose, EntityDimensions dimensions) {
         return this.isBaby() ? dimensions.height * 0.85F : dimensions.height * 0.92F;
-    }
-
-    @Override
-    public void tick() {
-        AnimalUtil.tick(this);
-        super.tick();
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -154,28 +150,13 @@ public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
 
     @Override
     public boolean isFood(ItemStack stack) {
+        // Check if the stack is a valid Yellowcake or the base food
         return AnimalUtil.isFood(stack, FOOD_ITEMS);
     }
 
     @Override
     public int getExperienceReward() {
         return this.isChickenJockey() ? 10 : super.getExperienceReward();
-    }
-
-    @Override
-    public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
-        InteractionResult returnValue = AnimalUtil.mobInteract(this, pPlayer, pHand);
-
-        if (returnValue != InteractionResult.PASS)
-            return returnValue;
-
-        return super.mobInteract(pPlayer, pHand);
-    }
-
-    @Override
-    public void handleEntityEvent(byte pId) {
-        if (!AnimalUtil.handleEntityEvent(this, pId))
-            super.handleEntityEvent(pId);
     }
 
     @Override
@@ -188,7 +169,6 @@ public class IrradiatedChicken extends Animal implements IrradiatedAnimal {
 
         if (compound.contains("ConversionTime", Tag.TAG_ANY_NUMERIC) && compound.getInt("ConversionTime") > -1)
             startConverting(compound.getInt("ConversionTime"));
-
     }
 
     @Override
