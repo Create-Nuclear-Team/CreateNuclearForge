@@ -105,8 +105,10 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
 
                     player.setItemInHand(handIn, ItemStack.EMPTY);
                 });
+                // Inserting the blueprint is what starts energy production: this is the activation
+                // cue, not the multiblock assembly one (that lives in ReactorAssembler).
                 // One-shot played server-side (null player) so it broadcasts to nearby clients.
-                worldIn.playSound(null, pos, CNSoundEvents.MOTOR_ASSEMBLE.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
+                worldIn.playSound(null, pos, CNSoundEvents.REACTOR_ACTIVATION.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
                 return InteractionResult.SUCCESS;
 
             }
@@ -123,7 +125,8 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
                     be.getOutputManager().rotateOutputs(be.getLevel(), be.getAssembled(), 0);
                     be.notifyUpdate();
                 });
-                worldIn.playSound(null, pos, CNSoundEvents.MOTOR_DISASSEMBLE.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
+                // Blueprint removed: the multiblock stays assembled, it just stops producing.
+                worldIn.playSound(null, pos, CNSoundEvents.REACTOR_SHUT_OFF.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
                 state.setValue(ASSEMBLED, false);
                 return InteractionResult.SUCCESS;
 

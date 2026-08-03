@@ -92,7 +92,10 @@ public class NuclearMushroomCloudParticle extends Particle {
             } else {
                 if (!playedRinging && CNConfigs.client().nuclearBombFlash.get()) {
                     playedRinging = true;
-                    playSound(CNSoundEvents.NUCLEAR_EXPLOSION_RINGING.getMainEvent(), 100, 50, 0.05F, true);
+                    // ringing.ogg lasts 8.91s = 178 ticks. Stopping at 100 ticks cut it mid-file,
+                    // so the tinnitus now runs to the end of the asset and fades over its last 3s.
+                    // Not looping: the file has no seamless loop point, and duration never exceeds it.
+                    playSound(CNSoundEvents.NUCLEAR_EXPLOSION_RINGING.getMainEvent(), 178, 118, 0.05F, false);
                     // playSound(CNSoundEvents.NUCLEAR_EXPLOSION_SHOCKWAVE.getMainEvent(), 100, 50, 0.05F, true);
                 }
                 CNClientProxy.renderNukeFlashFor = 16;

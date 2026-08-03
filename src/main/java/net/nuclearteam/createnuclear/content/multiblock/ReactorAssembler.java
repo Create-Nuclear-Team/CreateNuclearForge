@@ -4,11 +4,13 @@ import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.nuclearteam.createnuclear.CNBlocks;
+import net.nuclearteam.createnuclear.CNSoundEvents;
 import net.nuclearteam.createnuclear.api.multiblock.BlockPattern;
 import net.nuclearteam.createnuclear.api.multiblock.TypeMultiblock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
@@ -38,7 +40,17 @@ public final class ReactorAssembler {
         BlockPattern<TypeMultiblock> result = CNMultiblock.REGISTRATE_MULTIBLOCK.findStructure(level, pos, entity);
         if (result == null) return;
 
-        sendMessageToPlayer(level, pos, CreateNuclearLang.translate("notification.reactor.assembled"), !entity.isAssembled());
+        // Captured before setAssembled(true) below: assemble() is also reached from
+        // ReactorPattern.findControllerPos on an already-assembled reactor, and only the
+        // actual not-assembled -> assembled transition should notify and play the cue.
+        boolean wasAssembled = entity.isAssembled();
+
+        sendMessageToPlayer(level, pos, CreateNuclearLang.translate("notification.reactor.assembled"), !wasAssembled);
+
+        if (!wasAssembled) {
+            // Server-side (null player) so the one-shot broadcasts to nearby clients.
+            level.playSound(null, pos, CNSoundEvents.MOTOR_ASSEMBLE.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
+        }
 
         switch (result.data()) {
             case REACTOR_T1 -> entity.getAdvancement().awardPlayer(CNAdvancement.T1_REACTOR);
@@ -63,6 +75,10 @@ public final class ReactorAssembler {
         if (result != null) return;
 
         sendMessageToPlayer(level, pos, CreateNuclearLang.translate("notification.reactor.disassembled"), true);
+
+        // Both early returns above already guarantee this is a real assembled -> broken
+        // transition, so no extra guard is needed here.
+        level.playSound(null, pos, CNSoundEvents.MOTOR_DISASSEMBLE.getMainEvent(), SoundSource.BLOCKS, 1.0f, 1.0f);
 
         entity.setAssembled(false);
         entity.removeIOAll();

@@ -3,7 +3,6 @@ package net.nuclearteam.createnuclear.infrastructure.worldgen.biome;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
@@ -39,12 +38,11 @@ public class IrradiatedBiomes {
 
             .ambientParticle(new AmbientParticleSettings(new IrradiatedParticlesData(), 0.025F))
             .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
-            .backgroundMusic(new Music(
-                    soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.BIOME_WASTELAND.getId())),
-                    0, 300,
-                    true
-            ))
-            .ambientLoopSound(soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.BIOME_WASTELAND.getId())))// Disabled pending a dedicated ambient-loop sound distinct from the background music (see .backgroundMusic below).
+            // Plays continuously for as long as the player stands in the biome, under the
+            // Ambient/Environment volume slider. Deliberately NOT also set as .backgroundMusic():
+            // that would start a second, unsynchronised copy of the same file in the MUSIC
+            // category, and the two would phase against each other.
+            .ambientLoopSound(soundLookup.getOrThrow(ResourceKey.create(Registries.SOUND_EVENT, CNSoundEvents.BIOME_WASTELAND.getId())))
         ;
 
         return new Biome.BiomeBuilder()

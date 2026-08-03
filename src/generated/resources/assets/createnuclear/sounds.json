@@ -143,51 +143,6 @@
     ],
     "subtitle": "createnuclear.subtitle.reacteur/assemble_deassemble/motor_disassemble"
   },
-  "reacteur/casing_break": {
-    "sounds": [
-      {
-        "type": "file",
-        "name": "createnuclear:reacteur/casing_break"
-      }
-    ],
-    "subtitle": "createnuclear.subtitle.reacteur/casing_break"
-  },
-  "reacteur/casing_fall": {
-    "sounds": [
-      {
-        "type": "file",
-        "name": "createnuclear:reacteur/casing_fall"
-      }
-    ],
-    "subtitle": "createnuclear.subtitle.reacteur/casing_fall"
-  },
-  "reacteur/casing_hit": {
-    "sounds": [
-      {
-        "type": "file",
-        "name": "createnuclear:reacteur/casing_hit"
-      }
-    ],
-    "subtitle": "createnuclear.subtitle.reacteur/casing_hit"
-  },
-  "reacteur/casing_place": {
-    "sounds": [
-      {
-        "type": "file",
-        "name": "createnuclear:reacteur/casing_place"
-      }
-    ],
-    "subtitle": "createnuclear.subtitle.reacteur/casing_place"
-  },
-  "reacteur/casing_step": {
-    "sounds": [
-      {
-        "type": "file",
-        "name": "createnuclear:reacteur/casing_step"
-      }
-    ],
-    "subtitle": "createnuclear.subtitle.reacteur/casing_step"
-  },
   "reacteur/running": {
     "sounds": [
       {
