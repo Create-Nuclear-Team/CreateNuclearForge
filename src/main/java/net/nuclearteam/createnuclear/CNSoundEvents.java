@@ -35,30 +35,6 @@ public class CNSoundEvents {
     public static final Map<ResourceLocation, SoundEntry> ALL = new HashMap<>();
 
     public static final SoundEntry
-        REACTOR_CASING_BREAK = create("reacteur/casing", "break")
-            .subtitle("Break Reactor Casing")
-            .category(SoundSource.BLOCKS)
-            .build(),
-
-        REACTOR_CASING_STEP = create("reacteur/casing", "step")
-            .subtitle("Step on Reactor Casing")
-            .category(SoundSource.BLOCKS)
-            .build(),
-
-        REACTOR_CASING_PLACE = create("reacteur/casing", "place")
-            .subtitle("Place Reactor Casing")
-            .category(SoundSource.BLOCKS)
-            .build(),
-
-        REACTOR_CASING_HIT = create("reacteur/casing", "hit")
-            .subtitle("Hit Reactor Casing")
-            .category(SoundSource.BLOCKS)
-            .build(),
-
-        REACTOR_CASING_FALL = create("reacteur/casing", "fall")
-            .subtitle("Reactor Casing Fall")
-            .category(SoundSource.BLOCKS)
-            .build(),
 
         REACTOR_ACTIVATION = create("reacteur/activation")
             .subtitle("Reactor Activation")
