@@ -37,11 +37,11 @@ import java.util.List;
  * data/&lt;namespace&gt;/structures/, not loose ".snbt" text unless it also sits on disk
  * relative to the run's working directory).
  * <p>
- * Tests named "*_expectedContract" assert the documented/intended behavior of
- * extractFluids and are EXPECTED TO FAIL against the current implementation
- * (AUDIT_ACTUEL.md, ReactorInputFluidManager.java:137-155). They act as regression
- * markers for the future fix. Tests named "*_currentBehavior"/"*_characterization"
- * assert what the code does today and should keep passing until that fix lands.
+ * Tests named "*_expectedContract" cover the two extractFluids defects fixed on both branches:
+ * fluidNeeded was never decremented between handlers (so a request of 10 units drained 10 from
+ * EVERY input), and a request for exactly one unit was silently dropped by an
+ * {@code if (toExtract > 1)} guard. The whole suite passes; the two characterization tests that
+ * pinned the buggy behaviour were removed with the fix.
  */
 @GameTestHolder(CreateNuclear.MOD_ID)
 @PrefixGameTestTemplate(false)
@@ -361,26 +361,8 @@ public class ReactorInputFluidManagerGameTest {
     }
 
     /**
-     * Characterizes the CURRENT (buggy) behavior: "if (toExtract > 1)" silently ignores
-     * a request for exactly 1 unit. This test PASSES today.
-     */
-    @GameTest(template = STRUCTURE)
-    public static void extractFluids_needOfOne_isSilentlyIgnored_currentBehavior(GameTestHelper helper) {
-        BlockPos rel = new BlockPos(1, 1, 1);
-        place(helper, rel, Direction.NORTH);
-        fill(helper, rel, new FluidStack(Fluids.WATER, 5));
-
-        boolean result = manager(helper, rel).extractFluids(helper.getLevel(), 1);
-
-        helper.assertTrue(!result, "current implementation ignores single-unit extraction requests");
-        helper.assertTrue(tankAmount(helper, rel) == 5, "tank should be untouched: the toExtract>1 guard blocks the drain");
-        helper.succeed();
-    }
-
-    /**
-     * Asserts the intended contract: a request for exactly 1 unit with stock available
-     * should succeed. FAILS TODAY against ReactorInputFluidManager.java:147
-     * ("if (toExtract > 1)") — acts as a regression marker for the fix.
+     * A request for exactly 1 unit with stock available must succeed. This used to fail against
+     * an {@code if (toExtract > 1)} guard that silently dropped single-unit requests.
      */
     @GameTest(template = STRUCTURE)
     public static void extractFluids_needOfOne_shouldSucceed_expectedContract(GameTestHelper helper) {
@@ -396,32 +378,10 @@ public class ReactorInputFluidManagerGameTest {
     }
 
     /**
-     * Characterizes the CURRENT (buggy) over-extraction: fluidNeeded is never
-     * decremented between handlers, so both handlers get drained in full.
-     * This test PASSES today.
-     */
-    @GameTest(template = STRUCTURE)
-    public static void extractFluids_twoHandlers_currentBuggyBehavior_characterization(GameTestHelper helper) {
-        BlockPos rel1 = new BlockPos(1, 1, 1);
-        BlockPos rel2 = new BlockPos(3, 1, 1);
-        place(helper, rel1, Direction.NORTH);
-        place(helper, rel2, Direction.NORTH);
-        fill(helper, rel1, new FluidStack(Fluids.WATER, 10));
-        fill(helper, rel2, new FluidStack(Fluids.WATER, 10));
-
-        manager(helper, rel1, rel2).extractFluids(helper.getLevel(), 10);
-
-        helper.assertTrue(tankAmount(helper, rel1) == 0, "handler1 fully drained");
-        helper.assertTrue(tankAmount(helper, rel2) == 0,
-                "handler2 is ALSO fully drained: over-extraction bug removes 20 units for a request of 10");
-        helper.succeed();
-    }
-
-    /**
-     * Asserts the intended contract: extracting 10 units from a 20-unit pool spread
-     * across two handlers should leave 10 total remaining. FAILS TODAY against
-     * ReactorInputFluidManager.java:137-155 (fluidNeeded never decremented) — this is
-     * the flagship regression marker for the ticket's main bug.
+     * Extracting 10 units from a 20-unit pool spread across two handlers must leave 10 total
+     * remaining. The requested amount is a total across every input, not a per-input quota;
+     * this used to drain both handlers in full because {@code fluidNeeded} was never
+     * decremented between them.
      */
     @GameTest(template = STRUCTURE)
     public static void extractFluids_twoHandlers_shouldNotOverExtract_expectedContract(GameTestHelper helper) {
@@ -474,13 +434,12 @@ public class ReactorInputFluidManagerGameTest {
     }
 
     /**
-     * Documents a related contract mismatch found while designing this suite (not the
-     * ticket's main bug): the Javadoc promises "true if the full amount was extracted",
-     * but the implementation returns true after any partial extraction. This test
-     * asserts the CURRENT behavior and passes today; it is not a fix marker.
+     * A partial extraction still reports success: the reactor consumes whatever coolant it can
+     * reach rather than refusing to run. The Javadoc used to promise "true if the full amount
+     * was extracted", which never matched the implementation; it now documents this contract.
      */
     @GameTest(template = STRUCTURE)
-    public static void extractFluids_returnsTrueEvenWhenNotFullyExtracted_javadocMismatch(GameTestHelper helper) {
+    public static void extractFluids_partialExtraction_stillReportsSuccess(GameTestHelper helper) {
         BlockPos rel = new BlockPos(1, 1, 1);
         place(helper, rel, Direction.NORTH);
         fill(helper, rel, new FluidStack(Fluids.WATER, 30));
