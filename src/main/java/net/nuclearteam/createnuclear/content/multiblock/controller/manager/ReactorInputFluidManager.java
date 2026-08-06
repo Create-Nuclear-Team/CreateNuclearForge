@@ -129,28 +129,39 @@ public class ReactorInputFluidManager extends AbstractReactorIOManager implement
         return virtualReactorInputFluid;
     }
 
-    @Override
     /**
-     * Attempt to extract up to {@code fluidNeeded} units of fluid from tracked handlers.
-     * Returns true if the full amount was extracted.
+     * Extracts up to {@code fluidNeeded} units of fluid, spread across the tracked handlers.
+     * <p>
+     * The requested amount is a TOTAL across every input, not a per-input quota: each handler
+     * only ever drains what is still missing, so a request of 10 units against two inputs
+     * holding 10 each removes 10 in total, not 20.
+     *
+     * @return {@code true} if at least one unit was actually drained. A partial extraction still
+     *         returns {@code true}: the reactor consumes whatever coolant it can reach rather
+     *         than refusing to run.
      */
+    @Override
     public boolean extractFluids(Level level, int fluidNeeded) {
-        if (level == null) return false;
-        boolean isExtracted = false;
+        if (level == null || fluidNeeded <= 0) return false;
         List<IFluidHandler> handlers = getFuildHandlers(level);
         if (handlers.isEmpty()) return false;
 
+        int remaining = fluidNeeded;
+
         for (IFluidHandler handler : handlers) {
+            if (remaining <= 0) break;
+
             FluidStack stack = handler.getFluidInTank(0);
             if (stack.isEmpty()) continue;
-            int toExtract = Math.min(fluidNeeded, stack.getAmount());
-            if (toExtract > 1) {
-                handler.drain(toExtract, FluidAction.EXECUTE);
-                isExtracted = true;
-            }
-            if (fluidNeeded <= 0) break;
+
+            int toExtract = Math.min(remaining, stack.getAmount());
+            if (toExtract <= 0) continue;
+
+            // Subtract what was actually drained, not what was asked for: a handler is free to
+            // hand back less than requested.
+            remaining -= handler.drain(toExtract, FluidAction.EXECUTE).getAmount();
         }
 
-        return isExtracted;
+        return remaining < fluidNeeded;
     }
 }
