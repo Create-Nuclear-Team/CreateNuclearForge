@@ -18,11 +18,11 @@ import net.nuclearteam.createnuclear.infrastructure.worldgen.biome.BiomeIrradiat
 
 import java.util.List;
 
-public class BiomeIrradationExtractorItem extends Item {
+public class BiomeIrradiationExtractorItem extends Item {
     public static final String TAG = "biome_restore";
     private static final int CHARGE_PER_CLICK = 1;
 
-    public BiomeIrradationExtractorItem(Properties pProperties) {
+    public BiomeIrradiationExtractorItem(Properties pProperties) {
         super(pProperties);
     }
 
