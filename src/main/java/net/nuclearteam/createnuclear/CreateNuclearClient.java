@@ -12,7 +12,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.nuclearteam.createnuclear.content.particles.NuclearMushroomCloudParticle;
 import net.nuclearteam.createnuclear.content.particles.SmallNuclearExplosionParticle;
-import net.nuclearteam.createnuclear.content.biome.BiomeIrradationExtractorItem;
+import net.nuclearteam.createnuclear.content.biome.BiomeIrradiationExtractorItem;
 import net.nuclearteam.createnuclear.foundation.ponder.CreateNuclearPonderPlugin;
 import net.nuclearteam.createnuclear.foundation.utility.ClothTagHelper;
 
@@ -64,11 +64,11 @@ public class CreateNuclearClient {
      * model to pick a texture variant based on its current charge ratio (0.0 = empty, 1.0 = full).
      */
     private static void biomeRestoreItemProperties() {
-        ResourceLocation biomeRestore = CreateNuclear.asResource(BiomeIrradationExtractorItem.TAG);
+        ResourceLocation biomeRestore = CreateNuclear.asResource(BiomeIrradiationExtractorItem.TAG);
         ClampedItemPropertyFunction fn = ((stack, level, entity, seed) -> {
-            int max = BiomeIrradationExtractorItem.getMaxCharge();
+            int max = BiomeIrradiationExtractorItem.getMaxCharge();
 
-            return (float) BiomeIrradationExtractorItem.getChargeTag(stack, 0) / max;
+            return (float) BiomeIrradiationExtractorItem.getChargeTag(stack, 0) / max;
         });
 
         ItemProperties.register(CNItems.IRRADIATION_BIOME_EXTRACTOR.get(), biomeRestore, fn);

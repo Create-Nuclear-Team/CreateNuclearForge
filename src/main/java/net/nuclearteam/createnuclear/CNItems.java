@@ -14,7 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.nuclearteam.createnuclear.content.biome.BiomeIrradationExtractorItem;
+import net.nuclearteam.createnuclear.content.biome.BiomeIrradiationExtractorItem;
 import net.nuclearteam.createnuclear.foundation.data.CNBuilderTransformers;
 import net.nuclearteam.createnuclear.infrastructure.config.CNConfigs;
 import net.nuclearteam.createnuclear.api.data.recipe.SmithingClothRecipeBuilder;
@@ -417,8 +417,8 @@ public class CNItems {
         .properties(p -> p.stacksTo(16))
         .register();
 
-    public static final ItemEntry<BiomeIrradationExtractorItem> IRRADIATION_BIOME_EXTRACTOR = CreateNuclear.REGISTRATE
-        .item("biome_irradiation_extractor", BiomeIrradationExtractorItem::new)
+    public static final ItemEntry<BiomeIrradiationExtractorItem> IRRADIATION_BIOME_EXTRACTOR = CreateNuclear.REGISTRATE
+        .item("biome_irradiation_extractor", BiomeIrradiationExtractorItem::new)
         .lang("Biome Irradiation Extractor")
         .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.MISC, c.get(), 8)
             .unlockedBy("has_reinforced_glass_bottle", RegistrateRecipeProvider.has(CNItems.REINFORCED_GLASS_BOTTLE.get()))
