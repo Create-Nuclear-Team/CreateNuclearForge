@@ -3,63 +3,75 @@
   "configurations": [
     {
       "type": "java",
-      "name": "runClient",
       "request": "launch",
-      "mainClass": "cpw.mods.bootstraplauncher.BootstrapLauncher",
+      "name": "Client",
+      "presentation": {
+        "group": "Mod Development - CreateNuclearForge",
+        "order": 0
+      },
       "projectName": "CreateNuclearForge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\clientRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\clientRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcreatenuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
+      ],
       "cwd": "${workspaceFolder}\\run",
-      "vmArgs": "-Dforge.logging.console.level\u003ddebug -Dforge.logging.markers\u003dREGISTRIES \"-DlegacyClassPath.file\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge\\build\\classpath\\runClient_minecraftClasspath.txt\" -Dmixin.env.remapRefMap\u003dtrue \"-Dmixin.env.refMapRemappingFile\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge/build/createSrgToMcp/output.srg\" \"-Dnet.minecraftforge.gradle.GradleStart.srg.srg-mcp\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge\\build\\createSrgToMcp\\output.srg\" -DignoreList\u003dbootstraplauncher,securejarhandler,asm-commons,asm-util,asm-analysis,asm-tree,asm,JarJarFileSystems,client-extra,fmlcore,javafmllanguage,lowcodelanguage,mclanguage,forge- -DmergeModules\u003djna-5.10.0.jar,jna-platform-5.10.0.jar -Dforge.enableGameTest\u003dtrue -Dmixin.debug.verbose\u003dtrue -Dmixin.debug.export\u003dtrue -Djava.net.preferIPv6Addresses\u003dsystem -p \"C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\bootstraplauncher\\1.1.2\\c546e00443d8432cda6baa1c860346980742628\\bootstraplauncher-1.1.2.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\securejarhandler\\2.1.10\\51e6a22c6c716beb11e244bf5b8be480f51dd6b5\\securejarhandler-2.1.10.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-commons\\9.5\\19ab5b5800a3910d30d3a3e64fdb00fd0cb42de0\\asm-commons-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-util\\9.5\\64b5a1fc8c1b15ed2efd6a063e976bc8d3dc5ffe\\asm-util-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-analysis\\9.5\\490bacc77de7cbc0be1a30bb3471072d705be4a4\\asm-analysis-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-tree\\9.5\\fd33c8b6373abaa675be407082fdfda35021254a\\asm-tree-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm\\9.5\\dc6ea1875f4d64fbc85e1691c95b96a3d8569c90\\asm-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\net.minecraftforge\\JarJarFileSystems\\0.3.19\\2464eb7d6b9ddb9db36a82cf8a95193e5c6fe020\\JarJarFileSystems-0.3.19.jar\" --add-modules ALL-MODULE-PATH --add-opens java.base/java.util.jar\u003dcpw.mods.securejarhandler --add-opens java.base/java.lang.invoke\u003dcpw.mods.securejarhandler --add-exports java.base/sun.security.util\u003dcpw.mods.securejarhandler --add-exports jdk.naming.dns/com.sun.jndi.dns\u003djava.naming -XX:HeapDumpPath\u003dMojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump",
-      "args": "--launchTarget forgeclientuserdev --version MOD_DEV --assetIndex 5 --assetsDir \"C:\\Users\\Jean Paul\\.gradle\\caches\\forge_gradle\\assets\" --gameDir . --fml.forgeVersion 47.2.6 --fml.mcVersion 1.20.1 --fml.forgeGroup net.minecraftforge --fml.mcpVersion 20230612.114412 --mixin.config createnuclear.forge.mixins.json",
       "env": {
-        "MOD_CLASSES": "createnuclear%%${workspaceFolder}\\build\\resources\\main;createnuclear%%${workspaceFolder}\\build\\classes\\java\\main",
-        "MCP_MAPPINGS": "parchment_2023.09.03-1.20.1"
+        "MOD_CLASSES": "createnuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
       },
-      "preLaunchTask": "prepareRunClientCompile"
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
     },
     {
       "type": "java",
-      "name": "runData",
       "request": "launch",
-      "mainClass": "cpw.mods.bootstraplauncher.BootstrapLauncher",
+      "name": "Data",
+      "presentation": {
+        "group": "Mod Development - CreateNuclearForge",
+        "order": 1
+      },
       "projectName": "CreateNuclearForge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\dataRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\dataRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcreatenuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
+      ],
       "cwd": "${workspaceFolder}\\run",
-      "vmArgs": "-Dforge.logging.console.level\u003ddebug -Dforge.logging.markers\u003dREGISTRIES,REGISTRYDUMP \"-DlegacyClassPath.file\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge\\build\\classpath\\runData_minecraftClasspath.txt\" -Dmixin.env.remapRefMap\u003dtrue \"-Dmixin.env.refMapRemappingFile\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge/build/createSrgToMcp/output.srg\" \"-Dnet.minecraftforge.gradle.GradleStart.srg.srg-mcp\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge\\build\\createSrgToMcp\\output.srg\" -DignoreList\u003dbootstraplauncher,securejarhandler,asm-commons,asm-util,asm-analysis,asm-tree,asm,JarJarFileSystems,client-extra,fmlcore,javafmllanguage,lowcodelanguage,mclanguage,forge- -DmergeModules\u003djna-5.10.0.jar,jna-platform-5.10.0.jar -Dmixin.debug.verbose\u003dtrue -Dmixin.debug.export\u003dtrue -Djava.net.preferIPv6Addresses\u003dsystem -p \"C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\bootstraplauncher\\1.1.2\\c546e00443d8432cda6baa1c860346980742628\\bootstraplauncher-1.1.2.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\securejarhandler\\2.1.10\\51e6a22c6c716beb11e244bf5b8be480f51dd6b5\\securejarhandler-2.1.10.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-commons\\9.5\\19ab5b5800a3910d30d3a3e64fdb00fd0cb42de0\\asm-commons-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-util\\9.5\\64b5a1fc8c1b15ed2efd6a063e976bc8d3dc5ffe\\asm-util-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-analysis\\9.5\\490bacc77de7cbc0be1a30bb3471072d705be4a4\\asm-analysis-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-tree\\9.5\\fd33c8b6373abaa675be407082fdfda35021254a\\asm-tree-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm\\9.5\\dc6ea1875f4d64fbc85e1691c95b96a3d8569c90\\asm-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\net.minecraftforge\\JarJarFileSystems\\0.3.19\\2464eb7d6b9ddb9db36a82cf8a95193e5c6fe020\\JarJarFileSystems-0.3.19.jar\" --add-modules ALL-MODULE-PATH --add-opens java.base/java.util.jar\u003dcpw.mods.securejarhandler --add-opens java.base/java.lang.invoke\u003dcpw.mods.securejarhandler --add-exports java.base/sun.security.util\u003dcpw.mods.securejarhandler --add-exports jdk.naming.dns/com.sun.jndi.dns\u003djava.naming",
-      "args": "--launchTarget forgedatauserdev --assetIndex 5 --assetsDir \"C:\\Users\\Jean Paul\\.gradle\\caches\\forge_gradle\\assets\" --gameDir . --fml.forgeVersion 47.2.6 --fml.mcVersion 1.20.1 --fml.forgeGroup net.minecraftforge --fml.mcpVersion 20230612.114412 --mod createnuclear --all --output \"C:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge\\src\\generated\\resources\" --existing \"C:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge\\src\\main\\resources\" --mixin.config createnuclear.forge.mixins.json",
       "env": {
-        "MOD_CLASSES": "createnuclear%%${workspaceFolder}\\build\\resources\\main;createnuclear%%${workspaceFolder}\\build\\classes\\java\\main",
-        "MCP_MAPPINGS": "parchment_2023.09.03-1.20.1"
+        "MOD_CLASSES": "createnuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
       },
-      "preLaunchTask": "prepareRunDataCompile"
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
     },
     {
       "type": "java",
-      "name": "runGameTestServer",
       "request": "launch",
-      "mainClass": "cpw.mods.bootstraplauncher.BootstrapLauncher",
-      "projectName": "CreateNuclearForge",
-      "cwd": "${workspaceFolder}\\run\\gametest",
-      "vmArgs": "-Dforge.logging.console.level\u003ddebug -Dforge.logging.markers\u003dREGISTRIES \"-DlegacyClassPath.file\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge\\build\\classpath\\runGameTestServer_minecraftClasspath.txt\" -Dmixin.env.remapRefMap\u003dtrue \"-Dmixin.env.refMapRemappingFile\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge/build/createSrgToMcp/output.srg\" \"-Dnet.minecraftforge.gradle.GradleStart.srg.srg-mcp\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge\\build\\createSrgToMcp\\output.srg\" -DignoreList\u003dbootstraplauncher,securejarhandler,asm-commons,asm-util,asm-analysis,asm-tree,asm,JarJarFileSystems,client-extra,fmlcore,javafmllanguage,lowcodelanguage,mclanguage,forge- -DmergeModules\u003djna-5.10.0.jar,jna-platform-5.10.0.jar -Dmixin.debug.verbose\u003dtrue -Dmixin.debug.export\u003dtrue -Djava.net.preferIPv6Addresses\u003dsystem -p \"C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\bootstraplauncher\\1.1.2\\c546e00443d8432cda6baa1c860346980742628\\bootstraplauncher-1.1.2.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\securejarhandler\\2.1.10\\51e6a22c6c716beb11e244bf5b8be480f51dd6b5\\securejarhandler-2.1.10.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-commons\\9.5\\19ab5b5800a3910d30d3a3e64fdb00fd0cb42de0\\asm-commons-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-util\\9.5\\64b5a1fc8c1b15ed2efd6a063e976bc8d3dc5ffe\\asm-util-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-analysis\\9.5\\490bacc77de7cbc0be1a30bb3471072d705be4a4\\asm-analysis-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-tree\\9.5\\fd33c8b6373abaa675be407082fdfda35021254a\\asm-tree-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm\\9.5\\dc6ea1875f4d64fbc85e1691c95b96a3d8569c90\\asm-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\net.minecraftforge\\JarJarFileSystems\\0.3.19\\2464eb7d6b9ddb9db36a82cf8a95193e5c6fe020\\JarJarFileSystems-0.3.19.jar\" --add-modules ALL-MODULE-PATH --add-opens java.base/java.util.jar\u003dcpw.mods.securejarhandler --add-opens java.base/java.lang.invoke\u003dcpw.mods.securejarhandler --add-exports java.base/sun.security.util\u003dcpw.mods.securejarhandler --add-exports jdk.naming.dns/com.sun.jndi.dns\u003djava.naming",
-      "args": "--launchTarget forgegametestserveruserdev --gameDir . --fml.forgeVersion 47.2.6 --fml.mcVersion 1.20.1 --fml.forgeGroup net.minecraftforge --fml.mcpVersion 20230612.114412 --mixin.config createnuclear.forge.mixins.json",
-      "env": {
-        "MOD_CLASSES": "createnuclear%%${workspaceFolder}\\build\\resources\\main;createnuclear%%${workspaceFolder}\\build\\classes\\java\\main",
-        "MCP_MAPPINGS": "parchment_2023.09.03-1.20.1"
+      "name": "Server",
+      "presentation": {
+        "group": "Mod Development - CreateNuclearForge",
+        "order": 2
       },
-      "preLaunchTask": "prepareRunGameTestServerCompile"
-    },
-    {
-      "type": "java",
-      "name": "runServer",
-      "request": "launch",
-      "mainClass": "cpw.mods.bootstraplauncher.BootstrapLauncher",
       "projectName": "CreateNuclearForge",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\serverRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\build\\moddev\\serverRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcreatenuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
+      ],
       "cwd": "${workspaceFolder}\\run\\server",
-      "vmArgs": "-Dforge.logging.console.level\u003ddebug -Dforge.logging.markers\u003dREGISTRIES \"-DlegacyClassPath.file\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge\\build\\classpath\\runServer_minecraftClasspath.txt\" -Dmixin.env.remapRefMap\u003dtrue \"-Dmixin.env.refMapRemappingFile\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge/build/createSrgToMcp/output.srg\" \"-Dnet.minecraftforge.gradle.GradleStart.srg.srg-mcp\u003dC:\\Users\\Jean Paul\\Desktop\\mod_fabric\\CreateNuclearForge\\build\\createSrgToMcp\\output.srg\" -DignoreList\u003dbootstraplauncher,securejarhandler,asm-commons,asm-util,asm-analysis,asm-tree,asm,JarJarFileSystems,client-extra,fmlcore,javafmllanguage,lowcodelanguage,mclanguage,forge- -DmergeModules\u003djna-5.10.0.jar,jna-platform-5.10.0.jar -Dforge.enableGameTest\u003dtrue -Dmixin.debug.verbose\u003dtrue -Dmixin.debug.export\u003dtrue -Djava.net.preferIPv6Addresses\u003dsystem -p \"C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\bootstraplauncher\\1.1.2\\c546e00443d8432cda6baa1c860346980742628\\bootstraplauncher-1.1.2.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\cpw.mods\\securejarhandler\\2.1.10\\51e6a22c6c716beb11e244bf5b8be480f51dd6b5\\securejarhandler-2.1.10.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-commons\\9.5\\19ab5b5800a3910d30d3a3e64fdb00fd0cb42de0\\asm-commons-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-util\\9.5\\64b5a1fc8c1b15ed2efd6a063e976bc8d3dc5ffe\\asm-util-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-analysis\\9.5\\490bacc77de7cbc0be1a30bb3471072d705be4a4\\asm-analysis-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm-tree\\9.5\\fd33c8b6373abaa675be407082fdfda35021254a\\asm-tree-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\org.ow2.asm\\asm\\9.5\\dc6ea1875f4d64fbc85e1691c95b96a3d8569c90\\asm-9.5.jar;C:\\Users\\Jean Paul\\.gradle\\caches\\modules-2\\files-2.1\\net.minecraftforge\\JarJarFileSystems\\0.3.19\\2464eb7d6b9ddb9db36a82cf8a95193e5c6fe020\\JarJarFileSystems-0.3.19.jar\" --add-modules ALL-MODULE-PATH --add-opens java.base/java.util.jar\u003dcpw.mods.securejarhandler --add-opens java.base/java.lang.invoke\u003dcpw.mods.securejarhandler --add-exports java.base/sun.security.util\u003dcpw.mods.securejarhandler --add-exports jdk.naming.dns/com.sun.jndi.dns\u003djava.naming",
-      "args": "--launchTarget forgeserveruserdev --gameDir . --fml.forgeVersion 47.2.6 --fml.mcVersion 1.20.1 --fml.forgeGroup net.minecraftforge --fml.mcpVersion 20230612.114412 --mixin.config createnuclear.forge.mixins.json",
       "env": {
-        "MOD_CLASSES": "createnuclear%%${workspaceFolder}\\build\\resources\\main;createnuclear%%${workspaceFolder}\\build\\classes\\java\\main",
-        "MCP_MAPPINGS": "parchment_2023.09.03-1.20.1"
+        "MOD_CLASSES": "createnuclear%%C:\\Users\\giova\\bureau\\mod-fabric\\CreateNuclearForge\\bin\\main"
       },
-      "preLaunchTask": "prepareRunServerCompile"
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
     }
   ]
 }
