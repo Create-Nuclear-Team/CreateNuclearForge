@@ -376,6 +376,7 @@
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "Faites un clic _droit_ pour le remplir.",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour2": "Faites un clic _droit_ sur le contrôleur de réacteur pour l'ouvrir.",
   "item.createnuclear.reactor_blueprint_item.tooltip.condition1": "Rempli de barres de refroidissement et de chauffage",
+  "item.createnuclear.reactor_blueprint_item.tooltip.condition1": "Filled with cooling and heating rods",
   "item.createnuclear.reactor_blueprint_item.tooltip.condition2": "Le réacteur doit être assemblé",
   "item.createnuclear.reactor_blueprint_item.tooltip.summary": "Il vous permet de configurer votre propre paterne.",
   "item.createnuclear.red_cloth": "Tissu rouge",
@@ -383,6 +384,12 @@
   "item.createnuclear.steel_nugget": "Pépite d'acier",
   "item.createnuclear.thorium_rod": "Barre de thorium",
   "item.createnuclear.thorium_rod.tooltip.summary": "_Barre_ pour être utilisé dans _l'entrée du réacteur_ pour l'utiliser.",
+  "item.createnuclear.thorium_bucket": "Thorium Bucket",
+  "item.createnuclear.thorium_dust": "Thorium Dust",
+  "item.createnuclear.thorium_ingot": "Thorium Ingot",
+  "item.createnuclear.thorium_nugget": "Thorium Nugget",
+  "item.createnuclear.thorium_rod": "Thorium Rod",
+  "item.createnuclear.thorium_rod.tooltip.summary": "_Rod_ to be used in the _reactor rod input_ to operate it.",
   "item.createnuclear.uranium_bucket": "Seau d'uranium",
   "item.createnuclear.uranium_powder": "Poudre d'uranium",
   "item.createnuclear.uranium_rod": "Barre d'uranium",
@@ -430,4 +437,5 @@
   "tag.item.minecraft.campfires": "Feu de camps",
   "tag.item.trinkets.head.face": "Face avant",
   "item.createnuclear.raw_thorium": "Thorium brut"
+  "tag.item.trinkets.head.face": "Face avant"
 }
