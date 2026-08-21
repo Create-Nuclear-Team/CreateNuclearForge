@@ -85,7 +85,7 @@ public class ReactorBluePrintItem extends Item implements MenuProvider {
                                 .withStyle(style -> style
                                         .withColor(ChatFormatting.AQUA)
                                         .withUnderlined(true)
-                                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://wiki.createnuclear.net/"))
+                                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://wiki.createnuclear.net/wiki/block&items/reactor_blueprint_item"))
                                 ));
 
                 player.sendSystemMessage(message);
