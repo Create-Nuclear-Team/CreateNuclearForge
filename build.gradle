@@ -18,7 +18,7 @@ String gitHash = calculateGitHash() + (hasUnstaged() ? "-modified" : "")
 base {
     archivesName = "createnuclear-${artifact_minecraft_version}"
     group = mod_group_id
-    version = 'forge' + (dev && buildNumber != null ? "-${buildNumber}" : "")
+    version = "${mod_version}-forge" + (dev && buildNumber != null ? "-${buildNumber}" : "")
 }
 
 println "Java: ${System.getProperty 'java.version'}, " +
@@ -31,9 +31,6 @@ mixin {
     refmap = add(sourceSets.main, "createnuclear.refmap.json")
     // add sourceSets.main, 'createnuclear.forge.refmap.json'
     config 'createnuclear.forge.mixins.json'
-
-    debug.verbose = true
-    debug.export = true
 }
 
 idea {
@@ -43,14 +40,23 @@ idea {
     }
 }
 
-minecraft {
-    accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
+legacyForge {
+    version = "${minecraft_version}-${forge_version}"
 
-    mappings channel: mapping_channel, version: mapping_version
-    mappings channel: 'parchment', version: '2023.09.03-1.20.1'
+    accessTransformers {
+        from(file("src/main/resources/META-INF/accesstransformer.cfg"))
+    }
 
-    // Required for Gradle's ProcessResources task(s) to run on IDE output locations before launching the game.
-    copyIdeResources = true
+    parchment {
+        minecraftVersion = minecraft_version
+        mappingsVersion = mapping_version
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -59,27 +65,28 @@ minecraft {
         configureEach {
             systemProperty("forge.logging.markers", "REGISTRIES")
             systemProperty("forge.logging.console.level", "info")
-            jvmArguments = ["-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition"]
-            //jvmArgs("-XX:-OmitStackTraceInFastThrow") // uncomment when you get exceptions with null messages etc
-            //jvmArgs "-XX:+UnlockCommercialFeatures" // uncomment for profiling
+            jvmArguments.addAll("-XX:+IgnoreUnrecognizedVMOptions", "-XX:+AllowEnhancedClassRedefinition")
+            //jvmArgument("-XX:-OmitStackTraceInFastThrow") // uncomment when you get exceptions with null messages etc
+            //jvmArgument("-XX:+UnlockCommercialFeatures") // uncomment for profiling
 
             systemProperty("mixin.debug.export", "true")
             systemProperty("mixin.debug.verbose", "true")
 
             programArgument("-mixin.config=createnuclear.forge.mixins.json")
 
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            systemProperty("mixin.env.remapRefMap", "true")
+            systemProperty("mixin.env.refMapRemappingFile", "${projectDir}/build/moddev/artifacts/intermediateToNamed.srg")
         }
 
         client {
-            workingDirectory project.file('run')
+            client()
+            gameDirectory = project.file('run')
         }
 
         client2 {
-            parent runs.client
-            workingDirectory project.file('run/client2')
-            args '--username', 'Dev2'
+            client()
+            gameDirectory = project.file('run/client2')
+            programArguments.addAll('--username', 'Dev2')
         }
 
         server {
@@ -90,8 +97,9 @@ minecraft {
         // By default, the server will crash when no gametests are provided.
         // The gametest system is also enabled by default for other run configs under the /test command.
         gameTestServer {
-            workingDirectory project.file('run/gametest')
-            property 'forge.enabledGameTestNamespaces', mod_id
+            type = "gameTestServer"
+            gameDirectory = project.file('run/gametest')
+            systemProperty('forge.enabledGameTestNamespaces', mod_id)
         }
 
         data {
@@ -108,6 +116,10 @@ minecraft {
             )
         }
     }
+}
+
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
 }
 
 repositories {
@@ -138,25 +150,22 @@ repositories {
 dependencies {
     /* other minecraft dependencies are here */
     modImplementation("curse.maven:jade-324717:6106101")
-    
+
     // compile against the JEI API but do not include it at runtime
     modCompileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
     modCompileOnly("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
-    
+
     // at runtime, use the full JEI jar for Forge
 
     //Alex's cave
-    compileOnly fg.deobf("curse.maven:alexs-caves-924854:5848216")
-    compileOnly fg.deobf("curse.maven:citadel-331936:6002521")
+    modCompileOnly("curse.maven:alexs-caves-924854:5848216")
+    modCompileOnly("curse.maven:citadel-331936:6002521")
 
-    implementation(fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false })
-    implementation(fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}"))
-    compileOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}"))
-    runtimeOnly(fg.deobf("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}"))
-    implementation(fg.deobf("com.tterrag.registrate:Registrate:${registrate_version}"))
-    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
-    implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
-
+    modImplementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
+    modImplementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+    modCompileOnly("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
+    modRuntimeOnly("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+    modImplementation("com.tterrag.registrate:Registrate:${registrate_version}")
 
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case 'jei': modRuntimeOnly("mezz.jei:jei-${minecraft_version}-forge:${jei_version}"); break
@@ -164,12 +173,6 @@ dependencies {
         default: println("Unknown recipe viewer specified: $recipe_viewer. Must be JEI or disabled.")
     }
 
-    modImplementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
-    modImplementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
-    modCompileOnly("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
-    modRuntimeOnly("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
-    modImplementation("com.tterrag.registrate:Registrate:${registrate_version}")
-    
     implementation("io.github.llamalad7:mixinextras-forge:${mixin_extras_version}")
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
 
@@ -330,3 +333,6 @@ boolean hasUnstaged() {
         return false
     }
 }
+
+
+

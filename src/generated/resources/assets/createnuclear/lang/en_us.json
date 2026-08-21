@@ -328,7 +328,7 @@
   "gui.createnuclear.reactor_input.title": "Reactor Input Storage",
   "irradiated.taming.wip": "This creature cannot be tamed yet - irradiated mobs are still a work in progress",
   "item.createnuclear.biome_irradiation_extractor": "Biome Irradiation Extractor",
-  "item.createnuclear.biome_irradiation_extractor.tooltip.summary": "This item is currently in _beta_ and will change it's form & texture in the next update.",
+  "item.createnuclear.biome_irradiation_extractor.tooltip.summary": "This item is currently in _beta_ and might change in future updates.",
   "item.createnuclear.black_cloth": "Black Cloth",
   "item.createnuclear.blue_cloth": "Blue Cloth",
   "item.createnuclear.brown_cloth": "Brown Cloth",
