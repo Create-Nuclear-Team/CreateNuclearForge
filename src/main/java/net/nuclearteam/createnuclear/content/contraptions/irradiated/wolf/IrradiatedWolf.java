@@ -35,7 +35,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,6 +44,7 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.CNItems;
+import net.nuclearteam.createnuclear.content.contraptions.irradiated.AnimalUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -300,7 +301,7 @@ public class IrradiatedWolf extends TamableAnimal implements NeutralMob {
         ItemStack itemStack = player.getItemInHand(hand);
         Item item = itemStack.getItem();
         if (this.level().isClientSide) {
-            boolean bl = this.isOwnedBy(player) || this.isTame() || itemStack.is(Items.BONE) && !this.isTame() && !this.isAngry();
+            boolean bl = this.isOwnedBy(player) || this.isTame() || this.isFood(itemStack) && !this.isTame() && !this.isAngry();
             return bl ? InteractionResult.CONSUME : InteractionResult.PASS;
         } else {
             {
@@ -313,6 +314,8 @@ public class IrradiatedWolf extends TamableAnimal implements NeutralMob {
                         this.heal((float) item.getFoodProperties().getNutrition());
                         return InteractionResult.SUCCESS;
                     }
+                } else if (this.isFood(itemStack)) {
+                    return AnimalUtil.blockTamingWip(player, this.level());
                 }
 
                 return super.mobInteract(player, hand);
@@ -340,10 +343,13 @@ public class IrradiatedWolf extends TamableAnimal implements NeutralMob {
             return this.isTame() ? (0.55F - (this.getMaxHealth() - this.getHealth()) * 0.02F) * 3.1415927F : 0.62831855F;
         }
     }
+    // Define the base food of the animal (e.g., Wheat for Cows)
+    private static final Ingredient FOOD_ITEMS = Ingredient.of(CNItems.YELLOWCAKE);
 
+    @Override
     public boolean isFood(ItemStack stack) {
-        //Item item = stack.getItem();
-        return stack.is(CNItems.YELLOWCAKE.asItem());//stack.is(CNItems.URANIUM_POWDER.get()); //item.isEdible() && item.getFoodProperties().isMeat();
+        // Check if the stack is a valid Yellowcake or the base food
+        return AnimalUtil.isFood(stack, FOOD_ITEMS);
     }
 
     public int getMaxSpawnClusterSize() {

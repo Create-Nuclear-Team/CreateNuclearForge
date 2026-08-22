@@ -12,33 +12,22 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.util.Mth;
-import net.nuclearteam.createnuclear.CNBlocks;
 
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
-import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 
 import java.util.List;
-import java.util.Objects;
-
-import static net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput.DIR;
-
 
 public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
-    public int speed = 1;
+    public int speed = 0;
     public float heat = 0;
 
-    ReactorControllerBlock controller = null;
-    ReactorControllerBlockEntity controllerEntity = null;
+    protected ReactorPattern pattern =  new ReactorPattern();
 
-    // protected ScrollValueBehaviour generatedSpeed;
     protected float generatedSpeed;
 
     public ReactorOutputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -48,11 +37,6 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
         super.addBehaviours(behaviours);
-        // generatedSpeed = new KineticScrollValueBehaviour(CreateNuclearLang.translateDirect("kinetics.reactor_output.rotation_speed"), this, new ReactorOutputValue());
-        // generatedSpeed.between(-1500000, 1500000);
-        // generatedSpeed.setValue(speed);
-        // generatedSpeed.withCallback(i -> this.updateGeneratedRotation());
-        // behaviours.add(generatedSpeed);
 
     }
 
@@ -77,35 +61,33 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 		setChanged();
     }
 
-    @Override
-	protected void read(CompoundTag compound, boolean clientPacket) {
-		super.read(compound, clientPacket);
-		generatedSpeed = compound.getFloat("generatedSpeed");
-	}
-
-	
-	
-	@Override
-	public void write(CompoundTag compound, boolean clientPacket) {
-		super.write(compound, clientPacket);
-		compound.putFloat("generatedSpeed", generatedSpeed);
-	}
+    // Tracks the output's linked block position for persistence across reloads.
+    private BlockPos outputPos;
 
     @Override
-    public void tick() {
-        super.tick();
+    protected void read(CompoundTag compound, boolean clientPacket) {
+        super.read(compound, clientPacket);
 
-        BlockGetter level = getLevel();
+        // Restore the generated rotation speed
+        generatedSpeed = compound.getFloat("generatedSpeed");
 
-        if (level.getBlockState(getBlockPos().above(3)).getBlock() == CNBlocks.REACTOR_CONTROLLER.get()) {
-            controller = (ReactorControllerBlock) level.getBlockState(getBlockPos().above(3)).getBlock();
-            controllerEntity = (ReactorControllerBlockEntity) level.getBlockEntity(getBlockPos().above(3));
-            if (controllerEntity != null) {
-                if (!controllerEntity.getAssembled() && getSpeed() != 0) {
-                    setSpeed(0);
-                }
-            }
-        } else setSpeed(0);
+        // Restore the output position, if present in the tag
+        if (compound.contains("outputPos")) {
+            this.outputPos = BlockPos.of(compound.getLong("outputPos"));
+        }
+    }
+
+    @Override
+    public void write(CompoundTag compound, boolean clientPacket) {
+        super.write(compound, clientPacket);
+
+        // Persist the generated rotation speed
+        compound.putFloat("generatedSpeed", generatedSpeed);
+
+        // Persist the output position, if set
+        if (this.outputPos != null) {
+            compound.putLong("outputPos", this.outputPos.asLong());
+        }
     }
 
      @Override
@@ -140,45 +122,17 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
         if (!hasSource() || getGeneratedSpeed() > getTheoreticalSpeed())
         {
-            FindController(getBlockPos(), Objects.requireNonNull(getLevel()));
+            assert level != null;
+            pattern.findController(getBlockPos(), level, true);
         }
-    }
-
-    public void FindController(BlockPos pos, Level level){
-        if (level.getBlockState(pos.above(3)).getBlock() == CNBlocks.REACTOR_CONTROLLER.get()){
-            ReactorControllerBlock controller = (ReactorControllerBlock)level.getBlockState(pos.above(3)).getBlock();
-            controller.Verify(controller.defaultBlockState(), pos.above(3), level, level.players(), false);
-        }
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
-    }
-
-    public int getDir() {
-        BlockState state = getBlockState();
-        return state.getValue(DIR);
-    }
-
-    public void setDir(int dir, Level level, BlockPos pos) {
-        BlockState state = getBlockState();
-        level.setBlockAndUpdate(pos, state.setValue(DIR, dir));
     }
 
     @Override
     public float getGeneratedSpeed() {
-        // if (!CNBlocks.REACTOR_OUTPUT.has(getBlockState()))
-        //     return 0;
-        // return speed; //convertToDirection(speed, getBlockState().getValue(ReactorOutput.FACING));
         return Mth.clamp(generatedSpeed, 0, 1500000);
     }
 
-    @Override
-    protected Block getStressConfigKey() {
-        return super.getStressConfigKey();
-    }
-
-    class ReactorOutputValue extends ValueBoxTransform.Sided {
+    static class ReactorOutputValue extends ValueBoxTransform.Sided {
 
         @Override
         protected Vec3 getSouthLocation() {
