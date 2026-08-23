@@ -210,7 +210,7 @@
   "createnuclear.notification.reactor.assembled": "De reactor is in elkaar gezet",
   "createnuclear.notification.reactor.critical_failure": "KRITIEKE FOUT",
   "createnuclear.notification.reactor.destroyed": "REACTOR VERNIETIGD",
-  "createnuclear.notification.reactor.disassembled": "Reactor has been disassembled",
+  "createnuclear.notification.reactor.disassembled": "De reactor is ontmanteld",
   "createnuclear.notification.reactor.imminent_explosion": "IMMINENT EXPLOSION",
   "createnuclear.notification.reactor.meltdown_finished": "Critical meltdown completed",
   "createnuclear.notification.reactor.meltdown_in": "CORE MELTDOWN IN ",
