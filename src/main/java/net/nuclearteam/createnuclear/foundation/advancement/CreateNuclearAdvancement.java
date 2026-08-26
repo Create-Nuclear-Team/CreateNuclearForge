@@ -1,5 +1,7 @@
 package net.nuclearteam.createnuclear.foundation.advancement;
 
+import com.simibubi.create.foundation.advancement.AllTriggers;
+import com.simibubi.create.foundation.advancement.SimpleCreateTrigger;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.CriterionTriggerInstance;
@@ -23,12 +25,12 @@ import java.util.function.UnaryOperator;
 @SuppressWarnings("unused")
 public class CreateNuclearAdvancement {
 
-    static final ResourceLocation BACKGROUND = CreateNuclear.asResource("textures/gui/advancements/backgrounds/background_advancement.png");
+    static final ResourceLocation BACKGROUND = CreateNuclear.asResource("textures/block/steel_block.png");
     static final String LANG = "advancement." + CreateNuclear.MOD_ID + ".";
     static final String SECRET_SUFFIX = "\n\u00A77(Hidden Advancement)";
 
     private final Advancement.Builder builder;
-    private SimpleCreateNuclearTrigger builtinTrigger;
+    private SimpleCreateTrigger builtinTrigger;
     private CreateNuclearAdvancement parent;
 
     Advancement datagenResult;
@@ -46,7 +48,7 @@ public class CreateNuclearAdvancement {
         b.apply(t);
 
         if (!t.externalTrigger) {
-            builtinTrigger = CNTriggers.addSimple(id + "_builtin");
+            builtinTrigger = AllTriggers.addSimple(id + "_builtin");
             builder.addCriterion("0", builtinTrigger.instance());
         }
 

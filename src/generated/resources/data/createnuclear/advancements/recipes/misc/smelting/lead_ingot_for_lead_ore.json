@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:ores/lead"
+            "tag": "createnuclear:lead_ores"
           }
         ]
       },

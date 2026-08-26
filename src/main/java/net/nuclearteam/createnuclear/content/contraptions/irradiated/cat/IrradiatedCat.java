@@ -38,8 +38,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
-import net.nuclearteam.createnuclear.CNItems;
-import net.nuclearteam.createnuclear.content.contraptions.irradiated.AnimalUtil;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -58,6 +56,7 @@ public class IrradiatedCat extends TamableAnimal {
     private static final Ingredient TEMPT_INGREDIENT;
     private static final EntityDataAccessor<Boolean> IS_LYING;
     private static final EntityDataAccessor<Boolean> RELAX_STATE_ONE;
+    private static final EntityDataAccessor<Integer> DATA_COLLAR_COLOR;
     private CatAvoidEntityGoal<Player> avoidPlayersGoal;
     @Nullable
     private TemptGoal temptGoal;
@@ -72,7 +71,6 @@ public class IrradiatedCat extends TamableAnimal {
         super(entityType, level);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     protected void registerGoals() {
         this.temptGoal = new CatTemptGoal(this, 0.6, TEMPT_INGREDIENT, true);
         this.goalSelector.addGoal(1, new FloatGoal(this));
@@ -108,18 +106,33 @@ public class IrradiatedCat extends TamableAnimal {
         return this.entityData.get(RELAX_STATE_ONE);
     }
 
+    public DyeColor getCollarColor() {
+        return DyeColor.byId(this.entityData.get(DATA_COLLAR_COLOR));
+    }
+
+    public void setCollarColor(DyeColor color) {
+        this.entityData.set(DATA_COLLAR_COLOR, color.getId());
+    }
+
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(IS_LYING, false);
         this.entityData.define(RELAX_STATE_ONE, false);
+        this.entityData.define(DATA_COLLAR_COLOR, DyeColor.RED.getId());
     }
 
     public void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
+        compound.putByte("CollarColor", (byte)this.getCollarColor().getId());
     }
 
     public void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
+
+        if (compound.contains("CollarColor", 99)) {
+            this.setCollarColor(DyeColor.byId(compound.getInt("CollarColor")));
+        }
+
     }
 
     public void customServerAiStep() {
@@ -253,6 +266,11 @@ public class IrradiatedCat extends TamableAnimal {
             if (this.isTame()) {
                 cat.setOwnerUUID(this.getOwnerUUID());
                 cat.setTame(true);
+                if (this.random.nextBoolean()) {
+                    cat.setCollarColor(this.getCollarColor());
+                } else {
+                    cat.setCollarColor(cat2.getCollarColor());
+                }
             }
         }
 
@@ -270,7 +288,6 @@ public class IrradiatedCat extends TamableAnimal {
         }
     }
 
-    @SuppressWarnings("null")
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
         spawnData = super.finalizeSpawn(level, difficulty, reason, spawnData, dataTag);
         boolean bl = level.getMoonBrightness() > 0.9F;
@@ -282,7 +299,6 @@ public class IrradiatedCat extends TamableAnimal {
         return spawnData;
     }
 
-    @SuppressWarnings("null")
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
         Item item = itemStack.getItem();
@@ -296,21 +312,44 @@ public class IrradiatedCat extends TamableAnimal {
             InteractionResult interactionResult;
             if (this.isTame()) {
                 if (this.isOwnedBy(player)) {
-                    if (item.isEdible() && this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
-                        this.usePlayerItem(player, hand, itemStack);
-                        this.heal((float)item.getFoodProperties().getNutrition());
+                    if (!(item instanceof DyeItem)) {
+                        if (item.isEdible() && this.isFood(itemStack) && this.getHealth() < this.getMaxHealth()) {
+                            this.usePlayerItem(player, hand, itemStack);
+                            this.heal((float)item.getFoodProperties().getNutrition());
+                            return InteractionResult.CONSUME;
+                        }
+
+                        interactionResult = super.mobInteract(player, hand);
+                        if (!interactionResult.consumesAction() || this.isBaby()) {
+                            this.setOrderedToSit(!this.isOrderedToSit());
+                        }
+
+                        return interactionResult;
+                    }
+
+                    DyeColor dyeColor = ((DyeItem)item).getDyeColor();
+                    if (dyeColor != this.getCollarColor()) {
+                        this.setCollarColor(dyeColor);
+                        if (!player.getAbilities().instabuild) {
+                            itemStack.shrink(1);
+                        }
+
+                        this.setPersistenceRequired();
                         return InteractionResult.CONSUME;
                     }
-
-                    interactionResult = super.mobInteract(player, hand);
-                    if (!interactionResult.consumesAction() || this.isBaby()) {
-                        this.setOrderedToSit(!this.isOrderedToSit());
-                    }
-
-                    return interactionResult;
                 }
-            } else if (itemStack.is(CNItems.YELLOWCAKE.get())) {
-                return AnimalUtil.blockTamingWip(player, this.level());
+            } else if (this.isFood(itemStack)) {
+                this.usePlayerItem(player, hand, itemStack);
+                if (this.random.nextInt(3) == 0) {
+                    this.tame(player);
+                    this.setOrderedToSit(true);
+                    this.level().broadcastEntityEvent(this, (byte)7);
+                } else {
+                    this.level().broadcastEntityEvent(this, (byte)6);
+                }
+
+                this.setPersistenceRequired();
+                return InteractionResult.CONSUME;
             }
 
             interactionResult = super.mobInteract(player, hand);
@@ -351,9 +390,10 @@ public class IrradiatedCat extends TamableAnimal {
     }
 
     static {
-        TEMPT_INGREDIENT = Ingredient.of(new ItemLike[]{Items.COD, Items.SALMON, CNItems.YELLOWCAKE});
+        TEMPT_INGREDIENT = Ingredient.of(new ItemLike[]{Items.COD, Items.SALMON});
         IS_LYING = SynchedEntityData.defineId(IrradiatedCat.class, EntityDataSerializers.BOOLEAN);
         RELAX_STATE_ONE = SynchedEntityData.defineId(IrradiatedCat.class, EntityDataSerializers.BOOLEAN);
+        DATA_COLLAR_COLOR = SynchedEntityData.defineId(IrradiatedCat.class, EntityDataSerializers.INT);
     }
 
 

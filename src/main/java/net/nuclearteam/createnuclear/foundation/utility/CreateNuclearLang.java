@@ -1,5 +1,6 @@
 package net.nuclearteam.createnuclear.foundation.utility;
 
+import com.simibubi.create.Create;
 import net.createmod.catnip.lang.Lang;
 import net.createmod.catnip.lang.LangBuilder;
 import net.createmod.catnip.lang.LangNumberFormat;

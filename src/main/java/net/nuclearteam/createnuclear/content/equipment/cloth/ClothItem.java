@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item;
 import net.nuclearteam.createnuclear.CNItems;
 
 import java.util.*;
+import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class ClothItem extends Item {
@@ -15,10 +16,6 @@ public class ClothItem extends Item {
     public ClothItem(Item.Properties properties, DyeColor color) {
         super(properties);
         this.color = color;
-    }
-
-    public DyeColor getColor() {
-      return color;
     }
 
     public enum Cloths {
@@ -55,10 +52,6 @@ public class ClothItem extends Item {
 
         public ItemEntry<ClothItem> getItem() {
             return clothMap.get(this.color);
-        }
-
-        public DyeColor getColor() {
-            return color;
         }
 
         public static ItemEntry<ClothItem> getByColor(DyeColor color) {

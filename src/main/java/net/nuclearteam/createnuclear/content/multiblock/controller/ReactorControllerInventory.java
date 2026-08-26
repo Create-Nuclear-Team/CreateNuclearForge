@@ -14,6 +14,7 @@ public class ReactorControllerInventory extends SmartInventory {
         this.be = be;
     }
 
+
     @Override
     public ItemStack removeItemNoUpdate(int index) {
         be.setChanged();
@@ -22,6 +23,9 @@ public class ReactorControllerInventory extends SmartInventory {
 
     @Override
     public boolean isItemValid(int slot, ItemStack resource) {
-        return slot == 0 && resource.is(CNItems.REACTOR_BLUEPRINT.get());
+        return switch (slot) {
+            case 0 -> CNItems.REACTOR_BLUEPRINT.get() == resource.getItem();
+            default -> !super.isItemValid(slot, resource);
+        };
     }
 }

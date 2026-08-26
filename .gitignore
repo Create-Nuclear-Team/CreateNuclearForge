@@ -19,7 +19,6 @@ build
 
 # other
 eclipse
-.claude
 # run
 
 # Files from Forge MDK
@@ -36,20 +35,13 @@ run/resources/
 run/saves/
 run/schematics/uploaded
 run/screenshots/
-run/servers.*
-run/mods/
 run/fabricloader.log
 run/options.txt
 run/usercache.json
 run/usernamecache.json
-run/hs_err_pid*.log
-run/imgui.init
 run/emi.json
 run/.mixin.out
 run/gametest
 run/logs
+run/schematics
 run/server
-run/client2
-
-# LLM
-.claude/*

@@ -3,7 +3,7 @@
   "parent": "block/block",
   "textures": {
     "0": "createnuclear:block/reactor/output/output",
-    "1": "createnuclear:block/reactor/casing/reactor_casing",
+    "1": "createnuclear:block/reactor/casing/casing_top",
     "2": "createnuclear:block/reactor/casing/reactor_casing",
     "particle": "createnuclear:block/reactor/output/output"
   },

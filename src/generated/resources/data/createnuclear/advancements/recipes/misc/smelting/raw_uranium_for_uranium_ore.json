@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:ores/uranium"
+            "tag": "createnuclear:uranium_ores"
           }
         ]
       },

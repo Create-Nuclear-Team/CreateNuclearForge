@@ -2,7 +2,7 @@
   "type": "create:pressing",
   "ingredients": [
     {
-      "tag": "forge:dusts/coal"
+      "tag": "forge:coal_dusts"
     }
   ],
   "results": [

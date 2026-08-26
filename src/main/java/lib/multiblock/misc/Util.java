@@ -20,12 +20,14 @@ public class Util {
         Collections.reverse(aisles);
         Map<Character, List<MultiBlockOffsetPos>> blockOffsets = new HashMap<>();
 
-        int starX = -1, starY = -1, starZ = -1;
+        int starX = -1;
+        int starY = -1;
+        int starZ = -1;
 
         for (int y = 0; y < aisles.size(); y++) {
             String[] aisle = aisles.get(y);
 
-            for (int x = 0; x < aisle.length; x++) {
+            for (int x=0; x < aisle.length; x++) {
                 for (int z = 0; z < aisle[x].length(); z++) {
                     if (aisle[x].charAt(z) == '*') {
                         starX = x;

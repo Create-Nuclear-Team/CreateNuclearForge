@@ -11,23 +11,20 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.SlotItemHandler;
 import net.nuclearteam.createnuclear.CNMenus;
-import net.nuclearteam.createnuclear.api.multiblock.rods.RodType;
-import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRod;
+import net.nuclearteam.createnuclear.CNTags;
 
 import static net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem.getItemStorage;
 
 public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
 
-    public int countFuelRod = 0;
-    public int countCooledRod = 0;
-    public int fuelTime = 0;
-    public int coolerTime = 0;
+    public float heat = 0F;
+    public int graphiteTime = 5000;
+    public int uraniumTime = 3600;
+    public int countGraphiteRod = 0;
+    public int countUraniumRod = 0;
     public double progress = 0;
-    public float heat = 0;
-    public double totalInit = 0;
+
     public boolean sendUpdate = false;
 
     public ReactorBluePrintMenu(MenuType<?> type, int id, Inventory inv, FriendlyByteBuf extraData) {
@@ -60,17 +57,16 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
             }
         }
 
-        contentHolder.getOrCreateTag().putInt("fuelTime", 0);
-        contentHolder.getOrCreateTag().putInt("coolerTime", 0);
-        contentHolder.getOrCreateTag().putInt("countCoolerRod", 0);
-        contentHolder.getOrCreateTag().putInt("countFuelRod", 0);
-        contentHolder.getOrCreateTag().putInt("totalHeatRatio", 0);
+        contentHolder.getOrCreateTag().putInt("uraniumTime", 3600);
+        contentHolder.getOrCreateTag().putInt("graphiteTime", 5000);
+        contentHolder.getOrCreateTag().putInt("countGraphiteRod", 0);
+        contentHolder.getOrCreateTag().putInt("countUraniumRod", 0);
 
         ghostInventory.deserializeNBT(tag.getCompound("pattern"));
     }
 
     @Override
-    protected ItemStackHandler createGhostInventory() {
+    protected net.minecraftforge.items.ItemStackHandler createGhostInventory() {
         return getItemStorage(contentHolder);
     }
 
@@ -104,70 +100,31 @@ public class ReactorBluePrintMenu extends GhostItemMenu<ItemStack> {
         };
 
         for (int[] pos : positions) {// up and down not middle
-            this.addSlot(new SlotItemHandler(ghostInventory,i, startWidth + incr * pos[0], startHeight + incr * pos[1]));
+            this.addSlot(new net.minecraftforge.items.SlotItemHandler(ghostInventory,i, startWidth + incr * pos[0], startHeight + incr * pos[1]));
             i++;
         }
     }
 
     @Override
     protected void saveData(ItemStack contentHolder) {
-        countFuelRod = 0;
-        countCooledRod = 0;
-        int totalRatio = 0;
-        int totalFuelTime = 0;
-        int totalCoolerTime = 0;
-
         for (int i = 0; i < ghostInventory.getSlots(); i++) {
-            ItemStack stack = ghostInventory.getStackInSlot(i);
-            if (stack == null || stack.isEmpty()) {
-                ghostInventory.setStackInSlot(i, ItemStack.EMPTY);
-                continue;
-            }
-
-            RodType typeRod = RodType.resolveRodType(stack.getItem(), playerInventory.player.level());
-
-            boolean isFuel = typeRod.type() == TypeRod.FUEL;
-            boolean isCooler = typeRod.type() == TypeRod.COOLER;
-
-            if (isCooler) {
-                countCooledRod++;
-                totalCoolerTime += typeRod.rodTimer().get();
-            }
-            if (isFuel) {
-                countFuelRod++;
-                totalFuelTime += typeRod.rodTimer().get();
-            }
-            
-            if (isCooler || isFuel) {
-                totalRatio += typeRod.ratio().get();
-            }
+            if (ghostInventory.getStackInSlot(i).isEmpty() || ghostInventory.getStackInSlot(i) == null) ghostInventory.setStackInSlot(i, ItemStack.EMPTY);
+            if (!(ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.FUEL.tag) || ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.COOLER.tag))&& !ghostInventory.getStackInSlot(i).isEmpty()) ghostInventory.setStackInSlot(i, ItemStack.EMPTY);
+            if (ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.COOLER.tag)) countGraphiteRod += 1;
+            if (ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.FUEL.tag)) countUraniumRod += 1;
         }
 
         contentHolder.getOrCreateTag().put("pattern", ghostInventory.serializeNBT());
-        contentHolder.getOrCreateTag().putInt("countCoolerRod", countCooledRod);
-        contentHolder.getOrCreateTag().putInt("countFuelRod", countFuelRod);
-        contentHolder.getOrCreateTag().putInt("totalRatio", totalRatio);
-        contentHolder.getOrCreateTag().putInt("fuelTime", countFuelRod > 0 ? totalFuelTime / countFuelRod : 0);
-        contentHolder.getOrCreateTag().putInt("coolerTime", countCooledRod > 0 ? totalCoolerTime / countCooledRod : 0);
+        contentHolder.getOrCreateTag().putInt("countGraphiteRod", countGraphiteRod);
+        contentHolder.getOrCreateTag().putInt("countUraniumRod", countUraniumRod);
 
         for (int i = 0; i < ghostInventory.getSlots(); i++) {
-            ItemStack stack = ghostInventory.getStackInSlot(i);
-            if (stack == null || stack.isEmpty()) {
-                ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));
-                continue;
-            }
-
-            RodType typeRod = RodType.resolveRodType(stack.getItem(), playerInventory.player.level());
-
-            boolean isFuel = typeRod.type() == TypeRod.FUEL;
-            boolean isCooler = typeRod.type() == TypeRod.COOLER;
-
-            if (!(isFuel || isCooler)) {
-                ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));
-            }
+            if (ghostInventory.getStackInSlot(i).isEmpty() || ghostInventory.getStackInSlot(i) == null) ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));
+            if (!(ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.FUEL.tag) || ghostInventory.getStackInSlot(i).is(CNTags.CNItemTags.COOLER.tag))&& !ghostInventory.getStackInSlot(i).isEmpty()) ghostInventory.setStackInSlot(i, new ItemStack(Items.GLASS_PANE));
         }
 
         contentHolder.getOrCreateTag().put("patternAll", ghostInventory.serializeNBT());
+
     }
 
     protected int getPlayerInventoryXOffset() {

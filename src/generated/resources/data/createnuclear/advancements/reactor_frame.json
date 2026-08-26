@@ -1,5 +1,5 @@
 {
-  "parent": "createnuclear:reactor_cooler",
+  "parent": "createnuclear:reactor_casing",
   "criteria": {
     "0": {
       "conditions": {

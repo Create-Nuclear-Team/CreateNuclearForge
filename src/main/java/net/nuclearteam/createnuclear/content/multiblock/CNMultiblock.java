@@ -12,76 +12,32 @@ import java.util.function.Predicate;
 
 public class CNMultiblock {
     public static final MultiBlockManagerBeta<TypeMultiblock> REGISTRATE_MULTIBLOCK = new MultiBlockManagerBeta<>();
-
-    private static final Predicate<BlockInWorld> blockInWorldAPredicate = state ->
-            stateIs(CNBlocks.REACTOR_CASING.get()).test(state)
-            || stateIs(CNBlocks.REACTOR_OUTPUT.get()).test(state)
-            || stateIs(CNBlocks.REACTOR_ROD_INPUT.get()).test(state)
-            || stateIs(CNBlocks.REACTOR_FLUID_INPUT.get()).test(state)
-            || stateIs(CNBlocks.REACTOR_ALARM.get()).test(state)
-    ;
+    public static final String AAAAA = "AAAAA";
+    public static final String AABAA = "AABAA";
+    public static final String ADADA = "ADADA";
+    public static final String BACAB = "BACAB";
+    public static final String AAIAA = "AAIAA";
+    public static final String AAAA = "AA*AA";
+    public static final String AAOAA = "AAOAA";
 
     static {
-        REGISTRATE_MULTIBLOCK.register("createnuclear:reactor5x5",
-                TypeMultiblock.REACTOR_T1,
+        REGISTRATE_MULTIBLOCK.register("createnuclear:reactor",
+                TypeMultiblock.REACTOR,
                 SimpleMultiBlockAislePatternBuilder.start()
-                        .aisle("OOOOO", "OAAAO", "OAAAO", "OAAAO", "OOOOO")
-                        .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OABAO")
-                        .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OABAO")
-                        .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OA*AO")
-                        .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OABAO")
-                        .aisle("OABAO", "ADDDA", "BDCDB", "ADDDA", "OABAO")
-                        .aisle("OOOOO", "OAAAO", "OAAAO", "OAAAO", "OOOOO")
-                        .where('A', blockInWorldAPredicate)
+                        .aisle(AAAAA, AAAAA, AAAAA, AAAAA, AAAAA)
+                        .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
+                        .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
+                        .aisle(AAIAA, ADADA, BACAB, ADADA, AAAA)
+                        .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
+                        .aisle(AABAA, ADADA, BACAB, ADADA, AABAA)
+                        .aisle(AAAAA, AAAAA, AAAAA, AAAAA, AAOAA)
+                        .where('A', stateIs(CNBlocks.REACTOR_CASING.get()))
                         .where('B', stateIs(CNBlocks.REACTOR_FRAME.get()))
                         .where('C', stateIs(CNBlocks.REACTOR_CORE.get()))
                         .where('D', stateIs(CNBlocks.REACTOR_COOLER.get()))
                         .where('*', stateIs(CNBlocks.REACTOR_CONTROLLER.get()))
-                        .where('O', stateIs(CNBlocks.REACTOR_CASING.get()))
-                        .build()
-        );
-
-        REGISTRATE_MULTIBLOCK.register("createnuclear:reactor7x7",
-                TypeMultiblock.REACTOR_T2,
-                SimpleMultiBlockAislePatternBuilder.start()
-                        .aisle("OOOOOOO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OOOOOOO")
-                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OAB*BAO")
-                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OABABAO", "ADDDDDA", "BDCDCDB", "ADDDDDA", "BDCDCDB", "ADDDDDA", "OABABAO")
-                        .aisle("OOOOOOO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OAAAAAO", "OOOOOOO")
-                        .where('A', blockInWorldAPredicate)
-                        .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
-                        .where('C', a -> a.getState().is(CNBlocks.REACTOR_CORE.get()))
-                        .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
-                        .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
-                        .where('O', a -> a.getState().is(CNBlocks.REACTOR_CASING.get()))
-                        .build()
-        );
-
-        REGISTRATE_MULTIBLOCK.register("createnuclear:reactor9x9",
-                TypeMultiblock.REACTOR_T3,
-                SimpleMultiBlockAislePatternBuilder.start()
-                        .aisle("OOOOOOOOO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OOOOOOOOO")
-                        .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-                        .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-                        .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-                        .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-                        .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAA*AABO")
-                        .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-                        .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-                        .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-                        .aisle("OBAABAABO", "BDDDDDDDB", "ADCDCDCDA", "ADDDDDDDA", "BDCDCDCDB", "ADDDDDDDA", "ADCDCDCDA", "BDDDDDDDB", "OBAABAABO")
-                        .aisle("OOOOOOOOO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OAAAAAAAO", "OOOOOOOOO")
-                        .where('A', blockInWorldAPredicate)
-                        .where('B', a -> a.getState().is(CNBlocks.REACTOR_FRAME.get()))
-                        .where('C', a -> a.getState().is(CNBlocks.REACTOR_CORE.get()))
-                        .where('D', a -> a.getState().is(CNBlocks.REACTOR_COOLER.get()))
-                        .where('*', a -> a.getState().is(CNBlocks.REACTOR_CONTROLLER.get()))
-                        .where('O', a -> a.getState().is(CNBlocks.REACTOR_CASING.get()))
+                        .where('O', stateIs(CNBlocks.REACTOR_OUTPUT.get()))
+                        .where('I', stateIs(CNBlocks.REACTOR_INPUT.get()))
                         .build()
         );
     }

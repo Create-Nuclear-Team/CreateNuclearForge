@@ -6,20 +6,16 @@ import com.simibubi.create.content.decoration.encasing.EncasedCTBehaviour;
 import com.simibubi.create.foundation.data.AssetLookup;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.data.SharedProperties;
-import static com.simibubi.create.api.behaviour.display.DisplaySource.displaySource;
-
-
 import com.tterrag.registrate.providers.RegistrateRecipeProvider;
 import com.tterrag.registrate.providers.loot.RegistrateBlockLootTables;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.Direction;
 import net.minecraft.data.loot.BlockLootSubProvider;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -32,144 +28,123 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
-import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
-import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.common.Tags;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
 import net.nuclearteam.createnuclear.content.enriching.fire.EnrichingFireBlock;
-import net.minecraftforge.common.Tags;
-
-import net.nuclearteam.createnuclear.content.multiblock.alarm.ReactorAlarm;
+import net.nuclearteam.createnuclear.content.equipment.cloth.ClothItem;
 import net.nuclearteam.createnuclear.content.multiblock.casing.ReactorCasing;
 import net.nuclearteam.createnuclear.CNTags.CNBlockTags;
+import net.nuclearteam.createnuclear.CNTags.CNItemTags;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerGenerator;
-import net.nuclearteam.createnuclear.content.multiblock.cooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.core.ReactorCore;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorFrame;
 import net.nuclearteam.createnuclear.content.multiblock.frame.ReactorframeItem;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.item.ReactorRodInputGenerator;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInput;
-import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInput;
+import net.nuclearteam.createnuclear.content.multiblock.input.ReactorInputGenerator;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutput;
 import net.nuclearteam.createnuclear.content.multiblock.output.ReactorOutputGenerator;
+import net.nuclearteam.createnuclear.content.multiblock.reactorCooler.ReactorCooler;
 import net.nuclearteam.createnuclear.content.multiblock.reinforced.ReinforcedGlassBlock;
 import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreBlock;
-import net.nuclearteam.createnuclear.content.uraniumOre.UraniumOreItem;
 
 import static com.simibubi.create.foundation.data.CreateRegistrate.casingConnectivity;
 import static com.simibubi.create.foundation.data.ModelGen.customItemModel;
 import static com.simibubi.create.foundation.data.TagGen.axeOrPickaxe;
 import static com.simibubi.create.foundation.data.TagGen.pickaxeOnly;
 
-@SuppressWarnings("removal")
 public class CNBlocks {
 
-    public static final BlockEntry<ReactorCasing> REACTOR_CASING = CreateNuclear.REGISTRATE
-        .block("reactor_casing", properties -> new ReactorCasing(properties, ReactorCasing.TypeBlock.CASING))
-        .properties(p -> p
-            .explosionResistance(3F)
-            .destroyTime(4F)
-        )
-        .blockstate((c, p) -> p.getVariantBuilder(c.getEntry()).forAllStates((state) -> ConfiguredModel.builder()
-            .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/casing/block")))
-            .build()))
-        .onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(CNSpriteShifts.REACTOR_CASING)))
-        .onRegister(casingConnectivity((block, cc) -> cc.makeCasing(block, CNSpriteShifts.REACTOR_CASING)))
-        .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-        .simpleItem()
-        .transform(pickaxeOnly())
-        .transform(displaySource(CNDisplaySources.HEAT))
-        .transform(displaySource(CNDisplaySources.LIQUID_LEVEL))
-        .transform(displaySource(CNDisplaySources.FUEL))
-        .transform(displaySource(CNDisplaySources.COOLER))
-        .transform(displaySource(CNDisplaySources.REACTOR_SIZE))
-        .transform(displaySource(CNDisplaySources.REACTOR_SUMMARY))
-        .register();
-
-    public static final BlockEntry<ReactorCore> REACTOR_CORE = CreateNuclear.REGISTRATE
-        .block("reactor_core", ReactorCore::new)
-        .properties(p -> p.explosionResistance(6F))
-        .properties(p -> p.destroyTime(4F))
-        .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-        .blockstate((c, p) -> p.getVariantBuilder(c.getEntry())
-        .forAllStates(state -> ConfiguredModel.builder()
-            .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/core/block")))
-            .uvLock(false)
-            .build()))
-        .transform(pickaxeOnly())
-        .simpleItem()
-        .register();
-
-    public static final BlockEntry<ReactorFrame> REACTOR_FRAME = CreateNuclear.REGISTRATE
-        .block("reactor_frame", ReactorFrame::new)
-        .initialProperties(SharedProperties::stone)
-        .properties(p -> p.explosionResistance(3F).destroyTime(2F).noOcclusion())
-        .addLayer(() -> RenderType::cutoutMipped)
-        .transform(pickaxeOnly())
-        .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-        .blockstate((c, p) -> p.getVariantBuilder(c.getEntry())
-            .forAllStatesExcept(state -> {
-                ReactorFrame.Part part = state.getValue(ReactorFrame.PART);
-                String baseFile = "block/reactor/frame/frame_";
-                ModelFile start = p.models().getExistingFile(p.modLoc(baseFile + "top"));
-                ModelFile middle = p.models().getExistingFile(p.modLoc(baseFile + "middle"));
-                ModelFile bottom = p.models().getExistingFile(p.modLoc(baseFile + "bottom"));
-                ModelFile none = p.models().getExistingFile(p.modLoc(baseFile + "none"));
-                return ConfiguredModel.builder().modelFile(switch (part) {
-                        case START -> start;
-                        case MIDDLE -> middle;
-                        case END -> bottom;
-                        default -> none;
-                })
-                .uvLock(false)
-                .build();
-            }))
-            .item(ReactorframeItem::new)
-            .model(AssetLookup.customBlockItemModel("reactor", "frame", "item"))
-            .build()
-            .register();
-
-    public static final BlockEntry<ReactorCooler> REACTOR_COOLER = CreateNuclear.REGISTRATE
-            .block("reactor_cooler", ReactorCooler::new)
-            .properties(p -> p
-                .explosionResistance(3F)
+    public static final BlockEntry<ReactorCasing> REACTOR_CASING =
+        CreateNuclear.REGISTRATE.block("reactor_casing", properties -> new ReactorCasing(properties, ReactorCasing.TypeBlock.CASING))
+            .properties(p -> p.explosionResistance(3F)
                 .destroyTime(4F))
-            .blockstate((c, p) -> p.getVariantBuilder(c.getEntry()).forAllStates((state) -> ConfiguredModel.builder()
-                .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/cooler/block")))
-                .build()))
+            .blockstate((c,p) ->
+                p.getVariantBuilder(c.getEntry()).forAllStates((state) -> ConfiguredModel.builder()
+                    .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/casing/block")))
+                    .build()))
+            .onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(CNSpriteShifts.REACTOR_CASING)))
+            .onRegister(casingConnectivity((block,cc) -> cc.makeCasing(block, CNSpriteShifts.REACTOR_CASING)))
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .simpleItem()
             .transform(pickaxeOnly())
             .register();
 
-    public static final BlockEntry<ReactorRodInput> REACTOR_ROD_INPUT = CreateNuclear.REGISTRATE
-            .block("reactor_rod_input", ReactorRodInput::new)
-            .initialProperties(SharedProperties::stone)
+    public static final BlockEntry<ReactorCore> REACTOR_CORE =
+        CreateNuclear.REGISTRATE.block("reactor_core", ReactorCore::new)
             .properties(p -> p.explosionResistance(6F))
-            .properties(p -> p.destroyTime(2F))
+            .properties(p -> p.destroyTime(4F))
+            .tag(BlockTags.NEEDS_DIAMOND_TOOL)
+            .blockstate((c, p) ->
+                p.getVariantBuilder(c.getEntry())
+                    .forAllStates(state -> ConfiguredModel.builder()
+                        .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/core/block")))
+                        .uvLock(false)
+                        .build()
+                    )
+            )
+            .transform(pickaxeOnly())
+            .simpleItem()
+            .register();
+
+    public static final BlockEntry<ReactorFrame> REACTOR_FRAME =
+        CreateNuclear.REGISTRATE.block("reactor_frame", ReactorFrame::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(p -> p.explosionResistance(3F).destroyTime(2F))
             .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-            .blockstate(new ReactorRodInputGenerator()::generate)
-            .item()
-            .transform(customItemModel("reactor", "rod_input", "item"))
+            .blockstate((c, p) ->
+                p.getVariantBuilder(c.getEntry())
+                .forAllStatesExcept(state -> {
+                    ReactorFrame.Part part = state.getValue(ReactorFrame.PART);
+                    String baseFile = "block/reactor/frame/frame_";
+                    ModelFile start = p.models().getExistingFile(p.modLoc(baseFile + "top"));
+                    ModelFile middle = p.models().getExistingFile(p.modLoc(baseFile + "middle"));
+                    ModelFile bottom = p.models().getExistingFile(p.modLoc(baseFile + "bottom"));
+                    ModelFile none = p.models().getExistingFile(p.modLoc(baseFile + "none"));
+                    return ConfiguredModel.builder().modelFile(switch (part) {
+                        case START -> start;
+                        case MIDDLE -> middle;
+                        case END -> bottom;
+                        default -> none;
+                    })
+                    .uvLock(false)
+                    .build();
+                })
+            )
+            .item(ReactorframeItem::new)
+            .model(AssetLookup.customBlockItemModel("reactor", "frame", "item"))
+            .build()
+            .register();
+
+    public static final BlockEntry<ReactorCooler> REACTOR_COOLER =
+        CreateNuclear.REGISTRATE.block("reactor_cooler", ReactorCooler::new)
+            .properties(p -> p.explosionResistance(3F)
+                    .destroyTime(4F))
+            .blockstate((c,p) ->
+                    p.getVariantBuilder(c.getEntry()).forAllStates((state) -> ConfiguredModel.builder()
+                            .modelFile(p.models().getExistingFile(p.modLoc("block/reactor/cooler/block")))
+                            .build()))
+            .tag(BlockTags.NEEDS_DIAMOND_TOOL)
+            .simpleItem()
+            .transform(pickaxeOnly())
             .register();
 
 
-    public static final BlockEntry<ReactorFluidInput> REACTOR_FLUID_INPUT =
-        CreateNuclear.REGISTRATE.block("reactor_fluid_input", ReactorFluidInput::new)
+    public static final BlockEntry<ReactorInput> REACTOR_INPUT =
+        CreateNuclear.REGISTRATE.block("reactor_input", ReactorInput::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(2F))
             .addLayer(() -> RenderType::cutoutMipped)
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
-            .blockstate(new ReactorFluidInputGenerator()::generate)
+            .blockstate(new ReactorInputGenerator()::generate)
             .item()
-            .transform(customItemModel("reactor", "fluid_input", "item"))
+            .transform(customItemModel("reactor", "input", "item"))
             .register();
 
     public static final BlockEntry<ReactorOutput> REACTOR_OUTPUT =
@@ -180,25 +155,19 @@ public class CNBlocks {
             .tag(AllTags.AllBlockTags.SAFE_NBT.tag, BlockTags.NEEDS_DIAMOND_TOOL)
             .transform(pickaxeOnly())
             .blockstate(new ReactorOutputGenerator()::generate)
-            .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 64000.0))
+            .onRegister(block -> BlockStressValues.CAPACITIES.register(block, () -> 10240.0))
             .item()
             .transform(customItemModel("reactor", "output", "item"))
             .register();
 
-    public static final BlockEntry<ReactorControllerBlock> REACTOR_CONTROLLER = CreateNuclear.REGISTRATE
-            .block("reactor_controller", ReactorControllerBlock::new)
+    public static final BlockEntry<ReactorControllerBlock> REACTOR_CONTROLLER =
+        CreateNuclear.REGISTRATE.block("reactor_controller", ReactorControllerBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.explosionResistance(6F))
             .properties(p -> p.destroyTime(4F))
             .transform(pickaxeOnly())
             .tag(BlockTags.NEEDS_DIAMOND_TOOL)
             .blockstate(new ReactorControllerGenerator()::generate)
-            .transform(displaySource(CNDisplaySources.HEAT))
-            .transform(displaySource(CNDisplaySources.LIQUID_LEVEL))
-            .transform(displaySource(CNDisplaySources.FUEL))
-            .transform(displaySource(CNDisplaySources.COOLER))
-            .transform(displaySource(CNDisplaySources.REACTOR_SIZE))
-            .transform(displaySource(CNDisplaySources.REACTOR_SUMMARY))
             .item()
             .transform(customItemModel("reactor", "controller", "item"))
             .register();
@@ -206,7 +175,7 @@ public class CNBlocks {
     public static final BlockEntry<ReinforcedGlassBlock> REINFORCED_GLASS = CreateNuclear.REGISTRATE
         .block("reinforced_glass", ReinforcedGlassBlock::new)
         .initialProperties(() -> Blocks.GLASS)
-        .properties(p -> p.explosionResistance(1200.0F).destroyTime(2F))
+        .properties(p -> p.explosionResistance(7.0F).destroyTime(2F))
         .onRegister(CreateRegistrate.connectedTextures(() -> new EncasedCTBehaviour(CNSpriteShifts.REACTOR_GLASS)))
         .onRegister(casingConnectivity((block,cc) -> cc.makeCasing(block, CNSpriteShifts.REACTOR_GLASS)))
         .loot(RegistrateBlockLootTables::dropWhenSilkTouch)
@@ -234,8 +203,10 @@ public class CNBlocks {
         .build()
         .register();
 
-    public static final BlockEntry<EnrichingFireBlock> ENRICHING_FIRE = CreateNuclear.REGISTRATE
-            .block("enriching_fire", properties -> new EnrichingFireBlock(properties, 3.0f))
+
+
+    public static final BlockEntry<EnrichingFireBlock> ENRICHING_FIRE =
+        CreateNuclear.REGISTRATE.block("enriching_fire", properties -> new EnrichingFireBlock(properties, 3.0f))
             .initialProperties(() -> Blocks.FIRE)
             .properties(Properties::replaceable)
             .properties(Properties::noCollission)
@@ -292,15 +263,16 @@ public class CNBlocks {
                         .addModel()
                         .end();
             })
-            .register();
+            .register()
+    ;
 
-    public static final BlockEntry<EnrichingCampfireBlock> ENRICHING_CAMPFIRE = CreateNuclear.REGISTRATE
-            .block("enriching_campfire", properties -> new EnrichingCampfireBlock(properties, true, 5))
+    public static final BlockEntry<EnrichingCampfireBlock> ENRICHING_CAMPFIRE =
+        CreateNuclear.REGISTRATE.block("enriching_campfire", properties -> new EnrichingCampfireBlock(properties, true, 5))
             .properties(p -> p.mapColor(MapColor.PODZOL)
-                    .instrument(NoteBlockInstrument.BASS)
-                    .strength(2.0F)
-                    .sound(SoundType.WOOD)
-                    .lightLevel(EnrichingCampfireBlock::getLight))
+                .instrument(NoteBlockInstrument.BASS)
+                .strength(2.0F)
+                .sound(SoundType.WOOD)
+                .lightLevel(EnrichingCampfireBlock::getLight))
             .properties(Properties::noOcclusion)
             .properties(Properties::ignitedByLava)
             .addLayer(() -> RenderType::cutoutMipped)
@@ -330,54 +302,16 @@ public class CNBlocks {
                             default -> 0;
                         })
                         .build();
-            }, BlockStateProperties.SIGNAL_FIRE, BlockStateProperties.WATERLOGGED))
+                    }, BlockStateProperties.SIGNAL_FIRE, BlockStateProperties.WATERLOGGED
+                )
+            )
             .item()
-            .model((c, p) -> p.withExistingParent(c.getName(), new ResourceLocation("item/generated"))
-                    .texture("layer0", p.modLoc("item/enriched/campfire")))
+            .model((c, p) ->
+                p.withExistingParent(c.getName(), new ResourceLocation("item/generated"))
+                    .texture("layer0", p.modLoc("item/enriched/campfire"))
+            )
             .build()
             .tag(CNBlockTags.FAN_PROCESSING_CATALYSTS_ENRICHED.tag)
-            .register();
-
-
-        public static final BlockEntry<Block> ENRICHED_SOUL_SOIL =
-            CreateNuclear.REGISTRATE.block("enriched_soul_soil", Block::new)
-                .initialProperties(() -> Blocks.SOUL_SOIL)
-                .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, c.get())
-                        .unlockedBy("has_nether_star", RegistrateRecipeProvider.has(Items.NETHER_STAR))
-                        .define('S', Blocks.SOUL_SOIL)
-                        .define('O', Blocks.OBSIDIAN)
-                        .define('N', Items.NETHER_STAR)
-                        .pattern("SOS")
-                        .pattern("ONO")
-                        .pattern("SOS")
-                        .showNotification(true)
-                        .save(p, CreateNuclear.asResource("crafting/" + c.getName()))
-                )
-                .simpleItem()
-                .tag(BlockTags.MINEABLE_WITH_SHOVEL)
-                .tag(CNBlockTags.ENRICHING_FIRE_BASE_BLOCKS.tag, BlockTags.NEEDS_DIAMOND_TOOL)
-                .register();
-
-    public static final BlockEntry<UraniumOreBlock> DEEPSLATE_URANIUM_ORE =
-        CreateNuclear.REGISTRATE.block("deepslate_uranium_ore", UraniumOreBlock::new)
-            .initialProperties(() -> Blocks.DIAMOND_ORE)
-            .properties(UraniumOreBlock.litBlockEmission())
-            .transform(pickaxeOnly())
-            .loot((lt, b) -> lt.add(b,
-                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0F, 4.0F)))
-                        .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 1))
-            ))))
-            .tag(BlockTags.NEEDS_DIAMOND_TOOL,
-                BlockTags.NEEDS_IRON_TOOL,
-                CNTags.forgeBlockTag("ores"),
-                CNTags.forgeBlockTag("ores_in_ground/deepslate"),
-                CNTags.forgeBlockTag("ores/uranium")
-            )
-            .item((b, p) -> new UraniumOreItem(b, p, 3))
-            .tag(CNTags.forgeItemTag("ores/uranium"))
-            .build()
             .register();
 
     public static final BlockEntry<Block> DEEPSLATE_LEAD_ORE =
@@ -386,147 +320,43 @@ public class CNBlocks {
             .simpleItem()
             .transform(pickaxeOnly())
             .loot((lt, b) -> lt.add(b,
-                    RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                            lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
-                                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F)))
-                                    .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 4))
-                            ))))
-            .tag(BlockTags.NEEDS_IRON_TOOL,
-                    CNTags.forgeBlockTag("ores"),
-                    CNTags.forgeBlockTag("ores_in_ground/deepslate"),
-                    CNTags.forgeBlockTag("ores/lead")
-            )
-            .item()
-            .tag(CNTags.forgeItemTag("ores/lead"))
-            .build()
-            .register();
-    
-    public static final BlockEntry<Block> DEEPSLATE_THORIUM_ORE =
-        CreateNuclear.REGISTRATE.block("deepslate_thorium_ore", Block::new)
-            .initialProperties(() -> Blocks.DIAMOND_ORE)
-            .simpleItem()
-            .transform(pickaxeOnly())
-            .loot((lt, b) -> lt.add(b,
                 RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
-                        .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 5))
+                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
+                        .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
             ))))
-            .tag(BlockTags.NEEDS_DIAMOND_TOOL,
-                BlockTags.NEEDS_IRON_TOOL,
+            .tag(BlockTags.NEEDS_IRON_TOOL,
                 CNTags.forgeBlockTag("ores"),
                 CNTags.forgeBlockTag("ores_in_ground/deepslate"),
-                CNTags.forgeBlockTag("ores/thorium")
+                CNTags.forgeBlockTag("ores/lead"),
+                CNBlockTags.LEAD_ORES.tag
             )
             .item()
-            .tag(CNTags.forgeItemTag("ores/thorium"))
+            .tag(CNItemTags.LEAD_ORES.tag,
+                CNTags.forgeItemTag("ores/lead"))
             .build()
             .register();
 
-    public static final BlockEntry<UraniumOreBlock> URANIUM_ORE =
-        CreateNuclear.REGISTRATE.block("uranium_ore", UraniumOreBlock::new)
-            .initialProperties(SharedProperties::stone)
-            .properties(UraniumOreBlock.litBlockEmission())
-            .simpleItem()
-            .transform(pickaxeOnly())
-            .loot((lt, b) -> lt.add(b,
-                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(3.0F, 4.0F)))
-                        .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 1))
-            ))))
-            .tag(BlockTags.NEEDS_DIAMOND_TOOL,
-                BlockTags.NEEDS_IRON_TOOL,
-                CNTags.forgeBlockTag("ores"),
-                CNTags.forgeBlockTag("ores_in_ground/stone"),
-                CNTags.forgeBlockTag("ores/uranium")
-            )
-            .item((b, p) -> new UraniumOreItem(b, p, 3))
-            .tag(CNTags.forgeItemTag("ores/uranium"))
-            .build()
-            .register();
-
-    public static final BlockEntry<Block> LEAD_ORE = CreateNuclear.REGISTRATE.block("lead_ore", Block::new)
+    public static final BlockEntry<Block> LEAD_ORE =
+        CreateNuclear.REGISTRATE.block("lead_ore", Block::new)
             .initialProperties(SharedProperties::stone)
             .simpleItem()
             .transform(pickaxeOnly())
             .loot((lt, b) -> lt.add(b,
                 RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                        lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
-                                .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 4.0F)))
-                                .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 4))
-                        ))))
-            .tag(BlockTags.NEEDS_IRON_TOOL,
-                    CNTags.forgeBlockTag("ores"),
-                    CNTags.forgeBlockTag("ores_in_ground/stone"),
-                    CNTags.forgeBlockTag("ores/lead")
-            )
-            .item()
-            .tag(CNTags.forgeItemTag("ores/lead"))
-            .build()
-            .register();
-
-
-    public static final BlockEntry<Block> THORIUM_ORE =
-        CreateNuclear.REGISTRATE.block("thorium_ore", Block::new)
-            .initialProperties(SharedProperties::stone)
-            .simpleItem()
-            .transform(pickaxeOnly())
-            .loot((lt, b) -> lt.add(b,
-                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_THORIUM)
-                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(2.0F, 5.0F)))
-                        .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 5))
-            ))))
-            .tag(BlockTags.NEEDS_DIAMOND_TOOL,
-                BlockTags.NEEDS_IRON_TOOL,
-                CNTags.forgeBlockTag("ores"),
-                CNTags.forgeBlockTag("ores_in_ground/stone"),
-                CNTags.forgeBlockTag("ores/thorium")
-            )
-            .item()
-            .tag(CNTags.forgeItemTag("ores/thorium"))
-            .build()
-            .register();
-
-    public static final BlockEntry<Block> NITRATE_ORE =
-        CreateNuclear.REGISTRATE.block("nitrate_ore", Block::new)
-            .initialProperties(SharedProperties::stone)
-            .transform(pickaxeOnly())
-            .loot((lt, b) -> lt.add(b,
-                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.NITRATE)
+                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_LEAD)
                         .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
-                ))))
+            ))))
             .tag(BlockTags.NEEDS_IRON_TOOL,
-                    CNTags.forgeBlockTag("ores"),
-                    CNTags.forgeBlockTag("ores_in_ground/stone"),
-                    CNTags.forgeBlockTag("ores/nitrate")
+                CNTags.forgeBlockTag("ores"),
+                CNTags.forgeBlockTag("ores_in_ground/stone"),
+                    CNTags.forgeBlockTag("ores/lead"),
+                CNBlockTags.LEAD_ORES.tag
             )
             .item()
-            .tag(CNTags.forgeItemTag("ores/nitrate"))
+            .tag(CNItemTags.LEAD_ORES.tag,
+                CNTags.forgeItemTag("ores/lead"))
             .build()
             .register();
-
-    public static final BlockEntry<Block> DEEPSLATE_NITRATE_ORE =
-            CreateNuclear.REGISTRATE.block("deepslate_nitrate_ore", Block::new)
-                    .initialProperties(SharedProperties::stone)
-                    .simpleItem()
-                    .transform(pickaxeOnly())
-                    .loot((lt, b) -> lt.add(b,
-                            RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
-                                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.NITRATE)
-                                            .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
-                                    ))))
-                    .tag(BlockTags.NEEDS_IRON_TOOL,
-                            CNTags.forgeBlockTag("ores"),
-                            CNTags.forgeBlockTag("ores_in_ground/deepslate"),
-                            CNTags.forgeBlockTag("ores/nitrate")
-                    )
-                    .item()
-                    .tag(CNTags.forgeItemTag("ores/nitrate"))
-                    .build()
-                    .register();
 
     public static final BlockEntry<Block> RAW_URANIUM_BLOCK =
         CreateNuclear.REGISTRATE.block("raw_uranium_block", Block::new)
@@ -541,12 +371,13 @@ public class CNBlocks {
                 .pattern("RRR")
                 .pattern("RRR")
                 .save(p, CreateNuclear.asResource("crafting/" + c.getName())))
-            .item((b, p) -> new UraniumOreItem(b, p, 27))
+            .item()
             .tag(CNTags.forgeItemTag("storage_blocks/raw_uranium"))
             .build()
             .register();
 
-    public static final BlockEntry<Block> RAW_LEAD_BLOCK = CreateNuclear.REGISTRATE.block("raw_lead_block", Block::new)
+    public static final BlockEntry<Block> RAW_LEAD_BLOCK =
+        CreateNuclear.REGISTRATE.block("raw_lead_block", Block::new)
             .initialProperties(SharedProperties::stone)
             .transform(pickaxeOnly())
             .tag(CNTags.forgeBlockTag("storage_blocks/raw_lead"))
@@ -562,24 +393,6 @@ public class CNBlocks {
             .build()
             .register();
 
-
-    public static final BlockEntry<Block> RAW_THORIUM_BLOCK =
-        CreateNuclear.REGISTRATE.block("raw_thorium_block", Block::new)
-            .initialProperties(SharedProperties::stone)
-            .transform(pickaxeOnly())
-            .tag(BlockTags.NEEDS_DIAMOND_TOOL, CNTags.forgeBlockTag("storage_blocks/raw_thorium"))
-            .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, c.get())
-                    .unlockedBy("has_raw_materials_thorium", RegistrateRecipeProvider.has(CNTags.forgeItemTag("raw_materials/thorium")))
-                    .define('R', CNTags.forgeItemTag("raw_materials/thorium"))
-                    .pattern("RRR")
-                    .pattern("RRR")
-                    .pattern("RRR")
-                    .save(p, CreateNuclear.asResource("crafting/raw/" + c.getName())))
-            .item()
-            .tag(CNTags.forgeItemTag("storage_blocks/raw_thorium"))
-            .build()
-            .register();
-
     public static final BlockEntry<Block> LEAD_BLOCK =
         CreateNuclear.REGISTRATE.block("lead_block", Block::new)
             .initialProperties(SharedProperties::stone)
@@ -589,18 +402,75 @@ public class CNBlocks {
             .tag(CNTags.forgeItemTag("storage_blocks/lead"))
             .build()
             .register();
-    
-    public static final BlockEntry<Block> THORIUM_BLOCK =
-        CreateNuclear.REGISTRATE.block("thorium_block", Block::new)
-            .initialProperties(SharedProperties::stone)
+
+    public static final BlockEntry<Block> ENRICHED_SOUL_SOIL =
+        CreateNuclear.REGISTRATE.block("enriched_soul_soil", Block::new)
+            .initialProperties(() -> Blocks.SOUL_SOIL)
+            .recipe((c, p) -> ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, c.get())
+                .unlockedBy("has_nether_star", RegistrateRecipeProvider.has(Items.NETHER_STAR))
+                .define('S', Blocks.SOUL_SOIL)
+                .define('O', Blocks.OBSIDIAN)
+                .define('N', Items.NETHER_STAR)
+                .pattern("SOS")
+                .pattern("ONO")
+                .pattern("SOS")
+                .showNotification(true)
+                .save(p, CreateNuclear.asResource("crafting/" + c.getName()))
+            )
+            .simpleItem()
+            .tag(BlockTags.MINEABLE_WITH_SHOVEL)
+            .tag(CNBlockTags.ENRICHING_FIRE_BASE_BLOCKS.tag, BlockTags.NEEDS_DIAMOND_TOOL)
+            .register();
+
+    public static final BlockEntry<UraniumOreBlock> DEEPSLATE_URANIUM_ORE =
+        CreateNuclear.REGISTRATE.block("deepslate_uranium_ore", UraniumOreBlock::new)
+            .initialProperties(() -> Blocks.DIAMOND_ORE)
+            .properties(UraniumOreBlock.litBlockEmission())
             .transform(pickaxeOnly())
-            .tag(CNTags.forgeBlockTag("storage_blocks/thorium"))
+            .loot((lt, b) -> lt.add(b,
+                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
+                        .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+            ))))
+            .tag(BlockTags.NEEDS_DIAMOND_TOOL,
+                BlockTags.NEEDS_IRON_TOOL,
+                CNTags.forgeBlockTag("ores"),
+                CNTags.forgeBlockTag("ores_in_ground/deepslate"),
+                    CNTags.forgeBlockTag("ores/uranium"),
+                CNBlockTags.URANIUM_ORES.tag
+            )
             .item()
-            .tag(CNTags.forgeItemTag("storage_blocks/thorium"))
+            .tag(CNItemTags.URANIUM_ORES.tag,
+                    CNTags.forgeItemTag("ores/uranium"))
             .build()
             .register();
 
-    public static final BlockEntry<Block> STEEL_BLOCK = CreateNuclear.REGISTRATE.block("steel_block", Block::new)
+    public static final BlockEntry<UraniumOreBlock> URANIUM_ORE =
+        CreateNuclear.REGISTRATE.block("uranium_ore", UraniumOreBlock::new)
+            .initialProperties(SharedProperties::stone)
+            .properties(UraniumOreBlock.litBlockEmission())
+            .simpleItem()
+            .transform(pickaxeOnly())
+            .loot((lt, b) -> lt.add(b,
+                RegistrateBlockLootTables.createSilkTouchDispatchTable(b,
+                    lt.applyExplosionDecay(b, LootItem.lootTableItem(CNItems.RAW_URANIUM)
+                        .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+            ))))
+            .tag(BlockTags.NEEDS_DIAMOND_TOOL,
+                BlockTags.NEEDS_IRON_TOOL,
+                CNTags.forgeBlockTag("ores"),
+                CNTags.forgeBlockTag("ores_in_ground/stone"),
+                CNTags.forgeBlockTag("ores/uranium"),
+                CNBlockTags.URANIUM_ORES.tag
+            )
+            .item()
+            .tag(CNItemTags.URANIUM_ORES.tag,
+                CNTags.forgeItemTag("ores/uranium"))
+            .build()
+            .register();
+
+    public static final BlockEntry<Block> STEEL_BLOCK =
+        CreateNuclear.REGISTRATE.block("steel_block", Block::new)
             .initialProperties(SharedProperties::stone)
             .transform(pickaxeOnly())
             .tag(CNTags.forgeBlockTag("storage_blocks/steel"))
@@ -609,13 +479,11 @@ public class CNBlocks {
             .build()
             .register();
 
-    public static final BlockEntry<ReactorAlarm> REACTOR_ALARM =
-        CreateNuclear.REGISTRATE.block("reactor_alarm", ReactorAlarm::new)
-            .initialProperties(SharedProperties::stone)
-            .transform(pickaxeOnly())
-            .item()
-            .build()
-            .register();
+    /*public static final BlockEntry<EventTriggerBlock> TEST_EVENT_TRIGGER_BLOCK = CreateNuclear.REGISTRATE.block("test_event_trigger_block", EventTriggerBlock::new)
+            .defaultBlockstate()
+            .defaultLang()
+            .simpleItem()
+            .register();*/
 
 
     public static void register() {
