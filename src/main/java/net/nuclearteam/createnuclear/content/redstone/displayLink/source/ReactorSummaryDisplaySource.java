@@ -20,12 +20,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+
+import javax.annotation.Nullable;
 
 /**
  * Display source rendering a reactor controller's summary (status, size, fuel,
@@ -40,19 +43,27 @@ import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 public class ReactorSummaryDisplaySource extends DisplaySource {
 
     /** Fallback line shown when only a single display row is available. */
-    public static final List<MutableComponent> notEnoughSpaceSingle =
+    private static final List<MutableComponent> notEnoughSpaceSingle =
             List.of(CreateNuclearLang.translateDirect("display_source.reactor.not_enough_space")
                     .append(CreateNuclearLang.translateDirect("display_source.reactor.for_reactor_status")));
 
     /** Fallback lines shown when fewer than 6 rows are available (not enough for the full summary). */
-    public static final List<MutableComponent> notEnoughSpaceDouble =
+    private static final List<MutableComponent> notEnoughSpaceDouble =
             List.of(CreateNuclearLang.translateDirect("display_source.reactor.not_enough_space"),
                     CreateNuclearLang.translateDirect("display_source.reactor.for_reactor_status"));
 
     /** Fallback flap display rows, mirroring {@link #notEnoughSpaceDouble} for the flap layout. */
-    public static final List<List<MutableComponent>> notEnoughSpaceFlap =
+    private static final List<List<MutableComponent>> notEnoughSpaceFlap =
             List.of(List.of(CreateNuclearLang.translateDirect("display_source.reactor.not_enough_space")),
                     List.of(CreateNuclearLang.translateDirect("display_source.reactor.for_reactor_status")));
+
+    private static final List<MutableComponent> notEnabledReactor =
+            List.of(CreateNuclearLang.translateDirect("display_source.reactor.not_enabled_reactor"),
+                    CreateNuclearLang.translateDirect("display_source.reactor.reactor_structure_invalid"));
+
+    /** Flap display equivalent of {@link #notEnabledReactor}. */
+    private static final List<List<MutableComponent>> notEnabledReactorFlap =
+            List.of(List.of(CreateNuclearLang.translateDirect("display_source.reactor.reactor_structure_invalid")));
 
     /**
      * Provides the text lines for a regular (non-flap) display target.
@@ -62,6 +73,9 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
      */
     @Override
     public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
+        ReactorControllerBlockEntity controller = getController(context);
+        if (controller == null || !controller.isAssembled()) return notEnabledReactor;
+
         if (stats.maxRows() < 2) return notEnoughSpaceSingle;
         if (stats.maxRows() < 6) return notEnoughSpaceDouble;
 
@@ -89,6 +103,12 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
      */
     @Override
     public List<List<MutableComponent>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
+        ReactorControllerBlockEntity controller = getController(context);
+        if (controller == null || !controller.isAssembled()) {
+            context.flapDisplayContext = Boolean.FALSE;
+            return notEnabledReactorFlap;
+        }
+
         if (stats.maxRows() < 6) {
             context.flapDisplayContext = Boolean.FALSE;
             return notEnoughSpaceFlap;
@@ -145,7 +165,7 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
      * that case from a valid summary without relying on list size/positional access.
      */
     private Optional<ReactorSummary> getReactorSummary(DisplayLinkContext context, int gaugeWidth) {
-        ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(context.level(), context.getSourcePos());
+        ReactorControllerBlockEntity controller = getController(context);
 
         if (controller == null || controller.isRemoved()) {
             return Optional.empty();
@@ -178,6 +198,17 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
         MutableComponent lCooler = padLabel("cooler", lw).append(" ");
         MutableComponent lFluid  = padLabel("fluid", lw).append(" ");
         MutableComponent lHeat   = padLabel("heat", lw).append(" ");
+
+        CreateNuclear.LOGGER.warn("lStatus: {}", new ReactorSummary.Builder()
+                .status(lStatus, controller.isAssembled() ?
+                        CreateNuclearLang.translateDirect("display_source.reactor.active").withStyle(ChatFormatting.GOLD) :
+                        CreateNuclearLang.translateDirect("display_source.reactor.idle").withStyle(ChatFormatting.GRAY))
+                .size(lSize, formatSize(size))
+                .fuel(lFuel, formatValue(fuel, ReactorDisplayConstants.MAX_FUEL, mode, false, ChatFormatting.GREEN, gaugeWidth))
+                .cooler(lCooler, formatValue(cooler, ReactorDisplayConstants.MAX_COOLER, mode, false, ChatFormatting.AQUA, gaugeWidth))
+                .fluid(lFluid, formatFluid(fluid, ReactorDisplayConstants.MAX_FLUID, mode, ChatFormatting.BLUE, gaugeWidth))
+                .heat(lHeat, formatValue(heat, ReactorDisplayConstants.MAX_HEAT, mode, true, IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor(), gaugeWidth))
+                .build());
 
         return Optional.of(new ReactorSummary.Builder()
                 .status(lStatus, controller.isAssembled() ?
@@ -222,6 +253,11 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
 
     private MutableComponent labelOf(String label) {
         return CreateNuclearLang.translateDirect("display_source.reactor." + label);
+    }
+
+    @Nullable
+    private ReactorControllerBlockEntity getController(DisplayLinkContext context) {
+        return MultiblockHelpers.getControllerForPart(context.level(), context.getSourcePos());
     }
 
     @Override

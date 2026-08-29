@@ -42,6 +42,7 @@ public class MultiblockHelpers {
         }
     }
 
+    @Nullable
     public static ReactorControllerBlockEntity getControllerForPart(Level level, BlockPos pos) {
         /**
          * Returns the controller entity for the given part position, or null
