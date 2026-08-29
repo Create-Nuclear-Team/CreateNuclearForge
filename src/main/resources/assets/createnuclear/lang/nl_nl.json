@@ -178,6 +178,7 @@
   "createnuclear.display_source.reactor.mode.value": "Waarden",
   "createnuclear.display_source.reactor.no_controller": "Geen reactor-besturing gevonden",
   "createnuclear.display_source.reactor.not_enough_space": "Niet genoeg ruimte ",
+  "createnuclear.display_source.reactor.reactor_structure_invalid": "invalid reactor structure",
   "createnuclear.display_source.reactor.size": "Niveau: ",
   "createnuclear.display_source.reactor.size.large": "Groot",
   "createnuclear.display_source.reactor.size.medium": "Gemiddeld",
