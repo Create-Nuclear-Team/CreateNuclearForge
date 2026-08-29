@@ -178,6 +178,7 @@
   "createnuclear.display_source.reactor.mode.value": "Значення",
   "createnuclear.display_source.reactor.no_controller": "Не знайдено контролер реактора",
   "createnuclear.display_source.reactor.not_enough_space": "Недостатньо місця ",
+  "createnuclear.display_source.reactor.reactor_structure_invalid": "invalid reactor structure",
   "createnuclear.display_source.reactor.size": "Рівень: ",
   "createnuclear.display_source.reactor.size.large": "Великий",
   "createnuclear.display_source.reactor.size.medium": "Середній",
