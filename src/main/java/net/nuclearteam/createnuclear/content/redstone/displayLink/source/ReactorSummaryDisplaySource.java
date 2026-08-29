@@ -20,12 +20,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import javax.annotation.Nullable;
@@ -133,19 +133,25 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
     }
 
     /**
-     * Configures the flap display layout: the default layout for the first line
-     * (or when the flap display context was disabled by {@link #provideFlapDisplayText}),
-     * otherwise a two-section "Reactor" layout (label column + value/gauge column).
+     * Configures the flap display layout: the default layout when the flap display context
+     * was disabled by {@link #provideFlapDisplayText}, otherwise a two-section layout
+     * (label column + value column) for every row.
+     * <p>
+     * {@code lineIndex} maps directly to {@link ReactorSummary#toRows()}'s order (no
+     * separate header line): {@code status}/{@code size} (indices 0/1) hold translated
+     * text, which the "pixel" charset can't render, so they get "alphabet" instead. The
+     * remaining rows are numbers/gauges, which "pixel" renders fine.
      */
     @Override
     public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout, int lineIndex) {
-        if (lineIndex == 0 || context.flapDisplayContext instanceof Boolean b && !b) {
+        if (context.flapDisplayContext instanceof Boolean b && !b) {
             if (layout.isLayout("Default")) return;
             layout.loadDefault(flapDisplay.getMaxCharCount());
             return;
         }
 
-        String layoutKey = "Reactor";
+        boolean isTextRow = lineIndex == 0 || lineIndex == 1;
+        String layoutKey = isTextRow ? "ReactorText" : "ReactorGauge";
         if (layout.isLayout(layoutKey)) return;
 
         int lw = labelWidth();
@@ -153,9 +159,11 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
         float maxSpace = flapDisplay.getMaxCharCount(1) * FlapDisplaySection.MONOSPACE;
 
         FlapDisplaySection label = new FlapDisplaySection(labelLength, "alphabet", false, true);
-        FlapDisplaySection symbols = new FlapDisplaySection(maxSpace - labelLength, "pixel", false, false).wideFlaps();
+        FlapDisplaySection value = isTextRow
+            ? new FlapDisplaySection(maxSpace - labelLength, "alphabet", false, false)
+            : new FlapDisplaySection(maxSpace - labelLength, "pixel", false, false).wideFlaps();
 
-        layout.configure(layoutKey, List.of(label, symbols));
+        layout.configure(layoutKey, List.of(label, value));
     }
 
     /**
@@ -199,31 +207,24 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
         MutableComponent lFluid  = padLabel("fluid", lw).append(" ");
         MutableComponent lHeat   = padLabel("heat", lw).append(" ");
 
-        CreateNuclear.LOGGER.warn("lStatus: {}", new ReactorSummary.Builder()
-                .status(lStatus, controller.isAssembled() ?
-                        CreateNuclearLang.translateDirect("display_source.reactor.active").withStyle(ChatFormatting.GOLD) :
-                        CreateNuclearLang.translateDirect("display_source.reactor.idle").withStyle(ChatFormatting.GRAY))
-                .size(lSize, formatSize(size))
-                .fuel(lFuel, formatValue(fuel, ReactorDisplayConstants.MAX_FUEL, mode, false, ChatFormatting.GREEN, gaugeWidth))
-                .cooler(lCooler, formatValue(cooler, ReactorDisplayConstants.MAX_COOLER, mode, false, ChatFormatting.AQUA, gaugeWidth))
-                .fluid(lFluid, formatFluid(fluid, ReactorDisplayConstants.MAX_FLUID, mode, ChatFormatting.BLUE, gaugeWidth))
-                .heat(lHeat, formatValue(heat, ReactorDisplayConstants.MAX_HEAT, mode, true, IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor(), gaugeWidth))
-                .build());
-
         return Optional.of(new ReactorSummary.Builder()
-                .status(lStatus, controller.isAssembled() ?
-                        CreateNuclearLang.translateDirect("display_source.reactor.active").withStyle(ChatFormatting.GOLD) :
-                        CreateNuclearLang.translateDirect("display_source.reactor.idle").withStyle(ChatFormatting.GRAY))
-                .size(lSize, formatSize(size))
-                .fuel(lFuel, formatValue(fuel, ReactorDisplayConstants.MAX_FUEL, mode, false, ChatFormatting.GREEN, gaugeWidth))
-                .cooler(lCooler, formatValue(cooler, ReactorDisplayConstants.MAX_COOLER, mode, false, ChatFormatting.AQUA, gaugeWidth))
-                .fluid(lFluid, formatFluid(fluid, ReactorDisplayConstants.MAX_FLUID, mode, ChatFormatting.BLUE, gaugeWidth))
-                .heat(lHeat, formatValue(heat, ReactorDisplayConstants.MAX_HEAT, mode, true, IHeat.HeatLevel.of(heat, controller.getMultiblockSize()).getTextColor(), gaugeWidth))
-                .build());
+            .status(lStatus, formatStatus(controller.isActive()))
+            .size(lSize, formatSize(size))
+            .fuel(lFuel, formatValue(fuel, ReactorDisplayConstants.MAX_FUEL, mode, false, ChatFormatting.GREEN, gaugeWidth))
+            .cooler(lCooler, formatValue(cooler, ReactorDisplayConstants.MAX_COOLER, mode, false, ChatFormatting.AQUA, gaugeWidth))
+            .fluid(lFluid, formatFluid(fluid, ReactorFluidInputEntity.getCapacityForReactorSize(size), mode, ChatFormatting.BLUE, gaugeWidth))
+            .heat(lHeat, formatValue(heat, ReactorDisplayConstants.maxHeatForSize(size), mode, true, IHeat.HeatLevel.of(heat, size).getTextColor(), gaugeWidth))
+            .build());
     }
 
     private MutableComponent padLabel(String key, int lw) {
         return Component.literal(" ".repeat(lw - labelWidthOf(key))).append(labelOf(key));
+    }
+
+    private MutableComponent formatStatus(boolean isActive) {
+        String key = isActive ? "active" : "idle";
+        ChatFormatting formatting = isActive ? ChatFormatting.GOLD : ChatFormatting.GRAY;
+        return CreateNuclearLang.translateDirect("display_source.reactor." + key).withStyle(formatting);
     }
 
     private MutableComponent formatSize(int size) {
