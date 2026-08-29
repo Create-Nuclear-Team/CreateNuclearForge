@@ -58,6 +58,8 @@
   "createnuclear.display_source.reactor.not_enough_space": "Not enough space ",
   "createnuclear.display_source.reactor.for_reactor_status": "for reactor status",
   "createnuclear.display_source.reactor.no_controller": "No Reactor Controller found",
+  "createnuclear.display_source.reactor.not_enabled_reactor": "No value for this Reactor,",
+  "createnuclear.display_source.reactor.reactor_structure_invalid": "the reactor structure is not valid",
   "createnuclear.display_source.reactor.status": "Status: ",
   "createnuclear.display_source.reactor.active": "ACTIVE",
   "createnuclear.display_source.reactor.idle": "IDLE",
