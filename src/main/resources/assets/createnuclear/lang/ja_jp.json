@@ -129,7 +129,7 @@
   "block.createnuclear.reactor_cooler": "炉内冷却装置",
   "block.createnuclear.reactor_cooler.tooltip.summary": "_原子炉_建設用の_ブロック_",
   "block.createnuclear.reactor_core": "原子炉心",
-  "block.createnuclear.reactor_core.tooltip.summary": "_ブロック_ 、原子炉を建設するために使用される。",
+  "block.createnuclear.reactor_core.tooltip.summary": "_原子炉_を建設するために使用される_ブロック_",
   "block.createnuclear.reactor_fluid_input": "原子炉用液体入力装置",
   "block.createnuclear.reactor_fluid_input.tooltip.behaviour1": "_水_または_液体窒素_を大量に供給しながら_原子炉_を稼働させて_過熱を避けます。",
   "block.createnuclear.reactor_fluid_input.tooltip.condition1": "原子炉が組み立てられるとき",
