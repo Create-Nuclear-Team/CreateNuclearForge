@@ -12,8 +12,11 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class AbstractReactorStatDisplaySource extends NumericSingleLineDisplaySource {
+    private ReactorControllerBlockEntity controllerBlock;
+
     protected abstract String getLabelKey();
     protected abstract int getMax();
     protected abstract int computeValue(ReactorControllerBlockEntity controller, DisplayLinkContext context);
@@ -24,6 +27,8 @@ public abstract class AbstractReactorStatDisplaySource extends NumericSingleLine
     protected MutableComponent provideLine(DisplayLinkContext context, DisplayTargetStats stats) {
         ReactorControllerBlockEntity controller = MultiblockHelpers.getControllerForPart(context.level(), context.getSourcePos());
         if (controller == null || controller.isRemoved()) return ZERO.copy();
+
+        setControllerBlock(controller);
 
         MutableComponent label = CreateNuclearLang.translateDirect(getLabelKey()).append(" ");
         int mode = context.sourceConfig().getInt("display_mode");
@@ -40,6 +45,15 @@ public abstract class AbstractReactorStatDisplaySource extends NumericSingleLine
                 yield (unit != null ? base.append(unit) : base).withStyle(color);
             }
         });
+    }
+
+    public void setControllerBlock(ReactorControllerBlockEntity block) {
+        this.controllerBlock = block;
+    }
+
+    @Nullable
+    public ReactorControllerBlockEntity getControllerBlock() {
+        return this.controllerBlock;
     }
 
     @Override

@@ -14,7 +14,12 @@ public class HeatDisplaySource extends AbstractReactorStatDisplaySource {
 
     @Override
     protected int getMax() {
-        return ReactorDisplayConstants.MAX_HEAT;
+        ReactorControllerBlockEntity controller = getControllerBlock();
+        if (controller == null) {
+            return ReactorDisplayConstants.MAX_HEAT;
+        }
+
+        return ReactorDisplayConstants.maxHeatForSize(controller.getMultiblockSize());
     }
 
     @Override
