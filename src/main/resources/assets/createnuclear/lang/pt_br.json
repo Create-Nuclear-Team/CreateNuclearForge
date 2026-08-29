@@ -178,7 +178,7 @@
   "createnuclear.display_source.reactor.mode.value": "Valores",
   "createnuclear.display_source.reactor.no_controller": "Controlador do Reator não encontrado",
   "createnuclear.display_source.reactor.not_enough_space": "Espaço insuficiente ",
-  "createnuclear.display_source.reactor.reactor_structure_invalid": "invalid reactor structure",
+  "createnuclear.display_source.reactor.reactor_structure_invalid": "estrutura do reator inválida",
   "createnuclear.display_source.reactor.size": "Nível: ",
   "createnuclear.display_source.reactor.size.large": "Grande",
   "createnuclear.display_source.reactor.size.medium": "Médio",
