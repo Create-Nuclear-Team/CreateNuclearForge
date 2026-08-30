@@ -178,7 +178,7 @@
   "createnuclear.display_source.reactor.mode.value": "Wartości",
   "createnuclear.display_source.reactor.no_controller": "Nie znaleziono kontrolera reaktora",
   "createnuclear.display_source.reactor.not_enough_space": "Nie ma wystarczająco miejsca ",
-  "createnuclear.display_source.reactor.reactor_structure_invalid": "invalid reactor structure",
+  "createnuclear.display_source.reactor.reactor_structure_invalid": "nieprawidłowa struktura reaktora",
   "createnuclear.display_source.reactor.size": "Poziom: ",
   "createnuclear.display_source.reactor.size.large": "Duży",
   "createnuclear.display_source.reactor.size.medium": "Średni",
