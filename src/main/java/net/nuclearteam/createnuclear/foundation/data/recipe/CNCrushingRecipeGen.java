@@ -1,11 +1,14 @@
 package net.nuclearteam.createnuclear.foundation.data.recipe;
 
+import com.simibubi.create.AllBlocks;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllRecipeTypes;
 import com.simibubi.create.api.data.recipe.CrushingRecipeGen;
+import com.simibubi.create.content.decoration.palettes.AllPaletteStoneTypes;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipe;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeSerializer;
+import net.createmod.catnip.lang.Lang;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -22,17 +25,18 @@ import net.nuclearteam.createnuclear.CreateNuclear;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+
 public class CNCrushingRecipeGen extends CrushingRecipeGen {
 
     GeneratedRecipe
         COAL_DUST = create("coal", b -> b
             .duration(250)
             .require(ItemTags.COALS)
-            .output(.50f, CNItems.COAL_DUST)
+            .output(0.50f, CNItems.COAL_DUST)
         ),
 
         GRANITE_URANIUM_POWDER = create(() -> Items.GRANITE, b -> b.duration(250)
-            .output(.5f, CNItems.URANIUM_POWDER)
+            .output(0.5f, CNItems.URANIUM_POWDER)
             .output(1f, Blocks.RED_SAND)
         ),
 
@@ -41,29 +45,47 @@ public class CNCrushingRecipeGen extends CrushingRecipeGen {
                 .output(1, CNItems.URANIUM_POWDER, 9)
         ),
 
-        RAW_URANIUM_BLOCK = create(() -> CNBlocks.RAW_URANIUM_BLOCK, b -> b
+        RAW_THORIUM_BLOCK = create(() -> CNBlocks.RAW_THORIUM_BLOCK, b -> b
             .duration(250)
-            .output(1, CNItems.URANIUM_POWDER,81)
+            .output(1, CNItems.THORIUM_DUST, 9)
+            .output(0.75f, AllItems.EXP_NUGGET, 9)
+        ),
+
+        RAW_THORIUM_ITEM = create(() -> CNItems.RAW_THORIUM, b -> b
+                .duration(125)
+                .output(1, CNItems.THORIUM_DUST, 1)
+                .output(0.75f, AllItems.EXP_NUGGET, 1)
         ),
 
         RAW_ZINC = create(() -> AllItems.RAW_ZINC, b -> b.duration(250)
             .output(1, AllItems.CRUSHED_ZINC, 1)
-            .output(.75f, AllItems.EXP_NUGGET, 1)
-            .output(.25f, CNItems.LEAD_NUGGET,1)
+            .output(0.75f, AllItems.EXP_NUGGET, 1)
+            .output(0.25f, CNItems.LEAD_NUGGET,1)
         ),
-
 
         RAW_COPPER = create(() -> Items.RAW_COPPER, b -> b.duration(250)
             .output(1, AllItems.CRUSHED_COPPER, 1)
-            .output(.75f, AllItems.EXP_NUGGET, 1)
-            .output(.15f, CNItems.LEAD_NUGGET,1)
+            .output(0.75f, AllItems.EXP_NUGGET, 1)
+            .output(0.15f, CNItems.LEAD_NUGGET,1)
+        ),
+
+        NITRATE = create("nitrate", b -> b
+                .require(AllPaletteStoneTypes.LIMESTONE.materialTag)
+                .duration(250)
+                .output(0.6f, CNItems.NITRATE, 1)
+                .output(0.4f, CNItems.LEAD_NUGGET, 1)
         )
     ;
+
+    protected GeneratedRecipe mineralRecycling(AllPaletteStoneTypes type,
+                                               UnaryOperator<ProcessingRecipeBuilder<ProcessingRecipe<?>>> transform) {
+        create(Lang.asId(type.name()) + "_recycling", b -> transform.apply(b.require(type.materialTag)));
+        return create(type.getBaseBlock()::get, transform);
+    }
 
     public CNCrushingRecipeGen(PackOutput generator) {
         super(generator, CreateNuclear.MOD_ID);
     }
-
 
 
     protected <T extends ProcessingRecipe<?>> GeneratedRecipe createFix(String namespace,

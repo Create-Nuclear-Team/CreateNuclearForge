@@ -11,22 +11,20 @@ public class ReactorBluePrintItemPacket extends SimplePacketBase {
 
     private final CompoundTag tag;
     private final float heat;
-    private final int graphiteTime;
-    private final int uraniumTime;
-    private final int countGraphiteRod;
-    private final int countUraniumRod;
-    private double progress;
+    private final int coolerTime;
+    private final int fuelTime;
+    private final int countCoolerRod;
+    private final int countFuelRod;
+    private final double progress;
 
-    private static double totalInit;
-
-    public ReactorBluePrintItemPacket(CompoundTag tag, float heat, int graphiteTime, int uraniumTime, int countGraphiteRod, int countUraniumRod) {
+    public ReactorBluePrintItemPacket(CompoundTag tag, float heat, int coolerTime, int fuelTime, int countCoolerRod, int countFuelRod) {
         this.tag = tag;
         this.heat = heat;
-        this.graphiteTime = graphiteTime;
-        this.uraniumTime = uraniumTime;
-        this.countGraphiteRod = countGraphiteRod;
-        this.countUraniumRod = countUraniumRod;
-        this.progress = calculatePostgres(graphiteTime, countGraphiteRod, uraniumTime, countUraniumRod);
+        this.coolerTime = coolerTime;
+        this.fuelTime = fuelTime;
+        this.countCoolerRod = countCoolerRod;
+        this.countFuelRod = countFuelRod;
+        this.progress = calculatePostgres(coolerTime, countCoolerRod, fuelTime, countFuelRod);
     }
 
     public ReactorBluePrintItemPacket(CompoundTag tag) {
@@ -34,17 +32,16 @@ public class ReactorBluePrintItemPacket extends SimplePacketBase {
     }
 
     public ReactorBluePrintItemPacket(float heat) {
-        this(new CompoundTag(), heat, 3600,5000, 0, 0);
+        this(new CompoundTag(), heat, 3600, 5000, 0, 0);
     }
 
-    public ReactorBluePrintItemPacket(int graphiteTime, int uraniumTime, int countGraphiteRod, int countUraniumRod) {
-        this(new CompoundTag(), 0f, graphiteTime, uraniumTime, countGraphiteRod, countUraniumRod);
+    public ReactorBluePrintItemPacket(int coolerTime, int fuelTime, int countCoolerRod, int countFuelRod) {
+        this(new CompoundTag(), 0f, coolerTime, fuelTime, countCoolerRod, countFuelRod);
     }
 
 
     public ReactorBluePrintItemPacket(FriendlyByteBuf buf) {
         this(buf.readNbt(), buf.readFloat(), buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt());
-        this.progress = buf.readDouble();
     }
 
 
@@ -52,13 +49,10 @@ public class ReactorBluePrintItemPacket extends SimplePacketBase {
     public void write(FriendlyByteBuf buffer) {
         buffer.writeNbt(tag);
         buffer.writeFloat(heat);
-        buffer.writeInt(graphiteTime);
-        buffer.writeInt(uraniumTime);
-        buffer.writeInt(countGraphiteRod);
-        buffer.writeInt(countUraniumRod);
-        buffer.writeDouble(progress);
-
-        totalInit = calculateTotalInit(countUraniumRod, countGraphiteRod);
+        buffer.writeInt(coolerTime);
+        buffer.writeInt(fuelTime);
+        buffer.writeInt(countCoolerRod);
+        buffer.writeInt(countFuelRod);
     }
 
     @Override
@@ -66,10 +60,10 @@ public class ReactorBluePrintItemPacket extends SimplePacketBase {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player == null || !(player.containerMenu instanceof ReactorBluePrintMenu c)) return;
-            c.countUraniumRod = this.countUraniumRod;
-            c.countGraphiteRod = this.countGraphiteRod;
-            c.graphiteTime = this.graphiteTime;
-            c.uraniumTime = this.uraniumTime;
+            c.countFuelRod = this.countFuelRod;
+            c.countCooledRod = this.countCoolerRod;
+            c.fuelTime = this.fuelTime;
+            c.coolerTime = this.coolerTime;
             c.progress = this.progress;
             c.heat = this.heat;
             c.sendUpdate = true;
@@ -77,16 +71,19 @@ public class ReactorBluePrintItemPacket extends SimplePacketBase {
         return true;
     }
 
-    public static double calculatePostgres(int a, int a_exp, int b, int b_exp) {
-        double a2 = Math.pow(a, a_exp);
-        double b2 = Math.pow(b, b_exp);
-        double total = a2 + b2;
+    public static double calculatePostgres(int coolerTime, int countCoolerRod, int fuelTime, int countFuelRod) {
+        double coolerTotal = Math.pow(coolerTime, countCoolerRod);
+        double fuelTotal = Math.pow(fuelTime, countFuelRod);
+        double total = coolerTotal + fuelTotal;
 
-        if (Double.isNaN(totalInit)) return total/calculateTotalInit(a, b);
-        else return total/totalInit;
+        double totalInit = calculateTotalInit(countCoolerRod, countFuelRod);
+        if (totalInit == 0 || Double.isNaN(totalInit)) return 0;
+        return total / totalInit;
     }
 
-    public static double calculateTotalInit(int a, int b) {
-        return Math.pow(3600, a) + Math.pow(5000, b);
+    public static double calculateTotalInit(int countCoolerRod, int countFuelRod) {
+        // We assume 3600 and 5000 as base fallback times for initialization if needed.
+        // It should ideally use the actual base times from config, but this works for now.
+        return Math.pow(3600, countCoolerRod) + Math.pow(5000, countFuelRod);
     }
 }

@@ -17,7 +17,7 @@ public class MultiBlockManagerBeta <T> {
         structures.add(new BlockPattern<>(id, data, blockPattern));
     }
 
-    public BlockPattern<T> findStructure(Level level, BlockPos pos) {
+    public BlockPattern<T> findStructure(Level level, BlockPos pos, IMultiblockController entity) {
         List<Direction> directions = new ArrayList<>();
         directions.add(Direction.NORTH);
         directions.add(Direction.WEST);
@@ -26,8 +26,11 @@ public class MultiBlockManagerBeta <T> {
 
         for (Direction direction : directions) {
             for (BlockPattern<T> structure : structures) {
-                var result = structure.structure().matches(level, pos, direction);
-                if (result) return structure;
+                boolean result = structure.structure().matches(level, pos, direction);
+                if (result){
+                    entity.setMultiblockFacing(direction.getCounterClockWise());
+                    return structure;
+                }
             }
         }
 

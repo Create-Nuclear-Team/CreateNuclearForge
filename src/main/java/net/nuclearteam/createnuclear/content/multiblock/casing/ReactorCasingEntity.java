@@ -10,23 +10,11 @@ import java.util.List;
 
 public class ReactorCasingEntity extends SmartBlockEntity {
 
-    protected BlockPos controller;
-
     public ReactorCasingEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        setController(pos);
     }
 
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) { }
-
-
-    public void setController(BlockPos pos) {
-        controller = new BlockPos(pos.getX()+4, pos.getY(), pos.getZ()+4);
-    }
-
-    public BlockPos getController() {
-        return controller;
-    }
 
 }

@@ -1,8 +1,11 @@
 package net.nuclearteam.createnuclear.content.multiblock.bluePrintItem;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -13,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.ItemStackHandler;
@@ -21,6 +25,7 @@ import net.nuclearteam.createnuclear.CNItems;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -28,6 +33,18 @@ public class ReactorBluePrintItem extends Item implements MenuProvider {
 
     public ReactorBluePrintItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+
+        tooltip.add(Component.translatable("item.createnuclear.reactor_blueprint.tooltip")
+                .withStyle(ChatFormatting.GRAY));
+
+        // Adjust the tooltip text to hint at the available action
+        tooltip.add(Component.translatable("item.createnuclear.reactor_blueprint.tooltip_hint")
+                .withStyle(ChatFormatting.DARK_GRAY));
     }
 
     @Override
@@ -52,14 +69,26 @@ public class ReactorBluePrintItem extends Item implements MenuProvider {
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack heldItem = player.getItemInHand(hand);
 
+        // Plain right-click -> Opens the Blueprint screen
         if (!player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
             if (!world.isClientSide && player instanceof ServerPlayer)
                 NetworkHooks.openScreen((ServerPlayer) player, this, buf -> buf.writeItem(heldItem));
             return InteractionResultHolder.success(heldItem);
         }
+        // Shift + right-click -> Sends a clickable link in chat!
         else if (player.isShiftKeyDown() && hand == InteractionHand.MAIN_HAND) {
-            if (!world.isClientSide && player instanceof ServerPlayer) {
-                NetworkHooks.openScreen((ServerPlayer) player, this, buf -> buf.writeItem(heldItem));
+            if (!world.isClientSide) {
+                MutableComponent message = Component.translatable("item.createnuclear.reactor_blueprint.chat_info")
+                        .withStyle(ChatFormatting.GREEN)
+                        .append(" ")
+                        .append(Component.translatable("item.createnuclear.reactor_blueprint.wiki_link")
+                                .withStyle(style -> style
+                                        .withColor(ChatFormatting.AQUA)
+                                        .withUnderlined(true)
+                                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://wiki.createnuclear.net/wiki/block&items/reactor_blueprint_item"))
+                                ));
+
+                player.sendSystemMessage(message);
             }
             return InteractionResultHolder.success(heldItem);
         }

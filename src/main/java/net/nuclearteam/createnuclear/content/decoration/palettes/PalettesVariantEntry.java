@@ -37,10 +37,9 @@ public class PalettesVariantEntry {
                     .transform(pickaxeOnly())
                     .blockstate(pattern.getBlockStateGenerator()
                             .apply(pattern)
-                            .apply(name)::accept
-                    );
-            ItemBuilder<BlockItem, ? extends BlockBuilder<? extends Block, CreateRegistrate>> itemBuilder =
-                    builder.item();
+                            .apply(name)::accept);
+            ItemBuilder<BlockItem, ? extends BlockBuilder<? extends Block, CreateRegistrate>> itemBuilder = builder
+                    .item();
 
             TagKey<Block>[] blockTags = pattern.getBlockTags();
             if (blockTags != null)
@@ -51,10 +50,8 @@ public class PalettesVariantEntry {
 
             itemBuilder.tag(paletteStoneVariants.materialTag);
 
-            if (pattern.isTranslucent())
-                builder.addLayer(() -> RenderType::translucent);
             pattern.createCTBehaviour(name)
-                    .ifPresent(b -> builder.onRegister(connectedTextures(b)));
+                    .ifPresent(b -> builder.onRegister(CreateRegistrate.<Block>connectedTextures(b)));
 
             builder.recipe((c, p) -> {
                 p.stonecutting(DataIngredient.tag(paletteStoneVariants.materialTag), RecipeCategory.BUILDING_BLOCKS, c);
@@ -71,7 +68,8 @@ public class PalettesVariantEntry {
         }
 
         REGISTRATE.addDataGenerator(ProviderType.RECIPE,
-                p -> p.stonecutting(DataIngredient.tag(paletteStoneVariants.materialTag), RecipeCategory.BUILDING_BLOCKS,
+                p -> p.stonecutting(DataIngredient.tag(paletteStoneVariants.materialTag),
+                        RecipeCategory.BUILDING_BLOCKS,
                         baseBlock));
         REGISTRATE.addDataGenerator(ProviderType.ITEM_TAGS, p -> p.addTag(paletteStoneVariants.materialTag)
                 .add(baseBlock.get()

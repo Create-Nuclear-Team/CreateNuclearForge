@@ -136,6 +136,14 @@
   "block.createnuclear.reactor_fluid_input.tooltip.summary": "L'_Entrée de fluide de réacteur_ est un _bloc_ utilisé pour insérer de l'_Eau_ ou de l'_Azote liquide_ dans le réacteur.",
   "block.createnuclear.reactor_frame": "Structure de réacteur",
   "block.createnuclear.reactor_frame.tooltip.summary": "_Bloc_ utilisé pour construire le _réacteur_",
+  "block.createnuclear.reactor_input": "Entrée de réacteur",
+  "block.createnuclear.reactor_input.tooltip.behaviour1": "Insérer des barres de _chauffage_ (comme l'_uranium_ ou le _thorium_) et de _refroidissement_ (comme le _graphite_) en grandes quantités pour alimenter _le réacteur_.",
+  "block.createnuclear.reactor_input.tooltip.condition1": "Quand le réacteur est assemblé",
+  "block.createnuclear.reactor_input.tooltip.summary": "_L'entrée de barre de réacteur_ est un _bloc_ qui peut être utilisé pour insérer des barres de _chauffage_ ou de _refroidissement_ dans le réacteur.",
+
+  "block.createnuclear.reactor_liquid_input.tooltip.summary": "_L'entrée de fluide de réacteur_ est un _bloc_ qui peut être utilisé pour insérer de l'_eau_ ou de l'_azote liquide_ dans le réacteur.",
+  "block.createnuclear.reactor_liquid_input.tooltip.condition1": "Quand le réacteur est assemblé",
+  "block.createnuclear.reactor_liquid_input.tooltip.behaviour1": "Insérer de l'_eau_ ou de l'_azote liquide_ en grandes quantités pour alimenter _le réacteur_ et éviter la _surchauffe_.",
   "block.createnuclear.reactor_output": "Sortie de réacteur",
   "block.createnuclear.reactor_output.tooltip.behaviour1": "Vous pouvez _extraire l'énergie_ produite par le réacteur en attachant un _rotor_ à la sortie du _réacteur_",
   "block.createnuclear.reactor_output.tooltip.condition1": "Quand le réacteur produit de l'énergie",
@@ -371,6 +379,7 @@
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "Faites un clic _droit_ pour le remplir.",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour2": "Faites un clic _droit_ sur le contrôleur de réacteur pour l'ouvrir.",
   "item.createnuclear.reactor_blueprint_item.tooltip.condition1": "Rempli de barres de refroidissement et de chauffage",
+  "item.createnuclear.reactor_blueprint_item.tooltip.condition1": "Filled with cooling and heating rods",
   "item.createnuclear.reactor_blueprint_item.tooltip.condition2": "Le réacteur doit être assemblé",
   "item.createnuclear.reactor_blueprint_item.tooltip.summary": "Il vous permet de configurer votre propre paterne.",
   "item.createnuclear.red_cloth": "Tissu rouge",
@@ -428,5 +437,7 @@
   "tag.item.createnuclear.fuel": "Chaleur",
   "tag.item.minecraft.all.campfires": "Tous les feux de camps",
   "tag.item.minecraft.campfires": "Feu de camps",
+  "tag.item.trinkets.head.face": "Face avant",
+  "item.createnuclear.raw_thorium": "Thorium brut"
   "tag.item.trinkets.head.face": "Face avant"
 }

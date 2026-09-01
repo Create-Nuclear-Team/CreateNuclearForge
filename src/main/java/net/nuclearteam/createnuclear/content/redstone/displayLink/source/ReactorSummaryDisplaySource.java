@@ -1,0 +1,276 @@
+package net.nuclearteam.createnuclear.content.redstone.displayLink.source;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import com.simibubi.create.api.behaviour.display.DisplaySource;
+import com.simibubi.create.content.redstone.displayLink.DisplayLinkContext;
+import com.simibubi.create.content.redstone.displayLink.target.DisplayTargetStats;
+import com.simibubi.create.content.trains.display.FlapDisplayBlockEntity;
+import com.simibubi.create.content.trains.display.FlapDisplayLayout;
+import com.simibubi.create.content.trains.display.FlapDisplaySection;
+import com.simibubi.create.foundation.gui.ModularGuiLineBuilder;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.LecternBlockEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
+import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
+import net.nuclearteam.createnuclear.content.multiblock.IHeat;
+import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
+import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
+import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
+
+import javax.annotation.Nullable;
+
+/**
+ * Display source rendering a reactor controller's summary (status, size, fuel,
+ * cooler, fluid, heat) as one line per stat, for both regular displays and
+ * flap displays.
+ * <p>
+ * The underlying data is built by {@link #getReactorSummary} into a
+ * {@link ReactorSummary}, which is only converted to Create's positional
+ * {@code List<List<MutableComponent>>} format at the last moment via
+ * {@link ReactorSummary#toRows()}, right before returning it to the caller.
+ */
+public class ReactorSummaryDisplaySource extends DisplaySource {
+
+    /** Fallback line shown when only a single display row is available. */
+    private static final List<MutableComponent> notEnoughSpaceSingle =
+            List.of(CreateNuclearLang.translateDirect("display_source.reactor.not_enough_space")
+                    .append(CreateNuclearLang.translateDirect("display_source.reactor.for_reactor_status")));
+
+    /** Fallback lines shown when fewer than 6 rows are available (not enough for the full summary). */
+    private static final List<MutableComponent> notEnoughSpaceDouble =
+            List.of(CreateNuclearLang.translateDirect("display_source.reactor.not_enough_space"),
+                    CreateNuclearLang.translateDirect("display_source.reactor.for_reactor_status"));
+
+    /** Fallback flap display rows, mirroring {@link #notEnoughSpaceDouble} for the flap layout. */
+    private static final List<List<MutableComponent>> notEnoughSpaceFlap =
+            List.of(List.of(CreateNuclearLang.translateDirect("display_source.reactor.not_enough_space")),
+                    List.of(CreateNuclearLang.translateDirect("display_source.reactor.for_reactor_status")));
+
+    private static final List<MutableComponent> notEnabledReactor =
+            List.of(CreateNuclearLang.translateDirect("display_source.reactor.not_enabled_reactor"),
+                    CreateNuclearLang.translateDirect("display_source.reactor.reactor_structure_invalid"));
+
+    /** Flap display equivalent of {@link #notEnabledReactor}. */
+    private static final List<List<MutableComponent>> notEnabledReactorFlap =
+            List.of(List.of(CreateNuclearLang.translateDirect("display_source.reactor.reactor_structure_invalid")));
+
+    /**
+     * Provides the text lines for a regular (non-flap) display target.
+     * Falls back to {@link #notEnoughSpaceSingle}/{@link #notEnoughSpaceDouble} when there
+     * isn't enough room, and to the "no controller" message when no reactor controller
+     * could be resolved for this source.
+     */
+    @Override
+    public List<MutableComponent> provideText(DisplayLinkContext context, DisplayTargetStats stats) {
+        ReactorControllerBlockEntity controller = getController(context);
+        if (controller == null || !controller.isAssembled()) return notEnabledReactor;
+
+        if (stats.maxRows() < 2) return notEnoughSpaceSingle;
+        if (stats.maxRows() < 6) return notEnoughSpaceDouble;
+
+        int gaugeWidth = (stats.maxColumns() >= 80) ? 10 : 6;
+
+        Optional<ReactorSummary> summary = getReactorSummary(context, gaugeWidth);
+        if (summary.isEmpty()) {
+            return List.of(CreateNuclearLang.translateDirect("display_source.reactor.no_controller"));
+        }
+
+        List<List<MutableComponent>> components = summary.get().toRows();
+
+        if (context.getTargetBlockEntity() instanceof LecternBlockEntity) {
+            Stream<MutableComponent> componentList = components.stream().map(list -> list.stream().reduce(MutableComponent::append).orElse(EMPTY_LINE));
+            return List.of(componentList.reduce((c1, c2) -> c1.append(Component.literal("\n")).append(c2)).orElse(EMPTY_LINE));
+        }
+
+        return components.stream().map(list -> list.stream().reduce(MutableComponent::append).orElse(EMPTY_LINE)).toList();
+    }
+
+    /**
+     * Provides the rows for a flap display target. Disables the flap display context
+     * (falls back to the default layout) when there isn't enough room, either because
+     * of the row count or because the fuel value wouldn't fit the available columns.
+     */
+    @Override
+    public List<List<MutableComponent>> provideFlapDisplayText(DisplayLinkContext context, DisplayTargetStats stats) {
+        ReactorControllerBlockEntity controller = getController(context);
+        if (controller == null || !controller.isAssembled()) {
+            context.flapDisplayContext = Boolean.FALSE;
+            return notEnabledReactorFlap;
+        }
+
+        if (stats.maxRows() < 6) {
+            context.flapDisplayContext = Boolean.FALSE;
+            return notEnoughSpaceFlap;
+        }
+
+        int gaugeWidth = 6;
+        Optional<ReactorSummary> summary = getReactorSummary(context, gaugeWidth);
+
+        if (summary.isEmpty()) {
+            return notEnoughSpaceFlap;
+        }
+
+        ReactorSummary reactorSummary = summary.get();
+
+        if (stats.maxColumns() * FlapDisplaySection.MONOSPACE < 6 * FlapDisplaySection.MONOSPACE + reactorSummary.fuel()
+                .value().getString().length() * FlapDisplaySection.WIDE_MONOSPACE) {
+            context.flapDisplayContext = Boolean.FALSE;
+            return notEnoughSpaceFlap;
+        }
+
+        return reactorSummary.toRows();
+    }
+
+    /**
+     * Configures the flap display layout: the default layout when the flap display context
+     * was disabled by {@link #provideFlapDisplayText}, otherwise a two-section layout
+     * (label column + value column) for every row.
+     * <p>
+     * {@code lineIndex} maps directly to {@link ReactorSummary#toRows()}'s order (no
+     * separate header line): {@code status}/{@code size} (indices 0/1) hold translated
+     * text, which the "pixel" charset can't render, so they get "alphabet" instead. The
+     * remaining rows are numbers/gauges, which "pixel" renders fine.
+     */
+    @Override
+    public void loadFlapDisplayLayout(DisplayLinkContext context, FlapDisplayBlockEntity flapDisplay, FlapDisplayLayout layout, int lineIndex) {
+        if (context.flapDisplayContext instanceof Boolean b && !b) {
+            if (layout.isLayout("Default")) return;
+            layout.loadDefault(flapDisplay.getMaxCharCount());
+            return;
+        }
+
+        boolean isTextRow = lineIndex == 0 || lineIndex == 1;
+        String layoutKey = isTextRow ? "ReactorText" : "ReactorGauge";
+        if (layout.isLayout(layoutKey)) return;
+
+        int lw = labelWidth();
+        int labelLength = (int) (lw * FlapDisplaySection.MONOSPACE);
+        float maxSpace = flapDisplay.getMaxCharCount(1) * FlapDisplaySection.MONOSPACE;
+
+        FlapDisplaySection label = new FlapDisplaySection(labelLength, "alphabet", false, true);
+        FlapDisplaySection value = isTextRow
+            ? new FlapDisplaySection(maxSpace - labelLength, "alphabet", false, false)
+            : new FlapDisplaySection(maxSpace - labelLength, "pixel", false, false).wideFlaps();
+
+        layout.configure(layoutKey, List.of(label, value));
+    }
+
+    /**
+     * Resolves the reactor controller for this source and builds a {@link ReactorSummary}
+     * from its current state. Returns {@link Optional#empty()} when no controller is
+     * assigned to this display source or it has been removed, so callers can distinguish
+     * that case from a valid summary without relying on list size/positional access.
+     */
+    private Optional<ReactorSummary> getReactorSummary(DisplayLinkContext context, int gaugeWidth) {
+        ReactorControllerBlockEntity controller = getController(context);
+
+        if (controller == null || controller.isRemoved()) {
+            return Optional.empty();
+        }
+
+        int mode = context.sourceConfig().getInt("display_mode");
+
+        int heat = (int) controller.getConfiguredPattern().getOrCreateTag().getDouble("heat");
+        int fuel = 0;
+        int cooler = 0;
+
+        if (controller.getDisplayState() != null && controller.getDisplayState().items() != null) {
+            for (Map.Entry<Item, Integer> entry : controller.getDisplayState().items().entrySet()) {
+                if (TypeRodPredicate.isFuel(entry.getKey().getDefaultInstance(), context.level())) {
+                    fuel += entry.getValue();
+                } else if (TypeRodPredicate.isCooled(entry.getKey().getDefaultInstance(), context.level())) {
+                    cooler += entry.getValue();
+                }
+            }
+        }
+
+        int size = controller.getMultiblockSize();
+        List<BigFluidStack> fluidList = controller.getBigFluidStack();
+        int fluid = (fluidList != null && !fluidList.isEmpty() && fluidList.get(0) != null) ? fluidList.get(0).amount : 0;
+
+        int lw = labelWidth();
+        MutableComponent lStatus = padLabel("status", lw).append(" ");
+        MutableComponent lSize   = padLabel("size", lw).append(" ");
+        MutableComponent lFuel   = padLabel("fuel", lw).append(" ");
+        MutableComponent lCooler = padLabel("cooler", lw).append(" ");
+        MutableComponent lFluid  = padLabel("fluid", lw).append(" ");
+        MutableComponent lHeat   = padLabel("heat", lw).append(" ");
+
+        return Optional.of(new ReactorSummary.Builder()
+            .status(lStatus, formatStatus(controller.isActive()))
+            .size(lSize, formatSize(size))
+            .fuel(lFuel, formatValue(fuel, ReactorDisplayConstants.MAX_FUEL, mode, false, ChatFormatting.GREEN, gaugeWidth))
+            .cooler(lCooler, formatValue(cooler, ReactorDisplayConstants.MAX_COOLER, mode, false, ChatFormatting.AQUA, gaugeWidth))
+            .fluid(lFluid, formatFluid(fluid, ReactorFluidInputEntity.getCapacityForReactorSize(size), mode, ChatFormatting.BLUE, gaugeWidth))
+            .heat(lHeat, formatValue(heat, ReactorDisplayConstants.maxHeatForSize(size), mode, true, IHeat.HeatLevel.of(heat, size).getTextColor(), gaugeWidth))
+            .build());
+    }
+
+    private MutableComponent padLabel(String key, int lw) {
+        return Component.literal(" ".repeat(lw - labelWidthOf(key))).append(labelOf(key));
+    }
+
+    private MutableComponent formatStatus(boolean isActive) {
+        String key = isActive ? "active" : "idle";
+        ChatFormatting formatting = isActive ? ChatFormatting.GOLD : ChatFormatting.GRAY;
+        return CreateNuclearLang.translateDirect("display_source.reactor." + key).withStyle(formatting);
+    }
+
+    private MutableComponent formatSize(int size) {
+        String key = size <= 5 ? "small" : size <= 7 ? "medium" : "large";
+        return CreateNuclearLang.translateDirect("display_source.reactor.size." + key).withStyle(ChatFormatting.BLUE);
+    }
+
+    private MutableComponent formatFluid(int current, int max, int mode, ChatFormatting color, int width) {
+        if (mode == 0 || mode == 3) return ReactorGaugeRenderer.drawGauge(current, max, color, width);
+        if (mode == 2) return Component.literal((current * 100 / max) + "%").withStyle(color);
+        return Component.literal(String.valueOf(current)).append(" ").append(CreateNuclearLang.translateDirect("generic.unit.fluid.value")).withStyle(color);
+    }
+
+    private MutableComponent formatValue(int current, int max, int mode, boolean gaugeOnNormal, ChatFormatting color, int width) {
+        if (mode == 3 || (mode == 0 && gaugeOnNormal)) return ReactorGaugeRenderer.drawGauge(current, max, color, width);
+        if (mode == 2) return Component.literal((current * 100 / max) + "%").withStyle(color);
+        return Component.literal(String.valueOf(current)).withStyle(color);
+    }
+
+    private int labelWidth() {
+        return Stream.of("status", "size", "fuel", "cooler", "fluid", "heat").mapToInt(this::labelWidthOf).max().orElse(0);
+    }
+
+    private int labelWidthOf(String label) {
+        return labelOf(label).getString().length();
+    }
+
+    private MutableComponent labelOf(String label) {
+        return CreateNuclearLang.translateDirect("display_source.reactor." + label);
+    }
+
+    @Nullable
+    private ReactorControllerBlockEntity getController(DisplayLinkContext context) {
+        return MultiblockHelpers.getControllerForPart(context.level(), context.getSourcePos());
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void initConfigurationWidgets(DisplayLinkContext context, ModularGuiLineBuilder builder, boolean isFirstLine) {
+        if (isFirstLine) return;
+        builder.addSelectionScrollInput(0, 100, (selectionScrollInput, label) -> selectionScrollInput
+                .forOptions(CreateNuclearLang.translatedOptions("display_source.reactor.mode", "normal", "value", "percent", "gauge")), "display_mode");
+    }
+
+    @Override
+    protected String getTranslationKey() {
+        return "reactor_summary";
+    }
+}

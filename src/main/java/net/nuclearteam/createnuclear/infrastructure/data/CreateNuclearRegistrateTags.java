@@ -1,16 +1,19 @@
 package net.nuclearteam.createnuclear.infrastructure.data;
 
+import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.data.TagGen.CreateTagsProvider;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.Tags;
 import net.nuclearteam.createnuclear.CNBlocks;
 import net.nuclearteam.createnuclear.CNEntityType;
 import net.nuclearteam.createnuclear.CNTags;
@@ -43,6 +46,10 @@ public class CreateNuclearRegistrateTags {
                 .add(CNBlocks.ENRICHING_FIRE.get())
         ;
 
+        prov.tag(CNBlockTags.FAN_PROCESSING_CATALYSTS_SNOW_POWDER.tag)
+                .add(Blocks.POWDER_SNOW)
+        ;
+
         for (CNBlockTags tag : CNBlockTags.values()) {
             if (tag.alwaysDatagen) {
                 prov.getOrCreateRawBuilder(tag.tag);
@@ -69,6 +76,10 @@ public class CreateNuclearRegistrateTags {
 
         prov.tag(FluidTags.LAVA)
                 .addTag(CNFluidTags.URANIUM.tag)
+        ;
+
+        prov.tag(FluidTags.WATER)
+                .addTag(CNFluidTags.NITROGEN.tag)
         ;
 
 
