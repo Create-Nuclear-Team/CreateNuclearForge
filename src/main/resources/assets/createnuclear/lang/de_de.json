@@ -132,7 +132,7 @@
   "block.createnuclear.reactor_core.tooltip.summary": "Block der für den Bau des Reaktors verwendet wird",
   "block.createnuclear.reactor_fluid_input": "Reaktor Flüssigkeit Eingabe",
   "block.createnuclear.reactor_fluid_input.tooltip.behaviour1": "Setze _Wasser_ oder _ Flüssigstickstoff_ in großen Mengen ein um _den Reaktor_ zu betreiben und vor Überhitzung zu schützen.",
-  "block.createnuclear.reactor_fluid_input.tooltip.condition1": "When the reactor is assembled",
+  "block.createnuclear.reactor_fluid_input.tooltip.condition1": "Wenn der Reaktor gebaut ist",
   "block.createnuclear.reactor_fluid_input.tooltip.summary": "_The Reactor Fluid Input_ is a _block_ that can be used to insert _Water_ or _Liquid Nitrogen_ into the Reactor.",
   "block.createnuclear.reactor_frame": "Reaktor Rahmen",
   "block.createnuclear.reactor_frame.tooltip.summary": "_Block_ für den Bau des _Reaktors_",
