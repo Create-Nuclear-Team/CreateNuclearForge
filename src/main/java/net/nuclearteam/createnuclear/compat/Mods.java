@@ -13,7 +13,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public enum Mods {
-    ALEXS_CAVE("alexscaves")
+    ALEXS_CAVE("alexscaves"),
+    CREATE_DRAGONS_PLUS
     ;
 
     private final String id;

@@ -145,6 +145,9 @@ repositories {
     maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
     maven { url = "https://maven.tterrag.com" } // Registrate
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
+
+    maven { url "https://maven.dragons.plus/releases" } // DragonsPlusMinecraft Maven
+    maven { url "https://maven.fallenbreath.me/releases" } // Conditional Mixin
 }
 
 dependencies {
@@ -181,6 +184,11 @@ dependencies {
     /** Tests **/
     testImplementation platform('org.junit:junit-bom:5.10.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    modCompileOnly("plus.dragons.createdragonsplus:create-dragons-plus-${minecraft_version}:${create_dragons_plus_version}")
+    if (project.enable_create_dragons_plus.toBoolean()) {
+        modRuntimeOnly("plus.dragons.createdragonsplus:create-dragons-plus-${minecraft_version}:${create_dragons_plus_version}")
+    }
 }
 
 test {
