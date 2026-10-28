@@ -43,6 +43,7 @@ import net.nuclearteam.createnuclear.content.multiblock.controller.manager.*;
 import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import net.nuclearteam.createnuclear.content.multiblock.reactorLogic.HeatManager;
 
+import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ACTIVE;
 import static net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlock.ASSEMBLED;
 
 @SuppressWarnings({ "unused" })
@@ -182,6 +183,10 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
         return this.frameDisplayManager;
     }
 
+    public ReactorInputManagerI getInputManager() {
+        return this.inputManager;
+    }
+
     public ReactorInputFluidManagerI getInputFluidManager() {
         return this.inputFluidManager;
     }
@@ -302,6 +307,16 @@ public class ReactorControllerBlockEntity extends SmartBlockEntity
             return;
         level.setBlockAndUpdate(worldPosition, getBlockState().setValue(ASSEMBLED, assembled));
         this.setChanged();
+    }
+
+    public boolean isActive() {
+        if (level == null)
+            return false;
+        try {
+            return level.getBlockState(worldPosition).getValue(ACTIVE);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void logReactorConnections(Player player) {

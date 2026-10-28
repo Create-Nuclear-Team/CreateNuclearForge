@@ -22,6 +22,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegisterEvent;
+import net.nuclearteam.createnuclear.compat.Mods;
+import net.nuclearteam.createnuclear.compat.createdragonsplus.SnowPowderFreezingCompat;
 import net.nuclearteam.createnuclear.content.contraptions.irradiated.IrradiatedAnimal;
 import net.nuclearteam.createnuclear.content.decoration.palettes.CNPaletteBlocks;
 import net.nuclearteam.createnuclear.content.equipment.armor.AntiRadiationArmorItem.IGoggleHelmet;
@@ -99,6 +101,7 @@ public class CreateNuclear {
 
     public static void init(final FMLCommonSetupEvent event) {
         CNFluids.registerFluidInteractions();
+        Mods.CREATE_DRAGONS_PLUS.executeIfInstalled(() -> SnowPowderFreezingCompat::register);
         event.enqueueWork(() -> IrradiatedAnimal.VANILLA_TO_IRRADIATED.put(EntityType.CHICKEN, CNEntityType.IRRADIATED_CHICKEN.get()));
         event.enqueueWork(() -> {
             CNPotions.registerPotionsRecipes();

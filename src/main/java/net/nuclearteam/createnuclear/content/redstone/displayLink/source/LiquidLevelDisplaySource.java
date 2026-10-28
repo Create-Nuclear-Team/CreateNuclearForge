@@ -13,6 +13,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.controller.ReactorControllerBlockEntity;
+import net.nuclearteam.createnuclear.content.multiblock.input.fluid.ReactorFluidInputEntity;
 import net.nuclearteam.createnuclear.foundation.utility.CreateNuclearLang;
 
 import java.util.List;
@@ -25,7 +26,12 @@ public class LiquidLevelDisplaySource extends AbstractReactorStatDisplaySource {
 
     @Override
     protected int getMax() {
-        return ReactorDisplayConstants.MAX_FLUID;
+        ReactorControllerBlockEntity controller = getControllerBlock();
+        if (controller == null) {
+            return ReactorDisplayConstants.MAX_FLUID;
+        }
+
+        return ReactorFluidInputEntity.getCapacityForReactorSize(controller.getMultiblockSize());
     }
 
     @Override
