@@ -20,6 +20,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.nuclearteam.createnuclear.CreateNuclear;
 import net.nuclearteam.createnuclear.api.multiblock.rods.RodType.TypeRodPredicate;
 import net.nuclearteam.createnuclear.content.logistics.BigFluidStack;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
@@ -63,7 +64,8 @@ public class ReactorSummaryDisplaySource extends DisplaySource {
 
     /** Flap display equivalent of {@link #notEnabledReactor}. */
     private static final List<List<MutableComponent>> notEnabledReactorFlap =
-            List.of(List.of(CreateNuclearLang.translateDirect("display_source.reactor.reactor_structure_invalid")));
+            List.of(List.of(CreateNuclearLang.translateDirect("display_source.reactor.not_enabled_reactor")),
+                    List.of(CreateNuclearLang.translateDirect("display_source.reactor.reactor_structure_invalid")));
 
     /**
      * Provides the text lines for a regular (non-flap) display target.
