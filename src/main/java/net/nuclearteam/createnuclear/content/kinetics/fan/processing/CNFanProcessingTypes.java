@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.enriching.campfire.EnrichingCampfireBlock;
+import net.nuclearteam.createnuclear.content.particles.IrradiatedParticlesData;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.EnrichedRecipe.EnrichedWrapper;
 import net.nuclearteam.createnuclear.content.kinetics.fan.processing.SnowPowderRecipe.SnowPowderWrapper;
 import net.nuclearteam.createnuclear.content.radiation.capability.RadiationCapability;
@@ -115,7 +116,7 @@ public class CNFanProcessingTypes {
             particleAccess.setColor(Color.mixColors(0x0, 0x126568, random.nextFloat()));
             particleAccess.setAlpha(1f);
             if (random.nextFloat() < 1 / 128f) particleAccess.spawnExtraParticle(ParticleTypes.ASH, .125f);
-            if (random.nextFloat() < 1 / 32f) particleAccess.spawnExtraParticle(ParticleTypes.DOLPHIN, .125f);
+            if (random.nextFloat() < 1 / 32f) particleAccess.spawnExtraParticle(new IrradiatedParticlesData(), .125f);
         }
 
         @Override
