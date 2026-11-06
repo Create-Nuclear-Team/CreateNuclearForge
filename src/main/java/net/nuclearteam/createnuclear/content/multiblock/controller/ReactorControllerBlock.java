@@ -29,6 +29,7 @@ import net.nuclearteam.createnuclear.*;
 import net.nuclearteam.createnuclear.content.multiblock.IHeat;
 import net.nuclearteam.createnuclear.content.multiblock.MultiblockHelpers;
 import net.nuclearteam.createnuclear.content.multiblock.ReactorAssembler;
+import net.nuclearteam.createnuclear.content.multiblock.bluePrintItem.ReactorBluePrintItem;
 import net.nuclearteam.createnuclear.content.multiblock.input.fluid.PersistentFluidLocks;
 import net.nuclearteam.createnuclear.foundation.advancement.CNAdvancement;
 import net.nuclearteam.createnuclear.foundation.block.HorizontalDirectionalReactorBlock;
@@ -98,7 +99,7 @@ public class ReactorControllerBlock extends HorizontalDirectionalReactorBlock im
         if (!state.getValue(ASSEMBLED)) {
         }
         else {
-            if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty() && heldItem.getTag() != null){
+            if (heldItem.is(CNItems.REACTOR_BLUEPRINT.get()) && controllerBlockEntity.getInventoryObject().getItem(0).isEmpty() && ReactorBluePrintItem.hasRods(heldItem)){
                 withBlockEntityDo(worldIn, pos, be -> {
                     be.getInventoryObject().setStackInSlot(0, heldItem);
                     be.setConfiguredPattern(heldItem);

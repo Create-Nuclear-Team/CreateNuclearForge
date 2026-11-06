@@ -1,8 +1,6 @@
 package net.nuclearteam.createnuclear.content.equipment.armor;
 
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -11,89 +9,54 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 
 public class AntiRadiationArmorModel extends HumanoidModel<LivingEntity> {
-	private final ModelPart head;
-	private final ModelPart body;
-	private final ModelPart right_arm;
-	private final ModelPart left_arm;
-	private final ModelPart right_leg;
-	private final ModelPart left_leg;
-	private final ModelPart left_boot;
-	private final ModelPart right_boot;
+    public AntiRadiationArmorModel(ModelPart root, EquipmentSlot slot) {
+        super(root);
+        this.head.getChild("helmet").visible = slot == EquipmentSlot.HEAD;
+        this.body.getChild("chestplate").visible = slot == EquipmentSlot.CHEST;
+        this.rightArm.getChild("sleeve").visible = slot == EquipmentSlot.CHEST;
+        this.leftArm.getChild("sleeve").visible = slot == EquipmentSlot.CHEST;
+        this.rightLeg.getChild("leggings").visible = slot == EquipmentSlot.LEGS;
+        this.leftLeg.getChild("leggings").visible = slot == EquipmentSlot.LEGS;
+        this.rightLeg.getChild("boot").visible = slot == EquipmentSlot.FEET;
+        this.leftLeg.getChild("boot").visible = slot == EquipmentSlot.FEET;
+    }
 
-	// Set per render pass by AntiRadiationArmorClientExtensions so renderToBuffer can show
-	// the legs for LEGS (leggings) but only the boots for FEET (boots) — Forge makes the
-	// vanilla leg parts visible for BOTH slots, so we disambiguate here.
-	public EquipmentSlot currentSlot = EquipmentSlot.HEAD;
+    public static LayerDefinition createBodyLayer() {
+        MeshDefinition meshdefinition = new MeshDefinition();
+        PartDefinition partdefinition = meshdefinition.getRoot();
 
-	public AntiRadiationArmorModel(ModelPart root) {
-		super(root);
-		this.head = root.getChild("head");
-		this.body = root.getChild("body");
-		this.right_arm = root.getChild("right_arm");
-		this.left_arm = root.getChild("left_arm");
-		this.right_leg = root.getChild("right_leg");
-		this.left_leg = root.getChild("left_leg");
-		this.left_boot = root.getChild("left_boot");
-		this.right_boot = root.getChild("right_boot");
-	}
+        // HumanoidModel's constructor requires a "hat" child; keep it empty.
+        partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
 
-	public static LayerDefinition createBodyLayer() {
-		MeshDefinition meshdefinition = new MeshDefinition();
-		PartDefinition partdefinition = meshdefinition.getRoot();
+        
+        PartDefinition head = partdefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+        head.addOrReplaceChild("helmet", CubeListBuilder.create().texOffs(30, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.2F))
+                .texOffs(30, 16).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.5F)), PartPose.ZERO);
 
-		// HumanoidModel's constructor requires a "hat" child; keep it empty.
-		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
+        PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+        body.addOrReplaceChild("chestplate", CubeListBuilder.create().texOffs(0, 19).addBox(-3.7F, 0.0F, -2.8F, 8.0F, 12.0F, 5.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 0).addBox(-4.4F, -1.0F, -3.1F, 9.0F, 13.0F, 6.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 36).addBox(-4.0F, 0.0F, -2.7F, 8.0F, 12.0F, 5.0F, new CubeDeformation(0.0F))
+                .texOffs(64, 0).addBox(-4.5F, -1.0F, -3.0F, 9.0F, 13.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.ZERO);
 
-		PartDefinition head = partdefinition.addOrReplaceChild("head", CubeListBuilder.create().texOffs(30, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.2F))
-		.texOffs(30, 16).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.5F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition right_arm = partdefinition.addOrReplaceChild("right_arm", CubeListBuilder.create(), PartPose.offset(-5.0F, 2.0F, 0.0F));
+        right_arm.addOrReplaceChild("sleeve", CubeListBuilder.create().texOffs(45, 32).mirror().addBox(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.45F)).mirror(false)
+                .texOffs(29, 32).mirror().addBox(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.55F)).mirror(false), PartPose.ZERO);
 
-		PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 19).addBox(-3.7F, 0.0F, -2.8F, 8.0F, 12.0F, 5.0F, new CubeDeformation(0.0F))
-		.texOffs(0, 0).addBox(-4.4F, -1.0F, -3.1F, 9.0F, 13.0F, 6.0F, new CubeDeformation(0.0F))
-		.texOffs(0, 36).addBox(-4.0F, 0.0F, -2.7F, 8.0F, 12.0F, 5.0F, new CubeDeformation(0.0F))
-		.texOffs(64, 0).addBox(-4.5F, -1.0F, -3.0F, 9.0F, 13.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition left_arm = partdefinition.addOrReplaceChild("left_arm", CubeListBuilder.create(), PartPose.offset(5.0F, 2.0F, 0.0F));
+        left_arm.addOrReplaceChild("sleeve", CubeListBuilder.create().texOffs(45, 32).addBox(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.4F))
+                .texOffs(29, 32).addBox(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.5F)), PartPose.ZERO);
 
-		PartDefinition right_arm = partdefinition.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(45, 32).mirror().addBox(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.45F)).mirror(false)
-		.texOffs(29, 32).mirror().addBox(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.55F)).mirror(false), PartPose.offset(-5.0F, 2.0F, 0.0F));
+        PartDefinition right_leg = partdefinition.addOrReplaceChild("right_leg", CubeListBuilder.create(), PartPose.offset(1.9F, 12.0F, 0.0F));
+        right_leg.addOrReplaceChild("leggings", CubeListBuilder.create().texOffs(29, 48).mirror().addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)).mirror(false)
+                .texOffs(45, 48).mirror().addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)).mirror(false), PartPose.ZERO);
+        right_leg.addOrReplaceChild("boot", CubeListBuilder.create().texOffs(61, 39).mirror().addBox(-2.0F, 8.3F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)).mirror(false), PartPose.ZERO);
 
-		PartDefinition left_arm = partdefinition.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(45, 32).addBox(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.4F))
-		.texOffs(29, 32).addBox(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.5F)), PartPose.offset(5.0F, 2.0F, 0.0F));
+        PartDefinition left_leg = partdefinition.addOrReplaceChild("left_leg", CubeListBuilder.create(), PartPose.offset(-1.9F, 12.0F, 0.0F));
+        left_leg.addOrReplaceChild("leggings", CubeListBuilder.create().texOffs(29, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
+                .texOffs(45, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.ZERO);
+        left_leg.addOrReplaceChild("boot", CubeListBuilder.create().texOffs(61, 39).addBox(-2.0F, 8.3F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.ZERO);
 
-		PartDefinition right_leg = partdefinition.addOrReplaceChild("right_leg", CubeListBuilder.create().texOffs(29, 48).mirror().addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F)).mirror(false)
-		.texOffs(45, 48).mirror().addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)).mirror(false), PartPose.offset(1.9F, 12.0F, 0.0F));
-
-		PartDefinition left_leg = partdefinition.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(29, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.0F))
-		.texOffs(45, 48).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(-1.9F, 12.0F, 0.0F));
-
-		partdefinition.addOrReplaceChild("left_boot", CubeListBuilder.create().texOffs(61, 39).addBox(-2.0F, 8.3F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)), PartPose.offset(-1.9F, 12.0F, 0.0F));
-
-		partdefinition.addOrReplaceChild("right_boot", CubeListBuilder.create().texOffs(61, 39).mirror().addBox(-2.0F, 8.3F, -2.0F, 4.0F, 4.0F, 4.0F, new CubeDeformation(0.25F)).mirror(false), PartPose.offset(1.9F, 12.0F, 0.0F));
-
-		return LayerDefinition.create(meshdefinition, 96, 96);
-	}
-
-	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		// Make the boots follow the (already animated) legs.
-		this.right_boot.copyFrom(this.right_leg);
-		this.left_boot.copyFrom(this.left_leg);
-
-		// Control part visibility based on the slot being rendered
-		this.head.visible = this.currentSlot == EquipmentSlot.HEAD;
-		this.body.visible = this.currentSlot == EquipmentSlot.CHEST;
-		this.right_arm.visible = this.currentSlot == EquipmentSlot.CHEST;
-		this.left_arm.visible = this.currentSlot == EquipmentSlot.CHEST;
-		this.right_leg.visible = this.currentSlot == EquipmentSlot.LEGS;
-		this.left_leg.visible = this.currentSlot == EquipmentSlot.LEGS;
-		this.right_boot.visible = this.currentSlot == EquipmentSlot.FEET;
-		this.left_boot.visible = this.currentSlot == EquipmentSlot.FEET;
-
-		if (this.head.visible) head.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		if (this.body.visible) body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		if (this.right_arm.visible) right_arm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		if (this.left_arm.visible) left_arm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		if (this.right_leg.visible) right_leg.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		if (this.left_leg.visible) left_leg.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		if (this.right_boot.visible) right_boot.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-		if (this.left_boot.visible) left_boot.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-	}
+        return LayerDefinition.create(meshdefinition, 96, 96);
+    }
 }
