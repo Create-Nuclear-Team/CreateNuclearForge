@@ -23,12 +23,15 @@ import net.nuclearteam.createnuclear.content.multiblock.pattern.ReactorPattern;
 import java.util.List;
 
 public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
-    public int speed = 0;
     public float heat = 0;
 
     protected ReactorPattern pattern =  new ReactorPattern();
 
     protected float generatedSpeed;
+
+    // generatedSpeed is restored in read() before initialize() attaches this block entity to its
+    // kinetic network: updating rotation in that window would register its stress capacity twice.
+    private boolean kineticsInitialized = false;
 
     public ReactorOutputEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -40,19 +43,8 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
 
     }
 
-    @Override
-    public void lazyTick() {
-        super.lazyTick();
-
-        determineSpeed();
-    }
-
-    public void determineSpeed() {
-        int deterSpeed = this.speed;
-        setSpeedAndUpdate(deterSpeed);
-    }
-
     public void setSpeedAndUpdate(int speed) {
+        if (!kineticsInitialized) return;
         if (generatedSpeed == speed) return;
 
         generatedSpeed = (float) speed;
@@ -117,8 +109,15 @@ public class ReactorOutputEntity extends GeneratingKineticBlockEntity {
      }
 
     @Override
+    public void updateGeneratedRotation() {
+        if (!kineticsInitialized) return;
+        super.updateGeneratedRotation();
+    }
+
+    @Override
     public void initialize() {
         super.initialize();
+        kineticsInitialized = true;
 
         if (!hasSource() || getGeneratedSpeed() > getTheoreticalSpeed())
         {

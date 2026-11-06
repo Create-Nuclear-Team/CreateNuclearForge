@@ -43,7 +43,11 @@ public class ReactorBluePrintItem extends Item implements MenuProvider {
                 .withStyle(ChatFormatting.GRAY));
 
         // Adjust the tooltip text to hint at the available action
-        tooltip.add(Component.translatable("item.createnuclear.reactor_blueprint.tooltip_hint")
+        tooltip.add(Component.translatable(
+                        "item.createnuclear.reactor_blueprint.tooltip_hint",
+                        Component.keybind("key.sneak"),
+                        Component.keybind("key.use")
+                )
                 .withStyle(ChatFormatting.DARK_GRAY));
     }
 
@@ -93,6 +97,16 @@ public class ReactorBluePrintItem extends Item implements MenuProvider {
             return InteractionResultHolder.success(heldItem);
         }
         return InteractionResultHolder.pass(heldItem);
+    }
+
+    /**
+     * Whether this blueprint places at least one rod. Closing the blueprint menu always writes the
+     * pattern to the stack, so a tag alone doesn't mean it was configured: only the rod counts can
+     * tell an empty blueprint apart from a configured one.
+     */
+    public static boolean hasRods(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        return tag != null && (tag.getInt("countFuelRod") > 0 || tag.getInt("countCoolerRod") > 0);
     }
 
     public static ItemStackHandler getItemStorage(ItemStack stack) {

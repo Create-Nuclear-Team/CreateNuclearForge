@@ -1,0 +1,70 @@
+# git-cliff config — CurseForge/Modrinth public release-notes skeleton.
+#
+# Produces a DRAFT in the "New version available on CurseForge & Modrinth"
+# style, with clickable commit links and author names. Rewrite the bullets
+# into player-facing prose before publishing — the commit subject is a
+# starting point, not the final copy. Update the "mod loader" / "game
+# version" lines below if either changes (currently NeoForge / 1.21.1, see
+# gradle.properties).
+#
+# Usage (Docker):
+#   docker run --rm -v "$(pwd):/repo" -w /repo orhunp/git-cliff \
+#     -c cliff-release.toml --tag <next-version> -o CHANGELOG_RELEASE.md
+#
+#   # preview without writing a tag yet:
+#   docker run --rm -v "$(pwd):/repo" -w /repo orhunp/git-cliff -c cliff-release.toml --unreleased --tag <next-version>
+
+[changelog]
+header = ""
+body = """
+# New version available on CurseForge & Modrinth:
+- mod version: {{ version }}
+- mod loader: NeoForge
+- game version: 1.21.1
+
+## Notes
+- Version bump: **{{ version }}**{% if previous %} (from {{ previous.version }}){% endif %}
+{% for group, commits in commits | group_by(attribute="group") %}
+## {{ group | striptags | trim }}
+{% for commit in commits %}- [{{ commit.id | truncate(length=8, end="") }}](https://github.com/Create-Nuclear-Team/CreateNuclearNeoForge/commit/{{ commit.id }}) — {{ commit.message | split(pat="\n") | first | trim | upper_first }}{% if commit.author.name %} ({{ commit.author.name }}){% endif %}
+{% endfor %}
+{% endfor %}\
+"""
+footer = """
+
+---
+
+*If you want to help us translate to other languages: https://crowdin.com/project/createnuclear*
+*Some translations were verified/completed using AI, if you find any issues let us know on our Discord!*
+
+# Links:
+### Curseforge:
+https://www.curseforge.com/minecraft/mc-mods/createnuclear
+
+### Modrinth:
+https://modrinth.com/mod/createnuclear
+"""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+filter_commits = false
+tag_pattern = "v?[0-9]*"
+sort_commits = "oldest"
+
+commit_parsers = [
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^Merge", skip = true },
+  { message = "^feat", group = "<!-- 0 -->Additions" },
+  { message = "^fix", group = "<!-- 1 -->Technical / Codebase" },
+  { message = "^refactor", group = "<!-- 1 -->Technical / Codebase" },
+  { message = "^perf", group = "<!-- 1 -->Technical / Codebase" },
+  { message = "^style", group = "<!-- 1 -->Technical / Codebase" },
+  { message = "^build", group = "<!-- 1 -->Technical / Codebase" },
+  { message = "^docs", group = "<!-- 1 -->Technical / Codebase" },
+  { message = "^chore", group = "<!-- 1 -->Technical / Codebase" },
+  { message = "^ci", group = "<!-- 1 -->Technical / Codebase" },
+  { message = "^test", group = "<!-- 1 -->Technical / Codebase" },
+]

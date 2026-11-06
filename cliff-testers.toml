@@ -1,0 +1,56 @@
+# git-cliff config — Discord "@Testers" changelog skeleton.
+#
+# Produces a DRAFT grouped by commit type, matching the section names used in
+# past tester announcements (New Features / Gameplay Changes / Fixes and
+# Internal Cleanup / Misc). Rewrite each bullet into player-facing prose and
+# move any balance/tuning commits into "Gameplay Changes" by hand — that
+# group has no reliable commit-type signal to detect automatically.
+#
+# Usage (Docker):
+#   docker run --rm -v "$(pwd):/repo" -w /repo orhunp/git-cliff \
+#     -c cliff-testers.toml --tag <next-version> -o CHANGELOG_TESTERS.md
+#
+#   # preview without writing a tag yet:
+#   docker run --rm -v "$(pwd):/repo" -w /repo orhunp/git-cliff \
+#     -c cliff-testers.toml --unreleased --tag <next-version>
+
+#  — Author: {{ commit.author.name }}
+
+[changelog]
+header = ""
+body = """
+Hey @Testers, here is a new update!
+
+# Changelog - {{ version }}
+{% for group, commits in commits | group_by(attribute="group") %}
+{{ group | striptags | trim }}
+
+{% for commit in commits %}- {{ commit.message | split(pat="\n") | first | trim | upper_first }}
+{% endfor %}
+{% endfor %}\
+"""
+footer = ""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+split_commits = false
+filter_commits = false
+tag_pattern = "v?[0-9]*"
+sort_commits = "oldest"
+
+commit_parsers = [
+  { message = "^chore\\(release\\)", skip = true },
+  { message = "^Merge", skip = true },
+  { message = "^feat", group = "<!-- 0 -->## New Features" },
+  { message = "^perf", group = "<!-- 1 -->## Gameplay Changes" },
+  { message = "^fix", group = "<!-- 2 -->## Fixes and Internal Cleanup" },
+  { message = "^refactor", group = "<!-- 2 -->## Fixes and Internal Cleanup" },
+  { message = "^style", group = "<!-- 2 -->## Fixes and Internal Cleanup" },
+  { message = "^build", group = "<!-- 2 -->## Fixes and Internal Cleanup" },
+  { message = "^docs", group = "<!-- 3 -->## Misc" },
+  { message = "^chore", group = "<!-- 3 -->## Misc" },
+  { message = "^ci", group = "<!-- 3 -->## Misc" },
+  { message = "^test", group = "<!-- 3 -->## Misc" },
+]
