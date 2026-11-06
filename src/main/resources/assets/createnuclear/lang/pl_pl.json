@@ -366,7 +366,7 @@
   "item.createnuclear.raw_uranium": "Ruda uranu",
   "item.createnuclear.reactor_blueprint.chat_info": "Kliknij link, aby otworzyć dokumentację:",
   "item.createnuclear.reactor_blueprint.tooltip": "Używane do projektowania i wizualizacji układu wnętrza reaktora.",
-  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Naciśnij §eShift + Kliknij prawym przyciskiem myszy §7aby otworzyć link do Wiki.",
+  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Press §e%s + %s §7with the blueprint in hand to get the Wiki link.",
   "item.createnuclear.reactor_blueprint.wiki_link": "[Otwórz oficjalną Wiki]",
   "item.createnuclear.reactor_blueprint_item": "Schemat reaktora",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "Kliknij _prawym_ przyciskiem, by wypełnić.",
