@@ -366,7 +366,7 @@
   "item.createnuclear.raw_uranium": "Необроблений уран",
   "item.createnuclear.reactor_blueprint.chat_info": "Перейдіть за посиланням, щоб відкрити документацію:",
   "item.createnuclear.reactor_blueprint.tooltip": "Використовується для проєктування та візуалізації внутрішньої конфігурації реактора.",
-  "item.createnuclear.reactor_blueprint.tooltip_hint": "§eЗастосуйте крадькома§7, щоби відкрити посилання на вікі.",
+  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Press §e%s + %s §7with the blueprint in hand to get the Wiki link.",
   "item.createnuclear.reactor_blueprint.wiki_link": "[Відкрити офіційну вікі]",
   "item.createnuclear.reactor_blueprint_item": "Креслення реактора",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "_Застосуйте_, щоби визначити шаблон.",
