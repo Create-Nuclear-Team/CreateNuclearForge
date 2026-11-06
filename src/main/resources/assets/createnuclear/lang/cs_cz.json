@@ -366,7 +366,7 @@
   "item.createnuclear.raw_uranium": "Surový uran",
   "item.createnuclear.reactor_blueprint.chat_info": "Následujte odkaz pro otevření dokumentace:",
   "item.createnuclear.reactor_blueprint.tooltip": "Používá se k návrhu a vizualizaci vnitřního uspořádání reaktoru.",
-  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Zmáčni §eShift + Pravé Tlačítko §7s plánem v ruce pro získáni Wiki odkazu.",
+  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Press §e%s + %s §7with the blueprint in hand to get the Wiki link.",
   "item.createnuclear.reactor_blueprint.wiki_link": "[Otevřít Oficiální Wiki]",
   "item.createnuclear.reactor_blueprint_item": "Plánek reaktoru",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "_Pravé_ kliknutí k naplnění.",
