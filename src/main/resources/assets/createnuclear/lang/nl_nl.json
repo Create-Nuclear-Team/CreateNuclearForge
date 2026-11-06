@@ -366,7 +366,7 @@
   "item.createnuclear.raw_uranium": "Rauw Uranium",
   "item.createnuclear.reactor_blueprint.chat_info": "Volg de link om de documentatie te openen:",
   "item.createnuclear.reactor_blueprint.tooltip": "Wordt gebruikt om de interne indeling van de reactor te ontwerpen en te visualiseren.",
-  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Druk op §eShift + Rechtermuisknop §7met de blauwdruk in je hand om de Wiki-link te krijgen.",
+  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Press §e%s + %s §7with the blueprint in hand to get the Wiki link.",
   "item.createnuclear.reactor_blueprint.wiki_link": "[Open Officiële Wiki]",
   "item.createnuclear.reactor_blueprint_item": "Reactor Blauwdruk",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "_Rechts_ klik om het te vullen.",
