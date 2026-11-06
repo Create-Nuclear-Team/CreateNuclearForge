@@ -366,7 +366,7 @@
   "item.createnuclear.raw_uranium": "Rohes Uran",
   "item.createnuclear.reactor_blueprint.chat_info": "Folgen Sie dem Link, um die Dokumentation zu öffnen:",
   "item.createnuclear.reactor_blueprint.tooltip": "Verwendet, um die Innenausstattung des Reaktors zu entwerfen und zu visualisieren.",
-  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Drücke §eShift + Rechtsklick auf §7für mit der Blaupause in der Hand, um den Wiki-Link zu erhalten.",
+  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Press §e%s + %s §7with the blueprint in hand to get the Wiki link.",
   "item.createnuclear.reactor_blueprint.wiki_link": "[Offizielles Wiki öffnen]",
   "item.createnuclear.reactor_blueprint_item": "Reaktor Blaupause",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "Rechtsklick, um es zu füllen.",
