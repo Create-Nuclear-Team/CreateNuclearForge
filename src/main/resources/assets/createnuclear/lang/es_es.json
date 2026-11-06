@@ -366,7 +366,7 @@
   "item.createnuclear.raw_uranium": "Uranio en Bruto",
   "item.createnuclear.reactor_blueprint.chat_info": "Siga el enlace para abrir la documentación:",
   "item.createnuclear.reactor_blueprint.tooltip": "Utilizado para diseñar y visualizar el diseño interior del reactor.",
-  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Pulsa §eMayús + clic derecho §7sobre el plano para obtener el enlace a la wiki.",
+  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Press §e%s + %s §7with the blueprint in hand to get the Wiki link.",
   "item.createnuclear.reactor_blueprint.wiki_link": "[Abrir Wiki Oficial]",
   "item.createnuclear.reactor_blueprint_item": "Plano del Reactor",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "Clic _Derecho_ para llenarlo.",
