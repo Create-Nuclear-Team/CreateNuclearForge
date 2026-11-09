@@ -366,7 +366,7 @@
   "item.createnuclear.raw_uranium": "粗铀",
   "item.createnuclear.reactor_blueprint.chat_info": "点击链接打开文档：",
   "item.createnuclear.reactor_blueprint.tooltip": "用于设计和可视化反应堆的内部布局。",
-  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7Press §e%s + %s §7with the blueprint in hand to get the Wiki link.",
+  "item.createnuclear.reactor_blueprint.tooltip_hint": "§7手持反应堆按下 §e%s + %s §7以获取维基链接。",
   "item.createnuclear.reactor_blueprint.wiki_link": "[打开官方Wiki]",
   "item.createnuclear.reactor_blueprint_item": "反应堆控制蓝图",
   "item.createnuclear.reactor_blueprint_item.tooltip.behaviour1": "点击_右键_打开填写配置。",
